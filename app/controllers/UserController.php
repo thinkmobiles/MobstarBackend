@@ -1,0 +1,820 @@
+<?php
+
+use Swagger\Annotations as SWG;
+
+/**
+ * @package
+ * @category
+ * @subpackage
+ *
+ * @SWG\Resource(
+ *  apiVersion=0.2,
+ *  swaggerVersion=1.2,
+ *  resourcePath="/user",
+ *  basePath="http://api.mobstar.com"
+ * )
+ */
+class UserController extends BaseController
+{
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/user",
+	 *   description="Operations about users",
+	 *   produces="['application/json']",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="GET",
+	 *       summary="Get all users",
+	 *       notes="Returns a all users. API-Token is required for this method.",
+	 *       nickname="getAllUsers",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="fields",
+	 *           description="Accepted values for the fields parameter are: id, userName, groupName, displayName, fullName, email.",
+	 *           paramType="query",
+	 *           required=false,
+	 *           type="comma seperated list"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="page",
+	 *           description="Page of results you want to view",
+	 *           paramType="query",
+	 *           required=false,
+	 *           type="integer"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="limit",
+	 *           description="Maximum number of representations in response.",
+	 *           paramType="query",
+	 *           required=false,
+	 *           type="integer"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=404,
+	 *            message="No users found"
+	 *          )
+	 *        )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+
+	public $valid_fields = [ "id", "userName", "groupName", "displayName", "fullName", "email" ];
+
+	/**
+	 * Display a listing of the resource.
+	 *
+	 * @return Response
+	 */
+	public function index()
+	{
+		$fields = array_values( explode( ',', Input::get( "fields" ) ) );
+
+		if( $fields[ 0 ] == "" )
+		{
+			unset( $fields );
+		}
+
+		$return = [ ];
+		$valid = false;
+
+		if( !empty( $fields ) )
+		{
+			//Check if fields are valid
+			foreach( $fields as $field )
+			{
+				if( !in_array( $field, $this->valid_fields ) )
+				{
+					$return[ 'errors' ][ ] = [ $field . " is not a valid field." ];
+				}
+				else
+				{
+					$valid = true;
+				}
+			}
+		}
+
+		//Get limit to calculate pagination
+		$limit = ( Input::get( 'limit', '50' ) );
+
+		//If not numeric set it to the default limit
+		$limit = ( !is_numeric( $limit ) ) ? 50 : $limit;
+
+		//Get page
+		$page = ( Input::get( 'page', '1' ) );
+		$page = ( !is_numeric( $page ) ) ? 1 : $page;
+
+		//Calculate offset
+		$offset = ( $page * $limit ) - $limit;
+
+		//If page is greter than one show a previous link
+		if( $page > 1 )
+		{
+			$previous = true;
+		}
+		else
+		{
+			$previous = false;
+		}
+
+		//Find total number to put in header
+		$count = User::count();
+
+		if( $count == 0 )
+		{
+			$return = [ 'error' => 'No Users Found' ];
+			$status_code = 404;
+
+			return Response::make( $return, $status_code );
+		}
+
+		//If the count is greater than the highest number of items displayed show a next link
+		elseif( $count > ( $limit * $page ) )
+		{
+			$next = true;
+		}
+		else
+		{
+			$next = false;
+		}
+
+		$users = User::take( $limit )->skip( $offset )->get();
+		foreach( $users as $user )
+		{
+
+			//check to see if fields were specified
+			if( ( !empty( $fields ) ) && $valid )
+			{
+				$current = array();
+
+				if( in_array( "id", $fields ) )
+				{
+					$current[ 'id' ] = $user->user_id;
+				}
+
+				if( in_array( 'userName', $fields ) )
+				{
+					$current[ 'userName' ] = $user->user_name;
+				}
+
+				if( in_array( 'groupName', $fields ) )
+				{
+					$current[ 'groupName' ] = $user->user_group_name;
+				}
+
+				if( in_array( 'displayName', $fields ) )
+				{
+					$current[ 'displayName' ] = $user->user_display_name;
+				}
+
+				if( in_array( 'fullName', $fields ) )
+				{
+					$current[ 'fullName' ] = $user->user_full_name;
+				}
+
+				if( in_array( 'email', $fields ) )
+				{
+					$current[ 'email' ] = $user->user_email;
+				}
+
+				$return[ 'users' ][ ][ 'user' ] = $current;
+			}
+
+			//if not just return all info
+			else
+			{
+				$return[ 'users' ][ ][ 'user' ] = [ 'id'          => $user->user_id,
+													'userName'    => $user->user_name,
+													'groupName'   => $user->group->user_group_name,
+													'displayName' => $user->user_display_name,
+													'fullName'    => $user->user_full_name,
+													'email'       => $user->user_email,
+
+				];
+			}
+		}
+
+		$status_code = 200;
+
+		//If next is true create next page link
+		if( $next )
+		{
+			$return[ 'next' ] = "http://api.mobstar.com/user/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
+		}
+
+		if( $previous )
+		{
+			$return[ 'previous' ] = "http://api.mobstar.com/user/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
+		}
+
+		$response = Response::make( $return, $status_code );
+
+		$response->header( 'X-Total-Count', $count );
+
+		return $response;
+	}
+
+	/**
+	 * Display the specified resource.
+	 *
+	 * @param  int $user
+	 *
+	 * @return Response
+	 */
+
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/user/{userIds}",
+	 *   description="Operations about users",
+	 *   produces="['application/json']",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="GET",
+	 *       summary="Get specific user/users",
+	 *       notes="Returns users requested. API-Token is required for this method.",
+	 *       nickname="getSpecificUsers",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="userIds",
+	 *           description="ID or IDs of required users.",
+	 *           paramType="path",
+	 *           required=true,
+	 *           type="comma seperated list"
+	 *         ),
+	 *		   @SWG\Parameter(
+	 *           name="fields",
+	 *           description="Accepted values for the fields parameter are: id, userName, groupName, displayName, fullName, email.",
+	 *           paramType="query",
+	 *           required=false,
+	 *           type="comma seperated list"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="page",
+	 *           description="Page of results you want to view",
+	 *           paramType="query",
+	 *           required=false,
+	 *           type="integer"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="limit",
+	 *           description="Maximum number of representations in response.",
+	 *           paramType="query",
+	 *           required=false,
+	 *           type="integer"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=404,
+	 *            message="No users found"
+	 *          )
+	 *        )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+	public function show( $id_commas )
+	{
+
+		$status_code = 200;
+
+		// get ids
+		$id = array_values( explode( ',', $id_commas ) );
+
+		//Get fields
+		$fields = array_values( explode( ',', Input::get( "fields" ) ) );
+
+		//If no fields remove fields variable
+		if( $fields[ 0 ] == "" )
+		{
+			unset( $fields );
+		}
+
+		$return = [ ];
+
+		$valid = false;
+
+		if( !empty( $fields ) )
+		{
+			//Check if fields are valid
+			foreach( $fields as $field )
+			{
+				if( !in_array( $field, $this->valid_fields ) )
+				{
+					$return[ 'errors' ][ ] = [ $field . " is not a valid field." ];
+				}
+				else
+				{
+					$valid = true;
+				}
+			}
+		}
+
+		//Get limit and cursor and calculate pagination 
+		$limit = ( Input::get( 'limit', '50' ) );
+
+		//If not numeric set it to the default limit
+		$limit = ( !is_numeric( $limit ) ) ? 50 : $limit;
+
+		//Get page
+		$page = ( Input::get( 'page', '1' ) );
+		$page = ( !is_numeric( $page ) ) ? 1 : $page;
+
+		//Calculate offset
+		$offset = ( $page * $limit ) - $limit;
+
+		//If page is greter than one show a previous link
+		if( $page > 1 )
+		{
+			$previous = true;
+		}
+		else
+		{
+			$previous = false;
+		}
+
+		//Get users greater than the cursor from
+		$users = User::whereIn( 'user_id', $id )->take( $limit )->skip( $offset )->get();
+
+		//Find total number to put in header
+		$count = User::whereIn( 'user_id', $id )->count();
+
+		if( $count == 0 )
+		{
+			$return = [ 'error' => 'No Users Found' ];
+			$status_code = 404;
+
+			return Response::make( $return, $status_code );
+		}
+
+		//If the count is greater than the highest number of items displayed show a next link
+		elseif( $count > ( $limit * $page ) )
+		{
+			$next = true;
+		}
+		else
+		{
+			$next = false;
+		}
+
+		foreach( $users as $user )
+		{
+
+			//check to see if fields were specified and at least one is valid
+			if( ( !empty( $fields ) ) && $valid )
+			{
+				$current = array();
+
+				if( in_array( "id", $fields ) )
+				{
+					$current[ 'id' ] = $user->user_id;
+				}
+
+				if( in_array( 'userName', $fields ) )
+				{
+					$current[ 'userName' ] = $user->user_name;
+				}
+
+				if( in_array( 'groupName', $fields ) )
+				{
+					$current[ 'groupName' ] = $user->user_group_name;
+				}
+
+				if( in_array( 'displayName', $fields ) )
+				{
+					$current[ 'displayName' ] = $user->user_display_name;
+				}
+
+				if( in_array( 'fullName', $fields ) )
+				{
+					$current[ 'fullName' ] = $user->user_full_name;
+				}
+
+				if( in_array( 'email', $fields ) )
+				{
+					$current[ 'email' ] = $user->user_email;
+				}
+
+				if( count( $users ) > 1 )
+				{
+					$return[ 'users' ][ ][ 'user' ] = $current;
+				}
+				elseif( count( $users ) == 1 )
+				{
+					$return[ 'users' ][ ][ 'user' ] = $current;
+				}
+
+			}
+
+			//if not just return all info
+			else
+			{
+				$all_fields = [ 'id'          => $user->user_id,
+								'userName'    => $user->user_name,
+								'groupName'   => $user->group->user_group_name,
+								'displayName' => $user->user_display_name,
+								'fullName'    => $user->user_full_name,
+								'email'       => $user->user_email,
+
+				];
+				$return[ 'users' ][ ][ 'user' ] = $all_fields;
+
+			}
+		}
+
+		//If next is true create next page link
+		if( $next )
+		{
+			$return[ 'next' ] = "http://api.mobstar.com/user/" . $id_commas . "?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
+		}
+
+		if( $previous )
+		{
+			$return[ 'previous' ] = "http://api.mobstar.com/user/" . $id_commas . "?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
+		}
+
+		//echo $id_commas; 
+		$response = Response::make( $return, $status_code );
+
+		$response->header( 'X-Total-Count', $count );
+
+		//$response->header('LINK', "http://api.mobstar.com/user/" . $id_commas . "?limit=50&page=2; rel='next'");
+
+		return $response;
+		//return $user;
+	}
+
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/user/search",
+	 *   description="Operations about users",
+	 *   produces="['application/json']",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="GET",
+	 *       summary="Serch for a user",
+	 *       notes="Use the term parameter for your search term, if an email address is submitted the API will search for any users with this email address, anything other than an email address will result in a search of user names and display names. <br>API-Token is required for this method.",
+	 *       nickname="getAllUsers",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="term",
+	 *           description="Search term",
+	 *           paramType="query",
+	 *           required=false,
+	 *           type="comma seperated list"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="page",
+	 *           description="Page of results you want to view",
+	 *           paramType="query",
+	 *           required=false,
+	 *           type="integer"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="limit",
+	 *           description="Maximum number of representations in response.",
+	 *           paramType="query",
+	 *           required=false,
+	 *           type="integer"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=404,
+	 *            message="No users found"
+	 *          )
+	 *        )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+
+	public function search()
+	{
+		$term = Input::get( "term" );
+		//check to see if an email was entered
+		$validator = Validator::make(
+							  [ 'term' => $term ],
+							  [ 'term' => [ 'email' ] ]
+		);
+
+		//if not search by users name
+		if( $validator->fails() )
+		{
+			$results = User::where( 'user_name', 'like', '%' . $term . '%' )->orWhere( 'user_display_name', 'like', '%' . $term . '%' )->get();
+		}
+		else
+		{
+			$results = User::where( 'user_email', '=', $term )->get();
+		}
+
+		$status_code = 200;
+
+		if( count( $results ) == 0 )
+		{
+			$results = json_encode( [ 'error' => 'No Users Found' ] );
+			$status_code = 404;
+		}
+
+		return Response::make( $results, $status_code );
+	}
+
+	/**
+	 * Store a newly created resource in storage.
+	 *
+	 * @return Response
+	 *
+	 * @SWG\Api(
+	 *   path="/user",
+	 *   description="Operations about users",
+	 *   produces="['application/json']",
+	 *   @SWG\Operations(
+	 *	   @SWG\Operation(
+	 *       method="POST",
+	 *       summary="Add new user",
+	 *       notes="Adds a new user to MobStar.",
+	 *       nickname="addUsers",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="userName",
+	 *           description="The registering users desired username.",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="email",
+	 *           description="The registering users email addressed to be used to login.",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="fullName",
+	 *           description="The full name of the registering user.",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="displayName",
+	 *           description="The display name for the regisering user",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="password",
+	 *           description="Password for the regisering user",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="dob",
+	 *           description="The regisering user's date of birth, should be greater than 13 years from now.",
+	 *           paramType="form",
+	 *           required=false,
+	 *           type="string"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=400,
+	 *            message="Input validation failed"
+	 *          )
+	 *        )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+	public function store()
+	{
+		$rules = array(
+			'userName'    => 'required|unique:users,user_name',
+			'email'       => 'required|email|unique:users,user_email',
+			'fullName'    => 'required',
+			//'surname' 	=> 'required',
+			'displayName' => 'required',
+			'password'    => 'required',
+			//'dob' 		=> 'required|date|before:' . date('Y-m-d', strtotime("now - 13 years")),
+		);
+
+		$messages = array(
+			'userName.unique' => 'This user name is already taken.',
+			'email.unique'    => 'This email address is already registered',
+		);
+
+		$validator = Validator::make( Input::all(), $rules, $messages );
+
+		// process the login
+		if( $validator->fails() )
+		{
+
+			$return = $validator->messages();
+
+			$response = Response::make( $return, 400 );
+
+			return $response;
+		}
+		else
+		{
+
+			$input = [
+				'user_name'         => input::get( 'userName' ),
+				'user_email'        => input::get( 'email' ),
+				'user_full_name'    => input::get( 'fullName' ),
+				//'user_surname' => input::get('surname'),
+				'user_display_name' => input::get( 'displayName' ),
+				'user_password'     => Hash::make( input::get( 'password' ) ),
+				'user_dob'          => date( 'Y-m-d', strtotime( input::get( 'dob' ) ) ),
+			];
+			//Create the new user
+			User::create( $input );
+
+			//Log user in
+
+			// create our user data for the authentication
+			$userdata = array(
+				'user_email' => Input::get( 'email' ),
+				'password'   => Input::get( 'password' )
+			);
+
+			// attempt to do the login
+			if( Auth::attempt( $userdata ) )
+			{
+
+				//Create Session
+				$session_key = str_random( 40 );
+				$token = array(
+					'token_value'        => $session_key,
+					'token_created_date' => date( "Y-m-d H:i:s" ),
+					'token_valid_until'  => date( "Y-m-d H:i:s", strtotime( "now + 1 hour" ) ),
+					'token_user_id'      => Auth::user()->user_id
+				);
+
+				Token::create( $token );
+
+				//Return user id and token details:
+				$return = array(
+					'token'           => $session_key,
+					'userId'          => Auth::user()->user_id,
+					'userName'        => Auth::user()->user_name,
+					'userFullName'    => Auth::user()->user_full_name,
+					'userDisplayName' => Auth::user()->user_display_name,
+					'userGroup'       => Auth::user()->group->user_group_name,
+				);
+
+				return $return;
+
+			}
+			else
+			{
+
+				// validation not successful, send back to form	
+				return json_encode( array( "error" => "login unsucessful" ) );
+
+			}
+		}
+
+	}
+
+	/**
+	 * Update the specified resource in storage.
+	 *
+	 * @param  int $user
+	 *
+	 * @return Response
+	 * @SWG\Api(
+	 *   path="/user/{userId}",
+	 *   description="Operations about users",
+	 *   produces="['application/json']",
+	 *   @SWG\Operations(
+	 *	   @SWG\Operation(
+	 *       method="PUT",
+	 *       summary="Update a user",
+	 *       notes="Update a current MobStar user.",
+	 *       nickname="addUsers",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="userId",
+	 *           description="User's ID.",
+	 *           paramType="path",
+	 *           required=true,
+	 *           type="comma seperated list"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="fullName",
+	 *           description="The full name of the registering user.",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="displayName",
+	 *           description="The display name for the regisering user",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="password",
+	 *           description="Password for the regisering user",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=400,
+	 *            message="Input validation failed"
+	 *          )
+	 *        )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+
+	public function update( $id )
+	{
+		$user = User::find( $id );
+
+		$rules = array(
+			//'email'		=> 'required|email|unique:users,user_email',
+			'fullName'    => 'required',
+			'displayName' => 'required',
+			'password'    => 'required',
+			//'dob' 		=> 'required|date|before:' . date('Y-m-d', strtotime("now - 13 years")),
+		);
+
+		$messages = array(
+			'userName.unique' => 'This user name is already taken.',
+			'email.unique'    => 'This email address is already registered',
+		);
+
+		$validator = Validator::make( Input::all(), $rules, $messages );
+
+		if( $validator->fails() )
+		{
+			return $validator->messages();
+		}
+		else
+		{
+			$user->user_password = Hash::make( Input::get( "password" ) );
+			$user->user_full_name = Input::get( "fullName" );
+			$user->user_name = Input::get( "userName" );
+			$user->user_display_name = Input::get( "displayName" );
+			$user->user_dob = date( 'Y-m-d', strtotime( input::get( 'dob' ) ) );
+			$user->user_email = input::get( 'email' );
+			$user->save();
+
+			return $user;
+		}
+	}
+
+	/**
+	 * Remove the specified resource from storage.
+	 *
+	 * @param  int $id
+	 *
+	 * @return Response
+	 */
+	public function destroy( $user )
+	{
+		$user->delete();
+
+		return Response::json( true );
+	}
+
+}

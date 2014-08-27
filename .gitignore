@@ -1,0 +1,9 @@
+composer.lock
+*.DS_Store
+public/uploads
+.env.local.php
+public/docs/
+.env.php
+.elasticbeanstalk/
+_ide_helper.php
+.idea

@@ -1,0 +1,1067 @@
+<?php
+
+use MobStar\Storage\Entry\EntryRepository as Entry;
+use MobStar\Storage\Token\TokenRepository as Token;
+use Swagger\Annotations as SWG;
+
+/**
+ * @package
+ * @category
+ * @subpackage
+ *
+ * @SWG\Resource(
+ *  apiVersion=0.2,
+ *  swaggerVersion=1.2,
+ *  resourcePath="/entry",
+ *  basePath="http://api.mobstar.com"
+ * )
+ */
+
+class EntryController extends BaseController {
+
+	public $valid_fields = ["id", "userId", "category", "subCategory", "type", "name", "description", "created", "modified", "tags", "entryFiles", "upVotes", "downVotes", "rank", "language"];
+
+	
+
+	public function __construct(Entry $entry, Token $token)
+	{
+	  $this->entry = $entry;
+	  $this->token = $token;
+	}
+	/**
+	 * Display a listing of the resource.
+	 *
+	 * @return Response
+	 */
+	
+	/**
+     *
+     * @SWG\Api(
+     *   path="/entry",
+     *   description="Operations about Entries",
+     *   produces="['application/json']",
+     *   @SWG\Operations(
+     *     @SWG\Operation(
+     *       method="GET",
+     *       summary="Get all entries",
+     *       notes="Returns all available entries",
+     *       nickname="getAllEntries",
+     *       @SWG\Parameters(
+     *         @SWG\Parameter(
+     *           name="fields",
+     *           description="Accepted values for the fields parameter are: id, userId, groupName, category, subCategory, type, name, description, created, modified, tags, entryFiles, upVotes, downVotes, rank, language.",
+     *           paramType="query",
+     *           required=false,
+     *           type="comma seperated list"
+     *         ),     
+     *         @SWG\Parameter(
+     *           name="user",
+     *           description="User ID whose entries you want to view.",
+     *           paramType="query",
+     *           required=false,
+     *           type="integer"
+     *         ),
+     *         @SWG\Parameter(
+     *           name="category",
+     *           description="Category ID of entries you want to view.",
+     *           paramType="query",
+     *           required=false,
+     *           type="integer"
+     *         ),
+     *         @SWG\Parameter(
+     *           name="tagId",
+     *           description="Tag ID of entries you want to view.",
+     *           paramType="query",
+     *           required=false,
+     *           type="integer"
+     *         ),
+     *         @SWG\Parameter(
+     *           name="language",
+     *           description="Filter categories by language.",
+     *           paramType="query",
+     *           required=false,
+     *           type="string"
+     *         ),
+     *         @SWG\Parameter(
+     *           name="page",
+     *           description="Page of results you want to view.",
+     *           paramType="query",
+     *           required=false,
+     *           type="integer"
+     *         ),
+     *         @SWG\Parameter(
+     *           name="limit",
+     *           description="Maximum number of representations in response.",
+     *           paramType="query",
+     *           required=false,
+     *           type="integer"
+     *         )
+     *       ),
+     *       @SWG\ResponseMessages(
+     *          @SWG\ResponseMessage(
+     *            code=401,
+     *            message="Authorization failed"
+     *          ),
+     *          @SWG\ResponseMessage(
+     *            code=404,
+     *            message="Entry not found"
+     *          )
+     *       )
+     *     )
+     *   )
+     * )
+     */
+	public function index()
+	{
+
+		$fields = array_values(explode(',',Input::get("fields")));
+		
+		if ($fields[0] == "")
+			unset($fields);
+		
+		$return = [];
+		$valid = false;
+
+		if(!empty($fields))
+		{	
+			//Check if fields are valid
+			foreach($fields as $field)
+			{
+				if(!in_array($field, $this->valid_fields))
+					$return['errors'][] = [$field . " is not a valid field."];
+				else
+					$valid = true;
+			}
+
+		}
+
+		//Get limit to calculate pagination 
+		$limit = (Input::get('limit', '50'));
+
+		//If not numeric set it to the default limit
+		$limit = (!is_numeric($limit) || $limit < 1) ? 50 : $limit;
+
+		//Get page
+		$page = (Input::get('page', '1'));
+		$page = (!is_numeric($page)) ? 1 : $page;
+
+		//Calculate offset
+		$offset = ($page * $limit) - $limit;
+
+		//If page is greter than one show a previous link
+		if($page > 1)
+			$previous = true;
+		else 
+			$previous = false;
+		
+		//Get user
+		$user = (Input::get('user', '0'));
+		$user = (!is_numeric($user)) ? 0 : $user;
+		
+		//Get Category
+		$category = (Input::get('category', '0'));
+		$category = (!is_numeric($category)) ? 0 : $category;
+		
+		//Get subCategory
+		$subcategory = (Input::get('subCategory', '0'));
+		$subcategory = (!is_numeric($subcategory)) ? 0 : $subcategory;
+		
+		//Get subCategory
+		$tag = (Input::get('tagId', '0'));
+		$tag = (!is_numeric($tag)) ? 0 : $tag;
+		
+		$entries = $this->entry->all($user, $category, $subcategory, $tag, $limit, $offset, false);
+		$count = $this->entry->all($user, $category, $subcategory, $tag, $limit, $offset, true);
+
+		if($count == 0){
+			$return = ['error' => 'No Entries Found'];
+			$status_code = 404;
+			return Response::make($return, $status_code);
+		}
+
+		//If the count is greater than the highest number of items displayed show a next link
+		elseif($count > ($limit * $page))
+			$next = true;
+		else
+			$next = false;
+
+
+		foreach ($entries as $entry){
+
+			$up_votes = 0;
+			$down_votes = 0;
+			foreach($entry->vote as $vote){
+				if($vote->vote_up == 1 && $vote->vote_deleted == 0){
+					$up_votes++;
+				}
+				elseif($vote->vote_down == 1 && $vote->vote_deleted == 0){
+					$down_votes++;
+				}
+
+			}
+
+			$current = array();
+			//check to see if fields were specified and at least one is valid
+			if((!empty($fields)) && $valid)
+			{	
+
+				if(in_array("id",$fields))
+					$current['id'] = $entry->entry_id;
+
+				if(in_array("userId",$fields))
+					$current['userId'] = $entry->entry_user_id;
+
+				if(in_array("category",$fields))
+					$current['category'] = $entry->category->category_name;
+
+				//if(in_array("subCategory",$fields))
+					//$current['subCategory'] = $entry->sub_category->sub_category_name;
+
+				if(in_array("type",$fields))
+					$current['type'] = $entry->entry_type;
+					
+				if(in_array("name",$fields))
+					$current['name'] = $entry->entry_name;
+
+				if(in_array("description",$fields))
+					$current['description'] = $entry->entry_description;
+
+				if(in_array("created",$fields))
+					$current['created'] = $entry->entry_created_date;
+
+				if(in_array("modified",$fields))
+					$current['modified'] = $entry->entry_modified_date;
+
+				if(in_array("tags", $fields))
+				{					
+					$current['tags'] = array();
+					foreach($entry->entryTag as $tag)
+					{
+					}
+				}
+
+				if(in_array("entryFiles",$fields))
+				{
+					$current['entryFiles'] = array();
+					foreach ($entry->file as $file){
+						$url = "http://54.77.5.124/" . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+						$current['entryFiles'][] = [
+						'fileType' => $file->entry_file_type,
+						'filePath' => $url];
+					}
+				}
+
+				if(in_array("upVotes",$fields))
+					$current['upVotes'] = $up_votes;
+
+				if(in_array("upVotes",$fields))
+					$current['downVotes'] = $down_votes;
+					
+				if(in_array("rank",$fields))
+					$current['rank'] = $entry->entry_rank;
+
+				if(in_array("language",$fields))
+					$current['language'] = $entry->entry_language;
+
+
+				if($entry->entry_deleted)
+					$current['deleted'] = true;
+				else
+					$current['deleted'] = false;
+				
+				$return['entries'][]['entry'] = $current; 
+
+			}
+
+			else 
+			{
+				
+				$current['id'] = $entry->entry_id;
+				$current['userId'] = $entry->entry_user_id;
+				$current['category'] = $entry->category->category_name;
+				//$current['subCategory'] = $entry->subcategory->sub_category_name;
+				$current['type'] = $entry->entry_type;
+				$current['name'] = $entry->entry_name;
+				$current['description'] = $entry->entry_description;
+				$current['created'] = $entry->entry_created_date;
+				$current['modified'] = $entry->entry_modified_date;
+				
+				$current['tags'] = array();
+				foreach($entry->entryTag as $tag)
+				{
+<<<<<<< HEAD
+=======
+					$current['tags'][] = $tag->tag->tag_name;
+>>>>>>> 33344abb4f39a214ae0e1444ec018ebfc2625b98
+				}
+
+				foreach ($entry->file as $file){
+					$url = "http://54.77.5.124/" . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+					$current['entryFiles'][] = [
+					'fileType' => $file->entry_file_type,
+					'filePath' => $url];
+				}
+
+				$current['upVotes'] = $up_votes;
+				$current['downVotes'] = $down_votes;
+				$current['rank'] = $entry->entry_rank;
+				$current['language'] = $entry->entry_language;
+
+				if($entry->entry_deleted)
+					$current['deleted'] = true;
+				else
+					$current['deleted'] = false;
+
+				$return['entries'][]['entry'] = $current; 
+			}
+		}
+		
+		$status_code = 200;
+
+		//If next is true create next page link
+		if($next)
+			$return['next'] = url("index.php/entry/?" . http_build_query(["limit" => $limit, "page" => $page+1]));
+
+		if($previous)
+			$return['previous'] = url("index.php/entry/?" . http_build_query(["limit" => $limit, "page" => $page-1]));
+
+		$response = Response::make($return, $status_code);
+
+		$response->header('X-Total-Count', $count);
+
+		return $response;
+	}
+	
+
+
+	/**
+     *
+     * @SWG\Api(
+     *   path="/entry/{entryIds}",
+     *   description="Operation about Entries",
+     *   produces="['application/json']",
+     *   @SWG\Operations(
+     *     @SWG\Operation(
+     *       method="GET",
+     *       summary="Return specified entries",
+     *       notes="Returns entries requested. API-Token is required for this method.",
+     *       nickname="getEntryById",
+     *       @SWG\Parameters(
+     *         @SWG\Parameter(
+     *           name="entryIds",
+     *           description="Entry ID/IDs you want returned.",
+     *           paramType="path",
+     *           required=true,
+     *           type="comma seperated list"
+     *         ),  
+     *         @SWG\Parameter(
+     *           name="fields",
+     *           description="Accepted values for the fields parameter are: id, userId, groupName, category, subCategory, type, name, description, created, modified, tags, entryFiles, upVotes, downVotes, rank, language.",
+     *           paramType="query",
+     *           required=false,
+     *           type="comma seperated list"
+     *         ),     
+     *         @SWG\Parameter(
+     *           name="page",
+     *           description="Page of results you want to view",
+     *           paramType="query",
+     *           required=false,
+     *           type="integer"
+     *         ),
+     *         @SWG\Parameter(
+     *           name="limit",
+     *           description="Maximum number of representations in response.",
+     *           paramType="query",
+     *           required=false,
+     *           type="integer"
+     *         )
+     *       ),
+     *       @SWG\ResponseMessages(
+     *          @SWG\ResponseMessage(
+     *            code=401,
+     *            message="Authorization failed"
+     *          ),
+     *          @SWG\ResponseMessage(
+     *            code=404,
+     *            message="Entry not found"
+     *          )
+     *       )
+     *     )
+     *   )
+     * )
+     */
+
+	public function show($id_commas)
+	{
+		$id = array_values(explode(',',$id_commas));
+
+		$fields = array_values(explode(',',Input::get("fields")));
+		
+		if ($fields[0] == "")
+			unset($fields);
+		
+		$return = [];
+		$valid = false;
+
+		if(!empty($fields))
+		{	
+			//Check if fields are valid
+			foreach($fields as $field)
+			{
+				if(!in_array($field, $this->valid_fields))
+					$return['errors'][] = [$field . " is not a valid field."];
+				else
+					$valid = true;
+			}
+
+		}
+
+		//Get limit to calculate pagination 
+		$limit = (Input::get('limit', '50'));
+
+		//If not numeric set it to the default limit
+		$limit = (!is_numeric($limit) || $limit < 1) ? 50 : $limit;
+
+		//Get page
+		$page = (Input::get('page', '1'));
+		$page = (!is_numeric($page)) ? 1 : $page;
+
+		//Calculate offset
+		$offset = ($page * $limit) - $limit;
+
+		//If page is greter than one show a previous link
+		if($page > 1)
+			$previous = true;
+		else 
+			$previous = false;
+		
+		//Get user
+		$user = (Input::get('user', '0'));
+		$user = (!is_numeric($user)) ? 0 : $user;
+		
+		//Get Category
+		$category = (Input::get('category', '0'));
+		$category = (!is_numeric($category)) ? 0 : $category;
+		
+		//Get subCategory
+		$subcategory = (Input::get('subCategory', '0'));
+		$subcategory = (!is_numeric($subcategory)) ? 0 : $subcategory;
+
+		$entries = $this->entry->whereIn($id, $user, $category, $subcategory, $limit, $offset, false);
+
+		$count = $this->entry->whereIn($id, $user, $category, $subcategory, $limit, $offset, true);
+
+		//var_dump($entries); 
+		if($count == 0){
+			$return = ['error' => 'No Entries Found'];
+			$status_code = 404;
+			return Response::make($return, $status_code);
+		}
+
+		//If the count is greater than the highest number of items displayed show a next link
+		elseif($count > ($limit * $page))
+			$next = true;
+		else
+			$next = false;
+
+		foreach ($entries as $entry){
+			
+			$current = array();
+
+
+			$up_votes = 0;
+			$down_votes = 0;
+			foreach($entry->vote as $vote){
+				if($vote->vote_up == 1 && $vote->vote_deleted == 0){
+					$up_votes++;
+				}
+				elseif($vote->vote_down == 1 && $vote->vote_deleted == 0){
+					$down_votes++;
+				}
+
+			}
+
+			//check to see if fields were specified and at least one is valid
+			if((!empty($fields)) && $valid)
+			{	
+
+				if(in_array("id",$fields))
+					$current['id'] = $entry->entry_id;
+
+				if(in_array("userId",$fields))
+					$current['userId'] = $entry->entry_user_id;
+
+				if(in_array("category",$fields))
+					$current['category'] = $entry->category->category_name;
+
+				//if(in_array("subCategory",$fields))
+					//$current['subCategory'] = $entry->sub_category->sub_category_name;
+
+				if(in_array("type",$fields))
+					$current['type'] = $entry->entry_type;
+
+				if(in_array("name",$fields))
+					$current['name'] = $entry->entry_name;
+
+				if(in_array("description",$fields))
+					$current['description'] = $entry->entry_description;
+
+				if(in_array("created",$fields))
+					$current['created'] = $entry->entry_created_date;
+
+				if(in_array("modified",$fields))
+					$current['modified'] = $entry->entry_modified_date;
+
+				if(in_array("tags", $fields))
+				{					
+					$current['tags'] = array();
+					foreach($entry->entryTag as $tag)
+					{
+<<<<<<< HEAD
+=======
+						// if(!is_null($tag->tag))
+						$current['tags'][] = $tag->tag->tag_name;
+>>>>>>> 33344abb4f39a214ae0e1444ec018ebfc2625b98
+					}
+				}
+
+				if(in_array("entryFiles",$fields))
+				{
+					$current['entryFiles'] = array();
+					foreach ($entry->file as $file){
+						$url = "http://54.77.5.124/" . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+						$current['entryFiles'][] = [
+						'fileType' => $file->entry_file_type,
+						'filePath' => $url];
+					}
+				}
+
+				if(in_array("upVotes",$fields))
+					$current['upVotes'] = $up_votes;
+
+				if(in_array("upVotes",$fields))
+					$current['downVotes'] = $down_votes;
+					
+				if(in_array("rank",$fields))
+					$current['rank'] = $entry->entry_rank;
+
+				if(in_array("language",$fields))
+					$current['language'] = $entry->entry_language;
+
+				if($entry->entry_deleted)
+					$current['deleted'] = true;
+				else
+					$current['deleted'] = false;
+
+
+				
+				$return['entries'][]['entry'] = $current; 
+			}
+
+			else 
+			{		
+				
+
+				$current['id'] = $entry->entry_id;
+				$current['userId'] = $entry->entry_user_id;
+				$current['category'] = $entry->category->category_name;
+				//$current['subCategory'] = $entry->subcategory->sub_category_name;
+				$current['type'] = $entry->entry_type;
+				$current['name'] = $entry->entry_name;
+				$current['description'] = $entry->entry_description;
+				$current['created'] = $entry->entry_created_date;
+				$current['modified'] = $entry->entry_modified_date;
+				
+				$current['tags'] = array();
+				foreach($entry->entryTag as $tagd)
+				{
+<<<<<<< HEAD
+=======
+					// var_dump($tagd->tag->tag_id);
+
+					//if(!is_null($tag->tag))
+					$current['tags'][] = $tag->tag->tag_name;
+>>>>>>> 33344abb4f39a214ae0e1444ec018ebfc2625b98
+				}
+
+				//break;
+
+				$current['entryFiles'] = array();
+				foreach ($entry->file as $file)
+				{
+					$url = "http://54.77.5.124/" . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+					$current['entryFiles'][] = [
+					'fileType' => $file->entry_file_type,
+					'filePath' => $url];
+				}
+				
+				$current['upVotes'] = $up_votes;
+				$current['downVotes'] = $down_votes;
+                $current['rank'] = $entry->entry_rank;
+                $current['language'] = $entry->entry_language;
+				// /print_r($entry);
+
+				if($entry->entry_deleted)
+					$current['deleted'] = true;
+				else
+					$current['deleted'] = false;
+
+				$return['entries'][]['entry'] = $current; 
+			}
+		}
+		
+		$status_code = 200;
+
+		//If next is true create next page link
+		if($next)
+			$return['next'] = "http://api.mobstar.com/entry/" . $id_commas . "?" . http_build_query(["limit" => $limit, "page" => $page+1]);
+
+		if($previous)
+			$return['previous'] = "http://api.mobstar.com/entry/" . $id_commas . "?" . http_build_query(["limit" => $limit, "page" => $page-1]);
+
+		$response = Response::make($return, $status_code);
+
+		$response->header('X-Total-Count', $count);
+
+		return $response;
+	}
+
+	/**
+     *
+     * @SWG\Api(
+     *   path="/entry/",
+     *   description="Operation about entries",
+     *   produces="['application/json']",
+     *   @SWG\Operations(
+     *     @SWG\Operation(
+     *       method="POST",
+     *       summary="Add new entry",
+     *       notes="Submits a new entry.",
+     *       nickname="addEntry",
+     *       @SWG\Parameters(
+     *         @SWG\Parameter(
+     *           name="category",
+     *           description="Category ID the entry is submitted to.",
+     *           paramType="form",
+     *           required=true,
+     *           type="integer"
+     *         ),  
+     *         @SWG\Parameter(
+     *           name="name",
+     *           description="Name to be displayed for the entry",
+     *           paramType="form",
+     *           required=true,
+     *           type="string"
+     *         ),  
+     *         @SWG\Parameter(
+     *           name="language",
+     *           description="Language of entry",
+     *           paramType="form",
+     *           required=true,
+     *           type="string"
+     *         ),     
+     *         @SWG\Parameter(
+     *           name="type",
+     *           description="The main file for the entry.",
+     *           paramType="form",
+     *           required=true,
+     *           type="string",
+     *			 enum="['audio','video','image']"
+     *         ),
+     *         @SWG\Parameter(
+     *           name="description",
+     *           description="Brief accompanying text for entry.",
+     *           paramType="form",
+     *           required=true,
+     *           type="string"
+     *         ),
+     *         @SWG\Parameter(
+     *           name="tags",
+     *           description="Comma seperated list of tag IDs.",
+     *           paramType="form",
+     *           required=false,
+     *           type="string"
+     *         ),
+     *         @SWG\Parameter(
+     *           name="file1",
+     *           description="Primary file for entry.",
+     *           paramType="form",
+     *           required=true,
+     *           type="file"
+     *         ),
+     *         @SWG\Parameter(
+     *           name="file2",
+     *           description="Secondary file for entry, i.e. accompanying image for audio.",
+     *           paramType="form",
+     *           type="file",
+     *           required=false
+     *         )
+     *       ),
+     *       @SWG\ResponseMessages(
+     *          @SWG\ResponseMessage(
+     *            code=401,
+     *            message="Authorization failed"
+     *          ),
+     *          @SWG\ResponseMessage(
+     *            code=400,
+     *            message="Input validation failed"
+     *          )
+     *       )
+     *     )
+     *   )
+     * )
+     */
+
+	public  function store()
+	{
+
+		$token =  Request::header("X-API-TOKEN");
+
+		$session = $this->token->get_session($token);
+		
+		//Validate Input
+		$rules = array(
+			'category'  	=> 'required|numeric',
+			//'subCategory'	=> 'required|numeric',
+			'type' 			=> 'required',
+			'name' 			=> 'required',
+			'description' 	=> 'required',
+		);
+
+		$validator = Validator::make(Input::get(), $rules);
+
+		if ($validator->fails()) 
+		{
+			//var_dump($validator->messages());
+			$response['errors'] = $validator->messages();
+			$status_code = 400;
+		} 
+		else 
+		{
+
+			$file = Input::file('file1');
+
+			if(!empty($file) && $file->isValid()){
+
+				//Will need to do some work here to upload file to CDN
+
+				//Get input
+				$input = [
+					'entry_user_id' => $session->token_user_id,
+					'entry_category_id' => Input::get('category'),
+					'entry_sub_category_id' => Input::get('subCategory'),
+					'entry_type' => Input::get('type'),
+					'entry_name' => Input::get('name'),
+					'entry_language' => Input::get('language'),
+					'entry_description' => Input::get('description'),
+					'entry_created_date' => date('Y-m-d H:i:s'),
+					];
+
+				Eloquent::unguard();
+				$response['entry_id'] = $this->entry->create($input)->entry_id;
+				$status_code = 201;
+				Eloquent::reguard();
+
+
+				if(isset($input['tags']))
+				{
+					$tags = array_values(explode(',',$input['tags']));
+
+					foreach($tags as $tag)
+					{
+						$this->entry->addTag($tag, $response['entry_id'], $session->token_user_id);
+					}
+				}
+
+				$dest = 'uploads';
+
+				$filename = str_random(12);
+
+				$extension = $file->getClientOriginalExtension();
+
+				$file->move($dest, $filename);
+
+				Eloquent::unguard();
+
+				EntryFile::create([
+					'entry_file_name' 			=> $filename,
+					'entry_file_entry_id' 		=> $response['entry_id'],
+					'entry_file_location' 		=> $dest,
+					'entry_file_type'			=> $extension,
+					'entry_file_created_date'	=> date('Y-m-d H:i:s'),
+					'entry_file_updated_date'	=> date('Y-m-d H:i:s'),
+					]);
+				
+				Eloquent::reguard();
+
+
+				$file = Input::file('file2');
+
+				if(!empty($file) && $file->isValid()){
+					$dest = 'uploads';
+
+					$filename = str_random(12);
+
+					$extension = $file->getClientOriginalExtension();
+
+					$file->move($dest, $filename);
+
+					Eloquent::unguard();
+
+					EntryFile::create([
+						'entry_file_name' 			=> $filename,
+						'entry_file_entry_id' 		=> $response['entry_id'],
+						'entry_file_location' 		=> $dest,
+						'entry_file_type'			=> $extension,
+						'entry_file_created_date'	=> date('Y-m-d H:i:s'),
+						'entry_file_updated_date'	=> date('Y-m-d H:i:s'),
+						]);
+					
+					Eloquent::reguard();
+				}
+			}
+			else{
+
+				$response['error'] = "No file included";
+				$status_code = 400;
+			}
+
+		}
+
+		return Response::make($response, $status_code);
+	}
+
+
+/**
+     *
+     * @SWG\Api(
+     *   path="/entry/{entryId}",
+     *   description="Operation about Entries",
+     *   produces="['application/json']",
+     *   @SWG\Operations(
+     *     @SWG\Operation(
+     *       method="PUT",
+     *       summary="Update entry",
+     *       notes="Updates an entry.",
+     *       nickname="updateEntry",
+     *       @SWG\Parameters(
+     *			@SWG\Parameter(
+     *           name="entryId",
+     *           description="Entry ID to be updated.",
+     *           paramType="path",
+     *           required=false,
+     *           type="integer"
+     *         ),  
+     *         @SWG\Parameter(
+     *           name="category",
+     *           description="Category ID the entry is submitted to.",
+     *           paramType="form",
+     *           required=false,
+     *           type="integer"
+     *         ),  
+     *         @SWG\Parameter(
+     *           name="name",
+     *           description="Name to be displayed for the entry",
+     *           paramType="form",
+     *           required=false,
+     *           type="string"
+     *         ),  
+     *         @SWG\Parameter(
+     *           name="language",
+     *           description="Language of the entry",
+     *           paramType="form",
+     *           required=false,
+     *           type="string"
+     *         ),     
+     *         @SWG\Parameter(
+     *           name="type",
+     *           description="The main file for the entry.",
+     *           paramType="form",
+     *           required=false,
+     *           type="string",
+     *			 enum="['audio','video','image']"
+     *         ),
+     *         @SWG\Parameter(
+     *           name="description",
+     *           description="Brief accompanying text for entry.",
+     *           paramType="form",
+     *           required=false,
+     *           type="string"
+     *         )
+     *       ),
+     *       @SWG\ResponseMessages(
+     *          @SWG\ResponseMessage(
+     *            code=401,
+     *            message="Authorization failed"
+     *          ),
+     *          @SWG\ResponseMessage(
+     *            code=404,
+     *            message="Entry not found"
+     *          ),
+     *			
+     *          @SWG\ResponseMessage(
+     *            code=400,
+     *            message="Input validation failed"
+     *          )
+     *       )
+     *       )
+     *     )
+     *   )
+     */
+
+	public function update($id)
+	{
+
+		//Validate Input
+		$rules = array(
+			'category'  	=> 'numeric',
+			'subCategory'	=> 'numeric',
+		);
+
+		$validator = Validator::make(Input::get(), $rules);
+
+		if ($validator->fails()) 
+		{
+			$response['errors'] = $validator->messages();
+			$status_code = 400;
+		} 
+		else 
+		{
+
+			$input = Input::get();
+
+			if(isset($input['category']))
+				$update['entry_category_id'] = $input['category'];
+			if(isset($input['subCategory']))
+				$update['entry_sub_category_id'] = $input['subCategory'];
+			if(isset($input['type']))
+				$update['entry_type'] = $input['type'];
+			if(isset($input['name']))
+				$update['entry_name'] = $input['name'];
+			if(isset($input['description']))
+				$update['entry_description'] = $input['description'];
+			if(isset($input['language']))
+				$update['entry_language'] = $input['language'];
+
+			$token =  Request::header("X-API-TOKEN");
+
+			$session = $this->token->get_session($token);
+
+			if(isset($input['tags']))
+			{
+				$tags = array_values(explode(',',$input['tags']));
+
+				foreach($tags as $tag)
+				{
+					$this->entry->addTag($tag, $id, $session->token_user_id);
+				}
+			}
+			
+			if(isset($update))
+			{
+				if($this->entry->update($update, $id, $session->token_user_id)){
+					$response['entry_id'] = $id;
+					$response['notice'] = "Entry updated successfully.";
+					$status_code = 200;
+				}
+				else{
+					$response['error'] = "Update failed - entry not found.";
+					$status_code = 404;
+				}
+			}
+			else{
+
+					$response['entry_id'] = $id;
+					$response['notice'] = "Entry updated successfully.";
+					$status_code = 200;
+			}
+		}
+			
+		return Response::make($response, $status_code);
+	}
+
+
+	public function tagEntry ($id)
+	{
+		//Split id's into array
+		$id = array_values(explode(',',$id_commas));
+
+		if($this->entry->addTag($tags, $id, $session->token_user_id))
+			{
+				$response['entry_id'] = $id;
+				$response['notice'] = "Entry tagged successfully.";
+				$status_code = 200;
+			}
+			
+		return Response::make($response, $status_code);
+	}
+	
+	//////////////////////      Rerank function for Cron Job        \\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+	
+	public function rerank(){
+	    $user = 0;
+	    $category = 0;
+	    $subcategory = 0;
+	    $tag = 0;
+
+	    $entries = $this->entry->all($user, $category, $subcategory, $tag, 10000, 0, false)->toArray();
+
+        $sortArray = array(); 
+        $i = 0;
+        
+        foreach($entries as $entry){ 
+            
+            $up_votes = 0;
+			$down_votes = 0;
+			
+			foreach($entry['vote'] as $vote){
+				if($vote['vote_up'] && !$vote['vote_deleted']){
+					$up_votes++;
+				}
+				elseif($vote['vote_down'] && !$vote['vote_deleted']){
+					$down_votes++;
+				}
+			}
+			
+			$entries[$i]['entry_up_votes'] = $up_votes;
+			$entry['entry_up_votes'] = $up_votes;
+			$entries[$i]['entry_down_votes'] = $down_votes;
+            $entry['entry_down_votes'] = $down_votes;
+            
+            foreach($entry as $key=>$value){  
+                if(!isset($sortArray[$key])){ 
+                    $sortArray[$key] = array(); 
+                } 
+                $sortArray[$key][] = $value; 
+            } 
+        } 
+        
+        $orderby = "entry_up_votes"; //change this to whatever key you want from the array 
+        
+        array_multisort($sortArray[$orderby],SORT_DESC,$entries); 
+        
+        $r = 1;
+        $id = array();
+        $rank = array();
+        
+        foreach($entries as $entry){
+            if($entry['entry_rank'] != $r){
+                $rank[$entry['entry_id']] = $r;
+                $id[] = $entry['entry_id'];
+            }
+            $r++;
+        }
+        
+        if(count($rank))
+        {
+             $entries2 = $this->entry->whereIn($id, $user, $category, $subcategory, 10000, 0, false);
+            
+            foreach($entries2 as $entry){
+                $entry->entry_rank = $rank[$entry->entry_id];
+                $entry->save();   
+            } 
+        }
+	}
+
+
+}

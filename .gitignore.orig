@@ -1,0 +1,15 @@
+composer.lock
+vendor/
+*.DS_Store
+public/uploads
+.env.local.php
+<<<<<<< HEAD
+§
+<<<<<<< HEAD
+public/uploads
+=======
+.env.local.php
+>>>>>>> e9ddbceb73164eac860aa20d6c85f0dc97c7a765
+=======
+public/docs/
+>>>>>>> 0dda1266f045949a1079a88caf12ccf521f4a836
