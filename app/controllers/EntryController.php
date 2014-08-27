@@ -319,7 +319,7 @@ class EntryController extends BaseController
 					$current[ 'entryFiles' ] = array();
 					foreach( $entry->file as $file )
 					{
-						$url = "http://54.77.5.124/" . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+						$url = $_ENV['PATH'] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
 						$current[ 'entryFiles' ][ ] = [
 							'fileType' => $file->entry_file_type,
 							'filePath' => $url ];
@@ -921,22 +921,24 @@ class EntryController extends BaseController
 
 				$extension = $file->getClientOriginalExtension();
 
-				if( $input[ 'entry_type' ] == 'audio')
-				{
-					$file_in = $file->getRealPath();
-					$file_out = '/var/www/mobstar/public/uploads/' . $filename . '.mp3';
-					Sonus::convert()->input( $file_in )->output( $file_out )->go();
-				}
-				else if ($input['entry_type'] == 'video')
-				{
-					$file_in = $file->getRealPath();
-					$file_out = '/var/www/mobstar/public/uploads/' . $filename . '.aac';
-					Sonus::convert()->input( $file_in )->output( $file_out )->go();
-				}
-				else
-				{
-					$file->move($dest, $filename . '.' . $extension);
-				}
+				$file->move($dest, $filename . '.' . $extension);
+
+//				if( $input[ 'entry_type' ] == 'audio')
+//				{
+//					$file_in = $file->getRealPath();
+//					$file_out = '/var/www/mobstar/public/uploads/' . $filename . '.mp3';
+//					Sonus::convert()->input( $file_in )->output( $file_out )->go();
+//				}
+//				else if ($input['entry_type'] == 'video')
+//				{
+//					$file_in = $file->getRealPath();
+//					$file_out = '/var/www/mobstar/public/uploads/' . $filename . '.aac';
+//					Sonus::convert()->input( $file_in )->output( $file_out )->go();
+//				}
+//				else
+//				{
+//					$file->move($dest, $filename . '.' . $extension);
+//				}
 
 				Eloquent::unguard();
 
