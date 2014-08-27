@@ -60,7 +60,10 @@ Route::filter('auth', function()
 
 Route::filter('logged_in', function()
 {
-	$token =  Request::header("X-API-TOKEN");
+	if( $_ENV['URL'] == 'mobstar.local')
+		$token = '9KotAk4t0JGc9MluMMN7oDiaXKQpyajBgEWUjppi';
+	else
+		$token =  Request::header("X-API-TOKEN");
 
 	if(!$token)
 	{

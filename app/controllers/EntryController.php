@@ -319,7 +319,7 @@ class EntryController extends BaseController
 					$current[ 'entryFiles' ] = array();
 					foreach( $entry->file as $file )
 					{
-						$url = $_ENV['PATH'] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+						$url = $_ENV['URL'] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
 						$current[ 'entryFiles' ][ ] = [
 							'fileType' => $file->entry_file_type,
 							'filePath' => $url ];
