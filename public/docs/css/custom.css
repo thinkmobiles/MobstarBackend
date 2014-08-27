@@ -1,0 +1,19 @@
+.header-container{
+	padding:10px;
+	width:940px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.header-container input{
+	width:450px;
+	margin-right: 6px;
+	margin-left: 6px;
+	float:left;
+	height:20px;
+	border-radius: 5px;
+	box-shadow: none;
+	border: #ccc 1px solid;
+	padding:3px;
+	text-align: center;
+}
