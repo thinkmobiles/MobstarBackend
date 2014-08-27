@@ -28,7 +28,7 @@ $env = $app->detectEnvironment(array(
 
 	'local' => array('packer-virtualbox-iso'),
 	'production' => array('ip-172-31-27-177'),
-	'beta' => array('ip-172-31-5-112'),
+	'testing' => array('ip-172-31-5-112'),
 ));
 
 /*
