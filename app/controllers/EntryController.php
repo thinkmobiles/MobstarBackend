@@ -319,7 +319,7 @@ class EntryController extends BaseController
 					$current[ 'entryFiles' ] = array();
 					foreach( $entry->file as $file )
 					{
-						$url = $_ENV['URL'] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+						$url = 'http://' . $_ENV['URL'] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
 						$current[ 'entryFiles' ][ ] = [
 							'fileType' => $file->entry_file_type,
 							'filePath' => $url ];
@@ -382,7 +382,7 @@ class EntryController extends BaseController
 
 				foreach( $entry->file as $file )
 				{
-					$url = "http://54.77.5.124/" . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+					$url = 'http://' . $_ENV['URL'] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
 					$current[ 'entryFiles' ][ ] = [
 						'fileType' => $file->entry_file_type,
 						'filePath' => $url ];
@@ -658,7 +658,7 @@ class EntryController extends BaseController
 					$current[ 'entryFiles' ] = array();
 					foreach( $entry->file as $file )
 					{
-						$url = "http://54.77.5.124/" . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+						$url = 'http://' . $_ENV['URL'] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
 						$current[ 'entryFiles' ][ ] = [
 							'fileType' => $file->entry_file_type,
 							'filePath' => $url ];
@@ -722,7 +722,7 @@ class EntryController extends BaseController
 				$current[ 'entryFiles' ] = array();
 				foreach( $entry->file as $file )
 				{
-					$url = "http://54.77.5.124/" . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+					$url = 'http://' . $_ENV['URL'] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
 					$current[ 'entryFiles' ][ ] = [
 						'fileType' => $file->entry_file_type,
 						'filePath' => $url ];
