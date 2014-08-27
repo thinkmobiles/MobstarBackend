@@ -230,7 +230,20 @@ Route::get("entry2/rerank", [
 
 
 Route::get('api-info/', function(){
-     var_dump($_ENV);
+    // var_dump($_ENV);
+$swagger = new Swagger($_ENV['PATH'] . '/app/controllers');
+//header("Content-Type: application/json");
+//var_dump($swagger);
+$return =  $swagger->getRegistry();
+
+
+$return =  $swagger->getResourceList(array('output' => 'json'));
+
+$response = Response::make($return, 200);
+$response->header('Content-Type', "application/json");
+$response->header('Access-Control-Allow-Methods', "POST, GET, OPTIONS , PUT");
+$response->header('Access-Control-Allow-Origin', "*");
+return $response;
 });
 
 Route::get('api-info//{resource}', function($resource){
