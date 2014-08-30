@@ -35,7 +35,6 @@ if(App::bound("whoops")) {
  
 Route::get('/', function()
 {
-	var_dump(App::environment());
     // Force the execution to fail by throwing an exception:
     //throw new RuntimeException("Oopsie!");
 });
