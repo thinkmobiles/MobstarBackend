@@ -35,8 +35,9 @@ if(App::bound("whoops")) {
  
 Route::get('/', function()
 {
-    // Force the execution to fail by throwing an exception:
-    //throw new RuntimeException("Oopsie!");
+	var_dump(App::environment());
+//     Force the execution to fail by throwing an exception:
+//    throw new RuntimeException("Oopsie!");
 });
 
 Route::group(["before" => "auth"], function()
