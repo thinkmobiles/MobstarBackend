@@ -24,12 +24,10 @@ $app = new Illuminate\Foundation\Application;
 |
 */
 
-$env = $app->detectEnvironment(array(
-
-	'local' => array('packer-virtualbox-iso'),
-	'production' => array('ip-172-31-27-177'),
-	'testing' => array('ip-172-31-5-112'),
-));
+$env = $app->detectEnvironment(function()
+{
+	return getenv('_MY_ENVIRONMENT');
+});
 
 /*
 |--------------------------------------------------------------------------
