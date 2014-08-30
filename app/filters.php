@@ -60,10 +60,7 @@ Route::filter('auth', function()
 
 Route::filter('logged_in', function()
 {
-	var_dump(App::environment());
-	if( App::environment() == 'local')
-		$token = '9KotAk4t0JGc9MluMMN7oDiaXKQpyajBgEWUjppi';
-	else
+
 		$token =  Request::header("X-API-TOKEN");
 
 	if(!$token)
