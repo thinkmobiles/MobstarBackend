@@ -926,15 +926,15 @@ class EntryController extends BaseController
 				if( $input[ 'entry_type' ] == 'audio')
 				{
 					$file_in = $file->getRealPath();
-					$file_out = '/var/www/mobstar/public/uploads/' . $filename . '.mp3';
+					$file_out = $_ENV['PATH'] . 'public/uploads/' . $filename . '.mp3';
 					Sonus::convert()->input( $file_in )->output( $file_out )->go();
 					$extension = 'mp3';
 				}
 				else if ($input['entry_type'] == 'video')
 				{
 					$file_in = $file->getRealPath();
-					$file_out = '/var/www/mobstar/public/uploads/' . $filename . '.mp4';
-					Sonus::convert()->input( $file_in )->output( $file_out )->go('-strict -2');
+					$file_out = $_ENV['PATH'] . 'public/uploads/' . $filename . '.aac';
+					Sonus::convert()->input( $file_in )->output( $file_out )->go();
 					$extension = 'mp4';
 				}
 				else
