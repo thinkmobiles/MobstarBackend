@@ -938,7 +938,7 @@ class EntryController extends BaseController
 				else if ($input['entry_type'] == 'video')
 				{
 					$file_in = $file->getRealPath();
-					$file_out = $_ENV['PATH'] . 'public/uploads/' . $filename . '.aac';
+					$file_out = $_ENV['PATH'] . 'public/uploads/' . $filename . '.mp4';
 					// Transcode Video
 					shell_exec('/usr/bin/ffmpeg -i ' . $file_in . ' ' . $file_out . ' -strict -2');
 					$extension = 'mp4';
