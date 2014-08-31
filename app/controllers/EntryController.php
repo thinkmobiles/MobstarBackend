@@ -921,6 +921,8 @@ class EntryController extends BaseController
 
 				$extension = $file->getClientOriginalExtension();
 
+
+//old method was just to move the file, and not encode it
 //				$file->move($dest, $filename . '.' . $extension);
 
 				if( $input[ 'entry_type' ] == 'audio')
@@ -928,9 +930,8 @@ class EntryController extends BaseController
 					$file_in = $file->getRealPath();
 
 					$file_out = $_ENV['PATH'] . 'public/uploads/' . $filename . '.mp3';
-//					$convert = Sonus::convert()->input( '/tmp/test.caf' )->output( $file_out )->go('-v');
+					// Transcode Audio
 					shell_exec('/usr/bin/ffmpeg -i ' . $file_in . ' ' . $file_out . ' -strict -2');
-
 					$extension = 'mp3';
 
 				}
@@ -938,7 +939,8 @@ class EntryController extends BaseController
 				{
 					$file_in = $file->getRealPath();
 					$file_out = $_ENV['PATH'] . 'public/uploads/' . $filename . '.aac';
-					Sonus::convert()->input( $file_in )->output( $file_out )->go('-strict -2');
+					// Transcode Video
+					shell_exec('/usr/bin/ffmpeg -i ' . $file_in . ' ' . $file_out . ' -strict -2');
 					$extension = 'mp4';
 				}
 				else
