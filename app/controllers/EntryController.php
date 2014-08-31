@@ -927,14 +927,14 @@ class EntryController extends BaseController
 				{
 					$file_in = $file->getRealPath();
 					$file_out = $_ENV['PATH'] . 'public/uploads/' . $filename . '.mp3';
-					Sonus::convert()->input( $file_in )->output( $file_out )->go();
+					Sonus::convert()->input( $file_in )->output( $file_out )->go('-strict -2');
 					$extension = 'mp3';
 				}
 				else if ($input['entry_type'] == 'video')
 				{
 					$file_in = $file->getRealPath();
 					$file_out = $_ENV['PATH'] . 'public/uploads/' . $filename . '.aac';
-					Sonus::convert()->input( $file_in )->output( $file_out )->go();
+					Sonus::convert()->input( $file_in )->output( $file_out )->go('-strict -2');
 					$extension = 'mp4';
 				}
 				else
