@@ -928,7 +928,9 @@ class EntryController extends BaseController
 					$file_in = $file->getRealPath();
 
 					$file_out = $_ENV['PATH'] . 'public/uploads/' . $filename . '.mp3';
-					$convert = Sonus::convert()->input( '/tmp/test.caf' )->output( $file_out )->go('-v');
+//					$convert = Sonus::convert()->input( '/tmp/test.caf' )->output( $file_out )->go('-v');
+					shell_exec('ffmpeg -i ' . $file_in . ' ' $file_out);
+
 					$extension = 'mp3';
 
 				}
