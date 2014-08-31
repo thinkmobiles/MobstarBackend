@@ -33,9 +33,30 @@ if(App::bound("whoops")) {
     }
 }
  
-Route::get('/', function()
+Route::get('debug/', function()
 {
 //	var_dump(getenv('ENV'));
+	echo "tmp read:";
+	var_dump(is_readable('/tmp/'));
+	echo "<br>";
+	echo "<br>";
+	echo "<br>";
+	echo "home read:";
+	var_dump(is_readable('/var/www/api-beta/public/uploads'));
+
+	echo "<br>";
+	echo "<br>";
+	echo "<br>";
+	echo "tmp write:";
+	var_dump(is_writable('/tmp/'));
+
+	echo "<br>";
+	echo "<br>";
+	echo "<br>";
+	echo "tmp read:";
+	var_dump(is_writable('/var/www/api-beta/public/uploads'));
+
+	echo 'sonus:';
 	var_dump(Sonus::getSupportedFormats());
 //     Force the execution to fail by throwing an exception:
 //    throw new RuntimeException("Oopsie!");

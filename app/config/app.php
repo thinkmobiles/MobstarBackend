@@ -111,7 +111,7 @@ return array(
 		'LucaDegasperi\OAuth2Server\OAuth2ServerServiceProvider',
 		'MobStar\Storage\StorageServiceProvider',
 		'Rafasamp\Sonus\SonusServiceProvider',
-		//'Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider',
+		'Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider',
 
 	),
 
