@@ -36,7 +36,7 @@ if(App::bound("whoops")) {
 Route::get('/', function()
 {
 //	var_dump(getenv('ENV'));
-	var_dump($_ENV);
+	var_dump(Sonus::getSupportedFormats());
 //     Force the execution to fail by throwing an exception:
 //    throw new RuntimeException("Oopsie!");
 });
