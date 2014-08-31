@@ -935,7 +935,7 @@ class EntryController extends BaseController
 					$file_in = $file->getRealPath();
 					$file_out = $_ENV['PATH'] . 'public/uploads/' . $filename . '.aac';
 					Sonus::convert()->input( $file_in )->output( $file_out )->go();
-					$extension = 'mp3';
+					$extension = 'mp4';
 				}
 				else
 				{
