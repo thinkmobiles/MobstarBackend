@@ -5,3 +5,4 @@ return array(
 	'URL'				=> 'api2.mobstar.com',
 	'DEBUG'				=> false,
 );
+ 
