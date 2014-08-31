@@ -926,9 +926,14 @@ class EntryController extends BaseController
 				if( $input[ 'entry_type' ] == 'audio')
 				{
 					$file_in = $file->getRealPath();
+					return $file_in;
 					$file_out = $_ENV['PATH'] . 'public/uploads/' . $filename . '.mp3';
-					Sonus::convert()->input( $file_in )->output( $file_out )->go('-strict -2');
+					$convert = Sonus::convert()->input( $file_in )->output( $file_out )->go('-v');
 					$extension = 'mp3';
+
+					var_dump($file_in);
+
+					return $convert;
 				}
 				else if ($input['entry_type'] == 'video')
 				{
