@@ -67,7 +67,7 @@ class UserController extends BaseController
 	 * )
 	 */
 
-	public $valid_fields = [ "id", "userName", "groupName", "displayName", "fullName", "email" ];
+	public $valid_fields = [ "id", "userName", "groupName", "displayName", "fullName", "email", "stars", "starredBy" ];
 
 	/**
 	 * Display a listing of the resource.
@@ -191,15 +191,45 @@ class UserController extends BaseController
 			//if not just return all info
 			else
 			{
+
+				$stars = [ ];
+
+				foreach( $user->Stars as $star )
+				{
+					if( $star->user_star_deleted == 0 )
+					{
+
+						$stars[ ] = [ 'star_id'   => $star->user_star_star_id,
+									  'star_name' => $star->Star->user_display_name,
+						];
+
+					}
+				}
+
+				$starredBy = [ ];
+
+				foreach( $user->StarredBy as $starred )
+				{
+					if( $starred->user_star_deleted == 0 )
+					{
+						$starredBy[ ] = [ 'star_id'   => $starred->user_star_user_id,
+										  'star_name' => $starred->User->user_display_name,
+						];
+					}
+
+				}
+
 				$return[ 'users' ][ ][ 'user' ] = [ 'id'          => $user->user_id,
 													'userName'    => $user->user_name,
 													'groupName'   => $user->group->user_group_name,
 													'displayName' => $user->user_display_name,
 													'fullName'    => $user->user_full_name,
 													'email'       => $user->user_email,
-
+													'stars'       => $stars,
+													'starredBy'   => $starredBy,
 				];
 			}
+
 		}
 
 		$status_code = 200;
