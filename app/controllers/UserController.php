@@ -185,6 +185,45 @@ class UserController extends BaseController
 					$current[ 'email' ] = $user->user_email;
 				}
 
+				if( in_array( 'stars', $fields ) )
+				{
+					$stars = [ ];
+
+					foreach( $user->Stars as $star )
+					{
+						if( $star->user_star_deleted == 0 )
+						{
+
+							$stars[ ] = [ 'star_id'   => $star->user_star_star_id,
+										  'star_name' => $star->Star->user_display_name,
+							];
+
+						}
+					}
+
+					$current['stars'] = $stars;
+				}
+
+
+
+				if( in_array( 'starredBy', $fields ) )
+				{
+					$starredBy = [ ];
+
+					foreach( $user->StarredBy as $starred )
+					{
+						if( $starred->user_star_deleted == 0 )
+						{
+							$starredBy[ ] = [ 'star_id'   => $starred->user_star_user_id,
+											  'star_name' => $starred->User->user_display_name,
+							];
+						}
+
+					}
+
+					$current['starredBy'] = $starredBy;
+				}
+
 				$return[ 'users' ][ ][ 'user' ] = $current;
 			}
 
@@ -439,6 +478,45 @@ class UserController extends BaseController
 					$current[ 'email' ] = $user->user_email;
 				}
 
+				if( in_array( 'stars', $fields ) )
+				{
+					$stars = [ ];
+
+					foreach( $user->Stars as $star )
+					{
+						if( $star->user_star_deleted == 0 )
+						{
+
+							$stars[ ] = [ 'star_id'   => $star->user_star_star_id,
+										  'star_name' => $star->Star->user_display_name,
+							];
+
+						}
+					}
+
+					$current['stars'] = $stars;
+				}
+
+
+
+				if( in_array( 'starredBy', $fields ) )
+				{
+					$starredBy = [ ];
+
+					foreach( $user->StarredBy as $starred )
+					{
+						if( $starred->user_star_deleted == 0 )
+						{
+							$starredBy[ ] = [ 'star_id'   => $starred->user_star_user_id,
+											  'star_name' => $starred->User->user_display_name,
+							];
+						}
+
+					}
+
+					$current['starredBy'] = $starredBy;
+				}
+
 				if( count( $users ) > 1 )
 				{
 					$return[ 'users' ][ ][ 'user' ] = $current;
@@ -453,15 +531,42 @@ class UserController extends BaseController
 			//if not just return all info
 			else
 			{
-				$all_fields = [ 'id'          => $user->user_id,
-								'userName'    => $user->user_name,
-								'groupName'   => $user->group->user_group_name,
-								'displayName' => $user->user_display_name,
-								'fullName'    => $user->user_full_name,
-								'email'       => $user->user_email,
+				$stars = [ ];
 
+				foreach( $user->Stars as $star )
+				{
+					if( $star->user_star_deleted == 0 )
+					{
+
+						$stars[ ] = [ 'star_id'   => $star->user_star_star_id,
+									  'star_name' => $star->Star->user_display_name,
+						];
+
+					}
+				}
+
+				$starredBy = [ ];
+
+				foreach( $user->StarredBy as $starred )
+				{
+					if( $starred->user_star_deleted == 0 )
+					{
+						$starredBy[ ] = [ 'star_id'   => $starred->user_star_user_id,
+										  'star_name' => $starred->User->user_display_name,
+						];
+					}
+
+				}
+
+				$return[ 'users' ][ ][ 'user' ] = [ 'id'          => $user->user_id,
+													'userName'    => $user->user_name,
+													'groupName'   => $user->group->user_group_name,
+													'displayName' => $user->user_display_name,
+													'fullName'    => $user->user_full_name,
+													'email'       => $user->user_email,
+													'stars'       => $stars,
+													'starredBy'   => $starredBy,
 				];
-				$return[ 'users' ][ ][ 'user' ] = $all_fields;
 
 			}
 		}
