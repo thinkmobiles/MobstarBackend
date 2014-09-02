@@ -1,6 +1,7 @@
 <?php
 return array(
-    'DATABASE_PASSWORD'	=> 'd0wnund3r',
+	'DATABASE_HOST'		=> 'mobstar-beta.cyz3qf3vz9qw.eu-west-1.rds.amazonaws.com',
+	'DATABASE_PASSWORD'	=> 'd0wnund3r',
     'PATH'				=> '/var/www/api-beta/',
 	'URL'				=> 'api2.mobstar.com',
 	'DEBUG'				=> false,

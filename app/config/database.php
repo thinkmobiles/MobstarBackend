@@ -55,10 +55,10 @@ return array(
 
 		'mysql' => array(
 			'driver'    => 'mysql',
-			'host'      => '127.0.0.1',
+			'host'      => $_ENV['DATABASE_HOST'],
 			'database'  => 'dotIdol',
 			'username'  => 'root',
-			'password'  => 'd0wnund3r',
+			'password'  => $_ENV['DATABASE_PASSWORD'],
 			'charset'   => 'utf8',
 			'collation' => 'utf8_unicode_ci',
 			'prefix'    => '',
