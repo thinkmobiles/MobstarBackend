@@ -201,10 +201,8 @@ class UserController extends BaseController
 						}
 					}
 
-					$current['stars'] = $stars;
+					$current[ 'stars' ] = $stars;
 				}
-
-
 
 				if( in_array( 'starredBy', $fields ) )
 				{
@@ -221,7 +219,7 @@ class UserController extends BaseController
 
 					}
 
-					$current['starredBy'] = $starredBy;
+					$current[ 'starredBy' ] = $starredBy;
 				}
 
 				$return[ 'users' ][ ][ 'user' ] = $current;
@@ -494,10 +492,8 @@ class UserController extends BaseController
 						}
 					}
 
-					$current['stars'] = $stars;
+					$current[ 'stars' ] = $stars;
 				}
-
-
 
 				if( in_array( 'starredBy', $fields ) )
 				{
@@ -514,7 +510,7 @@ class UserController extends BaseController
 
 					}
 
-					$current['starredBy'] = $starredBy;
+					$current[ 'starredBy' ] = $starredBy;
 				}
 
 				if( count( $users ) > 1 )
@@ -906,10 +902,7 @@ class UserController extends BaseController
 		$user = User::find( $id );
 
 		$rules = array(
-			//'email'		=> 'required|email|unique:users,user_email',
-			'fullName'    => 'required',
-			'displayName' => 'required',
-			'password'    => 'required',
+			//'email'		=> 'required|email|unique:users,user_email'
 			//'dob' 		=> 'required|date|before:' . date('Y-m-d', strtotime("now - 13 years")),
 		);
 
@@ -926,12 +919,31 @@ class UserController extends BaseController
 		}
 		else
 		{
-			$user->user_password = Hash::make( Input::get( "password" ) );
-			$user->user_full_name = Input::get( "fullName" );
-			$user->user_name = Input::get( "userName" );
-			$user->user_display_name = Input::get( "displayName" );
-			$user->user_dob = date( 'Y-m-d', strtotime( input::get( 'dob' ) ) );
-			$user->user_email = input::get( 'email' );
+			$input = Input::get();
+			if( isset( $input[ 'password' ] ) )
+			{
+				$user->user_password = Hash::make( Input::get( "password" ) );
+			}
+			if( isset( $input[ 'fullName' ] ) )
+			{
+				$user->user_full_name = Input::get( "fullName" );
+			}
+			if( isset( $input[ 'userName' ] ) )
+			{
+				$user->user_name = Input::get( "userName" );
+			}
+			if( isset( $input[ 'displayName' ] ) )
+			{
+				$user->user_display_name = Input::get( "displayName" );
+			}
+			if( isset( $input[ 'dob' ] ) )
+			{
+				$user->user_dob = date( 'Y-m-d', strtotime( input::get( 'dob' ) ) );
+			}
+			if( isset( $input[ 'email' ] ) )
+			{
+				$user->user_email = input::get( 'email' );
+			}
 			$user->save();
 
 			return $user;
