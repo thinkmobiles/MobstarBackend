@@ -170,7 +170,7 @@ class EntryController extends BaseController
 			elseif( $order_by == 'latest' )
 			{
 				$order = 'entry_created_date';
-				$dir = 'asc';
+				$dir = 'desc';
 			}
 			else
 			{
