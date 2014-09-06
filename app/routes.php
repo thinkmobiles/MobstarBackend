@@ -223,6 +223,14 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "star/destroy",
 			"uses" => "StarController@destroy"
 		] );
+
+		// -------------------------------------------------------
+		// Winners
+		//---------------------------------------------------------
+		Route::get( "winner/", [
+			"as"   => "star/index",
+			"uses" => "WinnerController@index"
+		] );
 	} );
 
 	// -------------------------------------------------------

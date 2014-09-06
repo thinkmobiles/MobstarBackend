@@ -10,14 +10,12 @@ use Swagger\Annotations as SWG;
  * @SWG\Resource(
  *  apiVersion=0.2,
  *  swaggerVersion=1.2,
- *  resourcePath="/tag",
+ *  resourcePath="/winner",
  *  basePath="http://api.mobstar.com"
  * )
  */
-class TagController extends BaseController
+class WinnerController extends BaseController
 {
-
-	public $valid_fields = [ "id", "categoryName", "categoryDescription", "categoryActive", "mentors", "subCategories" ];
 
 	/**
 	 * Display a listing of the resource.
@@ -28,15 +26,15 @@ class TagController extends BaseController
 	/**
 	 *
 	 * @SWG\Api(
-	 *   path="/tag/",
-	 *   description="Operation about Tags",
+	 *   path="/winner/",
+	 *   description="Get Winning Entries",
 	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="GET",
-	 *       summary="View all tags",
-	 *       notes="Shows all tags available.",
-	 *       nickname="allTags",
+	 *       summary="View all winners",
+	 *       notes="Shows all winners.",
+	 *       nickname="allWinners",
 	 *       @SWG\Parameters(
 	 *         @SWG\Parameter(
 	 *           name="page",
@@ -91,18 +89,10 @@ class TagController extends BaseController
 		}
 
 		//Find total number to put in header
-		$count = Tag::count();
-
-		if( $count == 0 )
-		{
-			$return = [ 'error' => 'No Categories Found' ];
-			$status_code = 404;
-
-			return Response::make( $return, $status_code );
-		}
+		$count = WinningEntry::count();
 
 		//If the count is greater than the highest number of items displayed show a next link
-		elseif( $count > ( $limit * $page ) )
+		if( $count > ( $limit * $page ) )
 		{
 			$next = true;
 		}
@@ -111,16 +101,28 @@ class TagController extends BaseController
 			$next = false;
 		}
 
-		$tags = Tag::take( $limit )->skip( $offset )->get();
+		$winners = WinningEntry::take( $limit )->skip( $offset )->get();
 
-		foreach( $tags as $tag )
+		$return[ 'winners' ] = [ ];
+
+		foreach( $winners as $winner )
 		{
-
 			//var_dump($category->mentors()->getResults());
-			$current[ 'id' ] = $tag->tag_id;
-			$current[ 'tagName' ] = $tag->tag_name;
 
-			$return[ 'tags' ][ ][ 'tag' ] = $current;
+			$current = [ ];
+
+			$current[ 'winner' ][ 'entryId' ] = $winner->winning_entry_entry_id;
+			$current[ 'winner' ][ 'strapLine' ] = $winner->winning_entry_strapline;
+			$current[ 'winner' ][ 'entry' ][ 'userId' ] = $winner->entry()->getResults()->entry_user_id;
+			$current[ 'winner' ][ 'entry' ][ 'category' ] = $winner->entry()->getResults()->category->category_name;
+			$current[ 'winner' ][ 'entry' ][ 'type' ] = $winner->entry()->getResults()->entry_type;
+			$current[ 'winner' ][ 'entry' ][ 'userName' ] = $winner->entry()->getResults()->user->user_display_name;
+			$current[ 'winner' ][ 'entry' ][ 'entryName' ] = $winner->entry()->getResults()->entry_name;
+			$current[ 'winner' ][ 'entry' ][ 'entryDescription' ] = $winner->entry()->getResults()->entry_description;
+			$current[ 'winner' ][ 'entry' ][ 'created' ] = $winner->entry()->getResults()->entry_created_date;
+			$current[ 'winner' ][ 'entry' ][ 'modified' ] = $winner->entry()->getResults()->entry_modified_date;
+
+			$return[ 'winners' ][ ] = $current;
 		}
 
 		$status_code = 200;
@@ -128,12 +130,12 @@ class TagController extends BaseController
 		//If next is true create next page link
 		if( $next )
 		{
-			$return[ 'next' ] = "http://api.mobstar.com/tag/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
+			$return[ 'next' ] = "http://api.mobstar.com/winner/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
 		}
 
 		if( $previous )
 		{
-			$return[ 'previous' ] = "http://api.mobstar.com/tag/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
+			$return[ 'previous' ] = "http://api.mobstar.com/winner/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
 		}
 
 		$response = Response::make( $return, $status_code );
