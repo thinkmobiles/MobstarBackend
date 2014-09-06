@@ -110,7 +110,6 @@ class LoginController extends BaseController
 					'userName'        => Auth::user()->user_name,
 					'userFullName'    => Auth::user()->user_full_name,
 					'userDisplayName' => Auth::user()->user_display_name,
-					'userGroup'       => Auth::user()->group->user_group_name,
 				);
 
 				$status_code = 200;
@@ -248,7 +247,6 @@ class LoginController extends BaseController
 				'userName'        => null,
 				'userFullName'    => null,
 				'userDisplayName' => $user->user_display_name,
-				'userGroup'       => $user->user_group_name,
 			);
 
 			$status_code = 200;
@@ -329,7 +327,6 @@ class LoginController extends BaseController
 			$twitter_user->save();
 
 			$user = User::firstOrNew( array( 'user_twitter_id' => $twitter_user->twitter_user_id ) );
-			$user->user_user_group = 3;
 
 			$user->save();
 
@@ -359,7 +356,6 @@ class LoginController extends BaseController
 			// 	'userName' => null,
 			// 	'userFullName' => null,
 			// 	'userDisplayName' => $user->user_display_name,
-			// 	'userGroup' => $user->user_group_name,
 			// 	);
 
 			$status_code = 200;
@@ -449,8 +445,6 @@ class LoginController extends BaseController
 			$google_user->save();
 
 			$user = User::firstOrNew( array( 'user_google_id' => $google_user->google_user_id ) );
-
-			$user->user_user_group = 3;
 
 			$user->save();
 

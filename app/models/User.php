@@ -13,11 +13,6 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 	protected $guarded = array( 'user_user_group' );
 	protected $hidden = array( 'user_password' );
 
-	public function group()
-	{
-		return $this->hasOne( 'Group', 'user_group_id', 'user_user_group' );
-	}
-
 	public function entries()
 	{
 		return $this->hasMany( 'Entry', 'entry_user_id', 'user_id' );

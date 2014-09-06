@@ -30,8 +30,6 @@ function getUserProfile($user, $session){
 		$return['userDisplayName'] = $user->user_display_name;
 	}
 
-	$return['userGroup'] = $user->group->user_group_name;
-
 	return $return;
 
 }

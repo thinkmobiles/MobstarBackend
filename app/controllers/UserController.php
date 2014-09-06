@@ -31,7 +31,7 @@ class UserController extends BaseController
 	 *       @SWG\Parameters(
 	 *         @SWG\Parameter(
 	 *           name="fields",
-	 *           description="Accepted values for the fields parameter are: id, userName, groupName, displayName, fullName, email.",
+	 *           description="Accepted values for the fields parameter are: id, userName, displayName, fullName, email.",
 	 *           paramType="query",
 	 *           required=false,
 	 *           type="comma seperated list"
@@ -67,7 +67,7 @@ class UserController extends BaseController
 	 * )
 	 */
 
-	public $valid_fields = [ "id", "userName", "groupName", "displayName", "fullName", "email", "stars", "starredBy" ];
+	public $valid_fields = [ "id", "userName", "displayName", "fullName", "email", "stars", "starredBy" ];
 
 	/**
 	 * Display a listing of the resource.
@@ -165,11 +165,6 @@ class UserController extends BaseController
 					$current[ 'userName' ] = $user->user_name;
 				}
 
-				if( in_array( 'groupName', $fields ) )
-				{
-					$current[ 'groupName' ] = $user->user_group_name;
-				}
-
 				if( in_array( 'displayName', $fields ) )
 				{
 					$current[ 'displayName' ] = $user->user_display_name;
@@ -258,7 +253,6 @@ class UserController extends BaseController
 
 				$return[ 'users' ][ ][ 'user' ] = [ 'id'          => $user->user_id,
 													'userName'    => $user->user_name,
-													'groupName'   => $user->group->user_group_name,
 													'displayName' => $user->user_display_name,
 													'fullName'    => $user->user_full_name,
 													'email'       => $user->user_email,
@@ -319,7 +313,7 @@ class UserController extends BaseController
 	 *         ),
 	 *		   @SWG\Parameter(
 	 *           name="fields",
-	 *           description="Accepted values for the fields parameter are: id, userName, groupName, displayName, fullName, email.",
+	 *           description="Accepted values for the fields parameter are: id, userName, displayName, fullName, email.",
 	 *           paramType="query",
 	 *           required=false,
 	 *           type="comma seperated list"
@@ -456,11 +450,6 @@ class UserController extends BaseController
 					$current[ 'userName' ] = $user->user_name;
 				}
 
-				if( in_array( 'groupName', $fields ) )
-				{
-					$current[ 'groupName' ] = $user->user_group_name;
-				}
-
 				if( in_array( 'displayName', $fields ) )
 				{
 					$current[ 'displayName' ] = $user->user_display_name;
@@ -556,7 +545,6 @@ class UserController extends BaseController
 
 				$return[ 'users' ][ ][ 'user' ] = [ 'id'          => $user->user_id,
 													'userName'    => $user->user_name,
-													'groupName'   => $user->group->user_group_name,
 													'displayName' => $user->user_display_name,
 													'fullName'    => $user->user_full_name,
 													'email'       => $user->user_email,
@@ -818,7 +806,6 @@ class UserController extends BaseController
 					'userName'        => Auth::user()->user_name,
 					'userFullName'    => Auth::user()->user_full_name,
 					'userDisplayName' => Auth::user()->user_display_name,
-					'userGroup'       => Auth::user()->group->user_group_name,
 				);
 
 				return $return;
