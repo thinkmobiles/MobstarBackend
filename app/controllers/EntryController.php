@@ -319,7 +319,7 @@ class EntryController extends BaseController
 					$current[ 'entryFiles' ] = array();
 					foreach( $entry->file as $file )
 					{
-						$url = 'http://' . $_ENV['URL'] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+						$url = 'http://' . $_ENV[ 'URL' ] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
 						$current[ 'entryFiles' ][ ] = [
 							'fileType' => $file->entry_file_type,
 							'filePath' => $url ];
@@ -382,7 +382,7 @@ class EntryController extends BaseController
 
 				foreach( $entry->file as $file )
 				{
-					$url = 'http://' . $_ENV['URL'] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+					$url = 'http://' . $_ENV[ 'URL' ] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
 					$current[ 'entryFiles' ][ ] = [
 						'fileType' => $file->entry_file_type,
 						'filePath' => $url ];
@@ -658,7 +658,7 @@ class EntryController extends BaseController
 					$current[ 'entryFiles' ] = array();
 					foreach( $entry->file as $file )
 					{
-						$url = 'http://' . $_ENV['URL'] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+						$url = 'http://' . $_ENV[ 'URL' ] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
 						$current[ 'entryFiles' ][ ] = [
 							'fileType' => $file->entry_file_type,
 							'filePath' => $url ];
@@ -722,7 +722,7 @@ class EntryController extends BaseController
 				$current[ 'entryFiles' ] = array();
 				foreach( $entry->file as $file )
 				{
-					$url = 'http://' . $_ENV['URL'] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+					$url = 'http://' . $_ENV[ 'URL' ] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
 					$current[ 'entryFiles' ][ ] = [
 						'fileType' => $file->entry_file_type,
 						'filePath' => $url ];
@@ -921,31 +921,33 @@ class EntryController extends BaseController
 
 				$extension = $file->getClientOriginalExtension();
 
-
 //old method was just to move the file, and not encode it
 //				$file->move($dest, $filename . '.' . $extension);
 
-				if( $input[ 'entry_type' ] == 'audio')
+				if( $input[ 'entry_type' ] == 'audio' )
 				{
 					$file_in = $file->getRealPath();
 
-					$file_out = $_ENV['PATH'] . 'public/uploads/' . $filename . '.mp3';
+					$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp3';
 					// Transcode Audio
-					shell_exec('/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out);
+					shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
 					$extension = 'mp3';
 
 				}
-				else if ($input['entry_type'] == 'video')
-				{
-					$file_in = $file->getRealPath();
-					$file_out = $_ENV['PATH'] . 'public/uploads/' . $filename . '.mp4';
-					// Transcode Video
-					shell_exec('/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out);
-					$extension = 'mp4';
-				}
 				else
 				{
-					$file->move($dest, $filename . '.' . $extension);
+					if( $input[ 'entry_type' ] == 'video' )
+					{
+						$file_in = $file->getRealPath();
+						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
+						// Transcode Video
+						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
+						$extension = 'mp4';
+					}
+					else
+					{
+						$file->move( $dest, $filename . '.' . $extension );
+					}
 				}
 
 				Eloquent::unguard();
@@ -966,7 +968,6 @@ class EntryController extends BaseController
 				if( !empty( $file ) && $file->isValid() )
 				{
 					$dest = 'uploads';
-					
 
 					$filename = str_random( 12 );
 
@@ -1163,16 +1164,68 @@ class EntryController extends BaseController
 		return Response::make( $response, $status_code );
 	}
 
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/entry/tag/{entryIds}",
+	 *   description="Operation about Entries",
+	 *   produces="['application/json']",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="POST",
+	 *       summary="Tag an Entry",
+	 *       notes="Tags an entry. API-Token is required for this method.",
+	 *       nickname="tagEntry",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="entryIds",
+	 *           description="Entry ID you want to tag.",
+	 *           paramType="path",
+	 *           required=true,
+	 *           type="string"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="tag",
+	 *           description="Tag you wish to add to entry.",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="true"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=404,
+	 *            message="Entry not found"
+	 *          )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+
 	public function tagEntry( $id )
 	{
-		//Split id's into array
-		$id = array_values( explode( ',', $id_commas ) );
 
-		if( $this->entry->addTag( $tags, $id, $session->token_user_id ) )
+		$tag = Input::get( 'tag' );
+
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		if( $this->entry->addTag( $tag, $id, $session->token_user_id ) )
 		{
 			$response[ 'entry_id' ] = $id;
 			$response[ 'notice' ] = "Entry tagged successfully.";
 			$status_code = 200;
+		}
+		else
+		{
+			$response[ 'error' ] = 'Failed to add tag';
+			$status_code = 400;
 		}
 
 		return Response::make( $response, $status_code );

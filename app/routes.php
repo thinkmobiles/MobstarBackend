@@ -159,7 +159,7 @@ Route::group( [ "before" => "auth" ], function ()
 
 		Route::post( "entry/tag/{id}", [
 			"as"   => "entry/tag",
-			"uses" => "EntryController@tag"
+			"uses" => "EntryController@tagEntry"
 		] );
 
 		Route::post( "entry/report/{id}", [
@@ -309,5 +309,10 @@ Route::get( 'eloquent', function ()
 {
 
 	phpinfo();
+} );
+
+App::missing( function ( $exception )
+{
+	return Response::make( [ 'error' => 'Endpoint not found' ], 404 );
 } );
 

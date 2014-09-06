@@ -287,20 +287,6 @@ class LoginController extends BaseController
 	 *           required=true,
 	 *           type="string"
 	 *         ),
-	 *         @SWG\Parameter(
-	 *           name="dob",
-	 *           description="Date of birth from twitter profile",
-	 *           paramType="form",
-	 *           required=true,
-	 *           type="string"
-	 *         ),
-	 *         @SWG\Parameter(
-	 *           name="gender",
-	 *           description="Gender, from twitter profile",
-	 *           paramType="form",
-	 *           required=false,
-	 *           type="string"
-	 *         )
 	 *       ),
 	 *       @SWG\ResponseMessages(
 	 *          @SWG\ResponseMessage(
@@ -320,7 +306,6 @@ class LoginController extends BaseController
 		$rules = array(
 			'userId'      => 'required',
 			'displayName' => 'required',
-			'dob'         => 'required',
 		);
 
 		// run the validation rules on the inputs
@@ -340,8 +325,6 @@ class LoginController extends BaseController
 
 			$twitter_user->twitter_user_twitter_id = Input::get( 'userId' );
 			$twitter_user->twitter_user_display_name = Input::get( 'displayName' );
-			$twitter_user->twitter_user_dob = date( 'Y-m-d', strtotime( Input::get( 'dob' ) ) );
-			$twitter_user->twitter_user_gender = Input::get( 'gender' );
 
 			$twitter_user->save();
 
@@ -421,13 +404,6 @@ class LoginController extends BaseController
 	 *           paramType="form",
 	 *           required=true,
 	 *           type="string"
-	 *         ),
-	 *         @SWG\Parameter(
-	 *           name="gender",
-	 *           description="Gender from Google profile",
-	 *           paramType="form",
-	 *           required=true,
-	 *           type="string"
 	 *         )
 	 *       ),
 	 *       @SWG\ResponseMessages(
@@ -449,7 +425,6 @@ class LoginController extends BaseController
 			'userId'      => 'required',
 			'displayName' => 'required',
 			'userName'    => 'required',
-			'gender'      => 'required',
 		);
 
 		// run the validation rules on the inputs
@@ -470,7 +445,6 @@ class LoginController extends BaseController
 			$google_user->google_user_google_id = Input::get( 'userId' );
 			$google_user->google_user_display_name = Input::get( 'displayName' );
 			$google_user->google_user_user_name = Input::get( 'userName' );
-			$google_user->google_user_gender = Input::get( 'gender' );
 
 			$google_user->save();
 
