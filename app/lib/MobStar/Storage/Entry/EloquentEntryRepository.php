@@ -91,7 +91,6 @@ class EloquentEntryRepository implements EntryRepository
 		$tag = Tag::firstOrNew( array( 'tag_name' => $tags ) );
 
 		if( is_null( $tag->tag_created_date ) )
-		if( is_null( $tag->tag_created_date ) )
 			$tag->tag_created_date = date( 'Y-m-d H:i:s' );
 
 		if( is_null( $tag->tag_added_by ) )
