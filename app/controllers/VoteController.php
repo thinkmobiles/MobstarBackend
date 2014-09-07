@@ -415,13 +415,86 @@ class VoteController extends BaseController
 			//Delete previous votes for this entry cast by this user
 			$this->vote->delete_previous( $input );
 
+			$entry = Entry::find( $input[ 'vote_entry_id' ] );
+
 			if( Input::get( 'type' ) == 'up' )
 			{
+//				return $session;
 				$input[ 'vote_up' ] = 1;
+				$prev_not = Notification::where( 'notification_user_id', '=', $entry->entry_user_id, 'and' )
+										->where( 'notification_entry_id', '=', $entry->entry_id, 'and' )
+										->where( 'notification_details', '=', 'has voted up your entry', 'and' )
+										->orderBy( 'notification_updated_date', 'desc' )
+										->first();
+
+				if( !count( $prev_not ) )
+				{
+					Notification::create( [ 'notification_user_id'      => $entry->entry_user_id,
+											'notification_subject_ids'  => json_encode( [ $session->token_user_id ] ),
+											'notification_details'      => 'has voted up your entry',
+											'notification_read'         => 0,
+											'notification_entry_id'     => $entry->entry_id,
+											'notification_type'         => 'Entry Vote',
+											'notification_created_date' => isset( $notification )
+													? $notification->notification_created_date : date( 'Y-m-d H:i:s' ),
+											'notification_updated_date' => date( 'Y-m-d H:i:s' ) ] );
+				}
+				else
+				{
+
+					$subjects = json_decode( $prev_not->notification_subject_ids );
+
+					if( !in_array( $session->token_user_id, $subjects ) )
+					{
+						array_push( $subjects, $session->token_user_id );
+
+						$prev_not->notification_subject_ids = json_encode( $subjects );
+						$prev_not->notification_read = 0;
+						$prev_not->notification_updated_date = date( 'Y-m-d H:i:s' );
+
+						$prev_not->save();
+					}
+				}
 			}
 			elseif( Input::get( 'type' ) == 'down' )
 			{
 				$input[ 'vote_down' ] = 1;
+
+				$prev_not = Notification::where( 'notification_user_id', '=', $entry->entry_user_id, 'and' )
+										->where( 'notification_entry_id', '=', $entry->entry_id, 'and' )
+										->where( 'notification_details', '=', 'has voted down your entry', 'and' )
+										->orderBy( 'notification_updated_date', 'desc' )
+										->first();
+
+				if( !count( $prev_not ) )
+				{
+					Notification::create( [ 'notification_user_id'      => $entry->entry_user_id,
+											'notification_subject_ids'  => json_encode( [ $session->token_user_id ] ),
+											'notification_details'      => 'has voted down your entry',
+											'notification_read'         => 0,
+											'notification_entry_id'     => $entry->entry_id,
+											'notification_type'         => 'Entry Vote',
+											'notification_created_date' => date( 'Y-m-d H:i:s' ),
+											'notification_updated_date' => date( 'Y-m-d H:i:s' )
+										  ] );
+				}
+				else
+				{
+
+					$subjects = json_decode( $prev_not->notification_subject_ids );
+
+					if( !in_array( $session->token_user_id, $subjects ) )
+					{
+						array_push( $subjects, $session->token_user_id );
+
+						$prev_not->notification_subject_ids = json_encode( $subjects );
+						$prev_not->notification_read = 0;
+						$prev_not->notification_updated_date = date( 'Y-m-d H:i:s' );
+
+						$prev_not->save();
+					}
+
+				}
 			}
 			else
 			{
