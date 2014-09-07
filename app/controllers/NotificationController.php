@@ -11,7 +11,7 @@ use MobStar\Storage\Token\TokenRepository as Token;
  * @SWG\Resource(
  *  apiVersion=0.2,
  *  swaggerVersion=1.2,
- *  resourcePath="/winner",
+ *  resourcePath="/notification",
  *  basePath="http://api.mobstar.com"
  * )
  */
@@ -32,15 +32,15 @@ class NotificationController extends BaseController
 	/**
 	 *
 	 * @SWG\Api(
-	 *   path="/winner/",
-	 *   description="Get Notifications",
+	 *   path="/notification/",
+	 *   description="Operation about notifications",
 	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="GET",
-	 *       summary="View all winners",
-	 *       notes="Shows all winners.",
-	 *       nickname="allWinners",
+	 *       summary="Show all notifications",
+	 *       notes="Show all notifications for logged in user.",
+	 *       nickname="allNotifications",
 	 *       @SWG\Parameters(
 	 *         @SWG\Parameter(
 	 *           name="page",
