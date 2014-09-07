@@ -443,13 +443,17 @@ class VoteController extends BaseController
 				{
 
 					$subjects = json_decode( $prev_not->notification_subject_ids );
-					array_push( $subjects, $session->token_user_id );
 
-					$prev_not->notification_subject_ids = json_encode( $subjects );
-					$prev_not->notification_read = 0;
-					$prev_not->notification_updated_date = date( 'Y-m-d H:i:s' );
+					if( !in_array( $session->token_user_id, $subjects ) )
+					{
+						array_push( $subjects, $session->token_user_id );
 
-					$prev_not->save();
+						$prev_not->notification_subject_ids = json_encode( $subjects );
+						$prev_not->notification_read = 0;
+						$prev_not->notification_updated_date = date( 'Y-m-d H:i:s' );
+
+						$prev_not->save();
+					}
 				}
 			}
 			elseif( Input::get( 'type' ) == 'down' )
