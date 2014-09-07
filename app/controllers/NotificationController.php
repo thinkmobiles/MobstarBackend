@@ -111,7 +111,7 @@ class NotificationController extends BaseController
 			$next = false;
 		}
 
-		$notifications = Notification::where( 'notification_user_id', '=', $session->token_user_id )->take( $limit )->skip( $offset )->get();
+		$notifications = Notification::where( 'notification_user_id', '=', $session->token_user_id )->latest('notification_updated_date')->take( $limit )->skip( $offset )->get();
 
 		$return[ 'notifications' ] = [ ];
 
@@ -168,10 +168,13 @@ class NotificationController extends BaseController
 
 			$line = $names . ' ' . $line;
 
-			$current[ 'notificationId' ] = $notification->notification_entry_id;
+			$current[ 'notificationId' ] = $notification->notification_id;
 			$current[ 'notificationContent' ] = $line;
 			$current[ 'notificationDate' ] = $notification->notification_updated_date;
 			$current[ 'notificationRead' ] = ($notification->notification_read == 1);
+			$current['entry']['entry_id'] = $notification->entry->entry_id;
+			$current['entry']['entry_name'] = $notification->entry->entry_name;
+
 
 			$return[ 'notifications' ][] = $current;
 		}
