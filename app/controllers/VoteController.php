@@ -435,8 +435,7 @@ class VoteController extends BaseController
 											'notification_read'         => 0,
 											'notification_entry_id'     => $entry->entry_id,
 											'notification_type'         => 'Entry Vote',
-											'notification_created_date' => isset( $notification )
-													? $notification->notification_created_date : date( 'Y-m-d H:i:s' ),
+											'notification_created_date' => date( 'Y-m-d H:i:s' ),
 											'notification_updated_date' => date( 'Y-m-d H:i:s' ) ] );
 				}
 				else
