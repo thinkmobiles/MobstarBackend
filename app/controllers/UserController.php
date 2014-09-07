@@ -252,7 +252,7 @@ class UserController extends BaseController
 				}
 
 				$return[ 'users' ][ ][ 'user' ] = [ 'id'          => $user->user_id,
-													'userName'    => $user->user_name,
+													'userName'    => $user->user_name,¶
 													'displayName' => $user->user_display_name,
 													'fullName'    => $user->user_full_name,
 													'email'       => $user->user_email,
