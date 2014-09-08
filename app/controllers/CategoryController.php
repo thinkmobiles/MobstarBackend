@@ -30,7 +30,6 @@ class CategoryController extends BaseController {
      * @SWG\Api(
      *   path="/category/",
      *   description="Operation about Categories",
-     *   produces="['application/json']",
      *   @SWG\Operations(
      *     @SWG\Operation(
      *       method="GET",
@@ -74,20 +73,20 @@ class CategoryController extends BaseController {
      *   )
      * )
      */
-	
+
 	public function index()
 	{
 
 		$fields = array_values(explode(',',Input::get("fields")));
-		
+
 		if ($fields[0] == "")
 			unset($fields);
-		
+
 		$return = [];
 		$valid = false;
 
 		if(!empty($fields))
-		{	
+		{
 			//Check if fields are valid
 			foreach($fields as $field)
 			{
@@ -99,7 +98,7 @@ class CategoryController extends BaseController {
 
 		}
 
-		//Get limit to calculate pagination 
+		//Get limit to calculate pagination
 		$limit = (Input::get('limit', '50'));
 
 		//If not numeric set it to the default limit
@@ -115,7 +114,7 @@ class CategoryController extends BaseController {
 		//If page is greter than one show a previous link
 		if($page > 1)
 			$previous = true;
-		else 
+		else
 			$previous = false;
 
 		//Find total number to put in header
@@ -141,7 +140,7 @@ class CategoryController extends BaseController {
 
 			//check to see if fields were specified and at least one is valid
 			if((!empty($fields)) && $valid)
-			{	
+			{
 				$current = array();
 
 				if(in_array("id",$fields))
@@ -149,7 +148,7 @@ class CategoryController extends BaseController {
 
 				if(in_array("categoryName",$fields))
 					$current['categoryName'] = $category->category_name;
-				
+
 				if(in_array("categoryActive",$fields))
 					$current['categoryActive'] = ($category->category_active) ? true : false;
 
@@ -157,7 +156,7 @@ class CategoryController extends BaseController {
 					$current['categoryDescription'] = $category->category_description;
 
 				if(in_array("mentors",$fields)){
-					
+
 					$mentors = $category->mentors()->getResults();
 					$current['mentors'] = array();
 
@@ -189,18 +188,18 @@ class CategoryController extends BaseController {
 
 					}
 				}
-				
-					$return['categories'][]['category'] = $current; 
+
+					$return['categories'][]['category'] = $current;
 			}
 
-			else 
+			else
 			{
 				//var_dump($category->mentors()->getResults());
 				$current['id'] = $category->category_id;
 				$current['categoryName'] = $category->category_name;
 				$current['categoryActive'] = ($category->category_active) ? true : false;
 				$current['categoryDescription'] = $category->category_description;
-				
+
 				$mentors = $category->mentors()->getResults();
 				$current['mentors'] = array();
 
@@ -232,10 +231,10 @@ class CategoryController extends BaseController {
 
 				}
 
-				$return['categories'][]['category'] = $current; 
+				$return['categories'][]['category'] = $current;
 			}
 		}
-		
+
 		$status_code = 200;
 
 		//If next is true create next page link
@@ -259,7 +258,6 @@ class CategoryController extends BaseController {
      * @SWG\Api(
      *   path="/category/{categoryIds}",
      *   description="Operation about Categories",
-     *   produces="['application/json']",
      *   @SWG\Operations(
      *     @SWG\Operation(
      *       method="GET",
@@ -273,7 +271,7 @@ class CategoryController extends BaseController {
      *           paramType="path",
      *           required=true,
      *           type="comma seperated list"
-     *         ),  
+     *         ),
      *         @SWG\Parameter(
      *           name="fields",
      *           description="Accepted values for the fields parameter are: id, categoryName,  categoryActive, categoryDescription, mentors.",
@@ -312,22 +310,22 @@ class CategoryController extends BaseController {
      */
 
 
-	
+
 	public function show($id_commas)
 	{
 
 		$id = array_values(explode(',',$id_commas));
 
 		$fields = array_values(explode(',',Input::get("fields")));
-		
+
 		if ($fields[0] == "")
 			unset($fields);
-		
+
 		$return = [];
 		$valid = false;
 
 		if(!empty($fields))
-		{	
+		{
 			//Check if fields are valid
 			foreach($fields as $field)
 			{
@@ -338,7 +336,7 @@ class CategoryController extends BaseController {
 			}
 		}
 
-		//Get limit to calculate pagination 
+		//Get limit to calculate pagination
 		$limit = (Input::get('limit', '50'));
 
 		//If not numeric set it to the default limit
@@ -354,7 +352,7 @@ class CategoryController extends BaseController {
 		//If page is greter than one show a previous link
 		if($page > 1)
 			$previous = true;
-		else 
+		else
 			$previous = false;
 
 		//Find total number to put in header
@@ -381,7 +379,7 @@ class CategoryController extends BaseController {
 
 			//check to see if fields were specified and at least one is valid
 			if((!empty($fields)) && $valid)
-			{	
+			{
 				$current = array();
 
 				if(in_array("id",$fields))
@@ -389,7 +387,7 @@ class CategoryController extends BaseController {
 
 				if(in_array("categoryName",$fields))
 					$current['categoryName'] = $category->category_name;
-					
+
 				if(in_array("categoryActive",$fields))
 					$current['categoryActive'] = ($category->category_active) ? true : false;
 
@@ -397,7 +395,7 @@ class CategoryController extends BaseController {
 					$current['categoryDescription'] = $category->category_description;
 
 				if(in_array("mentors",$fields)){
-					
+
 					$mentors = $category->mentors()->getResults();
 					$current['mentors'] = array();
 
@@ -430,18 +428,18 @@ class CategoryController extends BaseController {
 
 					}
 				}
-				
-				$return['categories'][]['category'] = $current; 
+
+				$return['categories'][]['category'] = $current;
 			}
 
-			else 
+			else
 			{
 				//var_dump($category->mentors()->getResults());
 				$current['id'] = $category->category_id;
 				$current['categoryName'] = $category->category_name;
 				$current['categoryActive'] = ($category->category_active) ? true : false;
 				$current['categoryDescription'] = $category->category_description;
-				
+
 				$mentors = $category->mentors()->getResults();
 				$current['mentors'] = array();
 
@@ -473,10 +471,10 @@ class CategoryController extends BaseController {
 
 				}
 
-				$return['categories'][]['category'] = $current; 
+				$return['categories'][]['category'] = $current;
 			}
 		}
-		
+
 		$status_code = 200;
 
 		//If next is true create next page link

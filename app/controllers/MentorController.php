@@ -28,7 +28,6 @@ class MentorController extends BaseController {
      * @SWG\Api(
      *   path="/mentor/",
      *   description="Operation about mentors",
-     *   produces="['application/json']",
      *   @SWG\Operations(
      *     @SWG\Operation(
      *       method="GET",
@@ -230,7 +229,6 @@ class MentorController extends BaseController {
      * @SWG\Api(
      *   path="/mentor/{mentorIds}",
      *   description="Operation about mentors",
-     *   produces="['application/json']",
      *   @SWG\Operations(
      *     @SWG\Operation(
      *       method="GET",

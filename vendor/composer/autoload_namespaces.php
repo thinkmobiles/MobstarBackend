@@ -40,6 +40,7 @@ return array(
     'LucaDegasperi\\OAuth2Server' => array($vendorDir . '/lucadegasperi/oauth2-server-laravel/src'),
     'League\\OAuth2\\Server' => array($vendorDir . '/league/oauth2-server/src'),
     'Jeremeamia\\SuperClosure' => array($vendorDir . '/jeremeamia/SuperClosure/src'),
+    'Intervention\\Image\\' => array($vendorDir . '/intervention/image/src'),
     'Illuminate' => array($vendorDir . '/laravel/framework/src'),
     'Guzzle\\Stream' => array($vendorDir . '/guzzle/stream'),
     'Guzzle\\Parser' => array($vendorDir . '/guzzle/parser'),

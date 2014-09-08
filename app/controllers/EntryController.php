@@ -37,7 +37,6 @@ class EntryController extends BaseController
 	 * @SWG\Api(
 	 *   path="/entry",
 	 *   description="Operations about Entries",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="GET",
@@ -423,7 +422,6 @@ class EntryController extends BaseController
 	 * @SWG\Api(
 	 *   path="/entry/{entryIds}",
 	 *   description="Operation about Entries",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="GET",
@@ -757,7 +755,6 @@ class EntryController extends BaseController
 	 * @SWG\Api(
 	 *   path="/entry/",
 	 *   description="Operation about entries",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="POST",
@@ -989,7 +986,6 @@ class EntryController extends BaseController
 	 * @SWG\Api(
 	 *   path="/entry/{entryId}",
 	 *   description="Operation about Entries",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="PUT",
@@ -1147,7 +1143,6 @@ class EntryController extends BaseController
 	 * @SWG\Api(
 	 *   path="/entry/tag/{entryIds}",
 	 *   description="Operation about Entries",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="POST",
@@ -1214,7 +1209,6 @@ class EntryController extends BaseController
 	 * @SWG\Api(
 	 *   path="/entry/report/{entryIds}",
 	 *   description="Operation about Entries",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="POST",

@@ -28,7 +28,6 @@ class WinnerController extends BaseController
 	 * @SWG\Api(
 	 *   path="/winner/",
 	 *   description="Get Winning Entries",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="GET",

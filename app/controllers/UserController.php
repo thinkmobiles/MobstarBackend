@@ -1,6 +1,7 @@
 <?php
 
 use Swagger\Annotations as SWG;
+use MobStar\Storage\Token\TokenRepository as Token;
 
 /**
  * @package
@@ -16,12 +17,17 @@ use Swagger\Annotations as SWG;
  */
 class UserController extends BaseController
 {
+
+	public function __construct( Token $token )
+	{
+		$this->token = $token;
+	}
+
 	/**
 	 *
 	 * @SWG\Api(
 	 *   path="/user",
 	 *   description="Operations about users",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="GET",
@@ -67,7 +73,7 @@ class UserController extends BaseController
 	 * )
 	 */
 
-	public $valid_fields = [ "id", "userName", "displayName", "fullName", "email", "stars", "starredBy" ];
+	public $valid_fields = [ "id", "userName", "displayName", "fullName", "email", "stars", "starredBy", 'coverImage', 'profileImage' ];
 
 	/**
 	 * Display a listing of the resource.
@@ -180,6 +186,16 @@ class UserController extends BaseController
 					$current[ 'email' ] = $user->user_email;
 				}
 
+				if( in_array( 'profileImage', $fields ) )
+				{
+					$current[ 'profileImage' ] = 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image;
+				}
+
+				if( in_array( 'profileCover', $fields ) )
+				{
+					$current[ 'profileCover' ] = 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image;
+				}
+
 				if( in_array( 'stars', $fields ) )
 				{
 					$stars = [ ];
@@ -256,6 +272,8 @@ class UserController extends BaseController
 													'displayName' => $user->user_display_name,
 													'fullName'    => $user->user_full_name,
 													'email'       => $user->user_email,
+													'profileImage' => 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image,
+													'profileCover' => 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image,
 													'stars'       => $stars,
 													'starredBy'   => $starredBy,
 				];
@@ -296,7 +314,6 @@ class UserController extends BaseController
 	 * @SWG\Api(
 	 *   path="/user/{userIds}",
 	 *   description="Operations about users",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="GET",
@@ -465,6 +482,17 @@ class UserController extends BaseController
 					$current[ 'email' ] = $user->user_email;
 				}
 
+				if( in_array( 'profileImage', $fields ) )
+				{
+					$current[ 'profileImage' ] = 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image;
+				}
+
+				if( in_array( 'profileCover', $fields ) )
+				{
+					$current[ 'profileCover' ] = 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image;
+				}
+
+
 				if( in_array( 'stars', $fields ) )
 				{
 					$stars = [ ];
@@ -548,6 +576,8 @@ class UserController extends BaseController
 													'displayName' => $user->user_display_name,
 													'fullName'    => $user->user_full_name,
 													'email'       => $user->user_email,
+													'profileImage' => 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image,
+													'profileCover' => 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image,
 													'stars'       => $stars,
 													'starredBy'   => $starredBy,
 				];
@@ -582,7 +612,6 @@ class UserController extends BaseController
 	 * @SWG\Api(
 	 *   path="/user/search",
 	 *   description="Operations about users",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="GET",
@@ -666,7 +695,6 @@ class UserController extends BaseController
 	 * @SWG\Api(
 	 *   path="/user",
 	 *   description="Operations about users",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *	   @SWG\Operation(
 	 *       method="POST",
@@ -806,6 +834,8 @@ class UserController extends BaseController
 					'userName'        => Auth::user()->user_name,
 					'userFullName'    => Auth::user()->user_full_name,
 					'userDisplayName' => Auth::user()->user_display_name,
+					'profileImage' => 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image,
+					'profileCover' => 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image,
 				);
 
 				return $return;
@@ -831,7 +861,6 @@ class UserController extends BaseController
 	 * @SWG\Api(
 	 *   path="/user/{userId}",
 	 *   description="Operations about users",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *	   @SWG\Operation(
 	 *       method="PUT",
@@ -931,6 +960,24 @@ class UserController extends BaseController
 			{
 				$user->user_email = input::get( 'email' );
 			}
+
+			$cover = Input::file( 'coverImage' );
+
+			if( !empty( $cover ) )
+			{
+				$file_in = $cover->getRealPath();
+
+				$file_out = 'profile/' . $id . "-" . str_random( 12 ) . ".jpg";
+
+				$img = Image::make( $file_in );
+
+				$img->resize( 200, 200 );
+
+				$img->save( $_ENV[ 'PATH' ] . '/public/' . $file_out, 80 );
+
+				$user->user_cover_image = $file_out;
+			}
+
 			$user->save();
 
 			return $user;
@@ -938,12 +985,221 @@ class UserController extends BaseController
 	}
 
 	/**
-	 * Remove the specified resource from storage.
 	 *
-	 * @param  int $id
-	 *
-	 * @return Response
+	 * @SWG\Api(
+	 *     path="/user/profile",
+	 *   description="Operation about Users",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="POST",
+	 *       summary="Add profile pic",
+	 *       notes="Operation for user to add a profile image",
+	 *       nickname="removeStar",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="profileImage",
+	 *           description="The image file.",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="file"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=400,
+	 *            message="Input validation failed"
+	 *          )
+	 *       )
+	 *     )
+	 *   )
+	 * )
 	 */
+
+	public function profile( )
+	{
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		$profile = Input::file( 'profileImage' );
+
+		$user = User::find( $session->token_user_id );
+
+		if( !empty( $profile ) )
+		{
+			$file_in = $profile->getRealPath();
+
+			$file_out = 'profile/' . $session->token_user_id . "-" . str_random( 12 ) . ".jpg";
+
+			$img = Image::make( $file_in );
+
+			$img->resize( 200, 200 );
+
+			$img->save( $_ENV[ 'PATH' ] . '/public/' . $file_out, 80 );
+
+			$user->user_profile_image = $file_out;
+		}
+
+		else
+		{
+			return Response::make( [ 'errors' => 'File not included' ], 401 );
+		}
+
+		$user->save();
+
+		$stars = [ ];
+
+		foreach( $user->Stars as $star )
+		{
+			if( $star->user_star_deleted == 0 )
+			{
+
+				$stars[ ] = [ 'star_id'   => $star->user_star_star_id,
+							  'star_name' => $star->Star->user_display_name,
+				];
+
+			}
+		}
+
+		$starredBy = [ ];
+
+		foreach( $user->StarredBy as $starred )
+		{
+			if( $starred->user_star_deleted == 0 )
+			{
+				$starredBy[ ] = [ 'star_id'   => $starred->user_star_user_id,
+								  'star_name' => $starred->User->user_display_name,
+				];
+			}
+
+		}
+
+		$return[ 'user' ] = [ 'id'           => $user->user_id,
+							  'userName'     => $user->user_name,
+							  'displayName'  => $user->user_display_name,
+							  'fullName'     => $user->user_full_name,
+							  'email'        => $user->user_email,
+							  'profileImage' => 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image,
+							  'profileCover' => 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image,
+							  'stars'        => $stars,
+							  'starredBy'    => $starredBy,
+		];
+
+		return Response::make( $return, 200 );
+
+	}
+
+	/**
+	 *
+	 * @SWG\Api(
+	 *     path="/user/cover",
+	 *   description="Operation about Users",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="POST",
+	 *       summary="Add cover pic",
+	 *       notes="Operation for user to add a cover image",
+	 *       nickname="removeStar",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="coverImage",
+	 *           description="The image file.",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="file"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=400,
+	 *            message="Input validation failed"
+	 *          )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+	public function cover( )
+	{
+
+		$token = Request::header( "X-API-TOKEN" );
+		$session = $this->token->get_session( $token );
+
+		$cover = Input::file( 'coverImage' );
+
+		$user = User::find( $session->token_user_id );
+
+		if( !empty( $cover ) )
+		{
+			$file_in = $cover->getRealPath();
+
+			$file_out = 'profile/' . $session->token_user_id . "-" . str_random( 12 ) . ".jpg";
+
+			$img = Image::make( $file_in );
+
+			$img->resize( 200, 200 );
+
+			$img->save( $_ENV[ 'PATH' ] . '/public/' . $file_out, 80 );
+
+			$user->user_cover_image = $file_out;
+		}
+
+		else
+		{
+			return [ 'errors' => 'File not included' ];
+		}
+
+		$user->save();
+
+		$stars = [ ];
+
+		foreach( $user->Stars as $star )
+		{
+			if( $star->user_star_deleted == 0 )
+			{
+
+				$stars[ ] = [ 'star_id'   => $star->user_star_star_id,
+							  'star_name' => $star->Star->user_display_name,
+				];
+
+			}
+		}
+
+		$starredBy = [ ];
+
+		foreach( $user->StarredBy as $starred )
+		{
+			if( $starred->user_star_deleted == 0 )
+			{
+				$starredBy[ ] = [ 'star_id'   => $starred->user_star_user_id,
+								  'star_name' => $starred->User->user_display_name,
+				];
+			}
+
+		}
+
+		$return[ 'user' ] = [ 'id'           => $user->user_id,
+							  'userName'     => $user->user_name,
+							  'displayName'  => $user->user_display_name,
+							  'fullName'     => $user->user_full_name,
+							  'email'        => $user->user_email,
+							  'profileImage' => 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image,
+							  'profileCover' => 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image,
+							  'stars'        => $stars,
+							  'starredBy'    => $starredBy,
+		];
+
+		return Response::make( $return, 200 );
+	}
+
 	public function destroy( $user )
 	{
 		$user->delete();
