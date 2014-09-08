@@ -9,7 +9,7 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 	protected $table = "users";
 	protected $primaryKey = "user_id";
 	// Use fillable as a white list
-	protected $fillable = array( 'user_name', 'user_email', 'user_display_name', 'user_full_name', 'user_password', 'user_twitter_id', 'user_google_id', 'user_password', 'user_profile_image');
+	protected $fillable = array( 'user_name', 'user_email', 'user_display_name', 'user_full_name', 'user_password', 'user_twitter_id', 'user_google_id', 'user_password', 'user_profile_image', 'user_cover_image');
 	protected $guarded = array( 'user_user_group' );
 	protected $hidden = array( 'user_password' );
 

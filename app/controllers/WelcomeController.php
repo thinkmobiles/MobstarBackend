@@ -26,7 +26,6 @@ class WelcomeController extends BaseController {
      * @SWG\Api(
      *   path="/welcome/",
      *   description="Operation for Welcome Video",
-     *   produces="['application/json']",
      *   @SWG\Operations(
      *     @SWG\Operation(
      *       method="GET",

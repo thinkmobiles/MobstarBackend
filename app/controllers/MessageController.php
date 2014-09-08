@@ -35,7 +35,6 @@ class MessageController extends BaseController {
      * @SWG\Api(
      *   path="/message/",
      *   description="Operations about messages/message thread",
-     *   produces="['application/json']",
      *   @SWG\Operations(
      *     @SWG\Operation(
      *       method="GET",
@@ -295,7 +294,6 @@ class MessageController extends BaseController {
      * @SWG\Api(
      *   path="/message/",
      *   description="Operations about messages/message thread",
-     *   produces="['application/json']",
      *   @SWG\Operations(
      *     @SWG\Operation(
      *       method="POST",
@@ -380,7 +378,6 @@ class MessageController extends BaseController {
      * @SWG\Api(
      *   path="/message/",
      *   description="Operations about messages/message thread",
-     *   produces="['application/json']",
      *   @SWG\Operations(
      *     @SWG\Operation(
      *       method="DELETE",

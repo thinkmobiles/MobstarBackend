@@ -34,7 +34,6 @@ class NotificationController extends BaseController
 	 * @SWG\Api(
 	 *   path="/notification/",
 	 *   description="Operation about notifications",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="GET",

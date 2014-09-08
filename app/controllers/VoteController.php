@@ -37,7 +37,6 @@ class VoteController extends BaseController
 	 * @SWG\Api(
 	 *   path="/vote",
 	 *   description="Operations about Votes",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="GET",
@@ -342,7 +341,6 @@ class VoteController extends BaseController
 	 * @SWG\Api(
 	 *   path="/vote",
 	 *   description="Operations about Votes",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="POST",
@@ -515,7 +513,6 @@ class VoteController extends BaseController
 	 * @SWG\Api(
 	 *   path="/vote",
 	 *   description="Operations about Votes",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="DELETE",

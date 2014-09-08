@@ -28,7 +28,6 @@ class LoginController extends BaseController
 	 * @SWG\Api(
 	 *   path="/login",
 	 *   description="Operations to log user in or out",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="POST",
@@ -137,7 +136,6 @@ class LoginController extends BaseController
 	 * @SWG\Api(
 	 *   path="/login/facebook",
 	 *   description="Log in with facebook account",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="POST",
@@ -264,7 +262,6 @@ class LoginController extends BaseController
 	 * @SWG\Api(
 	 *   path="/login/twitter",
 	 *   description="Log in with twitter account",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="POST",
@@ -373,7 +370,6 @@ class LoginController extends BaseController
 	 * @SWG\Api(
 	 *   path="/login/google",
 	 *   description="Log in with Google account",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="POST",

@@ -28,7 +28,6 @@ class StarController extends BaseController
 	 * @SWG\Api(
 	 *   path="/star",
 	 *   description="Operations about stars",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="POST",
@@ -105,9 +104,7 @@ class StarController extends BaseController
 	/**
 	 *
 	 * @SWG\Api(
-	 *   path="/star",
 	 *   description="Operations about Stars",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="DELETE",
