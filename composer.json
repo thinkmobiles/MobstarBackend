@@ -11,7 +11,8 @@
 		"zircote/swagger-php": "*",
     	"doctrine/dbal": "~2.3",
 		"barryvdh/laravel-ide-helper": "dev-master",
-		"rafasamp/sonus": "dev-master"
+		"rafasamp/sonus": "dev-master",
+		"intervention/image": "2.*"
 	},
 	"autoload": {
 		"classmap": [

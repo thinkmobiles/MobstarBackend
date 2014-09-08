@@ -931,10 +931,90 @@ class UserController extends BaseController
 			{
 				$user->user_email = input::get( 'email' );
 			}
-			$user->save();
+
+
+
+			$cover = Input::file( 'coverImage' );
+
+			if( !empty( $cover ) )
+			{
+				$file_in = $cover->getRealPath();
+
+				$file_out = 'profile/' . $id . "-" . str_random( 12 ) . ".jpg";
+
+				$img = Image::make($file_in);
+
+				$img->resize(200, 200);
+
+				$img->save($_PATH . '/public/' . $file_out, 80);
+
+				$user->user_cover_image = $file_out;
+			}
+
+				$user->save();
 
 			return $user;
 		}
+	}
+
+	public function profile($id)
+	{
+		$profile = Input::file('profileImage');
+
+		$user = User::find( $id );
+
+		if( !empty($profile) )
+		{
+			$file_in = $profile->getRealPath();
+
+			$file_out = 'profile/' . $id . "-" . str_random( 12 ) . ".jpg";
+
+			$img = Image::make($file_in);
+
+			$img->resize(200, 200);
+
+			$img->save($_ENV['PATH'] . '/public/' . $file_out, 80);
+
+			$user->user_profile_image = $file_out;
+		}
+
+		else {
+			return ['errors' => 'File not included'];
+		}
+
+		$user->save();
+
+		return $user;
+	}
+
+	public function cover($id)
+	{
+		$profile = Input::file('coverImage');
+
+		$user = User::find( $id );
+
+		if( !empty($profile) )
+		{
+			$file_in = $profile->getRealPath();
+
+			$file_out = 'profile/' . $id . "-" . str_random( 12 ) . ".jpg";
+
+			$img = Image::make($file_in);
+
+			$img->resize(200, 200);
+
+			$img->save($_ENV['PATH'] . '/public/' . $file_out, 80);
+
+			$user->user_profile_image = $file_out;
+		}
+
+		else {
+			return ['errors' => 'File not included'];
+		}
+
+		$user->save();
+
+		return $user;
 	}
 
 	/**

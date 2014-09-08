@@ -91,6 +91,11 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "user/update",
 			"uses" => "UserController@update"
 		] );
+
+		Route::post( "user/profile/{id}", [
+			"as"   => "user/profile",
+			"uses" => "UserController@profile"
+		] );
 		Route::delete( "user/{user}", [
 			"as"   => "user/destroy",
 			"uses" => "UserController@destroy"
