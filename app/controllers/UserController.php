@@ -987,7 +987,7 @@ class UserController extends BaseController
 	/**
 	 *
 	 * @SWG\Api(
-	 *     path="user/profile",
+	 *     path="/user/profile",
 	 *   description="Operation about Users",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
@@ -1096,7 +1096,7 @@ class UserController extends BaseController
 	/**
 	 *
 	 * @SWG\Api(
-	 *     path="user/cover",
+	 *     path="/user/cover",
 	 *   description="Operation about Users",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
