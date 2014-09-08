@@ -231,6 +231,14 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "star/index",
 			"uses" => "WinnerController@index"
 		] );
+
+		// -------------------------------------------------------
+		// Notifications
+		//---------------------------------------------------------
+		Route::get( "notification/", [
+			"as"   => "notification/index",
+			"uses" => "NotificationController@index"
+		] );
 	} );
 
 	// -------------------------------------------------------
