@@ -992,7 +992,7 @@ class UserController extends BaseController
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="POST",
-	 *       summary="Add star",
+	 *       summary="Add profile pic",
 	 *       notes="Operation for user to add a profile image",
 	 *       nickname="removeStar",
 	 *       @SWG\Parameters(
@@ -1101,7 +1101,7 @@ class UserController extends BaseController
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="POST",
-	 *       summary="Add star",
+	 *       summary="Add cover pic",
 	 *       notes="Operation for user to add a cover image",
 	 *       nickname="removeStar",
 	 *       @SWG\Parameters(
