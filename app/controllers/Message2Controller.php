@@ -35,7 +35,6 @@ class Message2Controller extends BaseController {
      * @SWG\Api(
      *   path="/message/",
      *   description="Operations about messages/message thread",
-     *   produces="['application/json']",
      *   @SWG\Operations(
      *     @SWG\Operation(
      *       method="GET",

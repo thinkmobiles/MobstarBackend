@@ -30,7 +30,6 @@ class TagController extends BaseController
 	 * @SWG\Api(
 	 *   path="/tag/",
 	 *   description="Operation about Tags",
-	 *   produces="['application/json']",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="GET",

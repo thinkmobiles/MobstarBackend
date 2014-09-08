@@ -13,7 +13,7 @@ return array(
 	|
 	*/
 
-	'debug'     => $_ENV['DEBUG'],
+	'debug'     => $_ENV[ 'DEBUG' ],
 
 	/*
 	|--------------------------------------------------------------------------
@@ -112,7 +112,7 @@ return array(
 		'MobStar\Storage\StorageServiceProvider',
 		'Rafasamp\Sonus\SonusServiceProvider',
 		'Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider',
-
+		'Intervention\Image\ImageServiceProvider',
 	),
 
 	/*
@@ -181,7 +181,7 @@ return array(
 		'AuthorizationServer' => 'LucaDegasperi\OAuth2Server\Facades\AuthorizationServerFacade',
 		'ResourceServer'      => 'LucaDegasperi\OAuth2Server\Facades\ResourceServerFacade',
 		'Sonus'               => 'Rafasamp\Sonus\Facade',
-
+		'Image'               => 'Intervention\Image\Facades\Image',
 	),
 
 );
