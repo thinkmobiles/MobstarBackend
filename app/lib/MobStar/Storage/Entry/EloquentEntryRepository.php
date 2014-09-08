@@ -7,9 +7,9 @@ use EntryTag;
 class EloquentEntryRepository implements EntryRepository
 {
 
-	public function all( $user = 0, $category = 0, $subcategory = 0, $tag = 0, $order_by = 0, $order = 'desc', $limit = 50, $offset = 0, $count = false )
+	public function all( $user = 0, $category = 0, $tag = 0, $order_by = 0, $order = 'desc', $limit = 50, $offset = 0, $count = false )
 	{
-		$query = Entry::with( 'category', 'subcategory', 'vote', 'user', 'file', 'entryTag.tag' )->where( 'entry_id', '>', '0' );
+		$query = Entry::with( 'category', 'vote', 'user', 'file', 'entryTag.tag' )->where( 'entry_id', '>', '0' );
 
 		if( $user )
 		{
@@ -22,9 +22,6 @@ class EloquentEntryRepository implements EntryRepository
 
 		if( $category )
 			$query = $query->where( 'entry_category_id', '=', $category );
-
-		if( $subcategory )
-			$query = $query->where( 'entry_sub_category_id', '=', $subcategory );
 
 		if( $count )
 			return $query->count();
@@ -50,18 +47,15 @@ class EloquentEntryRepository implements EntryRepository
 		return Entry::create( $input );
 	}
 
-	public function whereIn( $ids, $user = 0, $category = 0, $subcategory = 0, $limit = 50, $offset = 0, $count = false )
+	public function whereIn( $ids, $user = 0, $category = 0,  $limit = 50, $offset = 0, $count = false )
 	{
-		$query = Entry::with( 'category', 'subcategory', 'file', 'vote', 'user', 'entryTag.tag' )->whereIn( 'entry_id', $ids );
+		$query = Entry::with( 'category', 'file', 'vote', 'user', 'entryTag.tag' )->whereIn( 'entry_id', $ids );
 
 		if( $user )
 			$query = $query->where( 'entry_user_id', '=', $user );
 
 		if( $category )
 			$query = $query->where( 'entry_category_id', '=', $category );
-
-		if( $subcategory )
-			$query = $query->where( 'entry_sub_category_id', '=', $subcategory );
 
 		if( $count )
 			return $query->count();

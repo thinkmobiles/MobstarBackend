@@ -19,7 +19,7 @@ use Swagger\Annotations as SWG;
 class EntryController extends BaseController
 {
 
-	public $valid_fields = [ "id", "userId", "category", "subCategory", "type", "name", "description", "created", "modified", "tags", "entryFiles", "upVotes", "downVotes", "rank", "language", 'userName' ];
+	public $valid_fields = [ "id", "userId", "category", "type", "name", "description", "created", "modified", "tags", "entryFiles", "upVotes", "downVotes", "rank", "language", 'userName' ];
 
 	public function __construct( Entry $entry, Token $token )
 	{
@@ -47,7 +47,7 @@ class EntryController extends BaseController
 	 *       @SWG\Parameters(
 	 *         @SWG\Parameter(
 	 *           name="fields",
-	 *           description="Accepted values for the fields parameter are: id, userId, groupName, category, subCategory, type, name, description, created, modified, tags, entryFiles, upVotes, downVotes, rank, language.",
+	 *           description="Accepted values for the fields parameter are: id, userId, groupName, category, type, name, description, created, modified, tags, entryFiles, upVotes, downVotes, rank, language.",
 	 *           paramType="query",
 	 *           required=false,
 	 *           type="comma seperated list"
@@ -205,16 +205,12 @@ class EntryController extends BaseController
 		$category = ( Input::get( 'category', '0' ) );
 		$category = ( !is_numeric( $category ) ) ? 0 : $category;
 
-		//Get subCategory
-		$subcategory = ( Input::get( 'subCategory', '0' ) );
-		$subcategory = ( !is_numeric( $subcategory ) ) ? 0 : $subcategory;
-
-		//Get subCategory
+		//Get tags
 		$tag = ( Input::get( 'tagId', '0' ) );
 		$tag = ( !is_numeric( $tag ) ) ? 0 : $tag;
 
-		$entries = $this->entry->all( $user, $category, $subcategory, $tag, $order, $dir, $limit, $offset, false );
-		$count = $this->entry->all( $user, $category, $subcategory, $tag, $order, $dir, $limit, $offset, true );
+		$entries = $this->entry->all( $user, $category, $tag, $order, $dir, $limit, $offset, false );
+		$count = $this->entry->all( $user, $category, $tag, $order, $dir, $limit, $offset, true );
 
 		if( $count == 0 )
 		{
@@ -276,9 +272,6 @@ class EntryController extends BaseController
 				{
 					$current[ 'category' ] = $entry->category->category_name;
 				}
-
-				//if(in_array("subCategory",$fields))
-				//$current['subCategory'] = $entry->sub_category->sub_category_name;
 
 				if( in_array( "type", $fields ) )
 				{
@@ -366,7 +359,6 @@ class EntryController extends BaseController
 				$current[ 'userId' ] = $entry->entry_user_id;
 				$current[ 'userName' ] = $entry->user->user_display_name;
 				$current[ 'category' ] = $entry->category->category_name;
-				//$current['subCategory'] = $entry->subcategory->sub_category_name;
 				$current[ 'type' ] = $entry->entry_type;
 				$current[ 'name' ] = $entry->entry_name;
 				$current[ 'description' ] = $entry->entry_description;
@@ -448,7 +440,7 @@ class EntryController extends BaseController
 	 *         ),
 	 *         @SWG\Parameter(
 	 *           name="fields",
-	 *           description="Accepted values for the fields parameter are: id, userId, groupName, category, subCategory, type, name, description, created, modified, tags, entryFiles, upVotes, downVotes, rank, language.",
+	 *           description="Accepted values for the fields parameter are: id, userId, groupName, category, type, name, description, created, modified, tags, entryFiles, upVotes, downVotes, rank, language.",
 	 *           paramType="query",
 	 *           required=false,
 	 *           type="comma seperated list"
@@ -545,13 +537,10 @@ class EntryController extends BaseController
 		$category = ( Input::get( 'category', '0' ) );
 		$category = ( !is_numeric( $category ) ) ? 0 : $category;
 
-		//Get subCategory
-		$subcategory = ( Input::get( 'subCategory', '0' ) );
-		$subcategory = ( !is_numeric( $subcategory ) ) ? 0 : $subcategory;
 
-		$entries = $this->entry->whereIn( $id, $user, $category, $subcategory, $limit, $offset, false );
+		$entries = $this->entry->whereIn( $id, $user, $category, $limit, $offset, false );
 
-		$count = $this->entry->whereIn( $id, $user, $category, $subcategory, $limit, $offset, true );
+		$count = $this->entry->whereIn( $id, $user, $category, $limit, $offset, true );
 
 		//var_dump($entries); 
 		if( $count == 0 )
@@ -615,9 +604,6 @@ class EntryController extends BaseController
 				{
 					$current[ 'userName' ] = $entry->user->user_display_name;
 				}
-
-				//if(in_array("subCategory",$fields))
-				//$current['subCategory'] = $entry->sub_category->sub_category_name;
 
 				if( in_array( "type", $fields ) )
 				{
@@ -703,7 +689,6 @@ class EntryController extends BaseController
 				$current[ 'id' ] = $entry->entry_id;
 				$current[ 'userId' ] = $entry->entry_user_id;
 				$current[ 'category' ] = $entry->category->category_name;
-				//$current['subCategory'] = $entry->subcategory->sub_category_name;
 				$current[ 'type' ] = $entry->entry_type;
 				$current[ 'userName' ] = $entry->user->user_display_name;
 				$current[ 'name' ] = $entry->entry_name;
@@ -863,7 +848,6 @@ class EntryController extends BaseController
 		//Validate Input
 		$rules = array(
 			'category'    => 'required|numeric',
-			//'subCategory'	=> 'required|numeric',
 			'type'        => 'required',
 			'name'        => 'required',
 			'description' => 'required',
@@ -890,7 +874,6 @@ class EntryController extends BaseController
 				$input = [
 					'entry_user_id'         => $session->token_user_id,
 					'entry_category_id'     => Input::get( 'category' ),
-					'entry_sub_category_id' => Input::get( 'subCategory' ),
 					'entry_type'            => Input::get( 'type' ),
 					'entry_name'            => Input::get( 'name' ),
 					'entry_language'        => Input::get( 'language' ),
@@ -1084,7 +1067,6 @@ class EntryController extends BaseController
 		//Validate Input
 		$rules = array(
 			'category'    => 'numeric',
-			'subCategory' => 'numeric',
 		);
 
 		$validator = Validator::make( Input::get(), $rules );
@@ -1102,10 +1084,6 @@ class EntryController extends BaseController
 			if( isset( $input[ 'category' ] ) )
 			{
 				$update[ 'entry_category_id' ] = $input[ 'category' ];
-			}
-			if( isset( $input[ 'subCategory' ] ) )
-			{
-				$update[ 'entry_sub_category_id' ] = $input[ 'subCategory' ];
 			}
 			if( isset( $input[ 'type' ] ) )
 			{
@@ -1320,10 +1298,9 @@ class EntryController extends BaseController
 	{
 		$user = 0;
 		$category = 0;
-		$subcategory = 0;
 		$tag = 0;
 
-		$entries = $this->entry->all( $user, $category, $subcategory, $tag, 10000, 0, false )->toArray();
+		$entries = $this->entry->all( $user, $category, $tag, 10000, 0, false )->toArray();
 
 		$sortArray = array();
 		$i = 0;
@@ -1381,7 +1358,7 @@ class EntryController extends BaseController
 
 		if( count( $rank ) )
 		{
-			$entries2 = $this->entry->whereIn( $id, $user, $category, $subcategory, 10000, 0, false );
+			$entries2 = $this->entry->whereIn( $id, $user, $category, 10000, 0, false );
 
 			foreach( $entries2 as $entry )
 			{
