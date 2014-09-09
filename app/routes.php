@@ -250,6 +250,15 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "notification/index",
 			"uses" => "NotificationController@index"
 		] );
+
+		// -------------------------------------------------------
+		// FAQ(s)
+		//---------------------------------------------------------
+
+		Route::get( "faq/", [
+			"as"   => "faq/index",
+			"uses" => "FaqController@index"
+		] );
 	} );
 
 	// -------------------------------------------------------
