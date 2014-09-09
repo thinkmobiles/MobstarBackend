@@ -188,12 +188,14 @@ class UserController extends BaseController
 
 				if( in_array( 'profileImage', $fields ) )
 				{
-					$current[ 'profileImage' ] = 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image;
+					$current[ 'profileImage' ] = ( !empty( $user->user_profile_image ) )
+						? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image : '';
 				}
 
 				if( in_array( 'profileCover', $fields ) )
 				{
-					$current[ 'profileCover' ] = 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image;
+					$current[ 'profileCover' ] = ( !empty( $user->user_cover_image ) )
+						? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image : '';
 				}
 
 				if( in_array( 'stars', $fields ) )
@@ -267,15 +269,17 @@ class UserController extends BaseController
 
 				}
 
-				$return[ 'users' ][ ][ 'user' ] = [ 'id'          => $user->user_id,
-													'userName'    => $user->user_name,
-													'displayName' => $user->user_display_name,
-													'fullName'    => $user->user_full_name,
-													'email'       => $user->user_email,
-													'profileImage' => 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image,
-													'profileCover' => 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image,
-													'stars'       => $stars,
-													'starredBy'   => $starredBy,
+				$return[ 'users' ][ ][ 'user' ] = [ 'id'           => $user->user_id,
+													'userName'     => $user->user_name,
+													'displayName'  => $user->user_display_name,
+													'fullName'     => $user->user_full_name,
+													'email'        => $user->user_email,
+													'profileImage' => ( !empty( $user->user_profile_image ) )
+															? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image : '',
+													'profileCover' => ( !empty( $user->user_cover_image ) )
+															? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image : '',
+													'stars'        => $stars,
+													'starredBy'    => $starredBy,
 				];
 			}
 
@@ -492,7 +496,6 @@ class UserController extends BaseController
 					$current[ 'profileCover' ] = 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image;
 				}
 
-
 				if( in_array( 'stars', $fields ) )
 				{
 					$stars = [ ];
@@ -571,15 +574,17 @@ class UserController extends BaseController
 
 				}
 
-				$return[ 'users' ][ ][ 'user' ] = [ 'id'          => $user->user_id,
-													'userName'    => $user->user_name,
-													'displayName' => $user->user_display_name,
-													'fullName'    => $user->user_full_name,
-													'email'       => $user->user_email,
-													'profileImage' => 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image,
-													'profileCover' => 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image,
-													'stars'       => $stars,
-													'starredBy'   => $starredBy,
+				$return[ 'users' ][ ][ 'user' ] = [ 'id'           => $user->user_id,
+													'userName'     => $user->user_name,
+													'displayName'  => $user->user_display_name,
+													'fullName'     => $user->user_full_name,
+													'email'        => $user->user_email,
+													'profileImage' => ( !empty( $user->user_profile_image ) )
+															? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image : '',
+													'profileCover' => ( !empty( $user->user_cover_image ) )
+															? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image : '',
+													'stars'        => $stars,
+													'starredBy'    => $starredBy,
 				];
 
 			}
@@ -834,8 +839,10 @@ class UserController extends BaseController
 					'userName'        => Auth::user()->user_name,
 					'userFullName'    => Auth::user()->user_full_name,
 					'userDisplayName' => Auth::user()->user_display_name,
-					'profileImage' => 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image,
-					'profileCover' => 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image,
+					'profileImage' => ( !empty( Auth::user()->user_profile_image ) )
+							? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_profile_image : '',
+					'profileCover' => ( !empty( Auth::user()->user_cover_image ) )
+							? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_cover_image : '',
 				);
 
 				return $return;
@@ -1019,7 +1026,7 @@ class UserController extends BaseController
 	 * )
 	 */
 
-	public function profile( )
+	public function profile()
 	{
 		$token = Request::header( "X-API-TOKEN" );
 
@@ -1083,8 +1090,10 @@ class UserController extends BaseController
 							  'displayName'  => $user->user_display_name,
 							  'fullName'     => $user->user_full_name,
 							  'email'        => $user->user_email,
-							  'profileImage' => 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image,
-							  'profileCover' => 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image,
+							  'profileImage' => ( !empty( $user->user_profile_image ) )
+									  ? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image : '',
+							  'profileCover' => ( !empty( $user->user_cover_image ) )
+									  ? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image : '',
 							  'stars'        => $stars,
 							  'starredBy'    => $starredBy,
 		];
@@ -1127,7 +1136,7 @@ class UserController extends BaseController
 	 *   )
 	 * )
 	 */
-	public function cover( )
+	public function cover()
 	{
 
 		$token = Request::header( "X-API-TOKEN" );
@@ -1191,8 +1200,10 @@ class UserController extends BaseController
 							  'displayName'  => $user->user_display_name,
 							  'fullName'     => $user->user_full_name,
 							  'email'        => $user->user_email,
-							  'profileImage' => 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image,
-							  'profileCover' => 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image,
+							  'profileImage' => ( !empty( $user->user_profile_image ) )
+									  ? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image : '',
+							  'profileCover' => ( !empty( $user->user_cover_image ) )
+									  ? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image : '',
 							  'stars'        => $stars,
 							  'starredBy'    => $starredBy,
 		];
