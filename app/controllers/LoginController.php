@@ -237,7 +237,7 @@ class LoginController extends BaseController
 
 			$facebook_user->save();
 
-			$user = User::firstOrNew( array( 'user_google_id' => $facebook_user->facebook_user_id ) );
+			$user = User::firstOrNew( array( 'user_facebook_id' => $facebook_user->facebook_user_id ) );
 
 			$user->save();
 
