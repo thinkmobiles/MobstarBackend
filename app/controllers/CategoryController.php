@@ -17,7 +17,7 @@ use Swagger\Annotations as SWG;
 
 class CategoryController extends BaseController {
 
-	public $valid_fields = ["id", "categoryName", "categoryDescription", "categoryActive", "mentors", "subCategories"];
+	public $valid_fields = ["id", "categoryName", "categoryDescription", "categoryActive", "mentors"];
 
 	/**
 	 * Display a listing of the resource.
@@ -174,21 +174,6 @@ class CategoryController extends BaseController {
 					}
 				}
 
-				if(in_array("subCategories",$fields)){
-					$subcats = $category->subCategories()->getResults();
-					$current['subCategories'] = array();
-
-					foreach($subcats as $subcat)
-					{
-						$current['subCategories'][] = [
-							'subCategoryId' => $subcat->sub_category_id,
-							'subCategoryName' => $subcat->sub_category_name,
-							'subCategoryDescription' => $subcat->sub_category_description,
-							];
-
-					}
-				}
-
 					$return['categories'][]['category'] = $current;
 			}
 
@@ -213,20 +198,6 @@ class CategoryController extends BaseController {
 						'mentorProfilePicture' => $mentor->mentor_profile_picture,
 						'mentorVideo' => $mentor->mentor_video,
 						'mentorInfo' => $mentor->mentor_bio,
-						];
-
-				}
-
-
-				$subcats = $category->subCategories()->getResults();
-				$current['subCategories'] = array();
-
-				foreach($subcats as $subcat)
-				{
-					$current['subCategories'][] = [
-						'subCategoryId' => $subcat->sub_category_id,
-						'subCategoryName' => $subcat->sub_category_name,
-						'subCategoryDescription' => $subcat->sub_category_description,
 						];
 
 				}
@@ -414,20 +385,6 @@ class CategoryController extends BaseController {
 					}
 				}
 
-				if(in_array("subCategories",$fields)){
-					$subcats = $category->subCategories()->getResults();
-					$current['subCategories'] = array();
-
-					foreach($subcats as $subcat)
-					{
-						$current['subCategories'][] = [
-							'subCategoryId' => $subcat->sub_category_id,
-							'subCategoryName' => $subcat->sub_category_name,
-							'subCategoryDescription' => $subcat->sub_category_description,
-							];
-
-					}
-				}
 
 				$return['categories'][]['category'] = $current;
 			}
@@ -453,20 +410,6 @@ class CategoryController extends BaseController {
 						'mentorProfilePicture' => $mentor->mentor_profile_picture,
 						'mentorVideo' => $mentor->mentor_video,
 						'mentorInfo' => $mentor->mentor_bio,
-						];
-
-				}
-
-
-				$subcats = $category->subCategories()->getResults();
-				$current['subCategories'] = array();
-
-				foreach($subcats as $subcat)
-				{
-					$current['subCategories'][] = [
-						'subCategoryId' => $subcat->sub_category_id,
-						'subCategoryName' => $subcat->sub_category_name,
-						'subCategoryDescription' => $subcat->sub_category_description,
 						];
 
 				}
