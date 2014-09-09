@@ -266,8 +266,8 @@ class EntryController extends BaseController
 				{
 					$current[ 'userName' ] = $entry->user->user_display_name;
 
-					$current[ 'profileImage' ] = ( !empty( $user->user_profile_image ) )
-						? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image : '';
+					$current[ 'profileImage' ] = ( !empty( $entry->user->user_profile_image ) )
+						? 'http://' . $_ENV[ 'URL' ] . '/' . $entry->user->user_profile_image  : '';
 				}
 
 				if( in_array( "category", $fields ) )
@@ -360,8 +360,8 @@ class EntryController extends BaseController
 				$current[ 'id' ] = $entry->entry_id;
 				$current[ 'userId' ] = $entry->entry_user_id;
 				$current[ 'userName' ] = $entry->user->user_display_name;
-				$current[ 'profileImage' ] = ( !empty( $user->user_profile_image ) )
-					? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image : '';
+				$current[ 'profileImage' ] = ( !empty( $entry->user->user_profile_image  ) )
+					? 'http://' . $_ENV[ 'URL' ] . '/' . $entry->user->user_profile_image  : '';
 				$current[ 'category' ] = $entry->category->category_name;
 				$current[ 'type' ] = $entry->entry_type;
 				$current[ 'name' ] = $entry->entry_name;
@@ -607,8 +607,8 @@ class EntryController extends BaseController
 				{
 					$current[ 'userName' ] = $entry->user->user_display_name;
 
-					$current[ 'profileImage' ] = ( !empty( $user->user_profile_image ) )
-						? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image : '';
+					$current[ 'profileImage' ] = ( !empty( $entry->user->user_profile_image  ) )
+						? 'http://' . $_ENV[ 'URL' ] . '/' . $entry->user->user_profile_image  : '';
 				}
 
 				if( in_array( "type", $fields ) )
@@ -695,8 +695,8 @@ class EntryController extends BaseController
 				$current[ 'id' ] = $entry->entry_id;
 				$current[ 'userId' ] = $entry->entry_user_id;
 
-				$current[ 'profileImage' ] = ( !empty( $user->user_profile_image ) )
-					? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image : '';
+				$current[ 'profileImage' ] = ( !empty( $entry->user->user_profile_image ) )
+					? 'http://' . $_ENV[ 'URL' ] . '/' . $entry->user->user_profile_image  : '';
 				$current[ 'category' ] = $entry->category->category_name;
 				$current[ 'type' ] = $entry->entry_type;
 				$current[ 'userName' ] = $entry->user->user_display_name;
