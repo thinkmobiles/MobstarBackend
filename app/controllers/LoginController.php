@@ -109,9 +109,9 @@ class LoginController extends BaseController
 					'userName'        => Auth::user()->user_name,
 					'userFullName'    => Auth::user()->user_full_name,
 					'userDisplayName' => Auth::user()->user_display_name,
-					'profileImage' => ( !empty( Auth::user()->user_profile_image ) )
+					'profileImage'    => ( !empty( Auth::user()->user_profile_image ) )
 							? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_profile_image : '',
-					'profileCover' => ( !empty( Auth::user()->user_cover_image ) )
+					'profileCover'    => ( !empty( Auth::user()->user_cover_image ) )
 							? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_cover_image : '',
 				);
 
@@ -152,6 +152,13 @@ class LoginController extends BaseController
 	 *           paramType="form",
 	 *           required=true,
 	 *           type="integer"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="userName",
+	 *           description="Name from facebook profile",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
 	 *         ),
 	 *         @SWG\Parameter(
 	 *           name="displayName",
@@ -200,6 +207,7 @@ class LoginController extends BaseController
 		$rules = array(
 			'userId'      => 'required',
 			'displayName' => 'required',
+			'userName'    => 'required',
 			'email'       => 'required',
 			'dob'         => 'required',
 			'gender'      => 'required',
@@ -218,14 +226,18 @@ class LoginController extends BaseController
 		{
 
 			//Check if this user has created an account by checking if the users id exists already in the user_social_id column
-			$user = User::firstOrNew( array( 'user_facebook_id' => Input::get( 'userId' ) ) );
 
-			$user->user_facebook_id = Input::get( 'userId' );
-			$user->user_facebook_display_name = Input::get( 'displayName' );
-			$user->user_display_name = Input::get( 'displayName' );
-			$user->user_facebook_email = Input::get( 'email' );
-			$user->user_facebook_dob = date( 'Y-m-d', strtotime( Input::get( 'dob' ) ) );
-			$user->user_facebook_gender = Input::get( 'gender' );
+			$facebook_user = FacebookUser::firstOrNew( array( 'facebook_user_facebook_id' => Input::get( 'userId' ) ) );
+
+			$facebook_user->facebook_user_facebook_id = Input::get( 'userId' );
+			$facebook_user->facebook_user_display_name = Input::get( 'displayName' );
+			$facebook_user->facebook_user_user_name = Input::get( 'userName' );
+			$facebook_user->facebook_user_email = Input::get( 'email' );
+			$facebook_user->facebook_user_gender = Input::get( 'gender' );
+
+			$facebook_user->save();
+
+			$user = User::firstOrNew( array( 'user_facebook_id' => $facebook_user->facebook_user_id ) );
 
 			$user->save();
 
