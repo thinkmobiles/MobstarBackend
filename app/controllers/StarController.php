@@ -11,7 +11,6 @@ use Swagger\Annotations as SWG;
  * @SWG\Resource(
  *  apiVersion=0.2,
  *  swaggerVersion=1.2,
- *  resourcePath="/star",
  *  basePath="http://api.mobstar.com"
  * )
  */
@@ -26,7 +25,7 @@ class StarController extends BaseController
 	/**
 	 *
 	 * @SWG\Api(
-	 *   path="/star",
+	 * 	path="/star",
 	 *   description="Operations about stars",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
@@ -105,6 +104,7 @@ class StarController extends BaseController
 	 *
 	 * @SWG\Api(
 	 *   description="Operations about Stars",
+	 *   path="/star/",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="DELETE",
@@ -140,35 +140,16 @@ class StarController extends BaseController
 
 		$session = $this->token->get_session( $token );
 
-		//Validate Input
-		$rules = array(
-			'star' => 'required|numeric',
-		);
+		$stars = Star::where('user_star_star_id','=', $id)->where('user_star_user_id', '=', $session->token_user_id)->get();
 
-		$validator = Validator::make( Input::get(), $rules );
-
-		if( $validator->fails() )
-		{
-			//var_dump($validator->messages());
-			$response[ 'errors' ] = $validator->messages()->all();
-			$status_code = 400;
+		foreach ($stars as $star){
+			$star->user_star_deleted = 1;
+			$star->save();
 		}
-		else
-		{
 
-			$where = ['user_star_star_id' => $id,
-			'user_star_user_id' => $session->token_user_id,];
-			$stars = Star::where('user_star_star_id','=', $id)->where('user_star_user_id', '=', $session->token_user_id)->get();
+		$response[ 'message' ] = "star removed";
+		$status_code = 200;
 
-			foreach ($stars as $star){
-				$star->user_star_deleted = 1;
-				$star->save();
-			}
-
-			$response[ 'message' ] = "star removed";
-			$status_code = 200;
-
-		}
 
 		return Response::make( $response, $status_code );
 	}

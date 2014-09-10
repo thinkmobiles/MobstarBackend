@@ -209,6 +209,8 @@ class UserController extends BaseController
 
 							$stars[ ] = [ 'star_id'   => $star->user_star_star_id,
 										  'star_name' => $star->Star->user_display_name,
+										  'profileImage' => ( !empty( $star->Star->user_profile_image ) )
+												  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Star->user_profile_image : '',
 							];
 
 						}
@@ -225,8 +227,10 @@ class UserController extends BaseController
 					{
 						if( $starred->user_star_deleted == 0 )
 						{
-							$starredBy[ ] = [ 'star_id'   => $starred->user_star_user_id,
+							$starredBy[ ] = [ 'star_id'   => $starred->User_star_user_id,
 											  'star_name' => $starred->User->user_display_name,
+											  'profileImage' => ( !empty( $starred->User->user_profile_image ) )
+													  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_profile_image : '',
 							];
 						}
 
@@ -251,6 +255,8 @@ class UserController extends BaseController
 
 						$stars[ ] = [ 'star_id'   => $star->user_star_star_id,
 									  'star_name' => $star->Star->user_display_name,
+									  'profileImage' => ( !empty( $star->Star->user_profile_image ) )
+											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Star->user_profile_image : '',
 						];
 
 					}
@@ -262,8 +268,10 @@ class UserController extends BaseController
 				{
 					if( $starred->user_star_deleted == 0 )
 					{
-						$starredBy[ ] = [ 'star_id'   => $starred->user_star_user_id,
+						$starredBy[ ] = [ 'star_id'   => $starred->User_star_user_id,
 										  'star_name' => $starred->User->user_display_name,
+										  'profileImage' => ( !empty( $starred->User->user_profile_image ) )
+												  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_profile_image : '',
 						];
 					}
 
@@ -488,12 +496,14 @@ class UserController extends BaseController
 
 				if( in_array( 'profileImage', $fields ) )
 				{
-					$current[ 'profileImage' ] = 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image;
+					$current[ 'profileImage' ] = ( !empty( $user->user_profile_image ) )
+						? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image : '';
 				}
 
 				if( in_array( 'profileCover', $fields ) )
 				{
-					$current[ 'profileCover' ] = 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image;
+					$current[ 'profileCover' ] = ( !empty( $user->user_cover_image ) )
+						? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image : '';
 				}
 
 				if( in_array( 'stars', $fields ) )
@@ -507,6 +517,8 @@ class UserController extends BaseController
 
 							$stars[ ] = [ 'star_id'   => $star->user_star_star_id,
 										  'star_name' => $star->Star->user_display_name,
+										  'profileImage' => ( !empty( $star->Star->user_profile_image ) )
+												  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Star->user_profile_image : '',
 							];
 
 						}
@@ -523,8 +535,10 @@ class UserController extends BaseController
 					{
 						if( $starred->user_star_deleted == 0 )
 						{
-							$starredBy[ ] = [ 'star_id'   => $starred->user_star_user_id,
+							$starredBy[ ] = [ 'star_id'   => $starred->User_star_user_id,
 											  'star_name' => $starred->User->user_display_name,
+											  'profileImage' => ( !empty( $starred->User->user_profile_image ) )
+													  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_profile_image : '',
 							];
 						}
 
@@ -556,6 +570,8 @@ class UserController extends BaseController
 
 						$stars[ ] = [ 'star_id'   => $star->user_star_star_id,
 									  'star_name' => $star->Star->user_display_name,
+									  'profileImage' => ( !empty( $star->Star->user_profile_image ) )
+											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Star->user_profile_image : '',
 						];
 
 					}
@@ -567,8 +583,10 @@ class UserController extends BaseController
 				{
 					if( $starred->user_star_deleted == 0 )
 					{
-						$starredBy[ ] = [ 'star_id'   => $starred->user_star_user_id,
+						$starredBy[ ] = [ 'star_id'   => $starred->User_star_user_id,
 										  'star_name' => $starred->User->user_display_name,
+										  'profileImage' => ( !empty( $starred->User->user_profile_image ) )
+												  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_profile_image : '',
 						];
 					}
 
