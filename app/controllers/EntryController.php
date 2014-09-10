@@ -257,17 +257,23 @@ class EntryController extends BaseController
 					$current[ 'id' ] = $entry->entry_id;
 				}
 
-				if( in_array( "userId", $fields ) )
+				if( in_array( "user", $fields ) )
 				{
-					$current[ 'userId' ] = $entry->entry_user_id;
+					$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
+					$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
 				}
 
 				if( in_array( "userName", $fields ) )
 				{
-					$current[ 'userName' ] = $entry->user->user_display_name;
 
-					$current[ 'profileImage' ] = ( !empty( $entry->user->user_profile_image ) )
-						? 'http://' . $_ENV[ 'URL' ] . '/' . $entry->user->user_profile_image  : '';
+					$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
+					$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
+					$current[ 'user' ][ 'displayName' ] = $entry->User->user_display_name;
+					$current[ 'user' ][ 'email' ] = $entry->User->user_email;
+					$current[ 'user' ][ 'profileImage' ] = ( !empty( $entry->User->user_profile_image ) )
+						? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
+					$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
+						? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
 				}
 
 				if( in_array( "category", $fields ) )
@@ -358,10 +364,17 @@ class EntryController extends BaseController
 			{
 
 				$current[ 'id' ] = $entry->entry_id;
-				$current[ 'userId' ] = $entry->entry_user_id;
+				$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
+				$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
+				$current[ 'user' ][ 'displayName' ] = $entry->User->user_display_name;
+				$current[ 'user' ][ 'email' ] = $entry->User->user_email;
+				$current[ 'user' ][ 'profileImage' ] = ( !empty( $entry->User->user_profile_image ) )
+					? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
+				$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
+					? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
 				$current[ 'userName' ] = $entry->user->user_display_name;
-				$current[ 'profileImage' ] = ( !empty( $entry->user->user_profile_image  ) )
-					? 'http://' . $_ENV[ 'URL' ] . '/' . $entry->user->user_profile_image  : '';
+				$current[ 'profileImage' ] = ( !empty( $entry->user->user_profile_image ) )
+					? 'http://' . $_ENV[ 'URL' ] . '/' . $entry->user->user_profile_image : '';
 				$current[ 'category' ] = $entry->category->category_name;
 				$current[ 'type' ] = $entry->entry_type;
 				$current[ 'name' ] = $entry->entry_name;
@@ -540,7 +553,6 @@ class EntryController extends BaseController
 		$category = ( Input::get( 'category', '0' ) );
 		$category = ( !is_numeric( $category ) ) ? 0 : $category;
 
-
 		$entries = $this->entry->whereIn( $id, $user, $category, $limit, $offset, false );
 
 		$count = $this->entry->whereIn( $id, $user, $category, $limit, $offset, true );
@@ -603,12 +615,16 @@ class EntryController extends BaseController
 					$current[ 'category' ] = $entry->category->category_name;
 				}
 
-				if( in_array( "userName", $fields ) )
+				if( in_array( "user", $fields ) )
 				{
-					$current[ 'userName' ] = $entry->user->user_display_name;
-
-					$current[ 'profileImage' ] = ( !empty( $entry->user->user_profile_image  ) )
-						? 'http://' . $_ENV[ 'URL' ] . '/' . $entry->user->user_profile_image  : '';
+					$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
+					$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
+					$current[ 'user' ][ 'displayName' ] = $entry->User->user_display_name;
+					$current[ 'user' ][ 'email' ] = $entry->User->user_email;
+					$current[ 'user' ][ 'profileImage' ] = ( !empty( $entry->User->user_profile_image ) )
+						? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
+					$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
+						? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
 				}
 
 				if( in_array( "type", $fields ) )
@@ -693,13 +709,16 @@ class EntryController extends BaseController
 			{
 
 				$current[ 'id' ] = $entry->entry_id;
-				$current[ 'userId' ] = $entry->entry_user_id;
-
-				$current[ 'profileImage' ] = ( !empty( $entry->user->user_profile_image ) )
-					? 'http://' . $_ENV[ 'URL' ] . '/' . $entry->user->user_profile_image  : '';
 				$current[ 'category' ] = $entry->category->category_name;
 				$current[ 'type' ] = $entry->entry_type;
-				$current[ 'userName' ] = $entry->user->user_display_name;
+				$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
+				$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
+				$current[ 'user' ][ 'displayName' ] = $entry->User->user_display_name;
+				$current[ 'user' ][ 'email' ] = $entry->User->user_email;
+				$current[ 'user' ][ 'profileImage' ] = ( !empty( $entry->User->user_profile_image ) )
+					? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
+				$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
+					? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
 				$current[ 'name' ] = $entry->entry_name;
 				$current[ 'description' ] = $entry->entry_description;
 				$current[ 'created' ] = $entry->entry_created_date;
@@ -880,13 +899,13 @@ class EntryController extends BaseController
 
 				//Get input
 				$input = [
-					'entry_user_id'         => $session->token_user_id,
-					'entry_category_id'     => Input::get( 'category' ),
-					'entry_type'            => Input::get( 'type' ),
-					'entry_name'            => Input::get( 'name' ),
-					'entry_language'        => Input::get( 'language' ),
-					'entry_description'     => Input::get( 'description' ),
-					'entry_created_date'    => date( 'Y-m-d H:i:s' ),
+					'entry_user_id'      => $session->token_user_id,
+					'entry_category_id'  => Input::get( 'category' ),
+					'entry_type'         => Input::get( 'type' ),
+					'entry_name'         => Input::get( 'name' ),
+					'entry_language'     => Input::get( 'language' ),
+					'entry_description'  => Input::get( 'description' ),
+					'entry_created_date' => date( 'Y-m-d H:i:s' ),
 				];
 
 				Eloquent::unguard();
@@ -1073,7 +1092,7 @@ class EntryController extends BaseController
 
 		//Validate Input
 		$rules = array(
-			'category'    => 'numeric',
+			'category' => 'numeric',
 		);
 
 		$validator = Validator::make( Input::get(), $rules );
