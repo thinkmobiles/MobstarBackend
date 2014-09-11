@@ -358,6 +358,7 @@ Route::get( 'eloquent', function ()
 
 App::missing( function ( $exception )
 {
+
 	return Response::make( [ 'error' => 'Endpoint not found' ], 404 );
 } );
 

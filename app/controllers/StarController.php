@@ -84,12 +84,13 @@ class StarController extends BaseController
 			$input = array(
 				'user_star_user_id'      => $session->token_user_id,
 				'user_star_star_id'      => Input::get( 'star' ),
-				'user_star_created_date' => date( 'Y-m-d H:i:s' ),
 			);
 
-			$star = new Star;
-			$star->user_star_user_id = $session->token_user_id;
-			$star->user_star_star_id = Input::get( 'star' );
+//			return $input;
+//			xdebug_break();
+			$star = Star::firstOrNew($input);
+			if(isset($star->user_star_created_date ))
+				return Response::make(['error' => 'Already a star'], 403);
 			$star->user_star_created_date = date( 'Y-m-d H:i:s' );
 			$star->save();
 

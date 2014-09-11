@@ -1,7 +1,7 @@
 <?php
 
 class Star extends \Eloquent {
-	protected $fillable = ['user_star_star_id'];
+	protected $fillable = ['user_star_star_id', 'user_star_user_id', 'user_star_created_date'];
 	protected $guarded = array();
 	public $timestamps = false;
 	protected $primaryKey = 'user_star_id';
@@ -13,7 +13,7 @@ class Star extends \Eloquent {
 		return $this->hasOne('User', 'user_id', 'user_star_user_id');
 	}
 
-	public function Star()
+	public function Stars()
 	{
 		return $this->hasOne('User', 'user_id', 'user_star_star_id');
 	}
