@@ -268,6 +268,15 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "report/store",
 			"uses" => "AbuseReportController@store"
 		] );
+
+		// -------------------------------------------------------
+		// Feedback
+		//---------------------------------------------------------
+
+		Route::post( "feedback/", [
+			"as"   => "feedback/store",
+			"uses" => "FeedbackController@store"
+		] );
 	} );
 
 	// -------------------------------------------------------
