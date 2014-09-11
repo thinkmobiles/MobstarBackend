@@ -86,8 +86,6 @@ class StarController extends BaseController
 				'user_star_star_id'      => Input::get( 'star' ),
 			);
 
-//			return $input;
-//			xdebug_break();
 			$star = Star::firstOrNew($input);
 			if(isset($star->user_star_created_date ))
 				return Response::make(['error' => 'Already a star'], 403);
