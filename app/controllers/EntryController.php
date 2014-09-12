@@ -118,6 +118,9 @@ class EntryController extends BaseController
 	 */
 	public function index()
 	{
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
 
 		$fields = array_values( explode( ',', Input::get( "fields" ) ) );
 
@@ -213,8 +216,36 @@ class EntryController extends BaseController
 
 		if( $count == 0 )
 		{
-			$return = [ 'error' => 'No Entries Found' ];
-			$status_code = 404;
+			if( $user != 0 )
+			{
+				$user = User::find($user);
+				$current[ 'id' ] = null;
+				$current[ 'user' ][ 'userId' ] = $user->user_id;
+				$current[ 'user' ][ 'userName' ] = $user->user_name;
+				$current[ 'user' ][ 'displayName' ] = $user->user_display_name;
+				$current[ 'user' ][ 'email' ] = $user->user_email;
+				$current[ 'user' ][ 'profileImage' ] = ( !empty( $user->user_profile_image ) )
+					? $_ENV[ 'URL' ] . "/" . $user->user_profile_cover : "";
+				$current[ 'user' ][ 'profileCover' ] = ( !empty( $user->user_profile_cover ) )
+					? $_ENV[ 'URL' ] . "/" . $user->user_profile_cover : "";
+				$current[ 'user' ][ 'isMyStar' ] = ( Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $user )->count() )
+					? true : false;
+				$current[ 'category' ] = null;
+				$current[ 'type' ] = null;
+				$current[ 'name' ] = null;
+				$current[ 'description' ] = null;
+				$current[ 'created' ] = null;
+				$current[ 'modified' ] = null;
+
+				$return['entries'][]['entry'] = $current;
+				$status_code = 404;
+
+			}
+			else
+			{
+				$return = [ 'error' => 'No Entries Found' ];
+				$status_code = 404;
+			}
 
 			return Response::make( $return, $status_code );
 		}
@@ -274,6 +305,7 @@ class EntryController extends BaseController
 						? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
 					$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
 						? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
+					$current[ 'user' ][ 'isMyStar' ] = ( Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $entry->entry_user_id ) );
 				}
 
 				if( in_array( "category", $fields ) )
@@ -372,9 +404,8 @@ class EntryController extends BaseController
 					? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
 				$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
 					? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
-				$current[ 'userName' ] = $entry->user->user_display_name;
-				$current[ 'profileImage' ] = ( !empty( $entry->user->user_profile_image ) )
-					? 'http://' . $_ENV[ 'URL' ] . '/' . $entry->user->user_profile_image : '';
+				$current[ 'user' ][ 'isMyStar' ] = ( Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $entry->entry_user_id )->count() )
+					? true : false;
 				$current[ 'category' ] = $entry->category->category_name;
 				$current[ 'type' ] = $entry->entry_type;
 				$current[ 'name' ] = $entry->entry_name;
@@ -493,6 +524,10 @@ class EntryController extends BaseController
 
 	public function show( $id_commas )
 	{
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
 		$id = array_values( explode( ',', $id_commas ) );
 
 		$fields = array_values( explode( ',', Input::get( "fields" ) ) );
@@ -625,6 +660,9 @@ class EntryController extends BaseController
 						? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
 					$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
 						? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
+					$current[ 'user' ][ 'isMyStar' ] = ( Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $entry->entry_user_id )->count() )
+						? true : false;
+
 				}
 
 				if( in_array( "type", $fields ) )
@@ -719,6 +757,9 @@ class EntryController extends BaseController
 					? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
 				$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
 					? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
+				$current[ 'user' ][ 'isMyStar' ] = ( Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $entry->entry_user_id )->count() )
+					? true : false;
+
 				$current[ 'name' ] = $entry->entry_name;
 				$current[ 'description' ] = $entry->entry_description;
 				$current[ 'created' ] = $entry->entry_created_date;
