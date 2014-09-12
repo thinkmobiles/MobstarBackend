@@ -225,7 +225,7 @@ class EntryController extends BaseController
 				$current[ 'user' ][ 'displayName' ] = $user->user_display_name;
 				$current[ 'user' ][ 'email' ] = $user->user_email;
 				$current[ 'user' ][ 'profileImage' ] = ( !empty( $user->user_profile_image ) )
-					? $_ENV[ 'URL' ] . "/" . $user->user_profile_cover : "";
+					? $_ENV[ 'URL' ] . "/" . $user->user_profile_image : "";
 				$current[ 'user' ][ 'profileCover' ] = ( !empty( $user->user_profile_cover ) )
 					? $_ENV[ 'URL' ] . "/" . $user->user_profile_cover : "";
 				$current[ 'user' ][ 'isMyStar' ] = ( Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $user )->count() )
@@ -300,11 +300,11 @@ class EntryController extends BaseController
 					$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
 					$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
 					$current[ 'user' ][ 'displayName' ] = $entry->User->user_display_name;
-					$current[ 'user' ][ 'email' ] = $entry->User->user_email;
-					$current[ 'user' ][ 'profileImage' ] = ( !empty( $entry->User->user_profile_image ) )
-						? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
-					$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
-						? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
+					$current[ 'user' ][ 'email' ] = $entry->user->user_email;
+					$current[ 'user' ][ 'profileImage' ] = ( !empty( $entry->user->user_profile_image ) )
+						? $_ENV[ 'URL' ] . "/" . $entry->user->user_profile_image : "";
+					$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->user->user_profile_cover ) )
+						? $_ENV[ 'URL' ] . "/" . $entry->user->user_profile_cover : "";
 					$current[ 'user' ][ 'isMyStar' ] = ( Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $entry->entry_user_id ) );
 				}
 
@@ -400,8 +400,8 @@ class EntryController extends BaseController
 				$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
 				$current[ 'user' ][ 'displayName' ] = $entry->User->user_display_name;
 				$current[ 'user' ][ 'email' ] = $entry->User->user_email;
-				$current[ 'user' ][ 'profileImage' ] = ( !empty( $entry->User->user_profile_image ) )
-					? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
+				$current[ 'user' ][ 'profileImage' ] = ( !empty( $entry->user->user_profile_image ) )
+					? $_ENV[ 'URL' ] . "/" . $entry->user->user_profile_image : "";
 				$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
 					? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
 				$current[ 'user' ][ 'isMyStar' ] = ( Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $entry->entry_user_id )->count() )
