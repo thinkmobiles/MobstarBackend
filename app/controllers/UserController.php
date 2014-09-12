@@ -208,9 +208,9 @@ class UserController extends BaseController
 						{
 
 							$stars[ ] = [ 'star_id'   => $star->user_star_star_id,
-										  'star_name' => $star->Star->user_display_name,
-										  'profileImage' => ( !empty( $star->Star->user_profile_image ) )
-												  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Star->user_profile_image : '',
+										  'star_name' => $star->Stars->user_display_name,
+										  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
+												  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image : '',
 							];
 
 						}
@@ -254,9 +254,9 @@ class UserController extends BaseController
 					{
 
 						$stars[ ] = [ 'star_id'   => $star->user_star_star_id,
-									  'star_name' => $star->Star->user_display_name,
-									  'profileImage' => ( !empty( $star->Star->user_profile_image ) )
-											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Star->user_profile_image : '',
+									  'star_name' => $star->Stars->user_display_name,
+									  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
+											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image : '',
 						];
 
 					}
@@ -516,9 +516,9 @@ class UserController extends BaseController
 						{
 
 							$stars[ ] = [ 'star_id'   => $star->user_star_star_id,
-										  'star_name' => $star->Star->user_display_name,
-										  'profileImage' => ( !empty( $star->Star->user_profile_image ) )
-												  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Star->user_profile_image : '',
+										  'star_name' => $star->Stars->user_display_name,
+										  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
+												  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image : '',
 							];
 
 						}
@@ -570,8 +570,8 @@ class UserController extends BaseController
 
 						$stars[ ] = [ 'star_id'   => $star->Stars->user_id,
 									  'star_name' => $star->Stars->user_display_name,
-									  'profileImage' => ( !empty( $star->Star->user_profile_image ) )
-											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Star->user_profile_image : '',
+									  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
+											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image : '',
 						];
 
 					}
@@ -1084,7 +1084,7 @@ class UserController extends BaseController
 			{
 
 				$stars[ ] = [ 'star_id'   => $star->user_star_star_id,
-							  'star_name' => $star->Star->user_display_name,
+							  'star_name' => $star->Stars->user_display_name,
 				];
 
 			}
@@ -1194,7 +1194,7 @@ class UserController extends BaseController
 			{
 
 				$stars[ ] = [ 'star_id'   => $star->user_star_star_id,
-							  'star_name' => $star->Star->user_display_name,
+							  'star_name' => $star->Stars->user_display_name,
 				];
 
 			}
