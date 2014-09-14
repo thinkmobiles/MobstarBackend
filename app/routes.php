@@ -277,6 +277,26 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "feedback/store",
 			"uses" => "FeedbackController@store"
 		] );
+
+		// -------------------------------------------------------
+		// Comments
+		//---------------------------------------------------------
+
+		Route::post( "comment/{entry}", [
+			"as"   => "comment/store",
+			"uses" => "CommentController@store"
+		] );
+
+		Route::get( "comment/", [
+			"as"   => "comment/index",
+			"uses" => "CommentController@index"
+		] );
+
+		Route::delete( "comment/{id}", [
+			"as"   => "comment/destroy",
+			"uses" => "CommentController@destroy"
+		] );
+
 	} );
 
 	// -------------------------------------------------------
