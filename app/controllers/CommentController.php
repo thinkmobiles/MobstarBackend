@@ -124,7 +124,7 @@ class CommentController extends BaseController
 
 		if( $entry )
 		{
-			$comments = $comments->where( 'comment_entry_id', '=', $user );
+			$comments = $comments->where( 'comment_entry_id', '=', $entry );
 		}
 
 		if( !$deleted )
