@@ -9,7 +9,7 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 	protected $table = "users";
 	protected $primaryKey = "user_id";
 	// Use fillable as a white list
-	protected $fillable = array( 'user_name', 'user_email', 'user_display_name', 'user_full_name', 'user_password', 'user_twitter_id', 'user_google_id', 'user_password', 'user_profile_image', 'user_cover_image', 'user_facebook_id');
+	protected $fillable = array( 'user_name', 'user_email', 'user_display_name', 'user_full_name', 'user_password', 'user_twitter_id', 'user_google_id', 'user_password', 'user_profile_image', 'user_cover_image', 'user_facebook_id' );
 	protected $guarded = array( 'user_user_group' );
 	protected $hidden = array( 'user_password' );
 
@@ -30,13 +30,13 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 
 	public function Stars()
 	{
-		return $this->hasMany('Star', 'user_star_user_id', 'user_id');
+		return $this->hasMany( 'Star', 'user_star_user_id', 'user_id' );
 	}
 
-	public function StarredBy(){
-		return $this->hasMany('Star', 'user_star_star_id', 'user_id');
+	public function StarredBy()
+	{
+		return $this->hasMany( 'Star', 'user_star_star_id', 'user_id' );
 	}
-
 
 	public function getAuthIdentifier()
 	{
@@ -78,4 +78,59 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 		return 'remember_token';
 	}
 
+	public function oneUser( $user, $includeStars = false )
+	{
+
+		$return = [ 'id'           => $user->user_id,
+					'userName'     => $user->user_name,
+					'displayName'  => $user->user_display_name,
+					'fullName'     => $user->user_full_name,
+					'email'        => $user->user_email,
+					'profileImage' => ( !empty( $user->user_profile_image ) )
+							? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image : '',
+					'profileCover' => ( !empty( $user->user_cover_image ) )
+							? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image : '',
+		];
+
+		if( $includeStars )
+		{
+			$stars = [ ];
+
+			foreach( $user->Stars as $star )
+			{
+				if( $star->user_star_deleted == 0 )
+				{
+
+					$stars[ ] = [ 'star_id'      => $star->Stars->user_id,
+								  'star_name'    => $star->Stars->user_display_name,
+								  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
+										  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image : '',
+					];
+
+				}
+			}
+
+			$return[ 'stars' ] = $stars;
+
+			$starredBy = [ ];
+
+			foreach( $user->StarredBy as $starred )
+			{
+				if( $starred->user_star_deleted == 0 )
+				{
+					$starredBy[ ] = [ 'star_id'      => $starred->User->user_id,
+									  'star_name'    => $starred->User->user_display_name,
+									  'profileImage' => ( !empty( $starred->User->user_profile_image ) )
+											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_profile_image
+											  : '',
+					];
+				}
+
+			}
+
+			$return[ 'starredBy' ] = $starredBy;
+		}
+
+		return $return;
+	}
 }
