@@ -197,7 +197,7 @@ class CommentController extends BaseController
 	/**
 	 *
 	 * @SWG\Api(
-	 *    path="/comment",
+	 *    path="/comment/{entryId}",
 	 *   description="Operations about comments",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
@@ -318,7 +318,7 @@ class CommentController extends BaseController
 	 *
 	 * @SWG\Api(
 	 *   description="Operations about Stars",
-	 *   path="/comment/",
+	 *   path="/comment/{comment}",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="DELETE",
