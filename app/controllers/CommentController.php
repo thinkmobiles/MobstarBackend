@@ -159,17 +159,17 @@ class CommentController extends BaseController
 
 			$current = array();
 
-			$current['commentId'] = $comment->comment_id;
+			$current[ 'commentId' ] = $comment->comment_id;
 
 			$user = new User;
-			$current['user'] = $user->oneUser($comment->User);
+			$current[ 'user' ] = $user->oneUser( $comment->User );
 
 //			$entry = new Entry;
 //			$current['entry'] = $entry->oneEntry($comment->Entry);
 
-			$current['comment'] = $comment->comment_content;
-			$current['commentDate'] = $comment->comment_added_date;
-			$current['commentDeleted'] = (bool) $comment->comment_deleted;
+			$current[ 'comment' ] = $comment->comment_content;
+			$current[ 'commentDate' ] = $comment->comment_added_date;
+			$current[ 'commentDeleted' ] = (bool)$comment->comment_deleted;
 
 			$return[ 'comments' ][ ][ 'comment' ] = $current;
 		}
@@ -271,10 +271,10 @@ class CommentController extends BaseController
 			{
 				Notification::create( [ 'notification_user_id'      => $record->entry_user_id,
 										'notification_subject_ids'  => json_encode( [ $session->token_user_id ] ),
-										'notification_details'      => 'has voted down your entry',
+										'notification_details'      => 'has commented on your entry',
 										'notification_read'         => 0,
 										'notification_entry_id'     => $record->entry_id,
-										'notification_type'         => 'Entry Vote',
+										'notification_type'         => 'Entry Comment',
 										'notification_created_date' => date( 'Y-m-d H:i:s' ),
 										'notification_updated_date' => date( 'Y-m-d H:i:s' )
 									  ] );
@@ -356,12 +356,19 @@ class CommentController extends BaseController
 
 		$comment = Comment::where( 'comment_id', '=', $id )->where( 'comment_user_id', '=', $session->token_user_id )->first();
 
-		$comment->comment_deleted = 1;
-		$comment->comment_deleted_by = $session->token_user_id;
-		$comment->save();
-
-		$response[ 'message' ] = "comment removed";
-		$status_code = 200;
+		if( count( $comment ) == 0 )
+		{
+			$response[ 'error' ] = "comment not found";
+			$status_code = 404;
+		}
+		else
+		{
+			$comment->comment_deleted = 1;
+			$comment->comment_deleted_by = $session->token_user_id;
+			$comment->save();
+			$response[ 'message' ] = "comment removed";
+			$status_code = 200;
+		}
 
 		return Response::make( $response, $status_code );
 	}
