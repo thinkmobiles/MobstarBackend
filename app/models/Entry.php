@@ -46,7 +46,7 @@ class Entry extends \Eloquent
 		return $this->hasMany( 'Comment', 'comment_entry_id' )->where( 'comment_deleted', '=', '0' );
 	}
 
-	public function oneEntry( $entry, $includeUser = false )
+	public function oneEntry( $entry, $session, $includeUser = false )
 	{
 
 		$current = array();
@@ -81,8 +81,7 @@ class Entry extends \Eloquent
 				? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
 			$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
 				? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
-			$current[ 'user' ][ 'isMyStar' ] = ( Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $entry->entry_user_id )->count() )
-				? true : false;
+			$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $entry->entry_user_id )->count();
 		}
 
 		$current[ 'name' ] = $entry->entry_name;

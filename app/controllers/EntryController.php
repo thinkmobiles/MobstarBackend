@@ -228,8 +228,7 @@ class EntryController extends BaseController
 					? "http://" .  $_ENV[ 'URL' ] . "/" . $user->user_profile_image : "";
 				$current[ 'user' ][ 'profileCover' ] = ( !empty( $user->user_profile_cover ) )
 					? "http://" . $_ENV[ 'URL' ] . "/" . $user->user_profile_cover : "";
-				$current[ 'user' ][ 'isMyStar' ] = ( Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $user )->count() )
-					? true : false;
+				$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $user->user_id )->count();
 				$current[ 'category' ] = null;
 				$current[ 'type' ] = null;
 				$current[ 'name' ] = null;
@@ -305,7 +304,7 @@ class EntryController extends BaseController
 						? "http://" . $_ENV[ 'URL' ] . "/" . $entry->user->user_profile_image : "";
 					$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->user->user_profile_cover ) )
 						? "http://" . $_ENV[ 'URL' ] . "/" . $entry->user->user_profile_cover : "";
-					$current[ 'user' ][ 'isMyStar' ] = ( Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $entry->entry_user_id ) );
+					$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $entry->entry_user_id )->count();
 				}
 
 				if( in_array( "category", $fields ) )
@@ -404,8 +403,7 @@ class EntryController extends BaseController
 					? "http://" . $_ENV[ 'URL' ] . "/" . $entry->user->user_profile_image : "";
 				$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
 					? "http://" . $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
-				$current[ 'user' ][ 'isMyStar' ] = ( Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $entry->entry_user_id )->count() )
-					? true : false;
+				$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $entry->entry_user_id )->count();
 				$current[ 'category' ] = $entry->category->category_name;
 				$current[ 'type' ] = $entry->entry_type;
 				$current[ 'name' ] = $entry->entry_name;
@@ -661,8 +659,7 @@ class EntryController extends BaseController
 						? "http://" . $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
 					$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
 						? "http://" . $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
-					$current[ 'user' ][ 'isMyStar' ] = ( Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $entry->entry_user_id )->count() )
-						? true : false;
+					$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $entry->entry_user_id )->count();
 
 				}
 
@@ -758,8 +755,7 @@ class EntryController extends BaseController
 					? "http://" . $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
 				$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
 					? "http://" . $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
-				$current[ 'user' ][ 'isMyStar' ] = ( Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $entry->entry_user_id )->count() )
-					? true : false;
+				$current[ 'user' ][ 'isMyStar' ] =  Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $entry->entry_user_id )->count();
 
 				$current[ 'name' ] = $entry->entry_name;
 				$current[ 'description' ] = $entry->entry_description;
@@ -1436,7 +1432,7 @@ class EntryController extends BaseController
 		}
 	}
 
-	public function oneEntry($entry, $includeUser = false){
+	public function oneEntry($entry, $session, $includeUser = false){
 
 		$current = array();
 
@@ -1470,8 +1466,7 @@ class EntryController extends BaseController
 				? "http://" . $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
 			$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
 				? "http://" . $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
-			$current[ 'user' ][ 'isMyStar' ] = ( Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $entry->entry_user_id )->count() )
-				? true : false;
+			$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $entry->entry_user_id )->count() ;
 		}
 
 		$current[ 'name' ] = $entry->entry_name;

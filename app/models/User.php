@@ -101,8 +101,8 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 				if( $star->user_star_deleted == 0 )
 				{
 
-					$stars[ ] = [ 'star_id'      => $star->Stars->user_id,
-								  'star_name'    => $star->Stars->user_display_name,
+					$stars[ ] = [ 'starId'      => $star->Stars->user_id,
+								  'starName'    => $star->Stars->user_display_name,
 								  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
 										  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image : '',
 					];
@@ -118,8 +118,8 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 			{
 				if( $starred->user_star_deleted == 0 )
 				{
-					$starredBy[ ] = [ 'star_id'      => $starred->User->user_id,
-									  'star_name'    => $starred->User->user_display_name,
+					$starredBy[ ] = [ 'starId'      => $starred->User->user_id,
+									  'starName'    => $starred->User->user_display_name,
 									  'profileImage' => ( !empty( $starred->User->user_profile_image ) )
 											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_profile_image
 											  : '',
