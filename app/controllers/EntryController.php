@@ -984,8 +984,8 @@ class EntryController extends BaseController
 
 					$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp3';
 					// Transcode Audio
-					shell_exec( 'sudo /usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
-					shell_exec( 'sudo chmod 777 ' . $file_out );
+					shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
+					shell_exec( 'chmod 777 ' . $file_out );
 					$extension = 'mp3';
 
 				}
