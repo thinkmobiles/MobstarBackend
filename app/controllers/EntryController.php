@@ -985,7 +985,7 @@ class EntryController extends BaseController
 					$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp3';
 					// Transcode Audio
 					shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
-					chown($file_out, "root");
+					chmod($file_out, 777);
 					$extension = 'mp3';
 
 				}
@@ -997,7 +997,7 @@ class EntryController extends BaseController
 						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
 						// Transcode Video
 						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
-						chown($file_out, "root");
+						chmod($file_out, 777);
 						$extension = 'mp4';
 					}
 					else
