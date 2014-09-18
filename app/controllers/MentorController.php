@@ -198,7 +198,7 @@ class MentorController extends BaseController {
 
 				foreach($categories as $category)
 				{
-					$current['categories'][] = [
+					$current['category'] = [
 						'categoryId' => $category->category_id,
 						'categoryName' => $category->category_name,
 						];
@@ -380,7 +380,7 @@ class MentorController extends BaseController {
 
 					foreach($categories as $category)
 					{
-						$current['categories'][] = [
+						$current['category'] = [
 							'categoryId' => $category->category_id,
 							'categoryName' => $category->category_name,
 							];
