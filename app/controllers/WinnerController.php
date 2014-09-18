@@ -1,6 +1,7 @@
 <?php
 
 use Swagger\Annotations as SWG;
+use MobStar\Storage\Token\TokenRepository as Token;
 
 /**
  * @package
@@ -16,6 +17,11 @@ use Swagger\Annotations as SWG;
  */
 class WinnerController extends BaseController
 {
+
+	public function __construct( Token $token )
+	{
+		$this->token = $token;
+	}
 
 	/**
 	 * Display a listing of the resource.
@@ -64,6 +70,10 @@ class WinnerController extends BaseController
 	public function index()
 	{
 
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
 		//Get limit to calculate pagination 
 		$limit = ( Input::get( 'limit', '50' ) );
 
@@ -110,16 +120,10 @@ class WinnerController extends BaseController
 
 			$current = [ ];
 
-			$current[ 'winner' ][ 'entryId' ] = $winner->winning_entry_entry_id;
-			$current[ 'winner' ][ 'strapLine' ] = $winner->winning_entry_strapline;
-			$current[ 'winner' ][ 'entry' ][ 'userId' ] = $winner->entry()->getResults()->entry_user_id;
-			$current[ 'winner' ][ 'entry' ][ 'category' ] = $winner->entry()->getResults()->category->category_name;
-			$current[ 'winner' ][ 'entry' ][ 'type' ] = $winner->entry()->getResults()->entry_type;
-			$current[ 'winner' ][ 'entry' ][ 'userName' ] = $winner->entry()->getResults()->user->user_display_name;
-			$current[ 'winner' ][ 'entry' ][ 'entryName' ] = $winner->entry()->getResults()->entry_name;
-			$current[ 'winner' ][ 'entry' ][ 'entryDescription' ] = $winner->entry()->getResults()->entry_description;
-			$current[ 'winner' ][ 'entry' ][ 'created' ] = $winner->entry()->getResults()->entry_created_date;
-			$current[ 'winner' ][ 'entry' ][ 'modified' ] = $winner->entry()->getResults()->entry_modified_date;
+			$entry = new Entry;
+
+			$current[ 'winner' ] = [ 'strapLine' => $winner->winning_entry_strapline,
+									 'entry'     => $entry->oneEntry( $winner->entry, $session, true ) ];
 
 			$return[ 'winners' ][ ] = $current;
 		}
