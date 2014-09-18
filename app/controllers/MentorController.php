@@ -165,7 +165,6 @@ class MentorController extends BaseController {
 				if(in_array("mentors",$fields)){
 					
 					$categories = $mentor->categories()->getResults();
-					$current['categories'] = array();
 
 					foreach($categories as $category)
 					{
@@ -194,7 +193,6 @@ class MentorController extends BaseController {
 			
 
 				$categories = $mentor->categories()->getResults();
-				$current['categories'] = array();
 
 				foreach($categories as $category)
 				{
@@ -376,7 +374,6 @@ class MentorController extends BaseController {
 				if(in_array("mentors",$fields)){
 					
 					$categories = $mentor->categories()->getResults();
-					$current['categories'] = array();
 
 					foreach($categories as $category)
 					{
@@ -405,7 +402,6 @@ class MentorController extends BaseController {
 			
 
 				$categories = $mentor->categories()->getResults();
-				$current['categories'] = array();
 
 				foreach($categories as $category)
 				{
