@@ -35,9 +35,13 @@ if( App::bound( "whoops" ) )
 	}
 }
 
+Route::get( '/', function()
+{
+	
+});
+
 Route::get( 'debug/', function ()
 {
-//	var_dump(getenv('ENV'));
 	echo "tmp read:";
 	var_dump( is_readable( '/tmp/' ) );
 	echo "<br>";

@@ -72,7 +72,6 @@ class Entry extends \Eloquent
 
 		if( $includeUser )
 		{
-
 			$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
 			$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
 			$current[ 'user' ][ 'displayName' ] = $entry->User->user_display_name;
@@ -81,7 +80,7 @@ class Entry extends \Eloquent
 				? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
 			$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
 				? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
-			$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', $entry->entry_user_id )->count();
+			$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $entry->entry_user_id )->count();
 		}
 
 		$current[ 'name' ] = $entry->entry_name;
