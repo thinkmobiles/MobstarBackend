@@ -127,12 +127,12 @@ class FaqController extends BaseController
 		//If next is true create next page link
 		if( $next )
 		{
-			$return[ 'next' ] = $_ENV['URL'] . "/faq/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
+			$return[ 'next' ] = "http://" . $_ENV['URL'] . "/faq/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
 		}
 
 		if( $previous )
 		{
-			$return[ 'previous' ] = $_ENV['URL'] . "/faq/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
+			$return[ 'previous' ] = "http://" . $_ENV['URL'] . "/faq/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
 		}
 
 		$response = Response::make( $return, $status_code );

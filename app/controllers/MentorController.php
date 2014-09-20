@@ -180,7 +180,7 @@ class MentorController extends BaseController
 
 				if( in_array( "profilePicture", $fields ) )
 				{
-					$current[ 'profilePicture' ] = $_ENV[ 'URL' ] . '/' . $mentor->mentor_profile_picture;
+					$current[ 'profilePicture' ] = "http://" . $_ENV[ 'URL' ] . '/' . $mentor->mentor_profile_picture;
 				}
 
 				if( in_array( "video", $fields ) )
@@ -217,7 +217,7 @@ class MentorController extends BaseController
 				$current[ 'displayName' ] = $mentor->mentor_display_name;
 				$current[ 'firstName' ] = $mentor->mentor_first_name;
 				$current[ 'surname' ] = $mentor->mentor_surname;
-				$current[ 'profilePicture' ] = $_ENV[ 'URL' ] . '/' . $mentor->mentor_profile_picture;
+				$current[ 'profilePicture' ] = "http://" . $_ENV[ 'URL' ] . '/' . $mentor->mentor_profile_picture;
 				$current[ 'video' ] = $mentor->mentor_video;
 				$current[ 'info' ] = $mentor->mentor_bio;
 
@@ -421,7 +421,7 @@ class MentorController extends BaseController
 
 				if( in_array( "profilePicture", $fields ) )
 				{
-					$current[ 'profilePicture' ] = $_ENV[ 'URL' ] . '/' . $mentor->mentor_profile_picture;
+					$current[ 'profilePicture' ] = "http://" . $_ENV[ 'URL' ] . '/' . $mentor->mentor_profile_picture;
 				}
 
 				if( in_array( "video", $fields ) )
@@ -458,7 +458,7 @@ class MentorController extends BaseController
 				$current[ 'displayName' ] = $mentor->mentor_display_name;
 				$current[ 'firstName' ] = $mentor->mentor_first_name;
 				$current[ 'surname' ] = $mentor->mentor_surname;
-				$current[ 'profilePicture' ] = $_ENV[ 'URL' ] . '/' . $mentor->mentor_profile_picture;
+				$current[ 'profilePicture' ] = "http://" . $_ENV[ 'URL' ] . '/' . $mentor->mentor_profile_picture;
 				$current[ 'video' ] = $mentor->mentor_video;
 				$current[ 'info' ] = $mentor->mentor_bio;
 
