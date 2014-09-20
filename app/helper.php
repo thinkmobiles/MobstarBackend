@@ -34,4 +34,60 @@ function getUserProfile($user, $session){
 
 }
 
+function oneUser( $user, $includeStars = false )
+{
+
+	$return = [ 'id'           => $user->user_id,
+				'userName'     => $user->user_name,
+				'displayName'  => $user->user_display_name,
+				'fullName'     => $user->user_full_name,
+				'email'        => $user->user_email,
+				'profileImage' => ( !empty( $user->user_profile_image ) )
+						? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image : '',
+				'profileCover' => ( !empty( $user->user_cover_image ) )
+						? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image : '',
+	];
+
+	if( $includeStars )
+	{
+		$stars = [ ];
+
+		foreach( $user->Stars as $star )
+		{
+			if( $star->user_star_deleted == 0 )
+			{
+
+				$stars[ ] = [ 'starId'      => $star->Stars->user_id,
+							  'starName'    => $star->Stars->user_display_name,
+							  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
+									  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image : '',
+				];
+
+			}
+		}
+
+		$return[ 'stars' ] = $stars;
+
+		$starredBy = [ ];
+
+		foreach( $user->StarredBy as $starred )
+		{
+			if( $starred->user_star_deleted == 0 )
+			{
+				$starredBy[ ] = [ 'starId'      => $starred->User->user_id,
+								  'starName'    => $starred->User->user_display_name,
+								  'profileImage' => ( !empty( $starred->User->user_profile_image ) )
+										  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_profile_image
+										  : '',
+				];
+			}
+
+		}
+
+		$return[ 'starredBy' ] = $starredBy;
+	}
+
+	return $return;
+}
+
 ?>

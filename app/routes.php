@@ -37,7 +37,7 @@ if( App::bound( "whoops" ) )
 
 Route::get( '/', function()
 {
-	
+
 });
 
 Route::get( 'debug/', function ()
@@ -181,6 +181,21 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "entry/report",
 			"uses" => "EntryController@report"
 		] );
+
+		// -------------------------------------------------------
+		// Entry Feedback
+		//---------------------------------------------------------
+
+		Route::post( "entryfeedback/{id}", [
+			"as"   => "entry/feedback",
+			"uses" => "EntryController@storeFeedback"
+		] );
+
+		Route::get( "entryfeedback/", [
+			"as"   => "entry/feedback",
+			"uses" => "EntryController@getFeedback"
+		] );
+
 
 		// -------------------------------------------------------
 		// Tags

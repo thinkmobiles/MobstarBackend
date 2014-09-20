@@ -218,14 +218,14 @@ class EntryController extends BaseController
 		{
 			if( $user != 0 )
 			{
-				$user = User::find($user);
+				$user = User::find( $user );
 				$current[ 'id' ] = null;
 				$current[ 'user' ][ 'userId' ] = $user->user_id;
 				$current[ 'user' ][ 'userName' ] = $user->user_name;
 				$current[ 'user' ][ 'displayName' ] = $user->user_display_name;
 				$current[ 'user' ][ 'email' ] = $user->user_email;
 				$current[ 'user' ][ 'profileImage' ] = ( !empty( $user->user_profile_image ) )
-					? "http://" .  $_ENV[ 'URL' ] . "/" . $user->user_profile_image : "";
+					? "http://" . $_ENV[ 'URL' ] . "/" . $user->user_profile_image : "";
 				$current[ 'user' ][ 'profileCover' ] = ( !empty( $user->user_profile_cover ) )
 					? "http://" . $_ENV[ 'URL' ] . "/" . $user->user_profile_cover : "";
 				$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $user->user_id )->count();
@@ -236,7 +236,7 @@ class EntryController extends BaseController
 				$current[ 'created' ] = null;
 				$current[ 'modified' ] = null;
 
-				$return['entries'][]['entry'] = $current;
+				$return[ 'entries' ][ ][ 'entry' ] = $current;
 				$status_code = 404;
 
 			}
@@ -408,7 +408,7 @@ class EntryController extends BaseController
 				$current[ 'type' ] = $entry->entry_type;
 				$current[ 'name' ] = $entry->entry_name;
 				$current[ 'description' ] = $entry->entry_description;
-				$current['totalComments'] = $entry->comments->count();
+				$current[ 'totalComments' ] = $entry->comments->count();
 				$current[ 'created' ] = $entry->entry_created_date;
 				$current[ 'modified' ] = $entry->entry_modified_date;
 
@@ -755,7 +755,7 @@ class EntryController extends BaseController
 					? "http://" . $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
 				$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
 					? "http://" . $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
-				$current[ 'user' ][ 'isMyStar' ] =  Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $entry->entry_user_id )->count();
+				$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $entry->entry_user_id )->count();
 
 				$current[ 'name' ] = $entry->entry_name;
 				$current[ 'description' ] = $entry->entry_description;
@@ -785,7 +785,7 @@ class EntryController extends BaseController
 				$current[ 'language' ] = $entry->entry_language;
 				// /print_r($entry);
 
-				$current['totalComments'] = $entry->comments->count();
+				$current[ 'totalComments' ] = $entry->comments->count();
 
 				if( $entry->entry_deleted )
 				{
@@ -1356,6 +1356,269 @@ class EntryController extends BaseController
 		}
 	}
 
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/entryfeedback/{entry}",
+	 *   description="Operation about Entries",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="POST",
+	 *       summary="Report an Entry",
+	 *       notes="Reports an entry. API-Token is required for this method.",
+	 *       nickname="reportEntry",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="entry",
+	 *           description="Entry ID you want to provide feedback for.",
+	 *           paramType="path",
+	 *           required=true,
+	 *           type="string"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="feedback",
+	 *           description="Feedback.",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="true"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=404,
+	 *            message="Entry not found"
+	 *          )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+
+	public function storeFeedback( $id )
+	{
+		//Validate Input
+		$rules = array(
+			'feedback' => 'required',
+		);
+
+		$validator = Validator::make( Input::get(), $rules );
+
+		if( $validator->fails() )
+		{
+			var_dump( $validator->messages() );
+			$response[ 'errors' ] = $validator->messages();
+			$status_code = 400;
+		}
+		else
+		{
+
+			$token = Request::header( "X-API-TOKEN" );
+
+			$session = $this->token->get_session( $token );
+
+			$feedback = [
+				'entry_feedback_entry_id'     => $id,
+				'entry_feedback_content'      => Input::get( 'feedback' ),
+				'entry_feedback_user_id'      => $session->token_user_id,
+				'entry_feedback_created_date' => date( 'Y-m-d H:i:s' ),
+			];
+
+			EntryFeedback::create( $feedback );
+
+			$response[ 'entry_id' ] = $id;
+			$response[ 'notice' ] = "Feedback submitted.";
+			$status_code = 201;
+
+			return Response::make( $response, $status_code );
+
+		}
+	}
+
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/entryfeedback",
+	 *   description="Operations about Entries",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="GET",
+	 *       summary="Get entry feedback",
+	 *       notes="Returns available entry feedback",
+	 *       nickname="getAllEntries",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="user",
+	 *           description="User ID whose feedback you want to view.",
+	 *           paramType="query",
+	 *           required=false,
+	 *           type="integer"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="entry",
+	 *           description="Entry ID of feedback you want to view.",
+	 *           paramType="query",
+	 *           required=false,
+	 *           type="integer"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="orderBy",
+	 *           description="Order to display feedback in.",
+	 *           paramType="query",
+	 *           required=false,
+	 *           type="string",
+	 *             enum="['latest','entry']"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="page",
+	 *           description="Page of results you want to view.",
+	 *           paramType="query",
+	 *           required=false,
+	 *           type="integer"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="limit",
+	 *           description="Maximum number of representations in response.",
+	 *           paramType="query",
+	 *           required=false,
+	 *           type="integer"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=404,
+	 *            message="Entry not found"
+	 *          )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+	public function getFeedback()
+	{
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		$return = [ ];
+
+		//Get limit to calculate pagination
+		$limit = ( Input::get( 'limit', '50' ) );
+
+		//If not numeric set it to the default limit
+		$limit = ( !is_numeric( $limit ) || $limit < 1 ) ? 50 : $limit;
+
+		//Get page
+		$page = ( Input::get( 'page', '1' ) );
+		$page = ( !is_numeric( $page ) ) ? 1 : $page;
+
+		//Get page
+		$order_by = ( Input::get( 'orderBy', '0' ) );
+
+		if( $order_by )
+		{
+			if( $order_by == 'entry' )
+			{
+				$order = 'entry_feedback_entry_id';
+				$dir = 'asc';
+			}
+			elseif( $order_by == 'latest' )
+			{
+				$order = 'entry_feedback_created_date';
+				$dir = 'desc';
+			}
+			else
+			{
+				$order = 0;
+				$dir = 0;
+			}
+		}
+		else
+		{
+			$order = 0;
+			$dir = 0;
+		}
+
+		//Calculate offset
+		$offset = ( $page * $limit ) - $limit;
+
+		//If page is greter than one show a previous link
+		if( $page > 1 )
+		{
+			$previous = true;
+		}
+		else
+		{
+			$previous = false;
+		}
+
+		//Get user
+		$user = ( Input::get( 'user', '0' ) );
+		$user = ( !is_numeric( $user ) ) ? 0 : $user;
+
+		//Get Category
+		$entry = ( Input::get( 'entry', '0' ) );
+		$entry = ( !is_numeric( $entry ) ) ? 0 : $entry;
+
+		//Get tags
+		$tag = ( Input::get( 'tagId', '0' ) );
+		$tag = ( !is_numeric( $tag ) ) ? 0 : $tag;
+
+		$feedbacks = $this->entry->feedback( $user, $entry, $order, $dir, $limit, $offset, false );
+		$count = $this->entry->feedback( $user, $entry, $order, $dir, $limit, $offset, true );
+
+		if( $count == 0 )
+		{
+
+		}
+
+		else
+		{
+			foreach( $feedbacks as $feedback )
+			{
+
+				if( !isset( $current[ $feedback->entry_feedback_entry_id ] ) )
+				{
+					$current[ $feedback->entry_feedback_entry_id ] = [
+						'entry'    => $this->oneEntry( $feedback->entry, $session, true ),
+						'feedback' => [
+							[
+								'feedbackUser' => oneUser( $feedback->user, false ),
+								'feedback'     => $feedback->entry_feedback_content
+							]
+						]
+					];
+				}
+				else
+				{
+					array_push( $current[ $feedback->entry_feedback_entry_id ][ 'feedback' ],
+								[ 'feedbackUser' => oneUser( $feedback->user, false ),
+								  'feedback'     => $feedback->entry_feedback_content ] );
+				}
+			}
+
+			foreach( $current as $i => $record )
+			{
+				$response[ ] = [
+					'feedback'      => $record[ 'feedback' ],
+					'feedbackEntry' => $record[ 'entry' ]
+				];
+			}
+		}
+
+		$status_code = 200;
+
+		return Response::make( $response, $status_code );
+
+	}
+
 	//////////////////////      Rerank function for Cron Job        \\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 	public function rerank()
@@ -1432,7 +1695,8 @@ class EntryController extends BaseController
 		}
 	}
 
-	public function oneEntry($entry, $session, $includeUser = false){
+	public function oneEntry( $entry, $session, $includeUser = false )
+	{
 
 		$current = array();
 
@@ -1455,7 +1719,7 @@ class EntryController extends BaseController
 		$current[ 'category' ] = $entry->category->category_name;
 		$current[ 'type' ] = $entry->entry_type;
 
-		if($includeUser)
+		if( $includeUser )
 		{
 
 			$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
@@ -1467,7 +1731,7 @@ class EntryController extends BaseController
 			$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
 				? "http://" . $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
 			xdebug_break();
-			$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $entry->entry_user_id )->count() ;
+			$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $entry->entry_user_id )->count();
 		}
 
 		$current[ 'name' ] = $entry->entry_name;
