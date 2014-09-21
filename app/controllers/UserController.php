@@ -919,6 +919,13 @@ class UserController extends BaseController
 	 *           type="string"
 	 *         ),
 	 *         @SWG\Parameter(
+	 *           name="tagline",
+	 *           description="The tagline to appear on the users profile",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
+	 *         ),
+	 *         @SWG\Parameter(
 	 *           name="password",
 	 *           description="Password for the regisering user",
 	 *           paramType="form",
@@ -944,7 +951,11 @@ class UserController extends BaseController
 
 	public function update( $id )
 	{
-		$user = User::find( $id );
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		$user = User::find( $session->token_user_id );
 
 		$rules = array(
 			//'email'		=> 'required|email|unique:users,user_email'
@@ -977,6 +988,12 @@ class UserController extends BaseController
 			{
 				$user->user_name = Input::get( "userName" );
 			}
+
+			if( isset( $input[ 'tagline' ] ) )
+			{
+				$user->user_tagline = Input::get( 'tagline' );
+			}
+
 			if( isset( $input[ 'displayName' ] ) )
 			{
 				$user->user_display_name = Input::get( "displayName" );
@@ -990,26 +1007,9 @@ class UserController extends BaseController
 				$user->user_email = input::get( 'email' );
 			}
 
-			$cover = Input::file( 'coverImage' );
-
-			if( !empty( $cover ) )
-			{
-				$file_in = $cover->getRealPath();
-
-				$file_out = 'profile/' . $id . "-" . str_random( 12 ) . ".jpg";
-
-				$img = Image::make( $file_in );
-
-				$img->resize( 200, 200 );
-
-				$img->save( $_ENV[ 'PATH' ] . '/public/' . $file_out, 80 );
-
-				$user->user_cover_image = $file_out;
-			}
-
 			$user->save();
 
-			return $user;
+			return ['user' => oneUser($user, $session, true)];
 		}
 	}
 
