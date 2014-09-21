@@ -238,14 +238,25 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "Message2Controller@index"
 		] );
 
+		Route::get( "message/{thread}", [
+			"as"   => "message/show",
+			"uses" => "Message2Controller@show"
+		] );
+
 		Route::post( "message/", [
 			"as"   => "message/store",
-			"uses" => "MessageController@store"
+			"uses" => "Message2Controller@store"
 		] );
-		Route::delete( "message/", [
-			"as"   => "message/destroy",
-			"uses" => "MessageController@destroy"
+
+		Route::post( "message/reply", [
+			"as"   => "message/reply",
+			"uses" => "Message2Controller@reply"
 		] );
+
+//		Route::delete( "message/", [
+//			"as"   => "message/destroy",
+//			"uses" => "MessageController@destroy"
+//		] );
 
 		// -------------------------------------------------------
 		// Stars

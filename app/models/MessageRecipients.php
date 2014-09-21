@@ -2,9 +2,9 @@
 
 class MessageRecipients extends \Eloquent {
 
-	protected $fillable = ["message_sender_id", "message_recipient_id", "message_body", "message_sender_deleted", "message_sender_deleted_date", "message_recipient_deleted", "message_recipient_deleted_date", "message_created_date"];
+	protected $fillable = ["join_message_recipient_message_id", "join_message_recipient_user_id", "join_message_recipient_created", "join_message_recipient_read", "join_message_recipient_read_date", "join_message_recipient_deleted", "join_message_recipient_deleted_date"];
 
-    protected $primaryKey = 'join_recipient_id';
+    protected $primaryKey = 'join_message_recipient_id';
 
     protected $table = 'join_message_recipients';
     

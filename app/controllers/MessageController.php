@@ -4,18 +4,6 @@ use MobStar\Storage\Message\MessageRepository as Message;
 use MobStar\Storage\Token\TokenRepository as Token;
 use Swagger\Annotations as SWG;
 
-/**
- * @package
- * @category
- * @subpackage
- *
- * @SWG\Resource(
- *  apiVersion=0.2,
- *  swaggerVersion=1.2,
- *  resourcePath="/message",
- *  basePath="http://api.mobstar.com"
- * )
- */
 class MessageController extends BaseController {
 
 	public $valid_fields = ["id", "sender", "recipient", "body", "date"];
@@ -25,66 +13,7 @@ class MessageController extends BaseController {
 	  $this->message = $message;
 	  $this->token = $token;
 	}
-	/**
-	 * Display a listing of the resource.
-	 *
-	 * @return Response
-	 */
-	/**
-     *
-     * @SWG\Api(
-     *   path="/message/",
-     *   description="Operations about messages/message thread",
-     *   @SWG\Operations(
-     *     @SWG\Operation(
-     *       method="GET",
-     *       summary="View all messages",
-     *       notes="This operation will return all message threads for a user logged in when the thread parameter is not sent, if the thread parameter is sent it will return this thread.",
-     *       nickname="allMessages",
-     *       @SWG\Parameters(
-     *         @SWG\Parameter(
-     *           name="fields",
-     *           description="Accepted values for the fields parameter are: id, sender, recipient, body, date.",
-     *           paramType="query",
-     *           required=false,
-     *           type="comma seperated list"
-     *         ),
-     *         @SWG\Parameter(
-     *           name="thread",
-     *           description="The thread you want to view, this is the ID of the user the correspondance is with.",
-     *           paramType="query",
-     *           required=false,
-     *           type="integer"
-     *         ),
-     *         @SWG\Parameter(
-     *           name="page",
-     *           description="Page of results you want to view.",
-     *           paramType="query",
-     *           required=false,
-     *           type="integer"
-     *         ),
-     *         @SWG\Parameter(
-     *           name="limit",
-     *           description="Maximum number of representations in response.",
-     *           paramType="query",
-     *           required=false,
-     *           type="integer"
-     *         )
-     *       ),
-     *       @SWG\ResponseMessages(
-     *          @SWG\ResponseMessage(
-     *            code=401,
-     *            message="Authorization failed"
-     *          ),
-     *          @SWG\ResponseMessage(
-     *            code=404,
-     *            message="No messages found"
-     *          )
-     *       )
-     *     )
-     *   )
-     * )
-     */
+
 	public function index()
 	{
 
@@ -289,48 +218,7 @@ class MessageController extends BaseController {
 		return $response;
 	}
 
-	/**
-     *
-     * @SWG\Api(
-     *   path="/message/",
-     *   description="Operations about messages/message thread",
-     *   @SWG\Operations(
-     *     @SWG\Operation(
-     *       method="POST",
-     *       summary="Send a message",
-     *       notes="Sends a message to another user.",
-     *       nickname="allMessages",
-     *       @SWG\Parameters(
-     *         @SWG\Parameter(
-     *           name="recipient",
-     *           description="User ID of recipient.",
-     *           paramType="form",
-     *           required=true,
-     *           type="integer"
-     *         ),
-     *         @SWG\Parameter(
-     *           name="body",
-     *           description="Message text",
-     *           paramType="form",
-     *           required=true,
-     *           type="string"
-     *         )
-     *       ),
-     *       @SWG\ResponseMessages(
-     *          @SWG\ResponseMessage(
-     *            code=401,
-     *            message="Authorization failed"
-     *          ),
-     *          @SWG\ResponseMessage(
-     *            code=400,
-     *            message="Input validation failed"
-     *          )
-     *       )
-     *     )
-     *   )
-     * )
-     */
-	
+
 
 	public  function store()
 	{
@@ -373,47 +261,7 @@ class MessageController extends BaseController {
 	}
 
 
-	/**
-     *
-     * @SWG\Api(
-     *   path="/message/",
-     *   description="Operations about messages/message thread",
-     *   @SWG\Operations(
-     *     @SWG\Operation(
-     *       method="DELETE",
-     *       summary="Delete message(s) or message thread(s)",
-     *       notes="Deletes messages(s) or message thread(s), you must supply at least one parameter in this request.",
-     *       nickname="allMessages",
-     *       @SWG\Parameters(
-     *         @SWG\Parameter(
-     *           name="id",
-     *           description="ID(s) of message to be deleted.",
-     *           paramType="form",
-     *           required=false,
-     *           type="comma seperated list"
-     *         ),
-     *         @SWG\Parameter(
-     *           name="thread",
-     *           description="ID(s) of correspondant in threads to be deleted",
-     *           paramType="form",
-     *           required=false,
-     *           type="comma seperated list"
-     *         )
-     *       ),
-     *       @SWG\ResponseMessages(
-     *          @SWG\ResponseMessage(
-     *            code=401,
-     *            message="Authorization failed"
-     *          ),
-     *          @SWG\ResponseMessage(
-     *            code=400,
-     *            message="Input validation failed"
-     *          )
-     *       )
-     *     )
-     *   )
-     * )
-     */
+
 	public function destroy()
 	{
 		$input = Input::get();

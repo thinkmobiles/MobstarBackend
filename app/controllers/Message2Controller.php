@@ -44,20 +44,6 @@ class Message2Controller extends BaseController
 	 *       nickname="allMessages",
 	 *       @SWG\Parameters(
 	 *         @SWG\Parameter(
-	 *           name="fields",
-	 *           description="Accepted values for the fields parameter are: id, sender, recipient, body, date.",
-	 *           paramType="query",
-	 *           required=false,
-	 *           type="comma seperated list"
-	 *         ),
-	 *         @SWG\Parameter(
-	 *           name="thread",
-	 *           description="The thread you want to view, this is the ID of the user the correspondance is with.",
-	 *           paramType="query",
-	 *           required=false,
-	 *           type="integer"
-	 *         ),
-	 *         @SWG\Parameter(
 	 *           name="page",
 	 *           description="Page of results you want to view.",
 	 *           paramType="query",
@@ -125,6 +111,8 @@ class Message2Controller extends BaseController
 
 		$count = ( count( $messages ) );
 
+		$return = [ ];
+
 		foreach( $messages as $message )
 		{
 
@@ -189,4 +177,383 @@ class Message2Controller extends BaseController
 
 		return $response;
 	}
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/message/{thread}",
+	 *   description="Operations about messages/message thread",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="GET",
+	 *       summary="View all messages",
+	 *       notes="This operation will return a thread and all messages the logged in user has received on this thread",
+	 *       nickname="thread",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="thread",
+	 *           description="Thread of messages you want to view",
+	 *           paramType="path",
+	 *           required=true,
+	 *           type="integer"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=404,
+	 *            message="No messages found"
+	 *          )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+	public function show( $thread )
+	{
+
+		//Get limit to calculate pagination
+		$limit = ( Input::get( 'limit', '50' ) );
+
+		//If not numeric set it to the default limit
+		$limit = ( !is_numeric( $limit ) || $limit < 1 ) ? 50 : $limit;
+
+		//Get page
+		$page = ( Input::get( 'page', '1' ) );
+		$page = ( !is_numeric( $page ) ) ? 1 : $page;
+
+		//Calculate offset
+		$offset = ( $page * $limit ) - $limit;
+
+		//If page is greter than one show a previous link
+		if( $page > 1 )
+		{
+			$previous = true;
+		}
+		else
+		{
+			$previous = false;
+		}
+
+		//Get current user
+		$token = Request::header( "X-API-TOKEN" );
+		$session = $this->token->get_session( $token );
+
+		$deleted = 0;
+
+		//Get users threads
+		$thread = $this->message->get_message_thread_new( $session[ 'token_user_id' ], $thread, $deleted, $limit, $offset, false );
+
+		$return = [ ];
+
+		$current = array();
+
+		$current[ 'threadId' ] = $thread->message_thread_thread_id;
+
+		$receivedMessages = [ ];
+
+		foreach( $thread->messageRecipients as $received )
+		{
+			if( $received->join_message_recipient_user_id == $session->token_user_id )
+			{
+				$receivedMessages[ ] = [
+					'message'         => $received->message->message_body,
+					'messageSender'   => oneUser( $received->message->sender ),
+					'messageReceived' => $received->message->message_created_date,
+					'messageRead'     => $received->join_message_recipient_read
+				];
+			}
+		}
+
+		$current[ 'messages' ] = $receivedMessages;
+
+		$current[ 'participants' ] = [ ];
+
+		foreach( $thread->messageParticipants as $participant )
+		{
+			if( $participant->user->user_id == $session->token_user_id )
+			{
+				continue;
+			}
+			$current[ 'participants' ][ ] = oneUser( $participant->user, false );
+		}
+
+		$return[ 'thread' ] = $current;
+
+		$status_code = 200;
+
+			//If the count is greater than the highest number of items displayed show a next link
+//		if( $count > ( $limit * $page ) )
+//		{
+//		$next = true;
+//		}
+//
+//		else
+//		{
+//			$next = false;
+//		}
+//
+//		//If next is true create next page link
+//		if( $next )
+//		{
+//			$return[ 'next' ] = "http://api.mobstar.com/message/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
+//		}
+//
+//		if( $previous )
+//		{
+//			$return[ 'previous' ] = "http://api.mobstar.com/message/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
+//		}
+//
+		$response = Response::make( $return, $status_code );
+
+//		$response->header( 'X-Total-Count', $count );
+
+		return $response;
+	}
+
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/message/",
+	 *   description="Operations about messages/message thread",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="POST",
+	 *       summary="Send a message",
+	 *       notes="This operation will send a message from the logged in user",
+	 *       nickname="sendMessages",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="recipients",
+	 *           description="Comma seperated list of user ID's who are to receive the message",
+	 *           paramType="query",
+	 *           required=true,
+	 *           type="comma seperated list"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="message",
+	 *           description="The message body",
+	 *           paramType="query",
+	 *           required=true,
+	 *           type="text"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=404,
+	 *            message="No messages found"
+	 *          )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+public function store()
+{
+
+	//Validate Input
+	$rules = array(
+		'recipients' => 'required',
+		'message'    => 'required',
+	);
+
+	$validator = Validator::make( Input::get(), $rules );
+
+	if( $validator->fails() )
+	{
+		$response[ 'errors' ] = $validator->messages();
+		$status_code = 400;
+	}
+	else
+	{
+		$recipients = Input::get( 'recipients' );
+		$message = Input::get( 'message' );
+
+		//Get current user
+		$token = Request::header( "X-API-TOKEN" );
+		$session = $this->token->get_session( $token );
+
+		$recipients = array_values( explode( ',', $recipients ) );
+
+		$recipArray = [ ];
+		$particArray = [ ];
+
+		$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ) ] );
+
+		$messageOb = Message2::create(
+							 [
+								 'message_creator_id'   => $session->token_user_id,
+								 'message_thread_id'    => $messageThread->message_thread_thread_id,
+								 'message_body'         => $message,
+								 'message_created_date' => date( 'Y-m-d H:i:s' )
+							 ]
+		);
+
+		foreach( $recipients as $recipient )
+		{
+
+			$particArray [ ] = [
+				'join_message_participant_message_thread_id' => $messageThread->message_thread_thread_id,
+				'join_message_participant_user_id'           => $recipient,
+			];
+
+			$recipArray [ ] = [
+				'join_message_recipient_thread_id'  => $messageThread->message_thread_thread_id,
+				'join_message_recipient_user_id'    => $recipient,
+				'join_message_recipient_message_id' => (int)$messageOb->message_id,
+				'join_message_recipient_created'    => 0,
+				'join_message_recipient_read'       => 0,
+			];
+
+		}
+
+		array_push( $particArray, [
+			'join_message_participant_message_thread_id' => $messageThread->message_thread_thread_id,
+			'join_message_participant_user_id'           => $session->token_user_id,
+		] );
+
+		array_push( $recipArray, [
+			'join_message_recipient_thread_id'  => $messageThread->message_thread_thread_id,
+			'join_message_recipient_user_id'    => $session->token_user_id,
+			'join_message_recipient_message_id' => $messageOb->message_id,
+			'join_message_recipient_created'    => 1,
+			'join_message_recipient_read'       => 1
+		] );
+
+		MessageParticipants::insert( $particArray );
+
+		MessageRecipients::insert( $recipArray );
+
+	}
+}
+
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/message/reply",
+	 *   description="Operations about messages/message thread",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="POST",
+	 *       summary="Send a message",
+	 *       notes="This operation will reply to the specified thread from the logged in user",
+	 *       nickname="sendMessages",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="thread",
+	 *           description="Thread ID to be replied to",
+	 *           paramType="query",
+	 *           required=true,
+	 *           type="integer"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="message",
+	 *           description="The message body",
+	 *           paramType="query",
+	 *           required=true,
+	 *           type="text"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=404,
+	 *            message="No messages found"
+	 *          )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+
+public function reply()
+{
+
+	//Validate Input
+	$rules = array(
+		'thread'  => 'required|exists:message_threads,message_thread_thread_id',
+		'message' => 'required',
+	);
+
+	$validator = Validator::make( Input::get(), $rules );
+
+	if( $validator->fails() )
+	{
+		$response[ 'errors' ] = $validator->messages();
+		$status_code = 400;
+	}
+	else
+	{
+		$thread = Input::get( 'thread' );
+		$message = Input::get( 'message' );
+
+		//Get current user
+		$token = Request::header( "X-API-TOKEN" );
+		$session = $this->token->get_session( $token );
+
+		$recipients = MessageParticipants::where( 'join_message_participant_message_thread_id', $thread );
+
+		$recipArray = [ ];
+		$particArray = [ ];
+
+		$messageOb = Message2::create(
+							 [
+								 'message_creator_id'   => $session->token_user_id,
+								 'message_thread_id'    => $thread,
+								 'message_body'         => $message,
+								 'message_created_date' => date( 'Y-m-d H:i:s' )
+							 ]
+		);
+
+		foreach( $recipients as $recipient )
+		{
+			if( $recipient->join_message_participant_user_id == $session->token_user_id )
+			{
+				continute;
+			}
+
+			$particArray [ ] = [
+				'join_message_participant_message_thread_id' => $thread,
+				'join_message_participant_user_id'           => $recipient->join_message_participant_user_id,
+			];
+
+			$recipArray [ ] = [
+				'join_message_recipient_thread_id'  => $thread,
+				'join_message_recipient_user_id'    => $recipient->join_message_participant_user_id,
+				'join_message_recipient_message_id' => $messageOb->message_id,
+				'join_message_recipient_created'    => 0,
+				'join_message_recipient_read'       => 0,
+			];
+
+		}
+
+		array_push( $particArray, [
+			'join_message_participant_message_thread_id' => $thread,
+			'join_message_participant_user_id'           => $session->token_user_id,
+		] );
+
+		array_push( $recipArray, [
+			'join_message_recipient_thread_id'  => $thread,
+			'join_message_recipient_user_id'    => $session->token_user_id,
+			'join_message_recipient_message_id' => $messageOb->message_id,
+			'join_message_recipient_created'    => 1,
+			'join_message_recipient_read'       => 1
+		] );
+
+		MessageParticipants::insert( $particArray );
+
+		MessageRecipients::insert( $recipArray );
+
+	}
+}
+
 }

@@ -1409,7 +1409,6 @@ class EntryController extends BaseController
 
 		if( $validator->fails() )
 		{
-			var_dump( $validator->messages() );
 			$response[ 'errors' ] = $validator->messages();
 			$status_code = 400;
 		}
