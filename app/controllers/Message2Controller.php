@@ -131,7 +131,7 @@ class Message2Controller extends BaseController
 			}
 
 			$current[ 'lastMessage' ][ 'messageContent' ] = $lastMessage->message->message_body;
-			$current[ 'lastMessage' ][ 'messageSender' ] = oneUser( $lastMessage->message->sender );
+			$current[ 'lastMessage' ][ 'messageSender' ] = oneUser( $lastMessage->message->sender, $session );
 
 			$current[ 'read' ] = $lastMessage->join_message_recipient_read;
 			$current[ 'participants' ] = [ ];
@@ -142,7 +142,7 @@ class Message2Controller extends BaseController
 				{
 					continue;
 				}
-				$current[ 'participants' ][ ] = oneUser( $participant->user, false );
+				$current[ 'participants' ][ ] = oneUser( $participant->user, $session, false );
 			}
 
 			$return[ 'threads' ][ ][ 'thread' ] = $current;
@@ -260,7 +260,7 @@ class Message2Controller extends BaseController
 			{
 				$receivedMessages[ ] = [
 					'message'         => $received->message->message_body,
-					'messageSender'   => oneUser( $received->message->sender ),
+					'messageSender'   => oneUser( $received->message->sender, $session ),
 					'messageReceived' => $received->message->message_created_date,
 					'messageRead'     => $received->join_message_recipient_read
 				];
@@ -277,7 +277,7 @@ class Message2Controller extends BaseController
 			{
 				continue;
 			}
-			$current[ 'participants' ][ ] = oneUser( $participant->user, false );
+			$current[ 'participants' ][ ] = oneUser( $participant->user,$session, false );
 		}
 
 		$return[ 'thread' ] = $current;

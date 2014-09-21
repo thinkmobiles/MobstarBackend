@@ -214,6 +214,11 @@ class VoteController extends BaseController
 			$next = false;
 		}
 
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+
 		foreach( $votes as $vote )
 		{
 
@@ -230,10 +235,7 @@ class VoteController extends BaseController
 
 				if( in_array( "user", $fields ) )
 				{
-					$current[ 'user' ][ 'userId' ] = $vote->vote_user_id;
-					$current[ 'user' ][ 'userEmail' ] = $vote->user()->getResults()->user_email;
-					$current[ 'user' ][ 'userName' ] = $vote->user()->user_name;
-					$current[ 'user' ][ 'userDisplayName' ] = $vote->user()->user_display_name;
+					$current[ 'user' ] = oneUser($user, $session,  true);
 				}
 
 				if( in_array( "entry", $fields ) )
@@ -277,11 +279,7 @@ class VoteController extends BaseController
 			{
 
 				$current[ 'id' ] = $vote->vote_id;
-				$current[ 'user' ][ 'userId' ] = $vote->vote_user_id;
-				$current[ 'user' ][ 'userName' ] = $vote->user->user_name;
-				$current[ 'user' ][ 'userEmail' ] = $vote->user->user_email;
-				$current[ 'user' ][ 'userDisplayName' ] = $vote->user->user_display_name;
-				$current[ 'entry' ][ 'entryId' ] = $vote->vote_entry_id;
+				$current[ 'user' ] = oneUser($user, $session, true);
 				if( is_null( $vote->entry ) )
 				{
 					$current[ 'entry' ][ 'error' ] = "entry unavailable";

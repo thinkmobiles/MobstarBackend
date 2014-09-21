@@ -154,6 +154,12 @@ class CommentController extends BaseController
 			$next = false;
 		}
 
+
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+
 		foreach( $comments as $comment )
 		{
 
@@ -162,7 +168,7 @@ class CommentController extends BaseController
 			$current[ 'commentId' ] = $comment->comment_id;
 
 			$user = new User;
-			$current[ 'user' ] = $user->oneUser( $comment->User );
+			$current[ 'user' ] = $user->oneUser( $comment->User, $session );
 
 //			$entry = new Entry;
 //			$current['entry'] = $entry->oneEntry($comment->Entry);

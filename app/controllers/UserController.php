@@ -152,6 +152,11 @@ class UserController extends BaseController
 			$next = false;
 		}
 
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+
 		$users = User::take( $limit )->skip( $offset )->get();
 		foreach( $users as $user )
 		{
@@ -281,20 +286,7 @@ class UserController extends BaseController
 
 				}
 
-				$return[ 'users' ][ ][ 'user' ] = [ 'id'           => $user->user_id,
-													'userName'     => $user->user_name,
-													'displayName'  => $user->user_display_name,
-													'fullName'     => $user->user_full_name,
-													'email'        => $user->user_email,
-													'profileImage' => ( !empty( $user->user_profile_image ) )
-															? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image
-															: '',
-													'profileCover' => ( !empty( $user->user_cover_image ) )
-															? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image
-															: '',
-													'stars'        => $stars,
-													'starredBy'    => $starredBy,
-				];
+				$return[ 'users' ][ ][ 'user' ] = oneUser($user, $session, true);
 			}
 
 		}
@@ -1115,18 +1107,7 @@ class UserController extends BaseController
 
 		}
 
-		$return[ 'user' ] = [ 'id'           => $user->user_id,
-							  'userName'     => $user->user_name,
-							  'displayName'  => $user->user_display_name,
-							  'fullName'     => $user->user_full_name,
-							  'email'        => $user->user_email,
-							  'profileImage' => ( !empty( $user->user_profile_image ) )
-									  ? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image : '',
-							  'profileCover' => ( !empty( $user->user_cover_image ) )
-									  ? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image : '',
-							  'stars'        => $stars,
-							  'starredBy'    => $starredBy,
-		];
+		$return[ 'user' ] = oneUser($user, $session, true);
 
 		return Response::make( $return, 200 );
 
@@ -1225,18 +1206,7 @@ class UserController extends BaseController
 
 		}
 
-		$return[ 'user' ] = [ 'id'           => $user->user_id,
-							  'userName'     => $user->user_name,
-							  'displayName'  => $user->user_display_name,
-							  'fullName'     => $user->user_full_name,
-							  'email'        => $user->user_email,
-							  'profileImage' => ( !empty( $user->user_profile_image ) )
-									  ? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image : '',
-							  'profileCover' => ( !empty( $user->user_cover_image ) )
-									  ? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image : '',
-							  'stars'        => $stars,
-							  'starredBy'    => $starredBy,
-		];
+		$return[ 'user' ] = oneUser($user, $session, true);
 
 		return Response::make( $return, 200 );
 	}

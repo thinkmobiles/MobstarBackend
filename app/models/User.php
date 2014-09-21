@@ -78,7 +78,7 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 		return 'remember_token';
 	}
 
-	public function oneUser( $user, $includeStars = false )
+	public function oneUser( $user, $session, $includeStars = false )
 	{
 
 		$return = [ 'id'           => $user->user_id,
