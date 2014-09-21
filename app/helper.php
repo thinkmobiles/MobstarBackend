@@ -46,7 +46,7 @@ function getUserProfile( $user, $session )
 
 }
 
-function oneUser( $user, $includeStars = false )
+function oneUser( $user, $session,  $includeStars = false )
 {
 
 	$return = [ 'id'           => $user->user_id,
@@ -59,7 +59,9 @@ function oneUser( $user, $includeStars = false )
 				'profileCover' => ( !empty( $user->user_cover_image ) )
 						? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image : '',
 	];
-	$return[ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $entry->entry_user_id )->count();
+
+	if($session->token_user_id != $user->user_id)
+		$return[ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $user->user_id )->count();
 
 	if( $includeStars )
 	{

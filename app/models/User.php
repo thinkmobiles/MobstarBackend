@@ -92,6 +92,9 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 							? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image : '',
 		];
 
+		if($session->token_user_id != $user->user_id)
+			$return[ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $user->user_id )->count();
+
 		if( $includeStars )
 		{
 			$stars = [ ];
