@@ -10,12 +10,12 @@ class MessageRecipients extends \Eloquent {
     
     public $timestamps = false;
 
-    public function messageThread(){
-        $this->belongsTo('MessageThread', 'join_message_recipient_message_thread_id', 'message_thread_thread_id');
-    }
+	public function messageThread(){
+		return $this->hasOne('MessageThread', 'join_message_recipient_message_thread_id', 'message_thread_thread_id');
+	}
 
     public function message(){
-        $this->belongsTo('Message2', 'join_message_recipient_message_id', 'message_id');
+        return $this->hasOne('Message2', 'message_id', 'join_message_recipient_message_id');
     }
 
     public function user(){

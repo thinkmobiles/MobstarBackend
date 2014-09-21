@@ -13,6 +13,10 @@ class MessageParticipants extends \Eloquent {
         return $this->hasOne('MessageThread', 'message_thread_thread_id', 'join_message_participant_message_thread_id');
     }
 
+	public function messages(){
+		return $this->belongsToMany('Message2', 'join_message_recipients', 'join_message_recipient_user_id', 'join_message_recipient_message_id');
+	}
+
     public function otherParticipants(){
         return $this->hasMany('MessageParticipants', 'join_message_participant_message_thread_id', 'join_message_participant_message_thread_id');
     }

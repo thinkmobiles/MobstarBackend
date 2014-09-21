@@ -11,8 +11,16 @@ class Message2 extends \Eloquent {
         $this->belongsTo('MessageThread', 'message_thread_id', 'message_thread_thread_id');
     }
 
+	public function participants(){
+		return $this->belongsToMany('Participants', 'join_message_recipients', 'join_message_recipient_user_id', 'message_id');
+	}
+
     public function recipients(){
-        $this->hasMany('MessageRecipients', 'message_id', 'join_message_recipient_message_id');
+        return $this->hasMany('MessageRecipients', 'join_message_recipient_message_id', 'message_id');
     }
+
+	public function sender(){
+		return $this->hasOne('User', 'user_id', 'message_creator_id');
+	}
 
 }
