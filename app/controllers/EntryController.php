@@ -1619,6 +1619,85 @@ class EntryController extends BaseController
 
 	}
 
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/entry/search",
+	 *   description="Operations about entries",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="GET",
+	 *       summary="Serch for an entry",
+	 *       notes="Use the term parameter for your search term, if an email address is submitted the API will search for any users with this email address, anything other than an email address will result in a search of user names and display names. API-Token is required for this method.",
+	 *       nickname="getAllUsers",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="term",
+	 *           description="Search term",
+	 *           paramType="query",
+	 *           required=false,
+	 *           type="comma seperated list"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="page",
+	 *           description="Page of results you want to view",
+	 *           paramType="query",
+	 *           required=false,
+	 *           type="integer"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="limit",
+	 *           description="Maximum number of representations in response.",
+	 *           paramType="query",
+	 *           required=false,
+	 *           type="integer"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=404,
+	 *            message="No users found"
+	 *          )
+	 *        )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+
+	public function search()
+	{
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		$term = Input::get( "term" );
+
+		$results = $this->entry->search($term);
+
+		$status_code = 200;
+
+		if( count( $results ) == 0 )
+		{
+			$return = json_encode( [ 'error' => 'No Entries Found' ] );
+			$status_code = 404;
+		}
+
+		else{
+			$return = [];
+			foreach ($results as $entry)
+			{
+				$return['entries'][] = oneEntry($entry, $session, true);
+			}
+		}
+
+		return Response::make( $return, $status_code );
+	}
+
 	//////////////////////      Rerank function for Cron Job        \\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 	public function rerank()

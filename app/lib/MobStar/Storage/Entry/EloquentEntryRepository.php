@@ -156,4 +156,12 @@ class EloquentEntryRepository implements EntryRepository
 		return $query->take( 50 )->skip( 0 )->get();
 	}
 
+	public function search($term){
+
+		return Entry::whereRaw(
+			 "MATCH(entry_name, entry_description) AGAINST(? IN BOOLEAN MODE)",
+			 array( $term )
+		)->get();
+	}
+
 }
