@@ -177,6 +177,8 @@ class CommentController extends BaseController
 			$current[ 'commentDate' ] = $comment->comment_added_date;
 			$current[ 'commentDeleted' ] = (bool)$comment->comment_deleted;
 
+			$current['entry'] = oneEntry($comment->Entry, $session, true);
+
 			$return[ 'comments' ][ ][ 'comment' ] = $current;
 		}
 
