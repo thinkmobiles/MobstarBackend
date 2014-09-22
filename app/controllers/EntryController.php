@@ -1580,7 +1580,7 @@ class EntryController extends BaseController
 
 		if( $count == 0 )
 		{
-
+			$response = ['feedback' => []];
 		}
 
 		else

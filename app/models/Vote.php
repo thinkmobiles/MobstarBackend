@@ -7,12 +7,12 @@ class Vote extends \Eloquent {
 
 	public function user()
     {
-        return $this->belongsTo('User', 'vote_user_id');
+        return $this->hasOne('User', 'user_id', 'vote_user_id');
     }
 
 	public function entry()
     {
-        return $this->belongsTo('Entry', 'vote_entry_id');
+        return $this->hasOne('Entry', 'entry_id', 'vote_entry_id');
     }
 
 }

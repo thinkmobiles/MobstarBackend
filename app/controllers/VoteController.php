@@ -235,20 +235,13 @@ class VoteController extends BaseController
 
 				if( in_array( "user", $fields ) )
 				{
-					$current[ 'user' ] = oneUser($user, $session,  true);
+					$current[ 'user' ] = oneUser($vote->user, $session,  true);
+
 				}
 
 				if( in_array( "entry", $fields ) )
 				{
-					$current[ 'entry' ][ 'entryId' ] = $vote->vote_entry_id;
-					$current[ 'entry' ][ 'userId' ] = $vote->entry()->getResults()->entry_user_id;
-					$current[ 'entry' ][ 'category' ] = $vote->entry()->getResults()->category->category_name;
-					$current[ 'entry' ][ 'type' ] = $vote->entry()->getResults()->entry_type;
-					$current[ 'entry' ][ 'userName' ] = $vote->entry()->getResults()->user->user_display_name;
-					$current[ 'entry' ][ 'entryName' ] = $vote->entry()->getResults()->entry_name;
-					$current[ 'entry' ][ 'entryDescription' ] = $vote->entry()->getResults()->entry_description;
-					$current[ 'entry' ][ 'created' ] = $vote->entry()->getResults()->entry_created_date;
-					$current[ 'entry' ][ 'modified' ] = $vote->entry()->getResults()->entry_modified_date;
+					$current[ 'entry' ] = oneEntry($vote->entry, $session, true);
 				}
 
 				if( in_array( "type", $fields ) )
@@ -279,23 +272,8 @@ class VoteController extends BaseController
 			{
 
 				$current[ 'id' ] = $vote->vote_id;
-				$current[ 'user' ] = oneUser($user, $session, true);
-				if( is_null( $vote->entry ) )
-				{
-					$current[ 'entry' ][ 'error' ] = "entry unavailable";
-				}
-				else
-				{
-					$current[ 'entry' ][ 'entryId' ] = $vote->vote_entry_id;
-					$current[ 'entry' ][ 'userId' ] = $vote->entry()->getResults()->entry_user_id;
-					$current[ 'entry' ][ 'category' ] = $vote->entry()->getResults()->category->category_name;
-					$current[ 'entry' ][ 'type' ] = $vote->entry()->getResults()->entry_type;
-					$current[ 'entry' ][ 'userName' ] = $vote->entry()->getResults()->user->user_display_name;
-					$current[ 'entry' ][ 'entryName' ] = $vote->entry()->getResults()->entry_name;
-					$current[ 'entry' ][ 'entryDescription' ] = $vote->entry()->getResults()->entry_description;
-					$current[ 'entry' ][ 'created' ] = $vote->entry()->getResults()->entry_created_date;
-					$current[ 'entry' ][ 'modified' ] = $vote->entry()->getResults()->entry_modified_date;
-				}
+				$current[ 'user' ] = oneUser($vote->user, $session,  true);
+				$current[ 'entry' ] = oneEntry($vote->entry, $session, true);
 
 				if( $vote[ 'vote_up' ] == 1 && $vote[ 'vote_down' ] == 0 )
 				{
