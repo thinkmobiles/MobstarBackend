@@ -56,7 +56,7 @@ class EloquentEntryRepository implements EntryRepository
 
 	public function whereIn( $ids, $user = 0, $category = 0, $limit = 50, $offset = 0, $count = false )
 	{
-		$query = Entry::with( 'category', 'file', 'vote', 'user', 'entryTag.tag', 'comment' )->whereIn( 'entry_id', $ids );
+		$query = Entry::with( 'category', 'file', 'vote', 'user', 'entryTag.tag', 'comments' )->whereIn( 'entry_id', $ids );
 
 		if( $user )
 		{

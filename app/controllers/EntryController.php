@@ -88,6 +88,13 @@ class EntryController extends BaseController
 	 *           type="string"
 	 *         ),
 	 *         @SWG\Parameter(
+	 *           name="showFeedback",
+	 *           description="Show feedback boolean - 1 for true, 0 for false",
+	 *           paramType="query",
+	 *           required=false,
+	 *           type="integer"
+	 *         ),
+	 *         @SWG\Parameter(
 	 *           name="page",
 	 *           description="Page of results you want to view.",
 	 *           paramType="query",
@@ -207,6 +214,8 @@ class EntryController extends BaseController
 		$category = ( Input::get( 'category', '0' ) );
 		$category = ( !is_numeric( $category ) ) ? 0 : $category;
 
+		$showFeedback = ( Input::get( 'showFeedback', '0' ) );
+
 		//Get tags
 		$tag = ( Input::get( 'tagId', '0' ) );
 		$tag = ( !is_numeric( $tag ) ) ? 0 : $tag;
@@ -220,7 +229,7 @@ class EntryController extends BaseController
 			{
 				$user = User::find( $user );
 				$current[ 'id' ] = null;
-				$current[ 'user' ] = oneUser($user, $session);
+				$current[ 'user' ] = oneUser( $user, $session );
 //				$current[ 'user' ][ 'userId' ] = $user->user_id;
 //				$current[ 'user' ][ 'userName' ] = $user->user_name;
 //				$current[ 'user' ][ 'displayName' ] = $user->user_display_name;
@@ -396,7 +405,7 @@ class EntryController extends BaseController
 			{
 
 				$current[ 'id' ] = $entry->entry_id;
-				$current[ 'user' ] = oneUser($entry->User, $session);
+				$current[ 'user' ] = oneUser( $entry->User, $session );
 
 //				$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
 //				$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
@@ -434,6 +443,21 @@ class EntryController extends BaseController
 				$current[ 'downVotes' ] = $down_votes;
 				$current[ 'rank' ] = $entry->entry_rank;
 				$current[ 'language' ] = $entry->entry_language;
+
+
+				if($showFeedback == 1)
+				{
+					$currentFeedback = [ ];
+
+					foreach( $entry->comments as $comment )
+					{
+						$currentFeedback[ ] = [
+							'comment'        => $comment->comment_content,
+							'commentDate'    => $comment->comment_added_date,
+							'commentDeleted' => (bool)$comment->comment_deleted ];
+					}
+					$current[ 'feedback' ] =$currentFeedback;
+				}
 
 				if( $entry->entry_deleted )
 				{
@@ -497,6 +521,14 @@ class EntryController extends BaseController
 	 *         @SWG\Parameter(
 	 *           name="page",
 	 *           description="Page of results you want to view",
+	 *           paramType="query",
+	 *           required=false,
+	 *           type="integer"
+	 *         ),
+	 *
+	 *         @SWG\Parameter(
+	 *           name="showFeedback",
+	 *           description="Show feedback boolean - 1 for true, 0 for false",
 	 *           paramType="query",
 	 *           required=false,
 	 *           type="integer"
@@ -589,6 +621,8 @@ class EntryController extends BaseController
 		//Get Category
 		$category = ( Input::get( 'category', '0' ) );
 		$category = ( !is_numeric( $category ) ) ? 0 : $category;
+
+		$showFeedback = ( Input::get( 'showFeedback', '0' ) );
 
 		$entries = $this->entry->whereIn( $id, $user, $category, $limit, $offset, false );
 
@@ -750,7 +784,7 @@ class EntryController extends BaseController
 				$current[ 'id' ] = $entry->entry_id;
 				$current[ 'category' ] = $entry->category->category_name;
 				$current[ 'type' ] = $entry->entry_type;
-				$current[ 'user' ] = oneUser($entry->User, $session);
+				$current[ 'user' ] = oneUser( $entry->User, $session );
 //
 //				$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
 //				$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
@@ -783,6 +817,21 @@ class EntryController extends BaseController
 						'fileType' => $file->entry_file_type,
 						'filePath' => $url ];
 				}
+
+				if($showFeedback == 1)
+				{
+					$currentFeedback = [ ];
+
+					foreach( $entry->comments as $comment )
+					{
+						$currentFeedback[ ] = [
+							'comment'        => $comment->comment_content,
+							'commentDate'    => $comment->comment_added_date,
+							'commentDeleted' => (bool)$comment->comment_deleted ];
+					}
+					$current[ 'feedback' ] =$currentFeedback;
+				}
+
 
 				$current[ 'upVotes' ] = $up_votes;
 				$current[ 'downVotes' ] = $down_votes;
@@ -1580,7 +1629,7 @@ class EntryController extends BaseController
 
 		if( $count == 0 )
 		{
-			$response = ['feedback' => []];
+			$response = [ 'feedback' => [ ] ];
 		}
 
 		else
@@ -1681,7 +1730,7 @@ class EntryController extends BaseController
 
 		$term = Input::get( "term" );
 
-		$results = $this->entry->search($term);
+		$results = $this->entry->search( $term );
 
 		$status_code = 200;
 
@@ -1691,11 +1740,12 @@ class EntryController extends BaseController
 			$status_code = 404;
 		}
 
-		else{
-			$return = [];
-			foreach ($results as $entry)
+		else
+		{
+			$return = [ ];
+			foreach( $results as $entry )
 			{
-				$return['entries'][] = oneEntry($entry, $session, true);
+				$return[ 'entries' ][ ] = oneEntry( $entry, $session, true );
 			}
 		}
 
@@ -1804,7 +1854,7 @@ class EntryController extends BaseController
 
 		if( $includeUser )
 		{
-			$current[ 'user' ] = oneUser($entry->User, $session);
+			$current[ 'user' ] = oneUser( $entry->User, $session );
 
 //			$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
 //			$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
