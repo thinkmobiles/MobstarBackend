@@ -1926,6 +1926,7 @@ class EntryController extends BaseController
 					shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
 
 					$file->entry_file_name = $filename;
+					$file->entry_file_updated_date = date('Y-m-d H:i:s');
 
 					$file->save();
 
@@ -1945,9 +1946,11 @@ class EntryController extends BaseController
 
 					$img->save($file_out, 80 );
 
+					Eloquent::unguard();
 					$file->entry_file_name = $filename;
-
 					$file->save();
+					Eloquent::reguard();
+
 					unlink($file_in);
 					$n++;
 
