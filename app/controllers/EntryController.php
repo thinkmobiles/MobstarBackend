@@ -1914,9 +1914,9 @@ class EntryController extends BaseController
 		$n = 0;
 		foreach ($entries as $entry)
 		{
-			$i++;
 			foreach($entry->file as $file)
 			{
+				$i++;
 				$filename = str_random( 12 );
 
 				$date = date('Y-m-d H:i:s');
