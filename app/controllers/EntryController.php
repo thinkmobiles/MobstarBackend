@@ -1919,7 +1919,7 @@ class EntryController extends BaseController
 			{
 				$filename = str_random( 12 );
 
-
+				$date = date('Y-m-d H:i:s');
 				if($file->entry_file_type == "mp4")
 				{
 					$file_in= $_ENV[ 'PATH' ] . 'public/uploads/' . $file->entry_file_name . ".mp4";
@@ -1933,7 +1933,7 @@ class EntryController extends BaseController
 
 						Eloquent::unguard();
 
-						DB::raw(" update entry_files set entry_file_name = $filename, entry_file_updated_date = NOW() where entry_file_id $entry->entry_file_id ");
+						DB::raw(" update entry_files set entry_file_name = $filename, entry_file_updated_date = $date where entry_file_id $entry->entry_file_id ");
 
 						Eloquent::reguard();
 
@@ -1961,7 +1961,7 @@ class EntryController extends BaseController
 
 						Eloquent::unguard();
 
-						DB::raw(" update entry_files set entry_file_name = $filename, entry_file_updated_date = NOW() where entry_file_id $entry->entry_file_id ");
+						DB::raw(" update entry_files set entry_file_name = $filename, entry_file_updated_date = $date where entry_file_id $entry->entry_file_id ");
 
 						Eloquent::reguard();
 
