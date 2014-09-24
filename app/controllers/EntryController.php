@@ -1951,5 +1951,6 @@ class EntryController extends BaseController
 				}
 			}
 		}
+	}
 
 }

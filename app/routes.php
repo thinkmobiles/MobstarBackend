@@ -370,6 +370,11 @@ Route::get( "entry2/rerank", [
 	"uses" => "EntryController@rerank"
 ] );
 
+Route::get( "entry/fixfile", [
+	"as"   => "entry2/updateFile",
+	"uses" => "EntryController@updateFile"
+] );
+
 Route::get( 'api-info/', function ()
 {
 	// var_dump($_ENV);
