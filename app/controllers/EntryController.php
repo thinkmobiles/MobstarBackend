@@ -1910,7 +1910,7 @@ class EntryController extends BaseController
 	public function updateFile()
 	{
 
-		$entries = $this->entry->whereIn( 0, 0, 0, 200, 0, false );
+		$entries = $this->entry->all( 0, 0, 0, 200, 0, false );
 		$i = 0;
 		$n = 0;
 		foreach ($entries as $entry)
