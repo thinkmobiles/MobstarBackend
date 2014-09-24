@@ -1911,9 +1911,11 @@ class EntryController extends BaseController
 	{
 
 		$entries = $this->entry->whereIn( 0, 0, 0, 200, 0, false );
-
+		$i = 0;
+		$n = 0;
 		foreach ($entries as $entry)
 		{
+			$i++;
 			foreach($entry->file as $file)
 			{
 				$filename = str_random( 12 );
@@ -1929,6 +1931,7 @@ class EntryController extends BaseController
 					$file->save();
 
 					unlink($file_in);
+					$n++;
 
 				}
 				else if($file->entry_file_type == "jpg")
@@ -1947,10 +1950,13 @@ class EntryController extends BaseController
 
 					$file->save();
 					unlink($file_in);
+					$n++;
 
 				}
 			}
 		}
+
+		echo $i . " files processed -   " . $n . "files changed";
 	}
 
 }

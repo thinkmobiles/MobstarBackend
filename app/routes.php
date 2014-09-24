@@ -370,7 +370,7 @@ Route::get( "entry2/rerank", [
 	"uses" => "EntryController@rerank"
 ] );
 
-Route::get( "entry/fixfile", [
+Route::get( "entry2/fixfile", [
 	"as"   => "entry2/updateFile",
 	"uses" => "EntryController@updateFile"
 ] );
