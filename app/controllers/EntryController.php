@@ -1942,7 +1942,6 @@ class EntryController extends BaseController
 
 						Eloquent::reguard();
 
-						unlink( $file_in );
 						$n++;
 					}
 
@@ -1974,7 +1973,6 @@ class EntryController extends BaseController
 
 							Eloquent::reguard();
 
-							unlink( $file_in );
 							$n++;
 						}
 					}
