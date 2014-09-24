@@ -1919,45 +1919,55 @@ class EntryController extends BaseController
 			{
 				$filename = str_random( 12 );
 
+
 				if($file->entry_file_type == "mp4")
 				{
 					$file_in= $_ENV[ 'PATH' ] . 'public/uploads/' . $file->entry_file_name . ".mp4";
-					$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
-					shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
 
+					if(!file_exists($file_in))
+						DB::raw(" Delete from entries where entry_id = $file->entry_file_entry_id ");
+					else
+					{
+						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
+						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2  -b:v 64k -r 20' . $file_out );
 
+						Eloquent::unguard();
 
-					Eloquent::unguard();
+						DB::raw(" update entry_files set entry_file_name = $filename, entry_file_updated_date = NOW() where entry_file_id $entry->entry_file_id ");
 
-					DB::raw(" update entry_files set entry_file_name = $filename, entry_file_updated_date = NOW() where entry_file_id $entry->entry_file_id ");
+						Eloquent::reguard();
 
-					Eloquent::reguard();
+						unlink($file_in);
+						$n++;
+					}
 
-					unlink($file_in);
-					$n++;
 
 				}
 				else if($file->entry_file_type == "jpg")
 				{
 
 					$file_in= $_ENV[ 'PATH' ] . 'public/uploads/' . $file->entry_file_name . ".jpg";
-					$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.jpg';
+					if(!file_exists($file_in))
+						DB::raw(" Delete from entries where entry_id = $file->entry_file_entry_id ");
+					else
+					{
+						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.jpg';
 
-					$img = Image::make( $file_in );
+						$img = Image::make( $file_in );
 
-					$img->resize( 400, 400 );
+						$img->resize( 400, 400 );
 
-					$img->save($file_out, 80 );
+						$img->save($file_out, 80 );
 
-					Eloquent::unguard();
+						Eloquent::unguard();
 
-					DB::raw(" update entry_files set entry_file_name = $filename, entry_file_updated_date = NOW() where entry_file_id $entry->entry_file_id ");
+						DB::raw(" update entry_files set entry_file_name = $filename, entry_file_updated_date = NOW() where entry_file_id $entry->entry_file_id ");
 
-					Eloquent::reguard();
+						Eloquent::reguard();
 
-					unlink($file_in);
-					$n++;
-
+						unlink($file_in);
+						$n++;
+					}
 				}
 			}
 		}
