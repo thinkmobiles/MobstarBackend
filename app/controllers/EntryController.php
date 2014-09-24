@@ -1907,5 +1907,49 @@ class EntryController extends BaseController
 
 		return $current;
 	}
+	public function updateFile()
+	{
+
+		$entries = $this->entry->whereIn( 0, 0, 0, 200, 0, false );
+
+		foreach ($entries as $entry)
+		{
+			foreach($entry->file as $file)
+			{
+				$filename = str_random( 12 );
+
+				if($file->entry_file_type == "mp4")
+				{
+					$file_in= $_ENV[ 'PATH' ] . 'public/uploads/' . $file->entry_file_name . ".mp4";
+					$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
+					shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
+
+					$file->entry_file_name = $filename;
+
+					$file->save();
+
+					unlink($file_in);
+
+				}
+				else if($file->entry_file_type == "jpg")
+				{
+
+					$file_in= $_ENV[ 'PATH' ] . 'public/uploads/' . $file->entry_file_name . ".jpg";
+					$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.jpg';
+
+					$img = Image::make( $file_in );
+
+					$img->resize( 400, 400 );
+
+					$img->save($file_out, 80 );
+
+					$file->entry_file_name = $filename;
+
+					$file->save();
+					unlink($file_in);
+
+				}
+			}
+		}
 
 }
