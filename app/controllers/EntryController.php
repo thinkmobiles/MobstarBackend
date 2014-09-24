@@ -1928,6 +1928,7 @@ class EntryController extends BaseController
 					{
 
 						DB::raw( " Delete from entries where entry_id = $file->entry_file_entry_id " );
+						echo $file_in;
 						$d++;
 					}
 					else
