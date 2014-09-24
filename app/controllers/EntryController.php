@@ -1947,8 +1947,9 @@ class EntryController extends BaseController
 					$img->save($file_out, 80 );
 
 					Eloquent::unguard();
-					$file->entry_file_name = $filename;
-					$file->save();
+
+					DB::raw(" update entry_files set entry_file_name = $filename, entry_file_updated_date = NOW() where entry_file_id $entry->entry_file_id ");
+
 					Eloquent::reguard();
 
 					unlink($file_in);
