@@ -1926,7 +1926,7 @@ class EntryController extends BaseController
 
 					if( !file_exists( $file_in ) )
 					{
-						
+
 						DB::raw( " Delete from entries where entry_id = $file->entry_file_entry_id " );
 						$d++;
 					}
@@ -1981,7 +1981,7 @@ class EntryController extends BaseController
 			}
 		}
 
-		echo $i . " files processed -   " . $n . "files changed";
+		echo $i . " files processed -   " . $n . " files changed - " . $d . " deleted";
 	}
 
 }
