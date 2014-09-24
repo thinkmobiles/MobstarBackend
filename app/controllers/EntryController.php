@@ -1925,10 +1925,13 @@ class EntryController extends BaseController
 					$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
 					shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
 
-					$file->entry_file_name = $filename;
-					$file->entry_file_updated_date = date('Y-m-d H:i:s');
 
-					$file->save();
+
+					Eloquent::unguard();
+
+					DB::raw(" update entry_files set entry_file_name = $filename, entry_file_updated_date = NOW() where entry_file_id $entry->entry_file_id ");
+
+					Eloquent::reguard();
 
 					unlink($file_in);
 					$n++;
