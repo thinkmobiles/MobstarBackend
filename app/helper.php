@@ -138,6 +138,7 @@ function oneEntry( $entry, $session, $includeUser = false )
 		$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
 		$current[ 'user' ][ 'displayName' ] = $entry->User->user_display_name;
 		$current[ 'user' ][ 'email' ] = $entry->User->user_email;
+		$current[ 'user' ][ 'tagline' ] = $entry->User->user_tagline;
 		$current[ 'user' ][ 'profileImage' ] = ( !empty( $entry->User->user_profile_image ) )
 			? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
 		$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
