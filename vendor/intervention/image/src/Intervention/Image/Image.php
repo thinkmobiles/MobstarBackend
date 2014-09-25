@@ -19,11 +19,11 @@ class Image extends File
     protected $core;
 
     /**
-     * Image resource backup of current image processor
+     * Array of Image resource backups of current image processor
      *
-     * @var mixed
+     * @var array
      */
-    protected $backup;
+    protected $backups = array();
 
     /**
      * Last image encoding result
@@ -159,23 +159,47 @@ class Image extends File
     /**
      * Returns current image backup
      *
+     * @param string $name
      * @return mixed
      */
-    public function getBackup()
+    public function getBackup($name = null)
     {
-        return $this->backup;
+        $name = is_null($name) ? 'default' : $name;
+
+        if ( ! $this->backupExists($name)) {
+            throw new \Intervention\Image\Exception\RuntimeException(
+                "Backup with name ({$name}) not available. Call backup() before reset()."
+            );
+        }
+
+        return $this->backups[$name];
     }
 
     /**
      * Sets current image backup
      *
-     * @param mixed $value
+     * @param mixed  $resource
+     * @param string $name
+     * @return self
      */
-    public function setBackup($value)
+    public function setBackup($resource, $name = null)
     {
-        $this->backup = $value;
+        $name = is_null($name) ? 'default' : $name;
+
+        $this->backups[$name] = $resource;
 
         return $this;
+    }
+
+    /**
+     * Checks if named backup exists
+     *
+     * @param  string $name
+     * @return bool
+     */
+    private function backupExists($name)
+    {
+        return array_key_exists($name, $this->backups);
     }
 
     /**

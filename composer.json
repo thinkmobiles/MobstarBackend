@@ -12,7 +12,10 @@
     	"doctrine/dbal": "~2.3",
 		"barryvdh/laravel-ide-helper": "dev-master",
 		"rafasamp/sonus": "dev-master",
-		"intervention/image": "2.*"
+		"intervention/image": "2.*",
+		"league/event": "~1.0",
+		"aws/aws-sdk-php": "~2.4",
+		"graham-campbell/flysystem": "~1.0@dev"
 	},
 	"autoload": {
 		"classmap": [
