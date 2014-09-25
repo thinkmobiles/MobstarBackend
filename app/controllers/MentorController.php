@@ -466,13 +466,8 @@ class MentorController extends BaseController
 
 				$categories = $mentor->categories()->getResults();
 
-				foreach( $categories as $category )
-				{
-					$current[ 'categories' ][ ] = [
-						'categoryId'   => $category->category_id,
-						'categoryName' => $category->category_name,
-					];
-				}
+				$current[ 'category' ]= $category->category_name;
+
 
 				$return[ 'mentors' ][ ][ 'mentor' ] = $current;
 			}
