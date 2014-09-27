@@ -1987,7 +1987,7 @@ class EntryController extends BaseController
 				if(file_exists($file_in))
 				{
 					$file->entry_file_size = filesize($file_in);
-					Flysystem::connection('awss3')->put(fread($file_in), $file_in));
+					Flysystem::connection('awss3')->put($local->read($file_in), $file_in);
 
 					var_dump($file_in);
 					var_dump(file_exists( $file_in ));
