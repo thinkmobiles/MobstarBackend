@@ -1962,15 +1962,15 @@ class EntryController extends BaseController
 
 	public function test()
 	{
-		$config = array(
-			'key' => Creds::ENV_KEY,
-			'secret' => Creds::ENV_SECRET
-		);
-
-		$client = S3Client::factory($config);
-
-		$signedUrl = $client->getObjectUrl('mobstar-1', 'hi.txt', '+10 minutes');
-		return $signedUrl;
+//		$config = array(
+//			'key' => Creds::ENV_KEY,
+//			'secret' => Creds::ENV_SECRET
+//		);
+//
+//		$client = S3Client::factory($config);
+//
+//		$signedUrl = $client->getObjectUrl('mobstar-1', 'hi.txt', '+10 minutes');
+//		return $signedUrl;
 		Flysystem::connection('awss3')->put('hi.txt', 'foo');
 	}
 
