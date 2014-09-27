@@ -1962,12 +1962,12 @@ class EntryController extends BaseController
 
 	public function test()
 	{
-//		$config = array(
-//			'key' => Creds::ENV_KEY,
-//			'secret' => Creds::ENV_SECRET
-//		);
-//
-//		$client = S3Client::factory($config);
+		$config = array(
+			'key' => Creds::ENV_KEY,
+			'secret' => Creds::ENV_SECRET
+		);
+
+		$client = S3Client::factory($config);
 //
 //		$signedUrl = $client->getObjectUrl('mobstar-1', 'hi.txt', '+10 minutes');
 //		return $signedUrl;
@@ -1991,6 +1991,8 @@ class EntryController extends BaseController
 
 					$file->save();
 				}
+				else
+					$client->deleteObject(['Bucket' => 'mobstar-1', 'Key' => $file->entry_file_name . "." . $file->entry_file_type]);
 
 			}
 		}
