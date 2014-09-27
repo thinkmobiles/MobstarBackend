@@ -1974,6 +1974,9 @@ class EntryController extends BaseController
 
 		$entries = $this->entry->all( 0, 0, 0, 0, 0, 200, 0, false );
 
+
+		$local = Flysystem::connection('localEntry');
+
 		foreach( $entries as $entry )
 		{
 			foreach( $entry->file as $file )
@@ -1984,7 +1987,7 @@ class EntryController extends BaseController
 				if(file_exists($file_in))
 				{
 					$file->entry_file_size = filesize($file_in);
-					Flysystem::connection('awss3')->put(fread($file->entry_file_name . "." . $file->entry_file_type, $file_in));
+					Flysystem::connection('awss3')->put(fread($file_in), $file_in));
 
 					var_dump($file_in);
 					var_dump(file_exists( $file_in ));
