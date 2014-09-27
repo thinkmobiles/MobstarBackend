@@ -3,7 +3,7 @@
 class EntryFile extends \Eloquent {
 
     protected $table = "entry_files";
-    protected $primary_key = "entry_file_id";	
+    protected $primaryKey = "entry_file_id";
     public $timestamps = false;
 
 	protected $fillable = ['entry_file_name', 'entry_file_updated_date'];
