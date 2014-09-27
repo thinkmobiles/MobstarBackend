@@ -1975,7 +1975,8 @@ class EntryController extends BaseController
 		$entries = $this->entry->all( 0, 0, 0, 0, 0, 200, 0, false );
 
 
-		$local = Flysystem::connection('localEntry');
+		$local = new Flysystem;
+		$local->connection('localEntry');
 
 		foreach( $entries as $entry )
 		{
