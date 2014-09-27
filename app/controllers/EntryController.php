@@ -1962,16 +1962,33 @@ class EntryController extends BaseController
 
 	public function test()
 	{
-		$config = array(
-			'key' => Creds::ENV_KEY,
-			'secret' => Creds::ENV_SECRET
-		);
+//		$config = array(
+//			'key' => Creds::ENV_KEY,
+//			'secret' => Creds::ENV_SECRET
+//		);
+//
+//		$client = S3Client::factory($config);
+//
+//		$signedUrl = $client->getObjectUrl('mobstar-1', 'hi.txt', '+10 minutes');
+//		return $signedUrl;
 
-		$client = S3Client::factory($config);
+		$entries = $this->entry->all( 0, 0, 0, 0, 0, 200, 0, false );
 
-		$signedUrl = $client->getObjectUrl('mobstar-1', 'hi.txt', '+10 minutes');
-		return $signedUrl;
-		Flysystem::connection('awss3')->put('hiya.txt', 'foo');
+		foreach( $entries as $entry )
+		{
+			foreach( $entry->file as $file )
+			{
+
+				$file_in = $_ENV[ 'PATH' ] . 'public/uploads/' . $file->entry_file_name . "." . $file->entry_file_type;
+
+				if(file_exists($file_in))
+				{
+					$file->entry_file_size = filesize($file_in);
+				}
+
+				Flysystem::connection('awss3')->put($file->entry_file_name . "." . $file->entry_file_type, $file_in);
+			}
+		}
 	}
 
 }
