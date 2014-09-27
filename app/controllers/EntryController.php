@@ -1971,7 +1971,7 @@ class EntryController extends BaseController
 //
 //		$signedUrl = $client->getObjectUrl('mobstar-1', 'hi.txt', '+10 minutes');
 //		return $signedUrl;
-		Flysystem::connection('awss3')->put('hi.txt', 'foo');
+		Flysystem::connection('awss3')->put('hiya.txt', 'foo');
 	}
 
 }
