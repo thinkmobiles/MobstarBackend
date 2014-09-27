@@ -3,6 +3,8 @@
 use MobStar\Storage\Entry\EntryRepository as Entry;
 use MobStar\Storage\Token\TokenRepository as Token;
 use Swagger\Annotations as SWG;
+use Aws\S3\S3Client;
+use Aws\Common\Credentials\Credentials as Creds;
 
 /**
  * @package
@@ -1923,7 +1925,7 @@ class EntryController extends BaseController
 				if( $file->entry_file_type == "mp4" )
 				{
 					$file_in = $_ENV[ 'PATH' ] . 'public/uploads/' . $file->entry_file_name . ".mp4";
-
+					
 					if( !file_exists( $file_in ) )
 					{
 
@@ -1981,6 +1983,20 @@ class EntryController extends BaseController
 		}
 
 		echo $i . " files processed -   " . $n . " files changed - " . $d . " deleted";
+	}
+
+	public function test()
+	{
+		$config = array(
+			'key' => Creds::ENV_KEY,
+			'secret' => Creds::ENV_SECRET
+		);
+
+		$client = S3Client::factory($config);
+
+		$signedUrl = $client->getObjectUrl('mobstar-1', 'hi.txt', '+10 minutes');
+		return $signedUrl;
+		Flysystem::connection('awss3')->put('hi.txt', 'foo');
 	}
 
 }

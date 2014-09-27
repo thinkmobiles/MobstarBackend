@@ -375,6 +375,12 @@ Route::get( "entry2/fixfile", [
 	"uses" => "EntryController@updateFile"
 ] );
 
+
+Route::get( "entry2/test", [
+	"as"   => "entry2/test",
+	"uses" => "EntryController@test"
+] );
+
 Route::get( 'api-info/', function ()
 {
 	// var_dump($_ENV);

@@ -113,6 +113,7 @@ return array(
 		'Rafasamp\Sonus\SonusServiceProvider',
 		'Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider',
 		'Intervention\Image\ImageServiceProvider',
+		'GrahamCampbell\Flysystem\FlysystemServiceProvider'
 	),
 
 	/*
@@ -182,6 +183,7 @@ return array(
 		'ResourceServer'      => 'LucaDegasperi\OAuth2Server\Facades\ResourceServerFacade',
 		'Sonus'               => 'Rafasamp\Sonus\Facade',
 		'Image'               => 'Intervention\Image\Facades\Image',
+		'Flysystem' => 'GrahamCampbell\Flysystem\Facades\Flysystem'
 	),
 
 );
