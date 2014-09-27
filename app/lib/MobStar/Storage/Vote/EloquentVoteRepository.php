@@ -27,6 +27,8 @@ class EloquentVoteRepository implements VoteRepository {
 		if($count)
 			return $query->count();
 
+		$query->orderBy('vote_id', 'desc');
+
 		return $query->take($limit)->skip($offset)->get();
 	}
 
