@@ -1923,59 +1923,61 @@ class EntryController extends BaseController
 				if( $file->entry_file_type == "mp4" )
 				{
 					$file_in = $_ENV[ 'PATH' ] . 'public/uploads/' . $file->entry_file_name . ".mp4";
-
-					if( !file_exists( $file_in ) )
-					{
-
-						DB::raw( " Delete from entries where entry_id = $file->entry_file_entry_id " );
-						echo $file_in;
-						$d++;
-					}
-					else
-					{
-						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
-						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2  -b:v 64k -r 20' . $file_out );
-
-						Eloquent::unguard();
-
-						DB::raw( " update entry_files set entry_file_name = $filename, entry_file_updated_date = $date where entry_file_id $entry->entry_file_id " );
-
-						Eloquent::reguard();
-
-						$n++;
-					}
+					var_dump($file_in);
+					var_dump(file_exists( $file_in ));
+					echo "<br>";
+//					if( !file_exists( $file_in ) )
+//					{
+//
+//						DB::raw( " Delete from entries where entry_id = $file->entry_file_entry_id " );
+//						echo $file_in;
+//						$d++;
+//					}
+//					else
+//					{
+//						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
+//						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2  -b:v 64k -r 20' . $file_out );
+//
+//						Eloquent::unguard();
+//
+//						DB::raw( " update entry_files set entry_file_name = $filename, entry_file_updated_date = $date where entry_file_id $entry->entry_file_id " );
+//
+//						Eloquent::reguard();
+//
+//						$n++;
+//					}
 
 				}
 				else
 				{
-					if( $file->entry_file_type == "jpg" )
-					{
-
-						$file_in = $_ENV[ 'PATH' ] . 'public/uploads/' . $file->entry_file_name . ".jpg";
-						if( !file_exists( $file_in ) )
-						{
-							DB::raw( " Delete from entries where entry_id = $file->entry_file_entry_id " );
-							$d++;
-						}
-						else
-						{
-							$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.jpg';
-
-							$img = Image::make( $file_in );
-
-							$img->resize( 400, 400 );
-
-							$img->save( $file_out, 80 );
-
-							Eloquent::unguard();
-
-							DB::raw( " update entry_files set entry_file_name = $filename, entry_file_updated_date = $date where entry_file_id $entry->entry_file_id " );
-
-							Eloquent::reguard();
-
-							$n++;
-						}
-					}
+//					if( $file->entry_file_type == "jpg" )
+//					{
+//
+//						$file_in = $_ENV[ 'PATH' ] . 'public/uploads/' . $file->entry_file_name . ".jpg";
+//						if( !file_exists( $file_in ) )
+//						{
+//							DB::raw( " Delete from entries where entry_id = $file->entry_file_entry_id " );
+//							$d++;
+//						}
+//						else
+//						{
+//							$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.jpg';
+//
+//							$img = Image::make( $file_in );
+//
+//							$img->resize( 400, 400 );
+//
+//							$img->save( $file_out, 80 );
+//
+//							Eloquent::unguard();
+//
+//							DB::raw( " update entry_files set entry_file_name = $filename, entry_file_updated_date = $date where entry_file_id $entry->entry_file_id " );
+//
+//							Eloquent::reguard();
+//
+//							$n++;
+//						}
+//					}
 				}
 			}
 		}
