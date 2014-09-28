@@ -1210,6 +1210,7 @@ class UserController extends BaseController
 		foreach( $users as $user )
 		{
 			$file_in = $_ENV['PATH'] . 'public/' . $user->user_profile_image;
+			var_dump(file_exists($file_in));
 			if(
 				isset($file_in)
 				&& file_exists($file_in)
