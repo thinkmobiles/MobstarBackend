@@ -2,6 +2,8 @@
 
 use Swagger\Annotations as SWG;
 use MobStar\Storage\Token\TokenRepository as Token;
+use Aws\S3\S3Client;
+use Aws\Common\Credentials\Credentials as Creds;
 
 /**
  * @package
@@ -1205,9 +1207,6 @@ class UserController extends BaseController
 
 		$users= User::all();
 
-
-		$local = Flysystem::connection('localProfile');
-
 		foreach( $users as $user )
 		{
 			$file_in = '/' . $_ENV['PATH'] .$user->user_profile_image;
@@ -1217,7 +1216,7 @@ class UserController extends BaseController
 			)
 			{
 				$handle = fopen($file_in, "r");
-				Flysystem::connection('awss3')->put($user->user_profile_image, fread($handle, filesize($file_in)));
+				Flysystem::connection('awss3')->put("test.jpg", fread($handle, filesize($file_in)));
 
 				var_dump($file_in);
 			}
