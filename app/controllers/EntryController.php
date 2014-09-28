@@ -370,6 +370,10 @@ class EntryController extends BaseController
 						$current[ 'entryFiles' ][ ] = [
 							'fileType' => $file->entry_file_type,
 							'filePath' => $url ];
+
+						$current['videoThumb'] = ($file->entry_file_type == "mp4") ?
+							$client->getObjectUrl('mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes')
+							: "";
 					}
 				}
 
@@ -444,6 +448,10 @@ class EntryController extends BaseController
 					$current[ 'entryFiles' ][ ] = [
 						'fileType' => $file->entry_file_type,
 						'filePath' => $signedUrl ];
+
+					$current['videoThumb'] = ($file->entry_file_type == "mp4") ?
+						$client->getObjectUrl('mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes')
+						: "";
 				}
 
 				$current[ 'upVotes' ] = $up_votes;
@@ -752,7 +760,12 @@ class EntryController extends BaseController
 						$current[ 'entryFiles' ][ ] = [
 							'fileType' => $file->entry_file_type,
 							'filePath' => $url ];
+
+						$current['videoThumb'] = ($file->entry_file_type == "mp4") ?
+							$client->getObjectUrl('mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes')
+							: "";
 					}
+
 				}
 
 				if( in_array( "upVotes", $fields ) )
@@ -825,6 +838,10 @@ class EntryController extends BaseController
 					$current[ 'entryFiles' ][ ] = [
 						'fileType' => $file->entry_file_type,
 						'filePath' => $url ];
+
+					$current['videoThumb'] = ($file->entry_file_type == "mp4") ?
+						$client->getObjectUrl('mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes')
+						: "";
 				}
 
 				if( $showFeedback == 1 )
@@ -1958,7 +1975,7 @@ class EntryController extends BaseController
 				'filePath' => $url ];
 
 			$current['videoThumb'] = ($file->entry_file_type == "mp4") ?
-				$client->getObjectUrl('mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes') 
+				$client->getObjectUrl('mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes')
 				: "";
 		}
 

@@ -172,6 +172,10 @@ function oneEntry( $entry, $session, $includeUser = false )
 		$current[ 'entryFiles' ][ ] = [
 			'fileType' => $file->entry_file_type,
 			'filePath' => $signedUrl ];
+
+		$current['videoThumb'] = ($file->entry_file_type == "mp4") ?
+			$client->getObjectUrl('mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes')
+			: "";
 	}
 
 	$current[ 'upVotes' ] = $up_votes;
