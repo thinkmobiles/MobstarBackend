@@ -1984,8 +1984,14 @@ class EntryController extends BaseController
 
 				$file_in = "/" . $_ENV[ 'PATH' ] . 'public/uploads/' . $file->entry_file_name . "." . $file->entry_file_type;
 
-				if(file_exists($file_in))
+				if(file_exists($file_in) && $file->file_type == "jpg")
 				{
+					$img = Image::make( $file_in );
+
+					$img->widen( 300 );
+
+					$img->save($file_in);
+
 					$file->entry_file_size = filesize($file_in);
 					Flysystem::connection('awss3')->put($file->entry_file_name . "." . $file->entry_file_type, $local->read($file->entry_file_name . "." . $file->entry_file_type));
 
@@ -1994,9 +2000,7 @@ class EntryController extends BaseController
 
 					$file->save();
 				}
-				else
-					$client->deleteObject(['Bucket' => 'mobstar-1', 'Key' => $file->entry_file_name . "." . $file->entry_file_type]);
-
+				
 			}
 		}
 	}
