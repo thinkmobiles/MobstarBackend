@@ -1063,6 +1063,12 @@ class EntryController extends BaseController
 						// Transcode Video
 						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
 						$extension = 'mp4';
+
+						$handle = fopen($file_out, "r");
+
+						Flysystem::connection('awss3')->put($filename . "." . $extension, fread($handle, filesize($file_out)));
+
+						unlink($file_out);
 					}
 					else
 					{
@@ -1083,8 +1089,6 @@ class EntryController extends BaseController
 						Flysystem::connection('awss3')->put($filename . "." . $extension,
 															fread($handle,
 																  filesize($file_out)));
-
-						unlink($file_out);
 					}
 				}
 
