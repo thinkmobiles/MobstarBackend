@@ -1997,7 +1997,7 @@ class EntryController extends BaseController
 					var_dump(filesize($file_out));
 					$file->entry_file_size = filesize($file_out);
 					$file->entry_file_updated_date = date('Y-m-d H:i:s');
-					Flysystem::connection('awss3')->put($file->entry_file_name . "." . $file->entry_file_type, fread($file_out));
+					Flysystem::connection('awss3')->put($file->entry_file_name . "." . $file->entry_file_type, fread($file_out, filesize($file_out)));
 
 					var_dump($file_in);
 //					var_dump(file_exists( $file_in ));
