@@ -84,6 +84,9 @@ class UserController extends BaseController
 	 */
 	public function index()
 	{
+
+		$client = getS3Client();
+
 		$fields = array_values( explode( ',', Input::get( "fields" ) ) );
 
 		if( $fields[ 0 ] == "" )
@@ -254,40 +257,6 @@ class UserController extends BaseController
 			//if not just return all info
 			else
 			{
-
-				$stars = [ ];
-
-				foreach( $user->Stars as $star )
-				{
-					if( $star->user_star_deleted == 0 )
-					{
-
-						$stars[ ] = [ 'star_id'      => $star->user_star_star_id,
-									  'star_name'    => $star->Stars->user_display_name,
-									  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
-											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image
-											  : '',
-						];
-
-					}
-				}
-
-				$starredBy = [ ];
-
-				foreach( $user->StarredBy as $starred )
-				{
-					if( $starred->user_star_deleted == 0 )
-					{
-						$starredBy[ ] = [ 'star_id'      => $starred->User_star_user_id,
-										  'star_name'    => $starred->User->user_display_name,
-										  'profileImage' => ( !empty( $starred->User->user_profile_image ) )
-												  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_profile_image
-												  : '',
-						];
-					}
-
-				}
-
 				$return[ 'users' ][ ][ 'user' ] = oneUser($user, $session, true);
 			}
 
@@ -379,6 +348,7 @@ class UserController extends BaseController
 	 */
 	public function show( $id_commas )
 	{
+		$client = getS3Client();
 
 		$status_code = 200;
 
@@ -602,10 +572,10 @@ class UserController extends BaseController
 													'fullName'     => $user->user_full_name,
 													'email'        => $user->user_email,
 													'profileImage' => ( !empty( $user->user_profile_image ) )
-															? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image
+															? $client->getObjectUrl('mobstar-1', $user->user_profile_image, '+10 minutes')
 															: '',
 													'profileCover' => ( !empty( $user->user_cover_image ) )
-															? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image
+															? $client->getObjectUrl('mobstar-1', $user->user_cover_image, '+10 minutes')
 															: '',
 													'stars'        => $stars,
 													'starredBy'    => $starredBy,
@@ -1072,6 +1042,12 @@ class UserController extends BaseController
 
 			$img->save( $_ENV[ 'PATH' ] . '/public/' . $file_out, 80 );
 
+			$handle = fopen($_ENV[ 'PATH' ] . '/public/' . $file_out, "r");
+
+			Flysystem::connection('awss3')->put($file_out,
+												fread($handle,
+													  filesize($_ENV[ 'PATH' ] . '/public/' . $file_out)));
+
 			$user->user_profile_image = $file_out;
 		}
 
@@ -1143,6 +1119,12 @@ class UserController extends BaseController
 			$img->resize( 200, 200 );
 
 			$img->save( $_ENV[ 'PATH' ] . '/public/' . $file_out, 80 );
+
+			$handle = fopen($_ENV[ 'PATH' ] . '/public/' . $file_out, "r");
+
+			Flysystem::connection('awss3')->put($file_out,
+												fread($handle,
+													  filesize($_ENV[ 'PATH' ] . '/public/' . $file_out)));
 
 			$user->user_cover_image = $file_out;
 		}

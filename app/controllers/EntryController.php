@@ -1043,7 +1043,15 @@ class EntryController extends BaseController
 					$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp3';
 					// Transcode Audio
 					shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
+
 					$extension = 'mp3';
+
+					$handle = fopen($file_out, "r");
+
+					Flysystem::connection('awss3')->put($filename . "." . $extension, fread($handle, filesize($file_out)));
+
+					unlink($file_out);
+
 
 				}
 				else
@@ -1058,7 +1066,25 @@ class EntryController extends BaseController
 					}
 					else
 					{
-						$file->move( $dest, $filename . '.' . $extension );
+						//File is an image
+
+						$file_in = $file->getRealPath();
+
+						$file_out = $_ENV['PATH'] . "public/uploads/" . $filename. '.' . $extension;
+
+						$image = Image::make($file_in);
+
+						$image->widen(200);
+
+						$image->save($file_out);
+
+						$handle = fopen($file_out, "r");
+
+						Flysystem::connection('awss3')->put($filename . "." . $extension,
+															fread($handle,
+																  filesize($file_out)));
+
+						unlink($file_out);
 					}
 				}
 
@@ -1081,11 +1107,25 @@ class EntryController extends BaseController
 				{
 					$dest = 'uploads';
 
-					$filename = str_random( 12 );
+					$file_in = $file->getRealPath();
 
-					$extension = $file->getClientOriginalExtension();
+					$extension = ".jpg";
 
-					$file->move( $dest, $filename . '.' . $extension );
+					$file_out = $_ENV['PATH'] . "public/uploads/" . $filename. '.' . $extension;
+
+					$image = Image::make($file_in);
+
+					$image->widen(200);
+
+					$image->save($file_out, 80);
+
+					$handle = fopen($file_out, "r");
+
+					Flysystem::connection('awss3')->put($filename . "." . $extension,
+														fread($handle,
+															  filesize($file_out)));
+
+					unlink($file_out);
 
 					Eloquent::unguard();
 
@@ -1841,6 +1881,8 @@ class EntryController extends BaseController
 
 	public function oneEntry( $entry, $session, $includeUser = false )
 	{
+
+		$client = getS3Client();
 
 		$current = array();
 

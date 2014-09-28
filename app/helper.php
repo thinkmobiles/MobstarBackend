@@ -59,7 +59,7 @@ function oneUser( $user, $session, $includeStars = false )
 				'profileImage' => ( !empty( $user->user_profile_image ) )
 						? $client->getObjectUrl('mobstar-1', $user->user_profile_image, '+10 minutes') : '',
 				'profileCover' => ( !empty( $user->user_cover_image ) )
-						? $client->getObjectUrl('mobstar-1', $user->user_profile_image, '+10 minutes') : '',
+						? $client->getObjectUrl('mobstar-1', $user->user_cover_image, '+10 minutes') : '',
 	];
 
 	if( $session->token_user_id != $user->user_id )
