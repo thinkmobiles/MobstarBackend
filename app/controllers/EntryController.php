@@ -1079,6 +1079,7 @@ class EntryController extends BaseController
 						Flysystem::connection('awss3')->put("thumbs/" . $filename . "-thumb.jpg", fread($handle, filesize($thumb)));
 
 						unlink($file_out);
+						unlink($thumb);
 					}
 					else
 					{
@@ -2056,22 +2057,17 @@ class EntryController extends BaseController
 				)
 				{
 
-					$file_out = "/" . $_ENV[ 'PATH' ] . 'public/uploads/tmp/' . $file->entry_file_name . "." . $file->entry_file_type;
-					// Transcode Video
-					shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
+					$video = $client->getObjectUrl('mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes');
 
-					echo "<br>";
-					var_dump(filesize($file_out));
-					$file->entry_file_size = filesize($file_out);
-					$file->entry_file_updated_date = date('Y-m-d H:i:s');
+					$thumb = $_ENV['PATH']  . 'public/uploads/' . $file->entry_file_name . '-thumb.jpg';
 
-					$handle = fopen($file_out, "r");
-					Flysystem::connection('awss3')->put($file->entry_file_name . "." . $file->entry_file_type, fread($handle, filesize($file_out)));
+					shell_exec( '/usr/bin/ffmpeg -i ' . $video . ' -vframes 1 -an -s 100x100 -ss 00:00:00.10 ' . $thumb );
 
-					var_dump($file_in);
-//					var_dump(file_exists( $file_in ));
+					$handle = fopen($thumb, "r");
 
-					$file->save();
+					Flysystem::connection('awss3')->put("thumbs/" . $file->entry_file_name . "-thumb.jpg", fread($handle, filesize($thumb)));
+
+					unlink($thumb);
 				}
 
 			}
