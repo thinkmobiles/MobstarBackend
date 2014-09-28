@@ -127,6 +127,15 @@ class EntryController extends BaseController
 	 */
 	public function index()
 	{
+		//Connect to S3
+
+		$config = array(
+			'key' => Creds::ENV_KEY,
+			'secret' => Creds::ENV_SECRET
+		);
+
+		$client = S3Client::factory($config);
+
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
@@ -435,10 +444,12 @@ class EntryController extends BaseController
 
 				foreach( $entry->file as $file )
 				{
-					$url = 'http://' . $_ENV[ 'URL' ] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+
+					$signedUrl = $client->getObjectUrl('mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes');
+
 					$current[ 'entryFiles' ][ ] = [
 						'fileType' => $file->entry_file_type,
-						'filePath' => $url ];
+						'filePath' => $signedUrl ];
 				}
 
 				$current[ 'upVotes' ] = $up_votes;
