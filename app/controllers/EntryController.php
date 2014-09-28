@@ -1984,18 +1984,19 @@ class EntryController extends BaseController
 
 				$file_in = "/" . $_ENV[ 'PATH' ] . 'public/uploads/' . $file->entry_file_name . "." . $file->entry_file_type;
 
-				if(file_exists($file_in) && ($file->entry_file_type == "jpg" || $file->entry_file_type == "png"))
+				if(file_exists($file_in)
+//				   && ($file->entry_file_type == "mp4" || $file->entry_file_type == "mp4")
+				)
 				{
-					$img = Image::make( $file_in );
 
-					$img->widen( 300 );
+					// Transcode Video
+//					shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_in );
 
-					$img->save($file_in);
 					echo "<br>";
 					var_dump(filesize($file_in));
 					$file->entry_file_size = filesize($file_in);
 					$file->entry_file_updated_date = date('Y-m-d H:i:s');
-					Flysystem::connection('awss3')->put($file->entry_file_name . "." . $file->entry_file_type, $local->read($file->entry_file_name . "." . $file->entry_file_type));
+//					Flysystem::connection('awss3')->put($file->entry_file_name . "." . $file->entry_file_type, $local->read($file->entry_file_name . "." . $file->entry_file_type));
 
 					var_dump($file_in);
 					var_dump(file_exists( $file_in ));
