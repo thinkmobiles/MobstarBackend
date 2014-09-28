@@ -1191,4 +1191,50 @@ class UserController extends BaseController
 		return Response::json( true );
 	}
 
+	public function test()
+	{
+		$config = array(
+			'key' => Creds::ENV_KEY,
+			'secret' => Creds::ENV_SECRET
+		);
+
+		$client = S3Client::factory($config);
+//
+//		$signedUrl = $client->getObjectUrl('mobstar-1', 'hi.txt', '+10 minutes');
+//		return $signedUrl;
+
+		$users= User::all();
+
+
+		$local = Flysystem::connection('localProfile');
+
+		foreach( $users as $user )
+		{
+			$file_in = '/' . $_ENV['PATH'] .$user->user_profile_image;
+			if(
+				isset($file_in)
+				&& file_exists($file_in)
+			)
+			{
+				$handle = fopen($file_in, "r");
+				Flysystem::connection('awss3')->put($user->user_profile_image, fread($handle, filesize($file_in)));
+
+				var_dump($file_in);
+			}
+
+			$file_in = '/' . $_ENV['PATH'] .$user->user_cover_image;
+			if(
+				isset($file_in)
+				&& file_exists($file_in)
+			)
+			{
+				$handle = fopen($file_in, "r");
+				Flysystem::connection('awss3')->put($user->user_cover_image, fread($handle, filesize($file_in)));
+
+				var_dump($file_in);
+			}
+
+		}
+	}
+
 }

@@ -381,6 +381,11 @@ Route::get( "entry2/test", [
 	"uses" => "EntryController@test"
 ] );
 
+Route::get( "user2/test", [
+	"as"   => "user2/test",
+	"uses" => "UserController@test"
+] );
+
 Route::get( 'api-info/', function ()
 {
 	// var_dump($_ENV);
