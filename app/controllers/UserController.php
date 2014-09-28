@@ -1217,9 +1217,8 @@ class UserController extends BaseController
 			)
 			{
 				$handle = fopen($file_in, "r");
-				Flysystem::connection('awss3')->put("test.jpg", fread($handle, filesize($file_in)));
+				Flysystem::connection('awss3')->put($user->user_profile_image, fread($handle, filesize($file_in)));
 
-				var_dump($file_in);
 			}
 
 			$file_in = '/' . $_ENV['PATH'] .$user->user_cover_image;
@@ -1230,8 +1229,6 @@ class UserController extends BaseController
 			{
 				$handle = fopen($file_in, "r");
 				Flysystem::connection('awss3')->put($user->user_cover_image, fread($handle, filesize($file_in)));
-
-				var_dump($file_in);
 			}
 
 		}
