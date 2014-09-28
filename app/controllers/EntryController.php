@@ -127,14 +127,7 @@ class EntryController extends BaseController
 	 */
 	public function index()
 	{
-		//Connect to S3
-
-		$config = array(
-			'key' => Creds::ENV_KEY,
-			'secret' => Creds::ENV_SECRET
-		);
-
-		$client = S3Client::factory($config);
+		$client = getS3Client();
 
 		$token = Request::header( "X-API-TOKEN" );
 
@@ -372,7 +365,8 @@ class EntryController extends BaseController
 					$current[ 'entryFiles' ] = array();
 					foreach( $entry->file as $file )
 					{
-						$url = 'http://' . $_ENV[ 'URL' ] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+
+						$url = $client->getObjectUrl('mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes');
 						$current[ 'entryFiles' ][ ] = [
 							'fileType' => $file->entry_file_type,
 							'filePath' => $url ];
@@ -570,6 +564,9 @@ class EntryController extends BaseController
 
 	public function show( $id_commas )
 	{
+
+		$client = getS3Client();
+
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
@@ -751,7 +748,7 @@ class EntryController extends BaseController
 					$current[ 'entryFiles' ] = array();
 					foreach( $entry->file as $file )
 					{
-						$url = 'http://' . $_ENV[ 'URL' ] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+						$url = $client->getObjectUrl('mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes');
 						$current[ 'entryFiles' ][ ] = [
 							'fileType' => $file->entry_file_type,
 							'filePath' => $url ];
@@ -824,7 +821,7 @@ class EntryController extends BaseController
 				$current[ 'entryFiles' ] = array();
 				foreach( $entry->file as $file )
 				{
-					$url = 'http://' . $_ENV[ 'URL' ] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+					$url = $client->getObjectUrl('mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes');
 					$current[ 'entryFiles' ][ ] = [
 						'fileType' => $file->entry_file_type,
 						'filePath' => $url ];
@@ -1194,6 +1191,8 @@ class EntryController extends BaseController
 
 	public function update( $id )
 	{
+
+		$client = getS3Client();
 
 		//Validate Input
 		$rules = array(
@@ -1735,6 +1734,7 @@ class EntryController extends BaseController
 
 	public function search()
 	{
+
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
@@ -1895,7 +1895,7 @@ class EntryController extends BaseController
 		$current[ 'entryFiles' ] = array();
 		foreach( $entry->file as $file )
 		{
-			$url = 'http://' . $_ENV[ 'URL' ] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+			$url = $client->getObjectUrl('mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes');
 			$current[ 'entryFiles' ][ ] = [
 				'fileType' => $file->entry_file_type,
 				'filePath' => $url ];

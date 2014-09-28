@@ -48,6 +48,7 @@ function getUserProfile( $user, $session )
 
 function oneUser( $user, $session, $includeStars = false )
 {
+	$client = getS3Client();
 
 	$return = [ 'id'           => $user->user_id,
 				'userName'     => $user->user_name,
@@ -56,9 +57,9 @@ function oneUser( $user, $session, $includeStars = false )
 				'email'        => $user->user_email,
 				'tagLine'      => $user->user_tagline,
 				'profileImage' => ( !empty( $user->user_profile_image ) )
-						? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image : '',
+						? $client->getObjectUrl('mobstar-1', $user->user_profile_image, '+10 minutes') : '',
 				'profileCover' => ( !empty( $user->user_cover_image ) )
-						? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image : '',
+						? $client->getObjectUrl('mobstar-1', $user->user_profile_image, '+10 minutes') : '',
 	];
 
 	if( $session->token_user_id != $user->user_id )
@@ -78,7 +79,7 @@ function oneUser( $user, $session, $includeStars = false )
 				$stars[ ] = [ 'starId'       => $star->Stars->user_id,
 							  'starName'     => $star->Stars->user_display_name,
 							  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
-									  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image : '',
+									  ? $client->getObjectUrl('mobstar-1', $star->user_profile_image, '+10 minutes') : '',
 				];
 
 			}
@@ -95,7 +96,7 @@ function oneUser( $user, $session, $includeStars = false )
 				$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
 								  'starName'     => $starred->User->user_display_name,
 								  'profileImage' => ( !empty( $starred->User->user_profile_image ) )
-										  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_profile_image
+										  ? $client->getObjectUrl('mobstar-1', $star->user_profile_image, '+10 minutes')
 										  : '',
 				];
 			}
@@ -110,6 +111,8 @@ function oneUser( $user, $session, $includeStars = false )
 
 function oneEntry( $entry, $session, $includeUser = false )
 {
+
+	$client = getS3Client();
 
 	$current = array();
 
@@ -163,10 +166,10 @@ function oneEntry( $entry, $session, $includeUser = false )
 	$current[ 'entryFiles' ] = array();
 	foreach( $entry->file as $file )
 	{
-		$url = 'http://' . $_ENV[ 'URL' ] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+		$signedUrl = $client->getObjectUrl('mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes');
 		$current[ 'entryFiles' ][ ] = [
 			'fileType' => $file->entry_file_type,
-			'filePath' => $url ];
+			'filePath' => $signedUrl ];
 	}
 
 	$current[ 'upVotes' ] = $up_votes;
@@ -185,6 +188,16 @@ function oneEntry( $entry, $session, $includeUser = false )
 	}
 
 	return $current;
+}
+
+function getS3Client(){
+
+	$config = array(
+		'key' => Creds::ENV_KEY,
+		'secret' => Creds::ENV_SECRET
+	);
+
+	return S3Client::factory($config);
 }
 
 ?>

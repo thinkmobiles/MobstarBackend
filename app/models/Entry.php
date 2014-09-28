@@ -49,6 +49,8 @@ class Entry extends \Eloquent
 	public function oneEntry( $entry, $session, $includeUser = false )
 	{
 
+		$client = getS3Client();
+
 		$current = array();
 
 		$up_votes = 0;
@@ -99,7 +101,7 @@ class Entry extends \Eloquent
 		$current[ 'entryFiles' ] = array();
 		foreach( $entry->file as $file )
 		{
-			$url = 'http://' . $_ENV[ 'URL' ] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+			$url = $client->getObjectUrl('mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes');
 			$current[ 'entryFiles' ][ ] = [
 				'fileType' => $file->entry_file_type,
 				'filePath' => $url ];

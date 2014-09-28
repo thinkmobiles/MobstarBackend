@@ -183,7 +183,8 @@ return array(
 		'ResourceServer'      => 'LucaDegasperi\OAuth2Server\Facades\ResourceServerFacade',
 		'Sonus'               => 'Rafasamp\Sonus\Facade',
 		'Image'               => 'Intervention\Image\Facades\Image',
-		'Flysystem' => 'GrahamCampbell\Flysystem\Facades\Flysystem'
+		'Flysystem'           => 'GrahamCampbell\Flysystem\Facades\Flysystem',
+		'Creds'               => 'Aws\Common\Credentials\Credentials'
 	),
 
 );
