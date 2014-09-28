@@ -1064,9 +1064,17 @@ class EntryController extends BaseController
 						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
 						$extension = 'mp4';
 
+						$thumb = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-thumb.jpg';
+
+						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -vframes 1 -an -s 100x100 -ss 1' . $thumb );
+
 						$handle = fopen($file_out, "r");
 
 						Flysystem::connection('awss3')->put($filename . "." . $extension, fread($handle, filesize($file_out)));
+
+						$handle = fopen($thumb, "r");
+
+						Flysystem::connection('awss3')->put("thumbs/" . $filename . "-thumb.jpg", fread($handle, filesize($thumb)));
 
 						unlink($file_out);
 					}
