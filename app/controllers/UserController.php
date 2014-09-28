@@ -1210,7 +1210,7 @@ class UserController extends BaseController
 		foreach( $users as $user )
 		{
 			$file_in = $_ENV['PATH'] . 'public/' . $user->user_profile_image;
-			
+
 			if(
 				isset($user->user_profile_image)
 				&& file_exists($file_in)
@@ -1224,7 +1224,7 @@ class UserController extends BaseController
 
 			$file_in = '/' . $_ENV['PATH'] .$user->user_cover_image;
 			if(
-				isset($file_in)
+				isset($user->user_cover_image)
 				&& file_exists($file_in)
 			)
 			{
