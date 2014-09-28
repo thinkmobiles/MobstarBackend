@@ -2057,7 +2057,7 @@ class EntryController extends BaseController
 				)
 				{
 
-					$video = $client->getObjectUrl('mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes');
+					$video =  $_ENV['PATH']  . 'public/uploads/' . $file->entry_file_name . ".mp4";
 
 					$thumb = $_ENV['PATH']  . 'public/uploads/' . $file->entry_file_name . '-thumb.jpg';
 
