@@ -1984,7 +1984,7 @@ class EntryController extends BaseController
 
 				$file_in = "/" . $_ENV[ 'PATH' ] . 'public/uploads/' . $file->entry_file_name . "." . $file->entry_file_type;
 
-				if(file_exists($file_in) && $file->file_type == "jpg")
+				if(file_exists($file_in) && $file->entry_file_type == "jpg")
 				{
 					$img = Image::make( $file_in );
 
@@ -2000,7 +2000,7 @@ class EntryController extends BaseController
 
 					$file->save();
 				}
-				
+
 			}
 		}
 	}
