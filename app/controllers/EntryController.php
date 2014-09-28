@@ -1060,17 +1060,19 @@ class EntryController extends BaseController
 					{
 						$file_in = $file->getRealPath();
 						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
+
 						// Transcode Video
 						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
+
 						$extension = 'mp4';
-
-						$thumb = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-thumb.jpg';
-
-						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -vframes 1 -an -s 100x100 -ss 1' . $thumb );
 
 						$handle = fopen($file_out, "r");
 
 						Flysystem::connection('awss3')->put($filename . "." . $extension, fread($handle, filesize($file_out)));
+
+						$thumb = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-thumb.jpg';
+
+						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -vframes 1 -an -s 100x100 -ss 00:00:00.10' . $thumb );
 
 						$handle = fopen($thumb, "r");
 
