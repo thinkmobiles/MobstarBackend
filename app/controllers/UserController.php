@@ -1209,7 +1209,7 @@ class UserController extends BaseController
 
 		foreach( $users as $user )
 		{
-			$file_in = '/' . $_ENV['PATH'] .$user->user_profile_image;
+			$file_in = $_ENV['PATH'] . 'public/' . $user->user_profile_image;
 			if(
 				isset($file_in)
 				&& file_exists($file_in)
