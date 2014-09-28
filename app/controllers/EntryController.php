@@ -1990,18 +1990,18 @@ class EntryController extends BaseController
 				{
 
 					// Transcode Video
-//					shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_in );
+					shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_in );
 
 					echo "<br>";
 					var_dump(filesize($file_in));
-//					$file->entry_file_size = filesize($file_in);
-//					$file->entry_file_updated_date = date('Y-m-d H:i:s');
-//					Flysystem::connection('awss3')->put($file->entry_file_name . "." . $file->entry_file_type, $local->read($file->entry_file_name . "." . $file->entry_file_type));
+					$file->entry_file_size = filesize($file_in);
+					$file->entry_file_updated_date = date('Y-m-d H:i:s');
+					Flysystem::connection('awss3')->put($file->entry_file_name . "." . $file->entry_file_type, $local->read($file->entry_file_name . "." . $file->entry_file_type));
 
 					var_dump($file_in);
 //					var_dump(file_exists( $file_in ));
 
-//					$file->save();
+					$file->save();
 				}
 
 			}
