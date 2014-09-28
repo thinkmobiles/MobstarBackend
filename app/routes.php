@@ -375,16 +375,16 @@ Route::get( "entry2/fixfile", [
 	"uses" => "EntryController@updateFile"
 ] );
 
-
-Route::get( "entry2/test", [
-	"as"   => "entry2/test",
-	"uses" => "EntryController@test"
-] );
-
-Route::get( "user2/test", [
-	"as"   => "user2/test",
-	"uses" => "UserController@test"
-] );
+//
+//Route::get( "entry2/test", [
+//	"as"   => "entry2/test",
+//	"uses" => "EntryController@test"
+//] );
+//
+//Route::get( "user2/test", [
+//	"as"   => "user2/test",
+//	"uses" => "UserController@test"
+//] );
 
 Route::get( 'api-info/', function ()
 {
