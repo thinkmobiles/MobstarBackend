@@ -1,5 +1,7 @@
 <?php
 
+use Aws\S3\S3Client;
+
 function getUserProfile( $user, $session )
 {
 
