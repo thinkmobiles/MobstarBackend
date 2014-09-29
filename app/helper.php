@@ -81,7 +81,7 @@ function oneUser( $user, $session, $includeStars = false )
 				$stars[ ] = [ 'starId'       => $star->Stars->user_id,
 							  'starName'     => $star->Stars->user_display_name,
 							  'profileImage' => ( isset( $star->Stars->user_profile_image ) )
-									  ? $client->getObjectUrl('mobstar-1', $star->user_profile_image, '+10 minutes') : '',
+									  ? $client->getObjectUrl('mobstar-1', $star->Stars->user_profile_image, '+10 minutes') : '',
 				];
 
 			}
@@ -98,7 +98,7 @@ function oneUser( $user, $session, $includeStars = false )
 				$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
 								  'starName'     => $starred->User->user_display_name,
 								  'profileImage' => ( isset( $starred->User->user_profile_image ) )
-										  ? $client->getObjectUrl('mobstar-1', $star->user_profile_image, '+10 minutes')
+										  ? $client->getObjectUrl('mobstar-1', $starred->User->user_profile_image, '+10 minutes')
 										  : '',
 				];
 			}
