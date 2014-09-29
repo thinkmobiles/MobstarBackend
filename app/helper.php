@@ -58,9 +58,9 @@ function oneUser( $user, $session, $includeStars = false )
 				'fullName'     => $user->user_full_name,
 				'email'        => $user->user_email,
 				'tagLine'      => $user->user_tagline,
-				'profileImage' => ( !empty( $user->user_profile_image ) )
+				'profileImage' => ( isset( $user->user_profile_image ) )
 						? $client->getObjectUrl('mobstar-1', $user->user_profile_image, '+10 minutes') : '',
-				'profileCover' => ( !empty( $user->user_cover_image ) )
+				'profileCover' => ( isset( $user->user_cover_image ) )
 						? $client->getObjectUrl('mobstar-1', $user->user_cover_image, '+10 minutes') : '',
 	];
 
@@ -80,7 +80,7 @@ function oneUser( $user, $session, $includeStars = false )
 
 				$stars[ ] = [ 'starId'       => $star->Stars->user_id,
 							  'starName'     => $star->Stars->user_display_name,
-							  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
+							  'profileImage' => ( isset( $star->Stars->user_profile_image ) )
 									  ? $client->getObjectUrl('mobstar-1', $star->user_profile_image, '+10 minutes') : '',
 				];
 
@@ -97,7 +97,7 @@ function oneUser( $user, $session, $includeStars = false )
 			{
 				$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
 								  'starName'     => $starred->User->user_display_name,
-								  'profileImage' => ( !empty( $starred->User->user_profile_image ) )
+								  'profileImage' => ( isset( $starred->User->user_profile_image ) )
 										  ? $client->getObjectUrl('mobstar-1', $star->user_profile_image, '+10 minutes')
 										  : '',
 				];
@@ -144,9 +144,9 @@ function oneEntry( $entry, $session, $includeUser = false )
 		$current[ 'user' ][ 'displayName' ] = $entry->User->user_display_name;
 		$current[ 'user' ][ 'email' ] = $entry->User->user_email;
 		$current[ 'user' ][ 'tagline' ] = $entry->User->user_tagline;
-		$current[ 'user' ][ 'profileImage' ] = ( !empty( $entry->User->user_profile_image ) )
+		$current[ 'user' ][ 'profileImage' ] = ( isset( $entry->User->user_profile_image ) )
 			? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
-		$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
+		$current[ 'user' ][ 'profileCover' ] = ( isset( $entry->User->user_profile_cover ) )
 			? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
 		$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $entry->entry_user_id )->count();
 	}
