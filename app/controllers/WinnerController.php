@@ -122,7 +122,7 @@ class WinnerController extends BaseController
 
 			$entry = new Entry;
 			$current[ 'winner' ] = [ 'strapLine' => $winner->winning_entry_strapline,
-									 'entry'     => $entry->oneEntry( $winner->entry, $session, true ) ];
+									 'entry'     => oneEntry( $winner->entry, $session, true ) ];
 
 			$return[ 'winners' ][ ] = $current;
 		}
