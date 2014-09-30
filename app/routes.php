@@ -436,8 +436,8 @@ Route::get( 'eloquent', function ()
 	phpinfo();
 } );
 
-Route::post( "login/resetpassword", [
-	"as"   => "login/resetpassword",
+Route::post( "login/forgotpassword", [
+	"as"   => "login/forgotpassword",
 	"uses" => "LoginController@password"
 ] );
 
