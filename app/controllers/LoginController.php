@@ -537,7 +537,7 @@ class LoginController extends BaseController
 		else
 		{
 
-			$user = User::where('user_email', '=', Input::get('email'))->get();
+			$user = User::where('user_email', '=', Input::get('email'))->count();
 
 			if($user)
 			{
