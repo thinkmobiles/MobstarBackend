@@ -438,6 +438,7 @@ Route::get( 'eloquent', function ()
 
 Route::get( 'email', function ()
 {
+	echo "yes";
 	$data = [];
 
 	Mail::send('hello', $data, function($message)
