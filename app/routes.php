@@ -436,6 +436,19 @@ Route::get( 'eloquent', function ()
 	phpinfo();
 } );
 
+Route::get( 'email', function ()
+{
+	$data = [];
+
+	Mail::send('hello', $data, function($message)
+	{
+		$message->from('us@example.com', 'Laravel');
+
+		$message->to('matt@dokoo.com')->cc('mmcardle16@hotmail.com');
+	});
+
+} );
+
 App::missing( function ( $exception )
 {
 
