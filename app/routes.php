@@ -436,19 +436,10 @@ Route::get( 'eloquent', function ()
 	phpinfo();
 } );
 
-Route::get( 'email', function ()
-{
-	echo "yes";
-	$data = [];
-
-	Mail::send('hello', $data, function($message)
-	{
-		$message->from('matt@api.mobstar.com', 'matt');
-
-		$message->to('matt@dokoo.com')->cc('mmcardle16@hotmail.com');
-	});
-
-} );
+Route::post( "login/resetpassword", [
+	"as"   => "login/resetpassword",
+	"uses" => "LoginController@password"
+] );
 
 App::missing( function ( $exception )
 {
