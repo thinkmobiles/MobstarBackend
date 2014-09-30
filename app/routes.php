@@ -443,7 +443,7 @@ Route::get( 'email', function ()
 
 	Mail::send('hello', $data, function($message)
 	{
-//		$message->from('us@example.com', 'Laravel');
+		$message->from('matt@api.mobstar.com', 'matt');
 
 		$message->to('matt@dokoo.com')->cc('mmcardle16@hotmail.com');
 	});
