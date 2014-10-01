@@ -1056,7 +1056,6 @@ class EntryController extends BaseController
 				if( $input[ 'entry_type' ] == 'audio' )
 				{
 					$file_in = $file->getRealPath();
-
 					$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp3';
 					// Transcode Audio
 					shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
@@ -1075,7 +1074,10 @@ class EntryController extends BaseController
 				{
 					if( $input[ 'entry_type' ] == 'video' )
 					{
+						$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', 'test.' . $extension);
+
 						$file_in = $file->getRealPath();
+
 						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
 
 						// Transcode Video
