@@ -19,7 +19,7 @@ return array(
 
 	'mailgun' => array(
 		'domain' => 'api.mobstar.com',
-		'secret' => 'key-93ac3edb3e3cbca043c2fcedbd449313',
+		'secret' => 'key-94635a13e7b036b5a4abaa6587a1a197',
 	),
 
 	/*
@@ -46,7 +46,7 @@ return array(
 	|
 	*/
 
-	'port' => 465,
+	'port' => 587,
 
 	/*
 	|--------------------------------------------------------------------------
