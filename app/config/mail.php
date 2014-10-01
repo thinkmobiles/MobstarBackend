@@ -15,7 +15,12 @@ return array(
 	|
 	*/
 
-	'driver' => 'smtp',
+	'driver' => 'mailgun',
+
+	'mailgun' => array(
+		'domain' => 'api.mobstar.com',
+		'secret' => 'key-93ac3edb3e3cbca043c2fcedbd449313',
+	),
 
 	/*
 	|--------------------------------------------------------------------------
