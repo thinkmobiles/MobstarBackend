@@ -229,7 +229,6 @@ class LoginController extends BaseController
 
 			$facebook_user = FacebookUser::firstOrNew( array( 'facebook_user_facebook_id' => Input::get( 'userId' ) ) );
 
-			$facebook_user->facebook_user_facebook_id = Input::get( 'userId' );
 			$facebook_user->facebook_user_display_name = Input::get( 'displayName' );
 			$facebook_user->facebook_user_user_name = Input::get( 'userName' );
 			$facebook_user->facebook_user_email = Input::get( 'email' );
@@ -252,16 +251,11 @@ class LoginController extends BaseController
 				'token_type'         => 'Facebook'
 			);
 
-			Token::create( $token );
+			$session = Token::create( $token );
 
 			//Return user id and token details not using auth library:
-			$return = array(
-				'token'           => $session_key,
-				'userId'          => $user->user_id,
-				'userName'        => null,
-				'userFullName'    => null,
-				'userDisplayName' => $user->user_display_name,
-			);
+
+			$return = getUserProfile( $user, $session );
 
 			$status_code = 200;
 

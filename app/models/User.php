@@ -28,6 +28,11 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 		return $this->hasOne( 'GoogleUser', 'google_user_id', 'user_google_id' );
 	}
 
+	public function FacebookUser()
+	{
+		return $this->hasOne( 'FacebookUser', 'facebook_user_id', 'user_facebook_id' );
+	}
+
 	public function Stars()
 	{
 		return $this->hasMany( 'Star', 'user_star_user_id', 'user_id' );
