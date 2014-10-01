@@ -1074,7 +1074,7 @@ class EntryController extends BaseController
 				{
 					if( $input[ 'entry_type' ] == 'video' )
 					{
-						$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', 'test.' . $extension);
+						$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', 'testorientation.' . $extension);
 
 						$file_in = $file->getRealPath();
 
