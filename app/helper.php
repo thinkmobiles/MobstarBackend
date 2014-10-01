@@ -14,14 +14,14 @@ function getUserProfile( $user, $session )
 	{
 		if( $session->token_type == 'Twitter' )
 		{
-			if( empty( $user->user_display_name ) )
+			if( !isset( $user->user_display_name ) )
 			{
 				$return[ 'userDisplayName' ] = $user->TwitterUser->twitter_user_display_name;
 			}
 		}
 		elseif( $session->token_type == 'Facebook' )
 		{
-			if( empty( $user->user_display_name ) )
+			if( !isset( $user->user_display_name ) )
 			{
 				$return[ 'userDisplayName' ] = $user->FacebookUser->facebook_user_display_name;
 			}
@@ -29,7 +29,7 @@ function getUserProfile( $user, $session )
 		elseif( $session->token_type == 'Google' )
 		{
 			//var_dump($user->GoogleUser);
-			if( empty( $user->user_display_name ) )
+			if( !isset( $user->user_display_name ) )
 			{
 				$return[ 'userDisplayName' ] = $user->GoogleUser->google_user_display_name;
 			}

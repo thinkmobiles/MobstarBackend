@@ -249,7 +249,7 @@ class LoginController extends BaseController
 				'token_created_date' => date( "Y-m-d H:i:s" ),
 				'token_valid_until'  => date( "Y-m-d H:i:s", strtotime( "now + 1 hour" ) ),
 				'token_user_id'      => $user->user_id,
-				'token_type'         => 'Native'
+				'token_type'         => 'Facebook'
 			);
 
 			Token::create( $token );
