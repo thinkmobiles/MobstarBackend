@@ -4,36 +4,40 @@ use Aws\S3\S3Client;
 
 function getUserProfile( $user, $session )
 {
+	$client = getS3Client();
 
 	$return[ 'token' ] = $session->token_value;
 	$return[ 'userId' ] = $user->user_id;
-	$return[ 'userName' ] = $user->user_name;
-	$return[ 'userFullName' ] = $user->user_full_name;
+	$return[ 'userFullName' ] = "";
 
 	if( ( empty( $user->user_display_name ) ) && $session->token_type != 'Native' )
 	{
 		if( $session->token_type == 'Twitter' )
 		{
-			if( !isset( $user->user_display_name ) )
+			if( empty( $user->user_display_name ) )
 			{
 				$return[ 'userDisplayName' ] = $user->TwitterUser->twitter_user_display_name;
 			}
+			$return[ 'userName' ] = "";
+
 		}
 		elseif( $session->token_type == 'Facebook' )
 		{
-			if( !isset( $user->user_display_name ) )
+			if( empty( $user->user_display_name ) )
 			{
 				$return[ 'userDisplayName' ] = $user->FacebookUser->facebook_user_display_name;
 			}
+			if( empty( $user->user_name ) )
+				$return[ 'userName' ] = $user->FacebookUser->facebook_user_user_name;
 		}
 		elseif( $session->token_type == 'Google' )
 		{
 			//var_dump($user->GoogleUser);
-			if( !isset( $user->user_display_name ) )
+			if( empty( $user->user_display_name ) )
 			{
 				$return[ 'userDisplayName' ] = $user->GoogleUser->google_user_display_name;
 			}
-			if( !isset( $user->user_name ) )
+			if( empty( $user->user_name ) )
 			{
 				$return[ 'userName' ] = $user->GoogleUser->google_user_user_name;
 			}
@@ -42,7 +46,14 @@ function getUserProfile( $user, $session )
 	else
 	{
 		$return[ 'userDisplayName' ] = $user->user_display_name;
+		$return[ 'userName' ] 		= $user->user_name;
 	}
+
+	$return['profileImage'] = (isset( $user->user_profile_image ) )
+		? $client->getObjectUrl('mobstar-1', $user->user_profile_image, '+10 minutes') : '';
+
+	$return['profileCover'] = ( isset( $user->user_cover_image ) )
+		? $client->getObjectUrl('mobstar-1', $user->user_cover_image, '+10 minutes') : '';
 
 	return $return;
 
