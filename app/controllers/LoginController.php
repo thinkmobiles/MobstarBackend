@@ -187,6 +187,13 @@ class LoginController extends BaseController
 	 *           paramType="form",
 	 *           required=true,
 	 *           type="string"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="fullName",
+	 *           description="Full Name from facebook profile",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
 	 *         )
 	 *       ),
 	 *       @SWG\ResponseMessages(
@@ -211,6 +218,7 @@ class LoginController extends BaseController
 			'email'       => 'required',
 			'dob'         => 'required',
 			'gender'      => 'required',
+			'fullName'    => 'required',
 		);
 
 		// run the validation rules on the inputs
@@ -233,6 +241,7 @@ class LoginController extends BaseController
 			$facebook_user->facebook_user_user_name = Input::get( 'userName' );
 			$facebook_user->facebook_user_email = Input::get( 'email' );
 			$facebook_user->facebook_user_gender = Input::get( 'gender' );
+			$facebook_user->facebook_user_full_name = Input::get( 'fullName' );
 
 			$facebook_user->save();
 
@@ -292,6 +301,13 @@ class LoginController extends BaseController
 	 *           required=true,
 	 *           type="string"
 	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="fullName",
+	 *           description="Full Name from twitter profile",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
+	 *         )
 	 *       ),
 	 *       @SWG\ResponseMessages(
 	 *          @SWG\ResponseMessage(
@@ -311,6 +327,7 @@ class LoginController extends BaseController
 		$rules = array(
 			'userId'      => 'required',
 			'displayName' => 'required',
+			'fullName'    => 'required',
 		);
 
 		// run the validation rules on the inputs
@@ -330,6 +347,7 @@ class LoginController extends BaseController
 
 			$twitter_user->twitter_user_twitter_id = Input::get( 'userId' );
 			$twitter_user->twitter_user_display_name = Input::get( 'displayName' );
+			$twitter_user->twitter_user_full_name = Input::get( 'fullName' );
 
 			$twitter_user->save();
 
@@ -406,6 +424,13 @@ class LoginController extends BaseController
 	 *           paramType="form",
 	 *           required=true,
 	 *           type="string"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="fullName",
+	 *           description="Full Name from Google profile",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
 	 *         )
 	 *       ),
 	 *       @SWG\ResponseMessages(
@@ -427,6 +452,7 @@ class LoginController extends BaseController
 			'userId'      => 'required',
 			'displayName' => 'required',
 			'userName'    => 'required',
+			'fullName'    => 'required',
 		);
 
 		// run the validation rules on the inputs
@@ -447,6 +473,7 @@ class LoginController extends BaseController
 			$google_user->google_user_google_id = Input::get( 'userId' );
 			$google_user->google_user_display_name = Input::get( 'displayName' );
 			$google_user->google_user_user_name = Input::get( 'userName' );
+			$google_user->google_user_full_name = Input::get( 'fullName' );
 
 			$google_user->save();
 

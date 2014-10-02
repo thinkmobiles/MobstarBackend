@@ -19,6 +19,7 @@ function getUserProfile( $user, $session )
 				$return[ 'userDisplayName' ] = $user->TwitterUser->twitter_user_display_name;
 			}
 			$return[ 'userName' ] = "";
+			$return['fullName'] = $user->TwitterUser->facebook_user_full_name;
 
 		}
 		elseif( $session->token_type == 'Facebook' )
@@ -29,6 +30,9 @@ function getUserProfile( $user, $session )
 			}
 			if( empty( $user->user_name ) )
 				$return[ 'userName' ] = $user->FacebookUser->facebook_user_user_name;
+
+			$return['fullName'] = $user->FacebookUser->facebook_user_full_name;
+
 		}
 		elseif( $session->token_type == 'Google' )
 		{
@@ -41,6 +45,9 @@ function getUserProfile( $user, $session )
 			{
 				$return[ 'userName' ] = $user->GoogleUser->google_user_user_name;
 			}
+
+			$return['fullName'] = $user->GoogleUser->facebook_user_full_name;
+
 		}
 	}
 	else
