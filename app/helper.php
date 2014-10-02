@@ -19,7 +19,7 @@ function getUserProfile( $user, $session )
 				$return[ 'userDisplayName' ] = $user->TwitterUser->twitter_user_display_name;
 			}
 			$return[ 'userName' ] = "";
-			$return['fullName'] = $user->TwitterUser->facebook_user_full_name;
+			$return['fullName'] = $user->TwitterUser->twitter_user_full_name;
 
 		}
 		elseif( $session->token_type == 'Facebook' )
