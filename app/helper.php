@@ -46,7 +46,7 @@ function getUserProfile( $user, $session )
 				$return[ 'userName' ] = $user->GoogleUser->google_user_user_name;
 			}
 
-			$return['fullName'] = $user->GoogleUser->facebook_user_full_name;
+			$return['fullName'] = $user->GoogleUser->google_user_full_name;
 
 		}
 	}
