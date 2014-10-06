@@ -210,7 +210,6 @@ class NotificationController extends BaseController
  *       summary="Get the total number of unread notifications for a user",
  *       notes="Show notification count.",
  *       nickname="allNotifications"
- *       ),
  *       @SWG\ResponseMessages(
  *          @SWG\ResponseMessage(
  *            code=401,
@@ -221,6 +220,32 @@ class NotificationController extends BaseController
  *   )
  * )
  */
+
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/privacy",
+	 *   description="Operations about privacy policy",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="GET",
+	 *       summary="Get MobStar Privacy Policy",
+	 *       notes="Returns available policy",
+	 *       nickname="getAllComments",
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=404,
+	 *            message="Policy not found"
+	 *          )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
 
 	public function count()
 	{
