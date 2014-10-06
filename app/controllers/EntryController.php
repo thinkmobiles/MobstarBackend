@@ -366,13 +366,13 @@ class EntryController extends BaseController
 					foreach( $entry->file as $file )
 					{
 
-						$url = $client->getObjectUrl('mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes');
+						$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
 						$current[ 'entryFiles' ][ ] = [
 							'fileType' => $file->entry_file_type,
 							'filePath' => $url ];
 
-						$current['videoThumb'] = ($file->entry_file_type == "mp4") ?
-							$client->getObjectUrl('mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes')
+						$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
+							$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
 							: "";
 					}
 				}
@@ -443,14 +443,14 @@ class EntryController extends BaseController
 				foreach( $entry->file as $file )
 				{
 
-					$signedUrl = $client->getObjectUrl('mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes');
+					$signedUrl = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
 
 					$current[ 'entryFiles' ][ ] = [
 						'fileType' => $file->entry_file_type,
 						'filePath' => $signedUrl ];
 
-					$current['videoThumb'] = ($file->entry_file_type == "mp4") ?
-						$client->getObjectUrl('mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes')
+					$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
+						$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
 						: "";
 				}
 
@@ -756,13 +756,13 @@ class EntryController extends BaseController
 					$current[ 'entryFiles' ] = array();
 					foreach( $entry->file as $file )
 					{
-						$url = $client->getObjectUrl('mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes');
+						$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
 						$current[ 'entryFiles' ][ ] = [
 							'fileType' => $file->entry_file_type,
 							'filePath' => $url ];
 
-						$current['videoThumb'] = ($file->entry_file_type == "mp4") ?
-							$client->getObjectUrl('mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes')
+						$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
+							$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
 							: "";
 					}
 
@@ -834,13 +834,13 @@ class EntryController extends BaseController
 				$current[ 'entryFiles' ] = array();
 				foreach( $entry->file as $file )
 				{
-					$url = $client->getObjectUrl('mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes');
+					$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
 					$current[ 'entryFiles' ][ ] = [
 						'fileType' => $file->entry_file_type,
 						'filePath' => $url ];
 
-					$current['videoThumb'] = ($file->entry_file_type == "mp4") ?
-						$client->getObjectUrl('mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes')
+					$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
+						$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
 						: "";
 				}
 
@@ -1062,19 +1062,18 @@ class EntryController extends BaseController
 
 					$extension = 'mp3';
 
-					$handle = fopen($file_out, "r");
+					$handle = fopen( $file_out, "r" );
 
-					Flysystem::connection('awss3')->put($filename . "." . $extension, fread($handle, filesize($file_out)));
+					Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, fread( $handle, filesize( $file_out ) ) );
 
-					unlink($file_out);
-
+					unlink( $file_out );
 
 				}
 				else
 				{
 					if( $input[ 'entry_type' ] == 'video' )
 					{
-						$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', 'testorientation.' . $extension);
+						$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', 'testorientation.' . $extension );
 
 						$file_in = $file->getRealPath();
 
@@ -1085,18 +1084,17 @@ class EntryController extends BaseController
 
 						$extension = 'mp4';
 
-						$handle = fopen($file_out, "r");
+						$handle = fopen( $file_out, "r" );
 
-						Flysystem::connection('awss3')->put($filename . "." . $extension, fread($handle, filesize($file_out)));
+						Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, fread( $handle, filesize( $file_out ) ) );
 
 						$thumb = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-thumb.jpg';
 
 						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -vframes 1 -an -s 100x100 -ss 00:00:00.10 ' . $thumb );
 
-						$handle = fopen($thumb, "r");
+						$handle = fopen( $thumb, "r" );
 
-						Flysystem::connection('awss3')->put("thumbs/" . $filename . "-thumb.jpg", fread($handle, filesize($thumb)));
-
+						Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", fread( $handle, filesize( $thumb ) ) );
 
 //						unlink($file_out);
 //						unlink($thumb);
@@ -1107,19 +1105,19 @@ class EntryController extends BaseController
 
 						$file_in = $file->getRealPath();
 
-						$file_out = $_ENV['PATH'] . "public/uploads/" . $filename. '.' . $extension;
+						$file_out = $_ENV[ 'PATH' ] . "public/uploads/" . $filename . '.' . $extension;
 
-						$image = Image::make($file_in);
+						$image = Image::make( $file_in );
 
-						$image->widen(200);
+						$image->widen( 200 );
 
-						$image->save($file_out);
+						$image->save( $file_out );
 
-						$handle = fopen($file_out, "r");
+						$handle = fopen( $file_out, "r" );
 
-						Flysystem::connection('awss3')->put($filename . "." . $extension,
-															fread($handle,
-																  filesize($file_out)));
+						Flysystem::connection( 'awss3' )->put( $filename . "." . $extension,
+															   fread( $handle,
+																	  filesize( $file_out ) ) );
 					}
 				}
 
@@ -1146,21 +1144,21 @@ class EntryController extends BaseController
 
 					$extension = ".jpg";
 
-					$file_out = $_ENV['PATH'] . "public/uploads/" . $filename. '.' . $extension;
+					$file_out = $_ENV[ 'PATH' ] . "public/uploads/" . $filename . '.' . $extension;
 
-					$image = Image::make($file_in);
+					$image = Image::make( $file_in );
 
-					$image->widen(200);
+					$image->widen( 200 );
 
-					$image->save($file_out, 80);
+					$image->save( $file_out, 80 );
 
-					$handle = fopen($file_out, "r");
+					$handle = fopen( $file_out, "r" );
 
-					Flysystem::connection('awss3')->put($filename . "." . $extension,
-														fread($handle,
-															  filesize($file_out)));
+					Flysystem::connection( 'awss3' )->put( $filename . "." . $extension,
+														   fread( $handle,
+																  filesize( $file_out ) ) );
 
-					unlink($file_out);
+					unlink( $file_out );
 
 					Eloquent::unguard();
 
@@ -1493,6 +1491,62 @@ class EntryController extends BaseController
 			return Response::make( $response, $status_code );
 
 		}
+	}
+
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/entry/view/{entryId}",
+	 *   description="Operation about Entries",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="POST",
+	 *       summary="Register an Entry View",
+	 *       notes="Registers that a user has viewed an entry. API-Token is required for this method.",
+	 *       nickname="reportEntry",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="entryId",
+	 *           description="Entry ID you want to report.",
+	 *           paramType="path",
+	 *           required=true,
+	 *           type="string"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=404,
+	 *            message="Entry not found"
+	 *          )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+
+	public function view( $id )
+	{
+
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		$view = [
+			'entry_view_entry_id' => $id,
+			'entry_view_user_id'  => $session->token_user_id,
+			'entry_view_date'     => date( 'Y-m-d H:i:s' ),
+		];
+
+		EntryView::create( $view );
+
+		$response[ 'notice' ] = "View recorded.";
+		$status_code = 200;
+
+		return Response::make( $response, $status_code );
 	}
 
 	/**
@@ -1972,13 +2026,13 @@ class EntryController extends BaseController
 		$current[ 'entryFiles' ] = array();
 		foreach( $entry->file as $file )
 		{
-			$url = $client->getObjectUrl('mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes');
+			$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
 			$current[ 'entryFiles' ][ ] = [
 				'fileType' => $file->entry_file_type,
 				'filePath' => $url ];
 
-			$current['videoThumb'] = ($file->entry_file_type == "mp4") ?
-				$client->getObjectUrl('mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes')
+			$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
+				$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
 				: "";
 		}
 

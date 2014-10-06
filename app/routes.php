@@ -187,6 +187,11 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "EntryController@report"
 		] );
 
+		Route::post( "entry/view/{id}", [
+			"as"   => "entry/view",
+			"uses" => "EntryController@view"
+		] );
+
 		// -------------------------------------------------------
 		// Entry Feedback
 		//---------------------------------------------------------
