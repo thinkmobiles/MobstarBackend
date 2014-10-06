@@ -332,6 +332,20 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "CommentController@destroy"
 		] );
 
+		//---------------------------------------------------------
+		// Privacy Policy
+		//---------------------------------------------------------
+
+		Route::get( "privacy", [
+			"as"   => "privacy/index",
+			"uses" => "PrivacyController@index"
+		] );
+
+		Route::get( "privacy/accept", [
+			"as"   => "privacy/store",
+			"uses" => "PrivacyController@store"
+		] );
+
 	} );
 
 	// -------------------------------------------------------
@@ -362,6 +376,7 @@ Route::group( [ "before" => "auth" ], function ()
 		"as"   => "user/store",
 		"uses" => "UserController@store"
 	] );
+
 
 } );
 
