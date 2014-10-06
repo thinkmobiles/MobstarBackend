@@ -291,6 +291,11 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "NotificationController@index"
 		] );
 
+		Route::get( "notification/count", [
+			"as"   => "notification/count",
+			"uses" => "NotificationController@count"
+		] );
+
 		// -------------------------------------------------------
 		// FAQ(s)
 		//---------------------------------------------------------
