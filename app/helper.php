@@ -8,7 +8,6 @@ function getUserProfile( $user, $session )
 
 	$return[ 'token' ] = $session->token_value;
 	$return[ 'userId' ] = $user->user_id;
-	$return[ 'userFullName' ] = "";
 
 	if( ( empty( $user->user_display_name ) ) && $session->token_type != 'Native' )
 	{
@@ -18,7 +17,7 @@ function getUserProfile( $user, $session )
 			{
 				$return[ 'userDisplayName' ] = $user->TwitterUser->twitter_user_display_name;
 			}
-			$return[ 'userName' ] = "";
+			$return[ 'userName' ] =  $user->TwitterUser->twitter_user_user_name;
 			$return['fullName'] = $user->TwitterUser->twitter_user_full_name;
 
 		}
@@ -47,7 +46,6 @@ function getUserProfile( $user, $session )
 			}
 
 			$return['fullName'] = $user->GoogleUser->google_user_full_name;
-
 		}
 	}
 	else
