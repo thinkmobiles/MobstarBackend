@@ -328,6 +328,7 @@ class LoginController extends BaseController
 			'userId'      => 'required',
 			'displayName' => 'required',
 			'fullName'    => 'required',
+			'userName'    => 'required',
 		);
 
 		// run the validation rules on the inputs
@@ -348,6 +349,7 @@ class LoginController extends BaseController
 			$twitter_user->twitter_user_twitter_id = Input::get( 'userId' );
 			$twitter_user->twitter_user_display_name = Input::get( 'displayName' );
 			$twitter_user->twitter_user_full_name = Input::get( 'fullName' );
+			$twitter_user->twitter_user_user_name = Input::get( 'userName' );
 
 			$twitter_user->save();
 
