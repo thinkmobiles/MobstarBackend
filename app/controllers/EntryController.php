@@ -1080,7 +1080,7 @@ class EntryController extends BaseController
 						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
 
 						// Transcode Video
-						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
+						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -metadata:s:v rotate="0" -vf "hflip,vflip" -strict -2 ' . $file_out );
 
 						$extension = 'mp4';
 
@@ -1090,7 +1090,7 @@ class EntryController extends BaseController
 
 						$thumb = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-thumb.jpg';
 
-						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -metadata:s:v rotate="0" -vf "hflip,vflip" -vframes 1 -an -s 100x100 -ss 00:00:00.10 ' . $thumb );
+						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -vframes 1 -an -s 100x100 -ss 00:00:00.10 ' . $thumb );
 
 						$handle = fopen( $thumb, "r" );
 
