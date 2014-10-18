@@ -118,17 +118,26 @@ class LoginController extends BaseController
 					'token_user_id'      => Auth::user()->user_id
 				);
 
-				$device = DeviceRegistration::firstOrNew(
-					[ 'device_registration_device_token' => Input::get( 'deviceToken' ) ]
-				);
+				$deviceToken = Input::get( 'deviceToken' );
+				$deviceType = Input::get( 'device' );
 
-				$device->device_registration_user_id = Auth::user()->user_id;
-				$device->device_registration_device_type = Input::get( 'deviceToken' );
-				$device->device_registration_date_created = date( "Y-m-d H:i:s" );
+				if( isset($deviceType) && isset($deviceToken) )
+				{
 
-				$device->save();
+					$device = DeviceRegistration::firstOrNew(
+						[ 'device_registration_device_token' => Input::get( 'deviceToken' ) ]
+					);
 
-				$this->registerSNSEndpoint( $device );
+					$device->device_registration_user_id = Auth::user()->user_id;
+					$device->device_registration_device_type = $deviceType;
+					$device->device_registration_device_token = $deviceToken;
+					$device->device_registration_date_created = date( "Y-m-d H:i:s" );
+
+					$device->save();
+
+					$this->registerSNSEndpoint( $device );
+
+				}
 
 				Token::create( $token );
 
@@ -224,6 +233,21 @@ class LoginController extends BaseController
 	 *           paramType="form",
 	 *           required=true,
 	 *           type="string"
+	 *         ),
+	 *			@SWG\Parameter(
+	 *           name="deviceToken",
+	 *           description="Device token for push notifications",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
+	 *         ),
+	 *			@SWG\Parameter(
+	 *           name="device",
+	 *           description="Device token for push notifications",
+	 *           paramType="form",
+	 *           required=true,
+	 *             enum="['apple', 'google']",
+	 *           type="string"
 	 *         )
 	 *       ),
 	 *       @SWG\ResponseMessages(
@@ -278,6 +302,27 @@ class LoginController extends BaseController
 			$user = User::firstOrNew( array( 'user_facebook_id' => $facebook_user->facebook_user_id ) );
 
 			$user->save();
+
+			$deviceToken = Input::get( 'deviceToken' );
+			$deviceType = Input::get( 'device' );
+
+			if( isset($deviceType) && isset($deviceToken) )
+			{
+
+				$device = DeviceRegistration::firstOrNew(
+					[ 'device_registration_device_token' => Input::get( 'deviceToken' ) ]
+				);
+
+				$device->device_registration_user_id = $user->user_id;
+				$device->device_registration_device_type = $deviceType;
+				$device->device_registration_device_token = $deviceToken;
+				$device->device_registration_date_created = date( "Y-m-d H:i:s" );
+
+				$device->save();
+
+				$this->registerSNSEndpoint( $device );
+
+			}
 
 			//Create Session
 			$session_key = str_random( 40 );
@@ -337,6 +382,21 @@ class LoginController extends BaseController
 	 *           paramType="form",
 	 *           required=true,
 	 *           type="string"
+	 *         ),
+	 *			@SWG\Parameter(
+	 *           name="deviceToken",
+	 *           description="Device token for push notifications",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
+	 *         ),
+	 *			@SWG\Parameter(
+	 *           name="device",
+	 *           description="Device token for push notifications",
+	 *           paramType="form",
+	 *           required=true,
+	 *             enum="['apple', 'google']",
+	 *           type="string"
 	 *         )
 	 *       ),
 	 *       @SWG\ResponseMessages(
@@ -386,6 +446,27 @@ class LoginController extends BaseController
 			$user = User::firstOrNew( array( 'user_twitter_id' => $twitter_user->twitter_user_id ) );
 
 			$user->save();
+
+			$deviceToken = Input::get( 'deviceToken' );
+			$deviceType = Input::get( 'device' );
+
+			if( isset($deviceType) && isset($deviceToken) )
+			{
+
+				$device = DeviceRegistration::firstOrNew(
+					[ 'device_registration_device_token' => Input::get( 'deviceToken' ) ]
+				);
+
+				$device->device_registration_user_id = $user->user_id;
+				$device->device_registration_device_type = $deviceType;
+				$device->device_registration_device_token = $deviceToken;
+				$device->device_registration_date_created = date( "Y-m-d H:i:s" );
+
+				$device->save();
+
+				$this->registerSNSEndpoint( $device );
+
+			}
 
 			//Create Session
 			$session_key = str_random( 40 );
@@ -463,6 +544,21 @@ class LoginController extends BaseController
 	 *           paramType="form",
 	 *           required=true,
 	 *           type="string"
+	 *         ),
+	 *			@SWG\Parameter(
+	 *           name="deviceToken",
+	 *           description="Device token for push notifications",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
+	 *         ),
+	 *			@SWG\Parameter(
+	 *           name="device",
+	 *           description="Device token for push notifications",
+	 *           paramType="form",
+	 *           required=true,
+	 *             enum="['apple', 'google']",
+	 *           type="string"
 	 *         )
 	 *       ),
 	 *       @SWG\ResponseMessages(
@@ -512,6 +608,27 @@ class LoginController extends BaseController
 			$user = User::firstOrNew( array( 'user_google_id' => $google_user->google_user_id ) );
 
 			$user->save();
+
+			$deviceToken = Input::get( 'deviceToken' );
+			$deviceType = Input::get( 'device' );
+
+			if( isset($deviceType) && isset($deviceToken) )
+			{
+
+				$device = DeviceRegistration::firstOrNew(
+					[ 'device_registration_device_token' => Input::get( 'deviceToken' ) ]
+				);
+
+				$device->device_registration_user_id = $user->user_id;
+				$device->device_registration_device_type = $deviceType;
+				$device->device_registration_device_token = $deviceToken;
+				$device->device_registration_date_created = date( "Y-m-d H:i:s" );
+
+				$device->save();
+
+				$this->registerSNSEndpoint( $device );
+
+			}
 
 			//var_dump($user);
 
@@ -631,12 +748,20 @@ class LoginController extends BaseController
 
 	public function registerSNSEndpoint( $device )
 	{
+		if( $device->device_registration_device_type == "apple" )
+		{
+			$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS_SANDBOX/com.mobstar";
+		}
+		else
+		{
+			return true;
+		}
 
 		$client = getSNSClient();
 
 		$arn = $client->createPlatformEndpoint( [
 													'PlatformApplicationArn' =>
-														'arn:aws:sns:eu-west-1:830026328040:app/APNS_SANDBOX/com.mobstar',
+														$arn,
 													'Token'                  =>
 														$device->device_registration_device_token
 												] );

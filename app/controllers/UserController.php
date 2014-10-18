@@ -161,7 +161,6 @@ class UserController extends BaseController
 
 		$session = $this->token->get_session( $token );
 
-
 		$users = User::take( $limit )->skip( $offset )->get();
 		foreach( $users as $user )
 		{
@@ -220,8 +219,8 @@ class UserController extends BaseController
 							$stars[ ] = [ 'star_id'      => $star->user_star_star_id,
 										  'star_name'    => $star->Stars->user_display_name,
 										  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
-												  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image
-												  : '',
+											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image
+											  : '',
 							];
 
 						}
@@ -241,8 +240,8 @@ class UserController extends BaseController
 							$starredBy[ ] = [ 'star_id'      => $starred->User_star_user_id,
 											  'star_name'    => $starred->User->user_display_name,
 											  'profileImage' => ( !empty( $starred->User->user_profile_image ) )
-													  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_profile_image
-													  : '',
+												  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_profile_image
+												  : '',
 							];
 						}
 
@@ -257,7 +256,7 @@ class UserController extends BaseController
 			//if not just return all info
 			else
 			{
-				$return[ 'users' ][ ][ 'user' ] = oneUser($user, $session, true);
+				$return[ 'users' ][ ][ 'user' ] = oneUser( $user, $session, true );
 			}
 
 		}
@@ -488,8 +487,8 @@ class UserController extends BaseController
 							$stars[ ] = [ 'star_id'      => $star->user_star_star_id,
 										  'star_name'    => $star->Stars->user_display_name,
 										  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
-												  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image
-												  : '',
+											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image
+											  : '',
 							];
 
 						}
@@ -509,8 +508,8 @@ class UserController extends BaseController
 							$starredBy[ ] = [ 'star_id'      => $starred->User_star_user_id,
 											  'star_name'    => $starred->User->user_display_name,
 											  'profileImage' => ( !empty( $starred->User->user_profile_image ) )
-													  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_profile_image
-													  : '',
+												  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_profile_image
+												  : '',
 							];
 						}
 
@@ -543,8 +542,8 @@ class UserController extends BaseController
 						$stars[ ] = [ 'star_id'      => $star->Stars->user_id,
 									  'star_name'    => $star->Stars->user_display_name,
 									  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
-											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image
-											  : '',
+										  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image
+										  : '',
 						];
 
 					}
@@ -559,8 +558,8 @@ class UserController extends BaseController
 						$starredBy[ ] = [ 'star_id'      => $starred->User->user_id,
 										  'star_name'    => $starred->User->user_display_name,
 										  'profileImage' => ( !empty( $starred->User->user_profile_image ) )
-												  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_profile_image
-												  : '',
+											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_profile_image
+											  : '',
 						];
 					}
 
@@ -572,11 +571,11 @@ class UserController extends BaseController
 													'fullName'     => $user->user_full_name,
 													'email'        => $user->user_email,
 													'profileImage' => ( !empty( $user->user_profile_image ) )
-															? $client->getObjectUrl('mobstar-1', $user->user_profile_image, '+10 minutes')
-															: '',
+														? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+10 minutes' )
+														: '',
 													'profileCover' => ( !empty( $user->user_cover_image ) )
-															? $client->getObjectUrl('mobstar-1', $user->user_cover_image, '+10 minutes')
-															: '',
+														? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+10 minutes' )
+														: '',
 													'stars'        => $stars,
 													'starredBy'    => $starredBy,
 				];
@@ -661,8 +660,8 @@ class UserController extends BaseController
 		$term = Input::get( "term" );
 		//check to see if an email was entered
 		$validator = Validator::make(
-							  [ 'term' => $term ],
-							  [ 'term' => [ 'email' ] ]
+			[ 'term' => $term ],
+			[ 'term' => [ 'email' ] ]
 		);
 
 		//if not search by users name
@@ -742,6 +741,21 @@ class UserController extends BaseController
 	 *           paramType="form",
 	 *           required=false,
 	 *           type="string"
+	 *         ),
+	 *			@SWG\Parameter(
+	 *           name="deviceToken",
+	 *           description="Device token for push notifications",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
+	 *         ),
+	 *			@SWG\Parameter(
+	 *           name="device",
+	 *           description="Device token for push notifications",
+	 *           paramType="form",
+	 *           required=true,
+	 *             enum="['apple', 'google']",
+	 *           type="string"
 	 *         )
 	 *       ),
 	 *       @SWG\ResponseMessages(
@@ -801,7 +815,28 @@ class UserController extends BaseController
 				'user_dob'          => date( 'Y-m-d', strtotime( input::get( 'dob' ) ) ),
 			];
 			//Create the new user
-			User::create( $input );
+			$user = User::create( $input );
+
+			$deviceToken = Input::get( 'deviceToken' );
+			$deviceType = Input::get( 'device' );
+
+			if( isset( $deviceType ) && isset( $deviceToken ) )
+			{
+
+				$device = DeviceRegistration::firstOrNew(
+					[ 'device_registration_device_token' => Input::get( 'deviceToken' ) ]
+				);
+
+				$device->device_registration_user_id = $user->user_id;
+				$device->device_registration_device_type = $deviceType;
+				$device->device_registration_device_token = $deviceToken;
+				$device->device_registration_date_created = date( "Y-m-d H:i:s" );
+
+				$device->save();
+
+				$this->registerSNSEndpoint( $device );
+
+			}
 
 			//Log user in
 
@@ -834,9 +869,9 @@ class UserController extends BaseController
 					'userFullName'    => Auth::user()->user_full_name,
 					'userDisplayName' => Auth::user()->user_display_name,
 					'profileImage'    => ( !empty( Auth::user()->user_profile_image ) )
-							? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_profile_image : '',
+						? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_profile_image : '',
 					'profileCover'    => ( !empty( Auth::user()->user_cover_image ) )
-							? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_cover_image : '',
+						? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_cover_image : '',
 				);
 
 				return $return;
@@ -981,7 +1016,7 @@ class UserController extends BaseController
 
 			$user->save();
 
-			return ['user' => oneUser($user, $session, true)];
+			return [ 'user' => oneUser( $user, $session, true ) ];
 		}
 	}
 
@@ -1042,11 +1077,11 @@ class UserController extends BaseController
 
 			$img->save( $_ENV[ 'PATH' ] . '/public/' . $file_out, 80 );
 
-			$handle = fopen($_ENV[ 'PATH' ] . '/public/' . $file_out, "r");
+			$handle = fopen( $_ENV[ 'PATH' ] . '/public/' . $file_out, "r" );
 
-			Flysystem::connection('awss3')->put($file_out,
-												fread($handle,
-													  filesize($_ENV[ 'PATH' ] . '/public/' . $file_out)));
+			Flysystem::connection( 'awss3' )->put( $file_out,
+												   fread( $handle,
+														  filesize( $_ENV[ 'PATH' ] . '/public/' . $file_out ) ) );
 
 			$user->user_profile_image = $file_out;
 		}
@@ -1058,7 +1093,7 @@ class UserController extends BaseController
 
 		$user->save();
 
-		$return[ 'user' ] = oneUser($user, $session, true);
+		$return[ 'user' ] = oneUser( $user, $session, true );
 
 		return Response::make( $return, 200 );
 
@@ -1120,11 +1155,11 @@ class UserController extends BaseController
 
 			$img->save( $_ENV[ 'PATH' ] . '/public/' . $file_out, 80 );
 
-			$handle = fopen($_ENV[ 'PATH' ] . '/public/' . $file_out, "r");
+			$handle = fopen( $_ENV[ 'PATH' ] . '/public/' . $file_out, "r" );
 
-			Flysystem::connection('awss3')->put($file_out,
-												fread($handle,
-													  filesize($_ENV[ 'PATH' ] . '/public/' . $file_out)));
+			Flysystem::connection( 'awss3' )->put( $file_out,
+												   fread( $handle,
+														  filesize( $_ENV[ 'PATH' ] . '/public/' . $file_out ) ) );
 
 			$user->user_cover_image = $file_out;
 		}
@@ -1163,7 +1198,7 @@ class UserController extends BaseController
 
 		}
 
-		$return[ 'user' ] = oneUser($user, $session, true);
+		$return[ 'user' ] = oneUser( $user, $session, true );
 
 		return Response::make( $return, 200 );
 	}
@@ -1187,30 +1222,30 @@ class UserController extends BaseController
 //		$signedUrl = $client->getObjectUrl('mobstar-1', 'hi.txt', '+10 minutes');
 //		return $signedUrl;
 
-		$users= User::all();
+		$users = User::all();
 
 		foreach( $users as $user )
 		{
-			$file_in = $_ENV['PATH'] . 'public/' . $user->user_profile_image;
+			$file_in = $_ENV[ 'PATH' ] . 'public/' . $user->user_profile_image;
 
 			if(
-				isset($user->user_profile_image)
-				&& file_exists($file_in)
+				isset( $user->user_profile_image )
+				&& file_exists( $file_in )
 			)
 			{
-				$handle = fopen($file_in, "r");
-				Flysystem::connection('awss3')->put($user->user_profile_image, fread($handle, filesize($file_in)));
+				$handle = fopen( $file_in, "r" );
+				Flysystem::connection( 'awss3' )->put( $user->user_profile_image, fread( $handle, filesize( $file_in ) ) );
 
 			}
 
-			$file_in = '/' . $_ENV['PATH'] .$user->user_cover_image;
+			$file_in = '/' . $_ENV[ 'PATH' ] . $user->user_cover_image;
 			if(
-				isset($user->user_cover_image)
-				&& file_exists($file_in)
+				isset( $user->user_cover_image )
+				&& file_exists( $file_in )
 			)
 			{
-				$handle = fopen($file_in, "r");
-				Flysystem::connection('awss3')->put($user->user_cover_image, fread($handle, filesize($file_in)));
+				$handle = fopen( $file_in, "r" );
+				Flysystem::connection( 'awss3' )->put( $user->user_cover_image, fread( $handle, filesize( $file_in ) ) );
 			}
 
 		}
