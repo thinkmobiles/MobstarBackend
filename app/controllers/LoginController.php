@@ -60,7 +60,7 @@ class LoginController extends BaseController
 	 *           description="Device token for push notifications",
 	 *           paramType="form",
 	 *           required=true,
-	 * 			 enum="['apple', 'google']",
+	 *             enum="['apple', 'google']",
 	 *           type="string"
 	 *         )
 	 *       ),
