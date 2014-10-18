@@ -1,6 +1,7 @@
 <?php
 
 use Aws\S3\S3Client;
+use Aws\Sns\SnsClient;
 
 function getUserProfile( $user, $session )
 {
@@ -222,4 +223,13 @@ function getS3Client(){
 	return S3Client::factory($config);
 }
 
+function getSNSClient()
+{
+	$config = array(
+		'key' => Creds::ENV_KEY,
+		'secret' => Creds::ENV_SECRET
+	);
+
+	return SnsClient::factory($config);
+}
 ?>
