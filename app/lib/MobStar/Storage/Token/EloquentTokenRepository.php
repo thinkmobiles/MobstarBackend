@@ -9,4 +9,10 @@ class EloquentTokenRepository implements TokenRepository {
 
 		return $session;
 	}
+
+	public function create_session($token){
+		$session = Token::create($token);
+
+		return $session;
+	}
 }

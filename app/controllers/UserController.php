@@ -859,7 +859,7 @@ class UserController extends BaseController
 					'token_user_id'      => Auth::user()->user_id
 				);
 
-				Token::create( $token );
+				$this->token->create_session( $token );
 
 				//Return user id and token details:
 				$return = array(
