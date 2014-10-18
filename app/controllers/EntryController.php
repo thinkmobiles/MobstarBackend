@@ -1092,7 +1092,7 @@ class EntryController extends BaseController
 
 						$rotation = shell_exec('/usr/bin/ffprobe ' . $file_out . ' 2>&1 | grep "rotate          :"');
 
-						$rotation = substr($rotation, 17);
+//						$rotation = substr($rotation, 17);
 
 						return var_dump($rotation);
 
