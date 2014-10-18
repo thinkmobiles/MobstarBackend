@@ -1080,7 +1080,7 @@ class EntryController extends BaseController
 						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
 
 						// Transcode Video
-						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=305:306 -strict -2  ' . $file_out );
+						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=305:306 -strict -2 ' . $file_out );
 
 						$extension = 'mp4';
 
