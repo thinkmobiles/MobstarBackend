@@ -636,7 +636,7 @@ class LoginController extends BaseController
 
 		$arn = $client->createPlatformEndpoint( [
 													'PlatformApplicationArn' =>
-														'aws:sns:eu-west-1:830026328040:app/APNS_SANDBOX/com.mobstar',
+														'arn:aws:sns:eu-west-1:830026328040:app/APNS_SANDBOX/com.mobstar',
 													'Token'                  =>
 														$device->device_registration_device_token
 												] );
