@@ -227,7 +227,8 @@ function getSNSClient()
 {
 	$config = array(
 		'key' => Creds::ENV_KEY,
-		'secret' => Creds::ENV_SECRET
+		'secret' => Creds::ENV_SECRET,
+		'region' => 'eu-west-1'
 	);
 
 	return SnsClient::factory($config);
