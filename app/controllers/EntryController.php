@@ -1094,7 +1094,7 @@ class EntryController extends BaseController
 
 //						$rotation = substr($rotation, 17);
 
-						return var_dump($rotation);
+						return $file_out . " " . $rotation;
 
 						switch($rotation)
 						{
