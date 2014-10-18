@@ -124,7 +124,7 @@ class LoginController extends BaseController
 
 				$device->device_registration_user_id = Auth::user()->user_id;
 				$device->device_registration_device_type = Input::get( 'deviceToken' );
-				$device->device_registation_date_created = date( "Y-m-d H:i:s" );
+				$device->device_registration_date_created = date( "Y-m-d H:i:s" );
 
 				$device->save();
 
