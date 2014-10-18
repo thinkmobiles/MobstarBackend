@@ -834,7 +834,8 @@ class UserController extends BaseController
 
 				$device->save();
 
-				$this->registerSNSEndpoint( $device );
+				$login = new LoginController;
+				$login->registerSNSEndpoint( $device );
 
 			}
 
