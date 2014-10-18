@@ -1109,7 +1109,7 @@ class EntryController extends BaseController
 
 						$image = Image::make( $file_in );
 
-						$image->widen( 200 );
+						$image->widen( 350 );
 
 						$image->save( $file_out );
 
@@ -1148,7 +1148,7 @@ class EntryController extends BaseController
 
 					$image = Image::make( $file_in );
 
-					$image->widen( 200 );
+					$image->widen( 350 );
 
 					$image->save( $file_out, 80 );
 
