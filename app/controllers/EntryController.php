@@ -1090,7 +1090,31 @@ class EntryController extends BaseController
 
 						$thumb = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-thumb.jpg';
 
-						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -vf transpose=1:portrait  -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
+						$rotation = shell_exec('/usr/bin/ffprobe ' . $file_out . ' 2>&1 | grep "rotate          :"');
+
+						$rotation = substr($rotation, 17);
+
+						return var_dump($rotation);
+
+						switch($rotation)
+						{
+							case "90":
+								$transpose = "transpose=1";
+								break;
+
+							case "180":
+								$transpose = "transpose=1,transpose=1";
+								break;
+
+							case "270":
+								$transpose = "transpose=1,transpose=1,transpose=1";
+								break;
+
+							default:
+								$transpose = "";
+						}
+
+						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -vf ' . $transpose . '  -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
 
 						$handle = fopen( $thumb, "r" );
 
