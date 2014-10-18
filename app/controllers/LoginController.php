@@ -1,6 +1,7 @@
 <?php
 
 use Swagger\Annotations as SWG;
+use Aws\Sns\SnsClient;
 
 /**
  * @package
@@ -49,7 +50,7 @@ class LoginController extends BaseController
 	 *           type="string"
 	 *         ),
 	 *			@SWG\Parameter(
-	 *           name="token",
+	 *           name="deviceToken",
 	 *           description="Device token for push notifications",
 	 *           paramType="form",
 	 *           required=true,
@@ -83,7 +84,7 @@ class LoginController extends BaseController
 			'email'    => 'required|email', // make sure the email is an actual email
 			'password' => 'required|alphaNum|min:3', // password can only be alphanumeric and has to be greater than 3 characters
 			'device'   => 'required|in:apple,google', // device type, must be google or apple
-			'token'    => 'required' // token is required
+			'deviceToken'    => 'required' // token is required
 		);
 
 		// run the validation rules on the inputs
@@ -117,7 +118,17 @@ class LoginController extends BaseController
 					'token_user_id'      => Auth::user()->user_id
 				);
 
+				$device = DeviceRegistration::firstOrNew(
+					['device_registration_device_token' => Input::get('deviceToken')]
+				);
 
+				$device->device_registration_user_id = Auth::user()->user_id;
+				$device->device_registration_device_type = Input::get('deviceToken');
+				$device->device_registation_created_date = date("Y-m-d H:i:s");
+
+				$device->save();
+
+				$this->registerSNSEndpoint($device);
 
 				Token::create( $token );
 
@@ -505,6 +516,11 @@ class LoginController extends BaseController
 		$response = Response::make( $return, $status_code );
 
 		return $response;
+
+	}
+
+	public function registerSNSEndpoint($device)
+	{
 
 	}
 
