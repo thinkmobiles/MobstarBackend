@@ -117,6 +117,8 @@ class LoginController extends BaseController
 					'token_user_id'      => Auth::user()->user_id
 				);
 
+
+
 				Token::create( $token );
 
 				//Return user id and token details:
@@ -127,9 +129,9 @@ class LoginController extends BaseController
 					'userFullName'    => Auth::user()->user_full_name,
 					'userDisplayName' => Auth::user()->user_display_name,
 					'profileImage'    => ( !empty( Auth::user()->user_profile_image ) )
-							? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_profile_image : '',
+						? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_profile_image : '',
 					'profileCover'    => ( !empty( Auth::user()->user_cover_image ) )
-							? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_cover_image : '',
+						? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_cover_image : '',
 				);
 
 				$status_code = 200;
