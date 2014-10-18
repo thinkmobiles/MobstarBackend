@@ -83,8 +83,8 @@ class LoginController extends BaseController
 		$rules = array(
 			'email'    => 'required|email', // make sure the email is an actual email
 			'password' => 'required|alphaNum|min:3', // password can only be alphanumeric and has to be greater than 3 characters
-			'device'   => 'required|in:apple,google', // device type, must be google or apple
-			'deviceToken'    => 'required' // token is required
+			'device'   => 'in:apple,google', // device type, must be google or apple
+//			'deviceToken'    => 'required' // token is required
 		);
 
 		// run the validation rules on the inputs
