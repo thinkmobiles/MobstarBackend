@@ -5,3 +5,4 @@ public/uploads
 .elasticbeanstalk/
 _ide_helper.php
 .idea
+app/config/packages/barryvdh
