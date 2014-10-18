@@ -15,7 +15,8 @@
 		"intervention/image": "2.*",
 		"league/event": "~1.0",
 		"aws/aws-sdk-php": "~2.4",
-		"graham-campbell/flysystem": "~1.0@dev"
+		"graham-campbell/flysystem": "~1.0@dev",
+		"guzzlehttp/guzzle": "~4.0"
 	},
 	"autoload": {
 		"classmap": [

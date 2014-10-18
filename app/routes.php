@@ -187,6 +187,11 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "EntryController@report"
 		] );
 
+		Route::post( "entry/view/{id}", [
+			"as"   => "entry/view",
+			"uses" => "EntryController@view"
+		] );
+
 		// -------------------------------------------------------
 		// Entry Feedback
 		//---------------------------------------------------------
@@ -286,6 +291,11 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "NotificationController@index"
 		] );
 
+		Route::get( "notification/count", [
+			"as"   => "notification/count",
+			"uses" => "NotificationController@count"
+		] );
+
 		// -------------------------------------------------------
 		// FAQ(s)
 		//---------------------------------------------------------
@@ -332,6 +342,20 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "CommentController@destroy"
 		] );
 
+		//---------------------------------------------------------
+		// Privacy Policy
+		//---------------------------------------------------------
+
+		Route::get( "privacy", [
+			"as"   => "privacy/index",
+			"uses" => "PrivacyController@index"
+		] );
+
+		Route::get( "privacy/accept", [
+			"as"   => "privacy/store",
+			"uses" => "PrivacyController@store"
+		] );
+
 	} );
 
 	// -------------------------------------------------------
@@ -363,6 +387,7 @@ Route::group( [ "before" => "auth" ], function ()
 		"uses" => "UserController@store"
 	] );
 
+
 } );
 
 Route::get( "entry2/rerank", [
@@ -375,11 +400,16 @@ Route::get( "entry2/fixfile", [
 	"uses" => "EntryController@updateFile"
 ] );
 
-
-Route::get( "entry2/test", [
-	"as"   => "entry2/test",
-	"uses" => "EntryController@test"
-] );
+//
+//Route::get( "entry2/test", [
+//	"as"   => "entry2/test",
+//	"uses" => "EntryController@test"
+//] );
+//
+//Route::get( "user2/test", [
+//	"as"   => "user2/test",
+//	"uses" => "UserController@test"
+//] );
 
 Route::get( 'api-info/', function ()
 {
@@ -430,6 +460,11 @@ Route::get( 'eloquent', function ()
 
 	phpinfo();
 } );
+
+Route::post( "login/forgotpassword", [
+	"as"   => "login/forgotpassword",
+	"uses" => "LoginController@password"
+] );
 
 App::missing( function ( $exception )
 {

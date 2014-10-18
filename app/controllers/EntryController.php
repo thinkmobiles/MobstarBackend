@@ -127,6 +127,8 @@ class EntryController extends BaseController
 	 */
 	public function index()
 	{
+		$client = getS3Client();
+
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
@@ -363,10 +365,15 @@ class EntryController extends BaseController
 					$current[ 'entryFiles' ] = array();
 					foreach( $entry->file as $file )
 					{
-						$url = 'http://' . $_ENV[ 'URL' ] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+
+						$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
 						$current[ 'entryFiles' ][ ] = [
 							'fileType' => $file->entry_file_type,
 							'filePath' => $url ];
+
+						$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
+							$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
+							: "";
 					}
 				}
 
@@ -435,10 +442,16 @@ class EntryController extends BaseController
 
 				foreach( $entry->file as $file )
 				{
-					$url = 'http://' . $_ENV[ 'URL' ] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+
+					$signedUrl = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
+
 					$current[ 'entryFiles' ][ ] = [
 						'fileType' => $file->entry_file_type,
-						'filePath' => $url ];
+						'filePath' => $signedUrl ];
+
+					$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
+						$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
+						: "";
 				}
 
 				$current[ 'upVotes' ] = $up_votes;
@@ -559,6 +572,9 @@ class EntryController extends BaseController
 
 	public function show( $id_commas )
 	{
+
+		$client = getS3Client();
+
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
@@ -740,11 +756,16 @@ class EntryController extends BaseController
 					$current[ 'entryFiles' ] = array();
 					foreach( $entry->file as $file )
 					{
-						$url = 'http://' . $_ENV[ 'URL' ] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+						$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
 						$current[ 'entryFiles' ][ ] = [
 							'fileType' => $file->entry_file_type,
 							'filePath' => $url ];
+
+						$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
+							$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
+							: "";
 					}
+
 				}
 
 				if( in_array( "upVotes", $fields ) )
@@ -813,10 +834,14 @@ class EntryController extends BaseController
 				$current[ 'entryFiles' ] = array();
 				foreach( $entry->file as $file )
 				{
-					$url = 'http://' . $_ENV[ 'URL' ] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+					$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
 					$current[ 'entryFiles' ][ ] = [
 						'fileType' => $file->entry_file_type,
 						'filePath' => $url ];
+
+					$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
+						$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
+						: "";
 				}
 
 				if( $showFeedback == 1 )
@@ -1031,26 +1056,68 @@ class EntryController extends BaseController
 				if( $input[ 'entry_type' ] == 'audio' )
 				{
 					$file_in = $file->getRealPath();
-
 					$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp3';
 					// Transcode Audio
 					shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
+
 					$extension = 'mp3';
+
+					$handle = fopen( $file_out, "r" );
+
+					Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, fread( $handle, filesize( $file_out ) ) );
+
+					unlink( $file_out );
 
 				}
 				else
 				{
 					if( $input[ 'entry_type' ] == 'video' )
 					{
+//						$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', 'testorientation.' . $extension );
+
 						$file_in = $file->getRealPath();
+
 						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
+
 						// Transcode Video
-						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
+						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -metadata:s:v rotate="0" -vf "hflip,vflip" -strict -2 ' . $file_out );
+
 						$extension = 'mp4';
+
+						$handle = fopen( $file_out, "r" );
+
+						Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, fread( $handle, filesize( $file_out ) ) );
+
+						$thumb = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-thumb.jpg';
+
+						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -vframes 1 -an -s 100x100 -ss 00:00:00.10 ' . $thumb );
+
+						$handle = fopen( $thumb, "r" );
+
+						Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", fread( $handle, filesize( $thumb ) ) );
+
+//						unlink($file_out);
+//						unlink($thumb);
 					}
 					else
 					{
-						$file->move( $dest, $filename . '.' . $extension );
+						//File is an image
+
+						$file_in = $file->getRealPath();
+
+						$file_out = $_ENV[ 'PATH' ] . "public/uploads/" . $filename . '.' . $extension;
+
+						$image = Image::make( $file_in );
+
+						$image->widen( 200 );
+
+						$image->save( $file_out );
+
+						$handle = fopen( $file_out, "r" );
+
+						Flysystem::connection( 'awss3' )->put( $filename . "." . $extension,
+															   fread( $handle,
+																	  filesize( $file_out ) ) );
 					}
 				}
 
@@ -1073,11 +1140,25 @@ class EntryController extends BaseController
 				{
 					$dest = 'uploads';
 
-					$filename = str_random( 12 );
+					$file_in = $file->getRealPath();
 
-					$extension = $file->getClientOriginalExtension();
+					$extension = ".jpg";
 
-					$file->move( $dest, $filename . '.' . $extension );
+					$file_out = $_ENV[ 'PATH' ] . "public/uploads/" . $filename . '.' . $extension;
+
+					$image = Image::make( $file_in );
+
+					$image->widen( 200 );
+
+					$image->save( $file_out, 80 );
+
+					$handle = fopen( $file_out, "r" );
+
+					Flysystem::connection( 'awss3' )->put( $filename . "." . $extension,
+														   fread( $handle,
+																  filesize( $file_out ) ) );
+
+					unlink( $file_out );
 
 					Eloquent::unguard();
 
@@ -1183,6 +1264,8 @@ class EntryController extends BaseController
 
 	public function update( $id )
 	{
+
+		$client = getS3Client();
 
 		//Validate Input
 		$rules = array(
@@ -1408,6 +1491,62 @@ class EntryController extends BaseController
 			return Response::make( $response, $status_code );
 
 		}
+	}
+
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/entry/view/{entryId}",
+	 *   description="Operation about Entries",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="POST",
+	 *       summary="Register an Entry View",
+	 *       notes="Registers that a user has viewed an entry. API-Token is required for this method.",
+	 *       nickname="reportEntry",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="entryId",
+	 *           description="Entry ID you want to report.",
+	 *           paramType="path",
+	 *           required=true,
+	 *           type="string"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=404,
+	 *            message="Entry not found"
+	 *          )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+
+	public function view( $id )
+	{
+
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		$view = [
+			'entry_view_entry_id' => $id,
+			'entry_view_user_id'  => $session->token_user_id,
+			'entry_view_date'     => date( 'Y-m-d H:i:s' ),
+		];
+
+		EntryView::create( $view );
+
+		$response[ 'notice' ] = "View recorded.";
+		$status_code = 200;
+
+		return Response::make( $response, $status_code );
 	}
 
 	/**
@@ -1724,6 +1863,7 @@ class EntryController extends BaseController
 
 	public function search()
 	{
+
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
@@ -1831,6 +1971,8 @@ class EntryController extends BaseController
 	public function oneEntry( $entry, $session, $includeUser = false )
 	{
 
+		$client = getS3Client();
+
 		$current = array();
 
 		$up_votes = 0;
@@ -1884,10 +2026,14 @@ class EntryController extends BaseController
 		$current[ 'entryFiles' ] = array();
 		foreach( $entry->file as $file )
 		{
-			$url = 'http://' . $_ENV[ 'URL' ] . '/' . $file->entry_file_location . "/" . $file->entry_file_name . "." . $file->entry_file_type;
+			$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
 			$current[ 'entryFiles' ][ ] = [
 				'fileType' => $file->entry_file_type,
 				'filePath' => $url ];
+
+			$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
+				$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
+				: "";
 		}
 
 		$current[ 'upVotes' ] = $up_votes;
@@ -1908,94 +2054,102 @@ class EntryController extends BaseController
 		return $current;
 	}
 
-	public function updateFile()
-	{
-		$entries = $this->entry->all( 0, 0, 0, 0, 0, 200, 0, false );
-		$i = 0;
-		$n = 0;
-		$d = 0;
-		foreach( $entries as $entry )
-		{
-			foreach( $entry->file as $file )
-			{
-				$i++;
-				$filename = str_random( 12 );
-
-				$date = date( 'Y-m-d H:i:s' );
-				if( $file->entry_file_type == "mp4" )
-				{
-					$file_in = $_ENV[ 'PATH' ] . 'public/uploads/' . $file->entry_file_name . ".mp4";
-					var_dump($file_in);
-					var_dump(file_exists( $file_in ));
-					echo "<br>";
-//					if( !file_exists( $file_in ) )
-//					{
+//	public function updateFile()
+//	{
+//		$entries = $this->entry->all( 0, 0, 0, 0, 0, 200, 0, false );
+//		$i = 0;
+//		$n = 0;
+//		$d = 0;
+//		foreach( $entries as $entry )
+//		{
+//			foreach( $entry->file as $file )
+//			{
+//				$i++;
+//				$filename = str_random( 12 );
 //
-//						DB::raw( " Delete from entries where entry_id = $file->entry_file_entry_id " );
-//						echo $file_in;
-//						$d++;
-//					}
-//					else
-//					{
-//						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
-//						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2  -b:v 64k -r 20' . $file_out );
+//				$date = date( 'Y-m-d H:i:s' );
+//				if( $file->entry_file_type == "mp4" )
+//				{
+//					$file_in = $_ENV[ 'PATH' ] . 'public/uploads/' . $file->entry_file_name . ".mp4";
+//					var_dump($file_in);
+//					var_dump(file_exists( $file_in ));
+//					echo "<br>";
+////					if( !file_exists( $file_in ) )
+////					{
+////
+////						DB::raw( " Delete from entries where entry_id = $file->entry_file_entry_id " );
+////						echo $file_in;
+////						$d++;
+////					}
+////					else
+////					{
+////						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
+////						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2  -b:v 64k -r 20' . $file_out );
+////
+////						Eloquent::unguard();
+////
+////						DB::raw( " update entry_files set entry_file_name = $filename, entry_file_updated_date = $date where entry_file_id $entry->entry_file_id " );
+////
+////						Eloquent::reguard();
+////
+////						$n++;
+////					}
 //
-//						Eloquent::unguard();
 //
-//						DB::raw( " update entry_files set entry_file_name = $filename, entry_file_updated_date = $date where entry_file_id $entry->entry_file_id " );
+//				}
+//				else
+//				{
+//				}
+//			}
+//		}
 //
-//						Eloquent::reguard();
+//		echo $i . " files processed -   " . $n . " files changed - " . $d . " deleted";
+//	}
 //
-//						$n++;
-//					}
-
-
-				}
-				else
-				{
-				}
-			}
-		}
-
-		echo $i . " files processed -   " . $n . " files changed - " . $d . " deleted";
-	}
-
-	public function test()
-	{
-		$config = array(
-			'key' => Creds::ENV_KEY,
-			'secret' => Creds::ENV_SECRET
-		);
-
-		$client = S3Client::factory($config);
+//	public function test()
+//	{
+//		$config = array(
+//			'key' => Creds::ENV_KEY,
+//			'secret' => Creds::ENV_SECRET
+//		);
 //
-//		$signedUrl = $client->getObjectUrl('mobstar-1', 'hi.txt', '+10 minutes');
-//		return $signedUrl;
-
-		$entries = $this->entry->all( 0, 0, 0, 0, 0, 200, 0, false );
-
-		foreach( $entries as $entry )
-		{
-			foreach( $entry->file as $file )
-			{
-
-				$file_in = $_ENV[ 'PATH' ] . 'public/uploads/' . $file->entry_file_name . "." . $file->entry_file_type;
-
-				if(file_exists($file_in))
-				{
-					$file->entry_file_size = filesize($file_in);
-					Flysystem::connection('awss3')->put($file->entry_file_name . "." . $file->entry_file_type, $file_in);
-
-					var_dump($file_in);
-					var_dump(file_exists( $file_in ));
-
-					$file->save();
-				}
-				else
-					$client->deleteObject(['Bucket' => 'mobstar-1', 'Key' => $file->entry_file_name . "." . $file->entry_file_type]);
-
-			}
-		}
-	}
+//		$client = S3Client::factory($config);
+////
+////		$signedUrl = $client->getObjectUrl('mobstar-1', 'hi.txt', '+10 minutes');
+////		return $signedUrl;
+//
+//		$entries = $this->entry->all( 0, 0, 0, 0, 0, 200, 0, false );
+//
+//
+//		$local = Flysystem::connection('localEntry');
+//
+//		foreach( $entries as $entry )
+//		{
+//			foreach( $entry->file as $file )
+//			{
+//
+//				$file_in = "/" . $_ENV[ 'PATH' ] . 'public/uploads/' . $file->entry_file_name . "." . $file->entry_file_type;
+//
+//				if(file_exists($file_in)
+//				   && ($file->entry_file_type == "mp4")
+//				)
+//				{
+//
+//					$video =  $_ENV['PATH']  . 'public/uploads/' . $file->entry_file_name . ".mp4";
+//
+//					$thumb = $_ENV['PATH']  . 'public/uploads/' . $file->entry_file_name . '-thumb.jpg';
+//
+//					shell_exec( '/usr/bin/ffmpeg -i ' . $video . ' -vframes 1 -an -s 100x100 -ss 00:00:00.10 ' . $thumb );
+//
+//					$handle = fopen($thumb, "r");
+//
+//					Flysystem::connection('awss3')->put("thumbs/" . $file->entry_file_name . "-thumb.jpg", fread($handle, filesize($thumb)));
+//
+//					unlink($thumb);
+//				}
+//
+//			}
+//		}
+//	}
 
 }

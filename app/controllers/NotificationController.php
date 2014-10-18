@@ -199,4 +199,47 @@ class NotificationController extends BaseController
 		return $response;
 	}
 
+	/**
+ *
+ * @SWG\Api(
+ *   path="/notification/count",
+ *   description="Operation about notifications",
+ *   @SWG\Operations(
+ *     @SWG\Operation(
+ *       method="GET",
+ *       summary="Get the total number of unread notifications for a user",
+ *       notes="Show notification count.",
+ *       nickname="allNotifications",
+ *       @SWG\ResponseMessages(
+ *          @SWG\ResponseMessage(
+ *            code=401,
+ *            message="Authorization failed"
+ *          )
+ *       )
+ *     )
+ *   )
+ * )
+ */
+
+	public function count()
+	{
+
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		//Find total number to put in header
+		$count = Notification::where( 'notification_user_id', '=', $session->token_user_id )->where('notification_read', '=', 0)->count();
+
+		$return[ 'notifications' ]= $count;
+
+		$status_code = 200;
+
+		$response = Response::make( $return, $status_code );
+
+		$response->header( 'X-Total-Count', $count );
+
+		return $response;
+	}
+
 }

@@ -8,6 +8,6 @@ class FacebookUser extends \Eloquent {
 	public $timestamps = false;
 
 	public function User(){
-		return $this->belongsTo('User', 'user_facebook_id');
+		return $this->belongsTo('User', 'facebook_user_id');
 	}
 }

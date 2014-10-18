@@ -217,6 +217,13 @@ class LoginController extends BaseController
 	 *           paramType="form",
 	 *           required=true,
 	 *           type="string"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="fullName",
+	 *           description="Full Name from facebook profile",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
 	 *         )
 	 *       ),
 	 *       @SWG\ResponseMessages(
@@ -241,6 +248,7 @@ class LoginController extends BaseController
 			'email'       => 'required',
 			'dob'         => 'required',
 			'gender'      => 'required',
+			'fullName'    => 'required',
 		);
 
 		// run the validation rules on the inputs
@@ -259,11 +267,11 @@ class LoginController extends BaseController
 
 			$facebook_user = FacebookUser::firstOrNew( array( 'facebook_user_facebook_id' => Input::get( 'userId' ) ) );
 
-			$facebook_user->facebook_user_facebook_id = Input::get( 'userId' );
 			$facebook_user->facebook_user_display_name = Input::get( 'displayName' );
 			$facebook_user->facebook_user_user_name = Input::get( 'userName' );
 			$facebook_user->facebook_user_email = Input::get( 'email' );
 			$facebook_user->facebook_user_gender = Input::get( 'gender' );
+			$facebook_user->facebook_user_full_name = Input::get( 'fullName' );
 
 			$facebook_user->save();
 
@@ -279,19 +287,14 @@ class LoginController extends BaseController
 				'token_created_date' => date( "Y-m-d H:i:s" ),
 				'token_valid_until'  => date( "Y-m-d H:i:s", strtotime( "now + 1 hour" ) ),
 				'token_user_id'      => $user->user_id,
-				'token_type'         => 'Native'
+				'token_type'         => 'Facebook'
 			);
 
-			Token::create( $token );
+			$session = Token::create( $token );
 
 			//Return user id and token details not using auth library:
-			$return = array(
-				'token'           => $session_key,
-				'userId'          => $user->user_id,
-				'userName'        => null,
-				'userFullName'    => null,
-				'userDisplayName' => $user->user_display_name,
-			);
+
+			$return = getUserProfile( $user, $session );
 
 			$status_code = 200;
 
@@ -328,6 +331,13 @@ class LoginController extends BaseController
 	 *           required=true,
 	 *           type="string"
 	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="fullName",
+	 *           description="Full Name from twitter profile",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
+	 *         )
 	 *       ),
 	 *       @SWG\ResponseMessages(
 	 *          @SWG\ResponseMessage(
@@ -347,6 +357,8 @@ class LoginController extends BaseController
 		$rules = array(
 			'userId'      => 'required',
 			'displayName' => 'required',
+			'fullName'    => 'required',
+			'userName'    => 'required',
 		);
 
 		// run the validation rules on the inputs
@@ -366,6 +378,8 @@ class LoginController extends BaseController
 
 			$twitter_user->twitter_user_twitter_id = Input::get( 'userId' );
 			$twitter_user->twitter_user_display_name = Input::get( 'displayName' );
+			$twitter_user->twitter_user_full_name = Input::get( 'fullName' );
+			$twitter_user->twitter_user_user_name = Input::get( 'userName' );
 
 			$twitter_user->save();
 
@@ -442,6 +456,13 @@ class LoginController extends BaseController
 	 *           paramType="form",
 	 *           required=true,
 	 *           type="string"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="fullName",
+	 *           description="Full Name from Google profile",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
 	 *         )
 	 *       ),
 	 *       @SWG\ResponseMessages(
@@ -463,6 +484,7 @@ class LoginController extends BaseController
 			'userId'      => 'required',
 			'displayName' => 'required',
 			'userName'    => 'required',
+			'fullName'    => 'required',
 		);
 
 		// run the validation rules on the inputs
@@ -483,6 +505,7 @@ class LoginController extends BaseController
 			$google_user->google_user_google_id = Input::get( 'userId' );
 			$google_user->google_user_display_name = Input::get( 'displayName' );
 			$google_user->google_user_user_name = Input::get( 'userName' );
+			$google_user->google_user_full_name = Input::get( 'fullName' );
 
 			$google_user->save();
 
@@ -511,6 +534,90 @@ class LoginController extends BaseController
 
 			$status_code = 200;
 
+		}
+
+		$response = Response::make( $return, $status_code );
+
+		return $response;
+
+	}/**
+ *
+ * @SWG\Api(
+ *   path="/login/forgotpassword",
+ *   description="Request a password reset link",
+ *   @SWG\Operations(
+ *     @SWG\Operation(
+ *       method="POST",
+ *       summary="Sends the email address a reset password link",
+ *       nickname="password",
+ *       @SWG\Parameters(
+ *         @SWG\Parameter(
+ *           name="email",
+ *           description="Email address to send reset link to",
+ *           paramType="form",
+ *           required=true,
+ *           type="string"
+ *         )
+ *       ),
+ *       @SWG\ResponseMessages(
+ *          @SWG\ResponseMessage(
+ *            code=401,
+ *            message="Authorization failed"
+ *          )
+ *        )
+ *       )
+ *     )
+ *   )
+ * )
+ */
+
+	public function password()
+	{
+		// validate the info, create rules for the inputs
+		$rules = array(
+			'email'    => 'required|email', // make sure the email is an actual email
+		);
+
+		// run the validation rules on the inputs
+		$validator = Validator::make( Input::all(), $rules );
+
+		// if the validator fails, return errors
+		if( $validator->fails() )
+		{
+			$return = $validator->messages();
+			$status_code = 401;
+		}
+		else
+		{
+
+			$user = User::where('user_email', '=', Input::get('email'))->count();
+
+			if($user)
+			{
+				//create token to send to user
+
+				//	echo "yes";
+				$data = [];
+
+				Mail::send('emails.password', $data, function($message)
+				{
+					$message->from('do-not-reply@mobstar.com', 'MobStar')->subject('Password Reset Link');;
+
+					$message->to(Input::get('email'))->bcc('matt@dokoo.com');
+				});
+
+				//do email stuff here
+
+				$return = ['notice' => 'link sent'];
+
+				$status_code = 200;
+			}
+			else{
+				// validation not successful, send back to form
+				$return = array( "error" => "User not found" );
+
+				$status_code = 404;
+			}
 		}
 
 		$response = Response::make( $return, $status_code );

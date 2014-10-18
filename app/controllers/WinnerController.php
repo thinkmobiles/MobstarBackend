@@ -69,7 +69,6 @@ class WinnerController extends BaseController
 
 	public function index()
 	{
-
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
@@ -122,7 +121,7 @@ class WinnerController extends BaseController
 
 			$entry = new Entry;
 			$current[ 'winner' ] = [ 'strapLine' => $winner->winning_entry_strapline,
-									 'entry'     => $entry->oneEntry( $winner->entry, $session, true ) ];
+									 'entry'     => oneEntry( $winner->entry, $session, true ) ];
 
 			$return[ 'winners' ][ ] = $current;
 		}
