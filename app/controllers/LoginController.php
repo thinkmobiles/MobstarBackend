@@ -119,16 +119,16 @@ class LoginController extends BaseController
 				);
 
 				$device = DeviceRegistration::firstOrNew(
-					['device_registration_device_token' => Input::get('deviceToken')]
+					[ 'device_registration_device_token' => Input::get( 'deviceToken' ) ]
 				);
 
 				$device->device_registration_user_id = Auth::user()->user_id;
-				$device->device_registration_device_type = Input::get('deviceToken');
-				$device->device_registation_created_date = date("Y-m-d H:i:s");
+				$device->device_registration_device_type = Input::get( 'deviceToken' );
+				$device->device_registation_created_date = date( "Y-m-d H:i:s" );
 
 				$device->save();
 
-				$this->registerSNSEndpoint($device);
+				$this->registerSNSEndpoint( $device );
 
 				Token::create( $token );
 
@@ -540,42 +540,44 @@ class LoginController extends BaseController
 
 		return $response;
 
-	}/**
- *
- * @SWG\Api(
- *   path="/login/forgotpassword",
- *   description="Request a password reset link",
- *   @SWG\Operations(
- *     @SWG\Operation(
- *       method="POST",
- *       summary="Sends the email address a reset password link",
- *       nickname="password",
- *       @SWG\Parameters(
- *         @SWG\Parameter(
- *           name="email",
- *           description="Email address to send reset link to",
- *           paramType="form",
- *           required=true,
- *           type="string"
- *         )
- *       ),
- *       @SWG\ResponseMessages(
- *          @SWG\ResponseMessage(
- *            code=401,
- *            message="Authorization failed"
- *          )
- *        )
- *       )
- *     )
- *   )
- * )
- */
+	}
+
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/login/forgotpassword",
+	 *   description="Request a password reset link",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="POST",
+	 *       summary="Sends the email address a reset password link",
+	 *       nickname="password",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="email",
+	 *           description="Email address to send reset link to",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          )
+	 *        )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
 
 	public function password()
 	{
 		// validate the info, create rules for the inputs
 		$rules = array(
-			'email'    => 'required|email', // make sure the email is an actual email
+			'email' => 'required|email', // make sure the email is an actual email
 		);
 
 		// run the validation rules on the inputs
@@ -590,29 +592,30 @@ class LoginController extends BaseController
 		else
 		{
 
-			$user = User::where('user_email', '=', Input::get('email'))->count();
+			$user = User::where( 'user_email', '=', Input::get( 'email' ) )->count();
 
-			if($user)
+			if( $user )
 			{
 				//create token to send to user
 
 				//	echo "yes";
-				$data = [];
+				$data = [ ];
 
-				Mail::send('emails.password', $data, function($message)
+				Mail::send( 'emails.password', $data, function ( $message )
 				{
-					$message->from('do-not-reply@mobstar.com', 'MobStar')->subject('Password Reset Link');;
+					$message->from( 'do-not-reply@mobstar.com', 'MobStar' )->subject( 'Password Reset Link' );;
 
-					$message->to(Input::get('email'))->bcc('matt@dokoo.com');
-				});
+					$message->to( Input::get( 'email' ) )->bcc( 'matt@dokoo.com' );
+				} );
 
 				//do email stuff here
 
-				$return = ['notice' => 'link sent'];
+				$return = [ 'notice' => 'link sent' ];
 
 				$status_code = 200;
 			}
-			else{
+			else
+			{
 				// validation not successful, send back to form
 				$return = array( "error" => "User not found" );
 
@@ -626,8 +629,28 @@ class LoginController extends BaseController
 
 	}
 
-	public function registerSNSEndpoint($device)
+	public function registerSNSEndpoint( $device )
 	{
+
+		$client = getSNSClient();
+
+		$arn = $client->createPlatformEndpoint( [
+													'PlatformApplicationArn' =>
+														'aws:sns:eu-west-1:830026328040:app/APNS_SANDBOX/com.mobstar',
+													'Token'                  =>
+														$device->device_registration_device_token
+												] );
+
+		$client->publish( [
+							  'TargetArn' => $arn,
+							  'Message'   => 'Welcome to Push Notifications',
+							  'Subject'   => 'MobStar',
+							  'MessageAttributues' => [
+								  'String'    => [
+									  'DataType' => 'string',
+								  ]
+							  ]
+						  ] );
 
 	}
 
