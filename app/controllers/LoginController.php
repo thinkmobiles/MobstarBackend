@@ -47,6 +47,21 @@ class LoginController extends BaseController
 	 *           paramType="form",
 	 *           required=true,
 	 *           type="string"
+	 *         ),
+	 *			@SWG\Parameter(
+	 *           name="token",
+	 *           description="Device token for push notifications",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
+	 *         ),
+	 *			@SWG\Parameter(
+	 *           name="device",
+	 *           description="Device token for push notifications",
+	 *           paramType="form",
+	 *           required=true,
+	 * 			 enum="['apple', 'google']",
+	 *           type="string"
 	 *         )
 	 *       ),
 	 *       @SWG\ResponseMessages(
