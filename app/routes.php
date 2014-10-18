@@ -61,9 +61,14 @@ Route::get( 'debug/', function ()
 	echo "<br>";
 	echo "tmp read:";
 	var_dump( is_writable( '/var/www/api-beta/public/uploads' ) );
+	echo "<br>";
+	echo "<br>";
+	echo "<br>";
 
 	echo 'sonus:';
 	var_dump( Sonus::getSupportedFormats() );
+
+	var_dump($_ENV);
 //     Force the execution to fail by throwing an exception:
 //    throw new RuntimeException("Oopsie!");
 } );
