@@ -124,7 +124,7 @@ class LoginController extends BaseController
 
 				$device->device_registration_user_id = Auth::user()->user_id;
 				$device->device_registration_device_type = Input::get( 'deviceToken' );
-				$device->device_registation_created_date = date( "Y-m-d H:i:s" );
+				$device->device_registation_date_created = date( "Y-m-d H:i:s" );
 
 				$device->save();
 
@@ -642,11 +642,11 @@ class LoginController extends BaseController
 												] );
 
 		$client->publish( [
-							  'TargetArn' => $arn,
-							  'Message'   => 'Welcome to Push Notifications',
-							  'Subject'   => 'MobStar',
+							  'TargetArn'          => $arn,
+							  'Message'            => 'Welcome to Push Notifications',
+							  'Subject'            => 'MobStar',
 							  'MessageAttributues' => [
-								  'String'    => [
+								  'String' => [
 									  'DataType' => 'string',
 								  ]
 							  ]
