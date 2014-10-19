@@ -1090,9 +1090,10 @@ class EntryController extends BaseController
 
 						$thumb = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-thumb.jpg';
 
-						exec('/usr/bin/ffprobe 2>&1 | grep "rotate          :"' . $file_out . '', $rotation);
+						exec('/usr/bin/ffprobe 2>&1 ' . $file_out . ' | grep "rotate          :"', $rotation);
 
-						$rotation = substr($rotation[0], 17);
+						if(isset($rotation[0]))
+							$rotation = substr($rotation[0], 17);
 
 						switch($rotation)
 						{
