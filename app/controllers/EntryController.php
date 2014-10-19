@@ -1092,13 +1092,7 @@ class EntryController extends BaseController
 
 						exec('/usr/bin/ffprobe ' . $file_out, $rotation);
 
-						$file_info = new ffprobe($file_out);
-
-//						$file_info->rotation;
-
 //						$rotation = substr($rotation, 17);
-
-						return var_dump($file_info);
 
 						switch($rotation)
 						{
