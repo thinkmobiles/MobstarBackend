@@ -1109,7 +1109,7 @@ class EntryController extends BaseController
 								break;
 
 							default:
-								$transpose = "";
+								$transpose = "transpose=1,transpose=1,transpose=1,transpose=1";
 						}
 
 						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -vf ' . $transpose . '  -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
