@@ -162,13 +162,11 @@ class CommentController extends BaseController
 
 		foreach( $comments as $comment )
 		{
-
 			$current = array();
 
 			$current[ 'commentId' ] = $comment->comment_id;
 
-			$user = new User;
-			$current[ 'user' ] = $user->oneUser( $comment->User, $session );
+			$current[ 'user' ] = oneUser( $comment->User, $session );
 
 //			$entry = new Entry;
 //			$current['entry'] = $entry->oneEntry($comment->Entry);
