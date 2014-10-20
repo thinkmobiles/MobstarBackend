@@ -90,6 +90,13 @@ class EntryController extends BaseController
 	 *           type="string"
 	 *         ),
 	 *         @SWG\Parameter(
+	 *           name="excludeVotes",
+	 *           description="Exclude entries the user has already voted on.",
+	 *           paramType="query",
+	 *           required=false,
+	 *           type="bool"
+	 *         ),
+	 *         @SWG\Parameter(
 	 *           name="showFeedback",
 	 *           description="Show feedback boolean - 1 for true, 0 for false",
 	 *           paramType="query",
@@ -224,8 +231,18 @@ class EntryController extends BaseController
 		$tag = ( Input::get( 'tagId', '0' ) );
 		$tag = ( !is_numeric( $tag ) ) ? 0 : $tag;
 
-		$entries = $this->entry->all( $user, $category, $tag, $order, $dir, $limit, $offset, false );
-		$count = $this->entry->all( $user, $category, $tag, $order, $dir, $limit, $offset, true );
+		$exclude = [];
+
+		if(Input::get('excludeVotes') == 'true')
+		{
+			$votes = Vote::where('vote_user_id', '=', $session['user_id']);
+			foreach($votes as $vote){
+				$exclude[] = $vote->vote_entry_id;
+			}
+		}
+
+		$entries = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false );
+		$count = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, true );
 
 		if( $count == 0 )
 		{

@@ -8,7 +8,7 @@ use EntryTag;
 class EloquentEntryRepository implements EntryRepository
 {
 
-	public function all( $user = 0, $category = 0, $tag = 0, $order_by = 0, $order = 'desc', $limit = 50, $offset = 0, $count = false )
+	public function all( $user = 0, $category = 0, $tag = 0, $exclude = 0, $order_by = 0, $order = 'desc', $limit = 50, $offset = 0, $count = false )
 	{
 		$query = Entry::with( 'category', 'vote', 'user', 'file', 'entryTag.tag', 'comments' )->where( 'entry_id', '>', '0' );
 
@@ -39,6 +39,11 @@ class EloquentEntryRepository implements EntryRepository
 			{
 				$q->where( 'entry_tag_tag_id', '=', $tag );
 			} );
+		}
+
+		if($exclude)
+		{
+			$query = $query->whereNotIn('entry_id', $exclude);
 		}
 
 		return $query->take( $limit )->skip( $offset )->get();
