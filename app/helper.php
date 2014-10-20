@@ -70,16 +70,39 @@ function oneUser( $user, $session, $includeStars = false )
 	$client = getS3Client();
 
 	$return = [ 'id'           => $user->user_id,
-				'userName'     => $user->user_name,
-				'displayName'  => $user->user_display_name,
-				'fullName'     => $user->user_full_name,
 				'email'        => $user->user_email,
 				'tagLine'      => $user->user_tagline,
 				'profileImage' => ( isset( $user->user_profile_image ) )
-						? $client->getObjectUrl('mobstar-1', $user->user_profile_image, '+10 minutes') : '',
+					? $client->getObjectUrl('mobstar-1', $user->user_profile_image, '+10 minutes') : '',
 				'profileCover' => ( isset( $user->user_cover_image ) )
-						? $client->getObjectUrl('mobstar-1', $user->user_cover_image, '+10 minutes') : '',
+					? $client->getObjectUrl('mobstar-1', $user->user_cover_image, '+10 minutes') : '',
 	];
+
+	if(!isset($user->user_display_name) || (!isset($user->user_name)) || (!isset($user->user_email)))
+	{
+		if(isset($user->user_facebook_id)){
+			$return['userName'] = $user->FacebookUser->facebook_user_user_name;
+			$return['displayName'] = $user->FacebookUser->facebook_user_display_name;
+			$return['fullName'] = $user->FacebookUser->facebook_user_full_name;
+		}
+		elseif(isset($user->user_twitter_id)){
+			$return['userName'] = $user->TwitterUser->facebook_user_user_name;
+			$return['displayName'] = $user->TwitterUser->facebook_user_display_name;
+			$return['fullName'] = $user->TwitterUser->facebook_user_full_name;
+		}
+		elseif(isset($user->user_google_id)){
+			$return['userName'] = $user->GoogleUser->google_user_user_name;
+			$return['displayName'] = $user->GoogleUser->google_user_display_name;
+			$return['fullName'] = $user->GoogleUser->google_user_full_name;
+		}
+	}
+	else{
+		$return['userName'] = $user->user_name;
+		$return['displayName'] = $user->user_display_name;
+		$return['fullName'] = $user->user_full_name;
+	}
+
+
 
 	if( $session->token_user_id != $user->user_id )
 	{
