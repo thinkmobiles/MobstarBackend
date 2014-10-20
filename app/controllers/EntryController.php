@@ -94,7 +94,8 @@ class EntryController extends BaseController
 	 *           description="Exclude entries the user has already voted on.",
 	 *           paramType="query",
 	 *           required=false,
-	 *           type="bool"
+	 *           type="string",
+	 *           enum="['true', 'false']"
 	 *         ),
 	 *         @SWG\Parameter(
 	 *           name="showFeedback",
@@ -115,7 +116,7 @@ class EntryController extends BaseController
 	 *           description="Maximum number of representations in response.",
 	 *           paramType="query",
 	 *           required=false,
-	 *           type="integer"
+	 *           type="integer",
 	 *         )
 	 *       ),
 	 *       @SWG\ResponseMessages(
