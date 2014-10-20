@@ -236,14 +236,17 @@ class EntryController extends BaseController
 
 		if(Input::get('excludeVotes') == 'true')
 		{
-			$votes = Vote::where('vote_user_id', '=', $session['user_id']);
+			$votes = Vote::where('vote_user_id', '=', $session->token_user_id)->get();
 			foreach($votes as $vote){
 				$exclude[] = $vote->vote_entry_id;
 			}
 		}
 
+
 		$entries = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false );
 		$count = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, true );
+
+
 
 		if( $count == 0 )
 		{
