@@ -121,7 +121,7 @@ class LoginController extends BaseController
 				$deviceToken = Input::get( 'deviceToken' );
 				$deviceType = Input::get( 'device' );
 
-				if( isset($deviceType) && isset($deviceToken) )
+				if( isset( $deviceType ) && isset( $deviceToken ) )
 				{
 
 					$device = DeviceRegistration::firstOrNew(
@@ -148,6 +148,7 @@ class LoginController extends BaseController
 					'userName'        => Auth::user()->user_name,
 					'userFullName'    => Auth::user()->user_full_name,
 					'userDisplayName' => Auth::user()->user_display_name,
+					'userTagline'     => Auth::user()->user_tagline,
 					'profileImage'    => ( !empty( Auth::user()->user_profile_image ) )
 						? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_profile_image : '',
 					'profileCover'    => ( !empty( Auth::user()->user_cover_image ) )
@@ -306,7 +307,7 @@ class LoginController extends BaseController
 			$deviceToken = Input::get( 'deviceToken' );
 			$deviceType = Input::get( 'device' );
 
-			if( isset($deviceType) && isset($deviceToken) )
+			if( isset( $deviceType ) && isset( $deviceToken ) )
 			{
 
 				$device = DeviceRegistration::firstOrNew(
@@ -450,7 +451,7 @@ class LoginController extends BaseController
 			$deviceToken = Input::get( 'deviceToken' );
 			$deviceType = Input::get( 'device' );
 
-			if( isset($deviceType) && isset($deviceToken) )
+			if( isset( $deviceType ) && isset( $deviceToken ) )
 			{
 
 				$device = DeviceRegistration::firstOrNew(
@@ -612,7 +613,7 @@ class LoginController extends BaseController
 			$deviceToken = Input::get( 'deviceToken' );
 			$deviceType = Input::get( 'device' );
 
-			if( isset($deviceType) && isset($deviceToken) )
+			if( isset( $deviceType ) && isset( $deviceToken ) )
 			{
 
 				$device = DeviceRegistration::firstOrNew(

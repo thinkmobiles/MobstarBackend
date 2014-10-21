@@ -18,8 +18,8 @@ function getUserProfile( $user, $session )
 			{
 				$return[ 'userDisplayName' ] = $user->TwitterUser->twitter_user_display_name;
 			}
-			$return[ 'userName' ] =  $user->TwitterUser->twitter_user_user_name;
-			$return['fullName'] = $user->TwitterUser->twitter_user_full_name;
+			$return[ 'userName' ] = $user->TwitterUser->twitter_user_user_name;
+			$return[ 'fullName' ] = $user->TwitterUser->twitter_user_full_name;
 
 		}
 		elseif( $session->token_type == 'Facebook' )
@@ -29,9 +29,11 @@ function getUserProfile( $user, $session )
 				$return[ 'userDisplayName' ] = $user->FacebookUser->facebook_user_display_name;
 			}
 			if( empty( $user->user_name ) )
+			{
 				$return[ 'userName' ] = $user->FacebookUser->facebook_user_user_name;
+			}
 
-			$return['fullName'] = $user->FacebookUser->facebook_user_full_name;
+			$return[ 'fullName' ] = $user->FacebookUser->facebook_user_full_name;
 
 		}
 		elseif( $session->token_type == 'Google' )
@@ -46,20 +48,23 @@ function getUserProfile( $user, $session )
 				$return[ 'userName' ] = $user->GoogleUser->google_user_user_name;
 			}
 
-			$return['fullName'] = $user->GoogleUser->google_user_full_name;
+			$return[ 'fullName' ] = $user->GoogleUser->google_user_full_name;
 		}
 	}
 	else
 	{
 		$return[ 'userDisplayName' ] = $user->user_display_name;
-		$return[ 'userName' ] 		= $user->user_name;
+		$return[ 'userName' ] = $user->user_name;
 	}
 
-	$return['profileImage'] = (isset( $user->user_profile_image ) )
-		? $client->getObjectUrl('mobstar-1', $user->user_profile_image, '+10 minutes') : '';
+	$return[ 'userTagline' ] = $user->user_tagline;
 
-	$return['profileCover'] = ( isset( $user->user_cover_image ) )
-		? $client->getObjectUrl('mobstar-1', $user->user_cover_image, '+10 minutes') : '';
+
+	$return[ 'profileImage' ] = ( isset( $user->user_profile_image ) )
+		? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+10 minutes' ) : '';
+
+	$return[ 'profileCover' ] = ( isset( $user->user_cover_image ) )
+		? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+10 minutes' ) : '';
 
 	return $return;
 
@@ -73,40 +78,42 @@ function oneUser( $user, $session, $includeStars = false )
 				'email'        => $user->user_email,
 				'tagLine'      => $user->user_tagline,
 				'profileImage' => ( isset( $user->user_profile_image ) )
-					? $client->getObjectUrl('mobstar-1', $user->user_profile_image, '+10 minutes') : '',
+					? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+10 minutes' ) : '',
 				'profileCover' => ( isset( $user->user_cover_image ) )
-					? $client->getObjectUrl('mobstar-1', $user->user_cover_image, '+10 minutes') : '',
+					? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+10 minutes' ) : '',
 	];
 
-	if(!isset($user->user_display_name) || (!isset($user->user_name)) || (!isset($user->user_email)))
+	if( !isset( $user->user_display_name ) || ( !isset( $user->user_name ) ) || ( !isset( $user->user_email ) ) )
 	{
-		if(isset($user->user_facebook_id)){
-			$return['userName'] = $user->FacebookUser->facebook_user_user_name;
-			$return['displayName'] = $user->FacebookUser->facebook_user_display_name;
-			$return['fullName'] = $user->FacebookUser->facebook_user_full_name;
+		if( isset( $user->user_facebook_id ) )
+		{
+			$return[ 'userName' ] = $user->FacebookUser->facebook_user_user_name;
+			$return[ 'displayName' ] = $user->FacebookUser->facebook_user_display_name;
+			$return[ 'fullName' ] = $user->FacebookUser->facebook_user_full_name;
 		}
-		elseif(isset($user->user_twitter_id)){
-			$return['userName'] = $user->TwitterUser->facebook_user_user_name;
-			$return['displayName'] = $user->TwitterUser->facebook_user_display_name;
-			$return['fullName'] = $user->TwitterUser->facebook_user_full_name;
+		elseif( isset( $user->user_twitter_id ) )
+		{
+			$return[ 'userName' ] = $user->TwitterUser->facebook_user_user_name;
+			$return[ 'displayName' ] = $user->TwitterUser->facebook_user_display_name;
+			$return[ 'fullName' ] = $user->TwitterUser->facebook_user_full_name;
 		}
-		elseif(isset($user->user_google_id)){
-			$return['userName'] = $user->GoogleUser->google_user_user_name;
-			$return['displayName'] = $user->GoogleUser->google_user_display_name;
-			$return['fullName'] = $user->GoogleUser->google_user_full_name;
+		elseif( isset( $user->user_google_id ) )
+		{
+			$return[ 'userName' ] = $user->GoogleUser->google_user_user_name;
+			$return[ 'displayName' ] = $user->GoogleUser->google_user_display_name;
+			$return[ 'fullName' ] = $user->GoogleUser->google_user_full_name;
 		}
 	}
-	else{
-		$return['userName'] = $user->user_name;
-		$return['displayName'] = $user->user_display_name;
-		$return['fullName'] = $user->user_full_name;
+	else
+	{
+		$return[ 'userName' ] = $user->user_name;
+		$return[ 'displayName' ] = $user->user_display_name;
+		$return[ 'fullName' ] = $user->user_full_name;
 	}
-
-
 
 	if( $session->token_user_id != $user->user_id )
 	{
-		$return[ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $user->user_id )->where('user_star_deleted', '!=', '1')->count();
+		$return[ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $user->user_id )->where( 'user_star_deleted', '!=', '1' )->count();
 	}
 
 	if( $includeStars )
@@ -121,7 +128,8 @@ function oneUser( $user, $session, $includeStars = false )
 				$stars[ ] = [ 'starId'       => $star->Stars->user_id,
 							  'starName'     => $star->Stars->user_display_name,
 							  'profileImage' => ( isset( $star->Stars->user_profile_image ) )
-									  ? $client->getObjectUrl('mobstar-1', $star->Stars->user_profile_image, '+10 minutes') : '',
+								  ? $client->getObjectUrl( 'mobstar-1', $star->Stars->user_profile_image, '+10 minutes' )
+								  : '',
 				];
 
 			}
@@ -138,8 +146,8 @@ function oneUser( $user, $session, $includeStars = false )
 				$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
 								  'starName'     => $starred->User->user_display_name,
 								  'profileImage' => ( isset( $starred->User->user_profile_image ) )
-										  ? $client->getObjectUrl('mobstar-1', $starred->User->user_profile_image, '+10 minutes')
-										  : '',
+									  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+10 minutes' )
+									  : '',
 				];
 			}
 
@@ -179,7 +187,7 @@ function oneEntry( $entry, $session, $includeUser = false )
 
 	if( $includeUser )
 	{
-		$current[ 'user' ] = oneUser($entry->User, $session);
+		$current[ 'user' ] = oneUser( $entry->User, $session );
 	}
 
 	$current[ 'name' ] = $entry->entry_name;
@@ -199,13 +207,13 @@ function oneEntry( $entry, $session, $includeUser = false )
 	$current[ 'entryFiles' ] = array();
 	foreach( $entry->file as $file )
 	{
-		$signedUrl = $client->getObjectUrl('mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes');
+		$signedUrl = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
 		$current[ 'entryFiles' ][ ] = [
 			'fileType' => $file->entry_file_type,
 			'filePath' => $signedUrl ];
 
-		$current['videoThumb'] = ($file->entry_file_type == "mp4") ?
-			$client->getObjectUrl('mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes')
+		$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
+			$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
 			: "";
 	}
 
@@ -227,24 +235,26 @@ function oneEntry( $entry, $session, $includeUser = false )
 	return $current;
 }
 
-function getS3Client(){
+function getS3Client()
+{
 
 	$config = array(
-		'key' => Creds::ENV_KEY,
+		'key'    => Creds::ENV_KEY,
 		'secret' => Creds::ENV_SECRET
 	);
 
-	return S3Client::factory($config);
+	return S3Client::factory( $config );
 }
 
 function getSNSClient()
 {
 	$config = array(
-		'key' => Creds::ENV_KEY,
+		'key'    => Creds::ENV_KEY,
 		'secret' => Creds::ENV_SECRET,
 		'region' => 'eu-west-1'
 	);
 
-	return SnsClient::factory($config);
+	return SnsClient::factory( $config );
 }
+
 ?>
