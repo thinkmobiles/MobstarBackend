@@ -179,16 +179,7 @@ function oneEntry( $entry, $session, $includeUser = false )
 
 	if( $includeUser )
 	{
-		$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
-		$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
-		$current[ 'user' ][ 'displayName' ] = $entry->User->user_display_name;
-		$current[ 'user' ][ 'email' ] = $entry->User->user_email;
-		$current[ 'user' ][ 'tagline' ] = $entry->User->user_tagline;
-		$current[ 'user' ][ 'profileImage' ] = ( isset( $entry->User->user_profile_image ) )
-			? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
-		$current[ 'user' ][ 'profileCover' ] = ( isset( $entry->User->user_profile_cover ) )
-			? $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
-		$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $entry->entry_user_id )->count();
+		$current[ 'user' ] = oneUser($entry->User, $session);
 	}
 
 	$current[ 'name' ] = $entry->entry_name;
