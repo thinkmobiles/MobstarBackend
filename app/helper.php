@@ -93,9 +93,9 @@ function oneUser( $user, $session, $includeStars = false )
 		}
 		elseif( isset( $user->user_twitter_id ) )
 		{
-			$return[ 'userName' ] = $user->TwitterUser->facebook_user_user_name;
-			$return[ 'displayName' ] = $user->TwitterUser->facebook_user_display_name;
-			$return[ 'fullName' ] = $user->TwitterUser->facebook_user_full_name;
+			$return[ 'userName' ] = $user->TwitterUser->twitter_user_user_name;
+			$return[ 'displayName' ] = $user->TwitterUser->twitter_user_display_name;
+			$return[ 'fullName' ] = $user->TwitterUser->twitter_user_full_name;
 		}
 		elseif( isset( $user->user_google_id ) )
 		{
