@@ -1119,24 +1119,26 @@ class EntryController extends BaseController
 
 						$contents = file_get_contents($_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt');
 						$string = "rotate          : ";
-						
+
 						switch($rotation)
 						{
 							case (strpos($contents, $string . "90") !== false):
 								$transpose = "transpose=1";
 								break;
 
-							case (strpos($contents, $string . "180" !== false):
+							case (strpos($contents, $string . "180") !== false):
 								$transpose = "transpose=1,transpose=1";
 								break;
 
-							case (strpos($contents, $string . "270" !== false):
+							case (strpos($contents, $string . "270") !== false):
 								$transpose = "transpose=1,transpose=1,transpose=1";
 								break;
 
 							default:
 								$transpose = "transpose=1,transpose=1,transpose=1,transpose=1";
 						}
+
+
 
 						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -vf ' . $transpose . '  -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
 
