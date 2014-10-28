@@ -1145,7 +1145,7 @@ class EntryController extends BaseController
 						$handle = fopen( $thumb, "r" );
 
 						Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", fread( $handle, filesize( $thumb ) ) );
-
+						return $transpose;
 //						unlink($file_out);
 //						unlink($thumb);
 					}
