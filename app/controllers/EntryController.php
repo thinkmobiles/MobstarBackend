@@ -1127,7 +1127,7 @@ class EntryController extends BaseController
 								break;
 
 							case (strpos($contents, $string . "180") !== false):
-								$transpose = "transpose=2";
+								$transpose = "transpose=1,transpose=1,transpose=1,transpose=1";
 								break;
 
 							case (strpos($contents, $string . "270") !== false):
@@ -1145,7 +1145,7 @@ class EntryController extends BaseController
 						$handle = fopen( $thumb, "r" );
 
 						Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", fread( $handle, filesize( $thumb ) ) );
-						return $transpose;
+
 //						unlink($file_out);
 //						unlink($thumb);
 					}
