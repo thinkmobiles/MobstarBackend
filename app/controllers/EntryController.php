@@ -1127,11 +1127,11 @@ class EntryController extends BaseController
 								break;
 
 							case (strpos($contents, $string . "180") !== false):
-								$transpose = "transpose=1,transpose=1,transpose=1";
+								$transpose = "transpose=1";
 								break;
 
 							case (strpos($contents, $string . "270") !== false):
-								$transpose = "transpose=1";
+								$transpose = "transpose=2";
 								break;
 
 							default:
