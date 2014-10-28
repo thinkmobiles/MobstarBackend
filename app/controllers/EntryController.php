@@ -1117,17 +1117,20 @@ class EntryController extends BaseController
 						if(isset($rotation[0]))
 							$rotation = substr($rotation[0], 17);
 
+						$contents = file_get_contents($_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt');
+						$string = "rotate          : ";
+						
 						switch($rotation)
 						{
-							case "90":
+							case (strpos($contents, $string . "90") !== false):
 								$transpose = "transpose=1";
 								break;
 
-							case "180":
+							case (strpos($contents, $string . "180" !== false):
 								$transpose = "transpose=1,transpose=1";
 								break;
 
-							case "270":
+							case (strpos($contents, $string . "270" !== false):
 								$transpose = "transpose=1,transpose=1,transpose=1";
 								break;
 
