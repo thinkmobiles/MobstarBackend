@@ -84,27 +84,23 @@ function oneUser( $user, $session, $includeStars = false )
 
 	if( ( $user->user_display_name == '') || ( is_null($user->user_name) ) || ( is_null( $user->user_email ) ) )
 	{
-		$return['social'] = true;
 		if( $user->user_facebook_id != 0 )
 		{
 			$return[ 'userName' ] = $user->FacebookUser->facebook_user_user_name;
 			$return[ 'displayName' ] = $user->FacebookUser->facebook_user_display_name;
 			$return[ 'fullName' ] = $user->FacebookUser->facebook_user_full_name;
-			$return['facebook'] = true;
 		}
-		elseif( $user->user_twitter_id !== 0 )
+		elseif( $user->user_twitter_id != 0 )
 		{
 			$return[ 'userName' ] = $user->TwitterUser->twitter_user_user_name;
 			$return[ 'displayName' ] = $user->TwitterUser->twitter_user_display_name;
 			$return[ 'fullName' ] = $user->TwitterUser->twitter_user_full_name;
-			$return['twitter'] = true;
 		}
-		elseif( $user->user_google_id !== 0 )
+		elseif( $user->user_google_id != 0 )
 		{
 			$return[ 'userName' ] = $user->GoogleUser->google_user_user_name;
 			$return[ 'displayName' ] = $user->GoogleUser->google_user_display_name;
 			$return[ 'fullName' ] = $user->GoogleUser->google_user_full_name;
-			$return['google'] = true;
 		}
 	}
 	else
