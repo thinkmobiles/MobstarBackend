@@ -82,7 +82,7 @@ function oneUser( $user, $session, $includeStars = false )
 					? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+10 minutes' ) : '',
 	];
 
-	if( !isset( $user->user_display_name ) || ( !isset( $user->user_name ) ) || ( !isset( $user->user_email ) ) )
+	if( ( $user->user_display_name == '') || ( is_null($user->user_name) ) || ( is_null( $user->user_email ) ) )
 	{
 		if( $user->user_facebook_id !== 0 )
 		{
