@@ -331,15 +331,8 @@ class EntryController extends BaseController
 				if( in_array( "userName", $fields ) )
 				{
 
-					$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
-					$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
-					$current[ 'user' ][ 'displayName' ] = $entry->User->user_display_name;
-					$current[ 'user' ][ 'email' ] = $entry->user->user_email;
-					$current[ 'user' ][ 'profileImage' ] = ( !empty( $entry->user->user_profile_image ) )
-						? "http://" . $_ENV[ 'URL' ] . "/" . $entry->user->user_profile_image : "";
-					$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->user->user_profile_cover ) )
-						? "http://" . $_ENV[ 'URL' ] . "/" . $entry->user->user_profile_cover : "";
-					$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $entry->entry_user_id )->count();
+					$current[ 'user' ] = oneUser($entry->User, $session);
+
 				}
 
 				if( in_array( "category", $fields ) )

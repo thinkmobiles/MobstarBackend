@@ -59,7 +59,6 @@ function getUserProfile( $user, $session )
 
 	$return[ 'userTagline' ] = $user->user_tagline;
 
-
 	$return[ 'profileImage' ] = ( isset( $user->user_profile_image ) )
 		? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+10 minutes' ) : '';
 
@@ -85,19 +84,19 @@ function oneUser( $user, $session, $includeStars = false )
 
 	if( !isset( $user->user_display_name ) || ( !isset( $user->user_name ) ) || ( !isset( $user->user_email ) ) )
 	{
-		if( isset( $user->user_facebook_id ) )
+		if( $user->user_facebook_id !== 0 )
 		{
 			$return[ 'userName' ] = $user->FacebookUser->facebook_user_user_name;
 			$return[ 'displayName' ] = $user->FacebookUser->facebook_user_display_name;
 			$return[ 'fullName' ] = $user->FacebookUser->facebook_user_full_name;
 		}
-		elseif( isset( $user->user_twitter_id ) )
+		elseif( $user->user_twitter_id !== 0 )
 		{
 			$return[ 'userName' ] = $user->TwitterUser->twitter_user_user_name;
 			$return[ 'displayName' ] = $user->TwitterUser->twitter_user_display_name;
 			$return[ 'fullName' ] = $user->TwitterUser->twitter_user_full_name;
 		}
-		elseif( isset( $user->user_google_id ) )
+		elseif( $user->user_google_id !== 0 )
 		{
 			$return[ 'userName' ] = $user->GoogleUser->google_user_user_name;
 			$return[ 'displayName' ] = $user->GoogleUser->google_user_display_name;
