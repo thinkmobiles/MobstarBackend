@@ -85,7 +85,7 @@ function oneUser( $user, $session, $includeStars = false )
 	if( ( $user->user_display_name == '') || ( is_null($user->user_name) ) || ( is_null( $user->user_email ) ) )
 	{
 		$return['social'] = true;
-		if( $user->user_facebook_id !== 0 )
+		if( $user->user_facebook_id != 0 )
 		{
 			$return[ 'userName' ] = $user->FacebookUser->facebook_user_user_name;
 			$return[ 'displayName' ] = $user->FacebookUser->facebook_user_display_name;
