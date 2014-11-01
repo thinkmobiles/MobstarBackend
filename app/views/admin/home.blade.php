@@ -4,6 +4,7 @@
 	<meta charset="UTF-8">
 	<title>MobStar Admin</title>
     <link href="/css/video-js.css" rel="stylesheet" type="text/css">
+    <script src="/js/jquery-1.11.1.min.js"></script>
 
 <script>
 $('.disable').click(function(){
@@ -44,7 +45,6 @@ $('a#'+id+'.restore').removeClass('restore btn-success').addClass('disable btn-w
 
     <!-- video.js must be in the <head> for older IEs to work. -->
     <script src="/js/video.js"></script>
-    <script src="/js/jquery-1.11.1.min.js"></script>
 	<!-- CSS -->
 	<!-- BOOTSTRAP -->
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
