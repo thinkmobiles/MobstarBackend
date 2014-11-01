@@ -118,7 +118,7 @@ $.ajax({
     }
 }
 ).done(function(){
-$(this).removeClass('disable').addClass('enable').text("Enable Entry");
+$('a#'+id+'.enable').removeClass('enable').addClass('disable').text("Disable Entry");
 });
 
 });
