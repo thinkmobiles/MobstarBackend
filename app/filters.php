@@ -134,3 +134,24 @@ Route::filter('csrf', function()
 		throw new Illuminate\Session\TokenMismatchException;
 	}
 });
+
+
+Route::filter('admin', function()
+{
+	$key =  Session::get("pass");
+
+	if(!$key)
+	{
+		Redirect::to('admin/login');
+	}
+
+	$token = Token::where('token_value', '=', $key)->whereIn('token_user_id', [301])->first();
+
+	if(!$token)
+	{
+		$return = ["error"=> "page not found"];
+		$status_code = 404;
+		return Response::make($return, $status_code);
+	}
+
+});

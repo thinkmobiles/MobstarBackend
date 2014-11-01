@@ -406,21 +406,24 @@ Route::get( "entry2/fixfile", [
 ] );
 
 
-Route::delete( "entry/{entry}", [
-	"as"   => "entry/delete",
-	"uses" => "EntryController@delete"
-] );
+Route::group( [ "before" => "admin" ], function ()
+{
+	Route::delete( "entry/{entry}", [
+		"as"   => "entry/delete",
+		"uses" => "EntryController@delete"
+	] );
 
+	Route::get( "restoreentry/{entry}", [
+		"as"   => "entry/undelete",
+		"uses" => "EntryController@undelete"
+	] );
 
-Route::get( "restoreentry/{entry}", [
-	"as"   => "entry/undelete",
-	"uses" => "EntryController@undelete"
-] );
+	Route::get( "admin/", [
+		"as"   => "admin/index",
+		"uses" => "AdminController@index"
+	] );
+});
 
-Route::get( "admin/", [
-	"as"   => "admin/index",
-	"uses" => "AdminController@index"
-] );
 //
 //Route::get( "entry2/test", [
 //	"as"   => "entry2/test",

@@ -93,11 +93,7 @@ if($(this).hasClass("disable"))
 
     $.ajax({
         url: '/entry/'+id,
-        type: 'DELETE',
-        complete: function(result, text) {
-            console.log(result);
-            console.log(text);
-        }
+        type: 'DELETE'
     }
     ).done(function(){
     $('a#'+id+'.disable').removeClass('disable btn-warning').addClass('restore btn-success').text("Enable Entry");
@@ -108,11 +104,7 @@ else if($(this).hasClass("restore"))
 
 $.ajax({
     url: '/restoreentry/'+id,
-    type: 'GET',
-    complete: function(result, text) {
-        console.log(result);
-        console.log(text);
-    }
+    type: 'GET'
 }
 ).done(function(){
 $('a#'+id+'.restore').removeClass('restore btn-success').addClass('disable btn-warning').text("Disable Entry");
