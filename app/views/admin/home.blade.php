@@ -79,7 +79,7 @@
                 @if($entry['entry_deleted'] == 0)
                     <a href="#" class="disable btn btn-warning disable" id="{{$entry['entry_id']}}">Disable Entry</a>
                 @else
-                    <a href="#" class="enable btn btn-success restore" id="{{$entry['entry_id']}}">Enable Entry</a>
+                    <a href="#" class="restore btn btn-success restore" id="{{$entry['entry_id']}}">Enable Entry</a>
                 @endif
             </div>
         </div>
