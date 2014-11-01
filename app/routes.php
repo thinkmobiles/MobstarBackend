@@ -405,6 +405,18 @@ Route::get( "entry2/fixfile", [
 	"uses" => "EntryController@updateFile"
 ] );
 
+
+Route::delete( "entry/{entry}", [
+	"as"   => "entry/delete",
+	"uses" => "EntryController@delete"
+] );
+
+
+Route::get( "restoreentry/{entry}", [
+	"as"   => "entry/undelete",
+	"uses" => "EntryController@undelete"
+] );
+
 Route::get( "admin/", [
 	"as"   => "admin/index",
 	"uses" => "AdminController@index"

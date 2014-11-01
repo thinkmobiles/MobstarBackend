@@ -2195,4 +2195,26 @@ class EntryController extends BaseController
 //		}
 //	}
 
+
+	public function delete($id){
+		$entry = Entry::find($id);
+
+		$entry->entry_deleted = 1;
+
+		$entry->save();
+
+		return Response::make(['status' => 'entry deleted'], 200);
+	}
+
+
+	public function undelete($id){
+		$entry = Entry::find($id);
+
+		$entry->entry_deleted = 0;
+
+		$entry->save();
+
+		return Response::make(['status' => 'entry undeleted'], 200);
+	}
+
 }

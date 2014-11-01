@@ -2,7 +2,7 @@
 
 class Entry extends \Eloquent
 {
-	protected $fillable = [ "entry_description", "entry_category_id", "entry_sub_category_id", "entry_name" ];
+	protected $fillable = [ "entry_description", "entry_category_id", "entry_sub_category_id", "entry_name", "entry_deleted" ];
 	public $timestamps = false;
 	protected $primaryKey = 'entry_id';
 
