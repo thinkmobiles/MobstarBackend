@@ -13,7 +13,7 @@ class AdminController extends BaseController
 
 	public function index()
 	{
-		$entries = $this->entry->all();
+		$entries = $this->entry->all_include_deleted();
 		$data[ 'entries' ] = [ ];
 
 		$client = getS3Client();
