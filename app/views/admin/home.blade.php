@@ -101,7 +101,7 @@ $.ajax({
     }
 }
 ).done(function(){
-$('a#'+id+'.disable').removeClass('disable btn-warning').addClass('enable btn-success').text("Enable Entry");
+$('a#'+id+'.disable').removeClass('disable btn-warning').addClass('restore btn-success').text("Enable Entry");
 });
 
 });
@@ -118,7 +118,7 @@ $.ajax({
     }
 }
 ).done(function(){
-$('a#'+id+'.enable').removeClass('enable btn-success').addClass('disable btn-warning').text("Disable Entry");
+$('a#'+id+'.enable').removeClass('restore btn-success').addClass('disable btn-warning').text("Disable Entry");
 });
 
 });
