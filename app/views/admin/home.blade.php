@@ -92,7 +92,7 @@
 $('.toggle').click(function(){
 var id = $(this).attr('id');
 
-if($(this).hasClass('.disable'))
+if($(this).hasClass("disable"))
 {
 
     $.ajax({
@@ -107,7 +107,7 @@ if($(this).hasClass('.disable'))
     $('a#'+id+'.disable').removeClass('disable btn-warning').addClass('restore btn-success').text("Enable Entry");
     });
 }
-else if($(this).hasClass('.restore'))
+else if($(this).hasClass("restore"))
 {
 
 $.ajax({
