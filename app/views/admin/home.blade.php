@@ -89,25 +89,26 @@
 
 
 <script>
-$('.disable').click(function(){
+$('.toggle').click(function(){
 var id = $(this).attr('id');
 
-$.ajax({
-    url: '/entry/'+id,
-    type: 'DELETE',
-    complete: function(result, text) {
-        console.log(result);
-        console.log(text);
+if($(this).hasClass('disable'))
+{
+
+    $.ajax({
+        url: '/entry/'+id,
+        type: 'DELETE',
+        complete: function(result, text) {
+            console.log(result);
+            console.log(text);
+        }
     }
+    ).done(function(){
+    $('a#'+id+'.disable').removeClass('disable btn-warning').addClass('restore btn-success').text("Enable Entry");
+    });
 }
-).done(function(){
-$('a#'+id+'.disable').removeClass('disable btn-warning').addClass('restore btn-success').text("Enable Entry");
-});
-
-});
-
-$('.restore').click(function(){
-var id = $(this).attr('id');
+else if($(this).hasClass('restore'))
+{
 
 $.ajax({
     url: '/restoreentry/'+id,
@@ -121,6 +122,8 @@ $.ajax({
 $('a#'+id+'.restore').removeClass('restore btn-success').addClass('disable btn-warning').text("Disable Entry");
 });
 
+
+}
 });
 
 </script>
