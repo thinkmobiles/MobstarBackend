@@ -15,6 +15,6 @@ class AdminController extends BaseController
 	{
 		$data['entries'] = $this->entry->all();
 
-		return View::make('hello', $data);
+		return View::make('admin.home', $data);
 	}
 }
