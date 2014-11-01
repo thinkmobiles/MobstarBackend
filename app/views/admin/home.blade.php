@@ -101,7 +101,7 @@ $.ajax({
     }
 }
 ).done(function(){
-$(this).removeClass('disable btn-warning').addClass('enable btn-success').text("Enable Entry");
+$('a#'+id+'.disable').removeClass('disable btn-warning').addClass('enable btn-success').text("Enable Entry");
 });
 
 });
