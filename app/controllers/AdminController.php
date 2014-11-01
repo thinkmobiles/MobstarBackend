@@ -64,8 +64,6 @@ class AdminController extends BaseController
 
 		}
 
-		return $data['entries'];
-
 		return View::make('admin.home', $data);
 	}
 }
