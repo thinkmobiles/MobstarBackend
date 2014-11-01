@@ -33,7 +33,7 @@
             <div class="col-md-6">
                 @if ($entry['entry_type'] == 'video')
 
-                    @if (isset($entry['entry_file']) && $entry['entry_file'] != ''))
+                    @if (isset($entry['entry_file']) && $entry['entry_file'] != '')
                         <video style="width:100%; height:auto" controls>
                           <source src="{{$entry['entry_file']}}" type="video/mp4">
                         Your browser does not support the video tag.
