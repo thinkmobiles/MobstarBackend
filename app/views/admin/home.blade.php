@@ -90,7 +90,7 @@
 
 <script>
 $('.btn-warning').click(function(){
-var id = this.attr('id');
+var id = $(this).attr('id');
 
 $.ajax({
     url: '/entry/'+id,
