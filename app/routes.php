@@ -405,6 +405,10 @@ Route::get( "entry2/fixfile", [
 	"uses" => "EntryController@updateFile"
 ] );
 
+Route::get( "admin/", [
+	"as"   => "admin/index",
+	"uses" => "AdminController@index"
+] );
 //
 //Route::get( "entry2/test", [
 //	"as"   => "entry2/test",
