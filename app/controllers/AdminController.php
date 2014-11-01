@@ -20,6 +20,10 @@ class AdminController extends BaseController
 
 		foreach($entries as $entry)
 		{
+			if(count($entry->file) == 0)
+			{
+				continue;
+			}
 			$new = [];
 
 			foreach($entry->file as $file)
@@ -59,6 +63,7 @@ class AdminController extends BaseController
 			$new['entry_display_name'] = $entry->user->user_display_name;
 			$new['entry_name'] = $entry->entry_description;
 			$new['entry_type'] = $entry->entry_type;
+			$new['entry_id'] = $entry->entry_id;
 
 			$data['entries'][] = $new;
 
