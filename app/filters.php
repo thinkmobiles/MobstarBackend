@@ -138,18 +138,26 @@ Route::filter('csrf', function()
 
 Route::filter('admin', function()
 {
-	$key =  Session::get("pass");
+	$key =  Session::get("sessionkey");
 
-	if(!$key)
+	if(!$key || $key == '')
 	{
 		Redirect::to('admin/login');
+	}
+	else if (!isset($key))
+	{
+		Redirect::to('admin/login2');
+	}
+	else if (empty($key))
+	{
+		Redirect::to('admin/login3');
 	}
 
 	$token = Token::where('token_value', '=', $key)->whereIn('token_user_id', [301])->first();
 
 	if(!$token)
 	{
-		$return = ["error"=> "page not found"];
+		$return = ["error"=> "Endpoint not found"];
 		$status_code = 404;
 		return Response::make($return, $status_code);
 	}
