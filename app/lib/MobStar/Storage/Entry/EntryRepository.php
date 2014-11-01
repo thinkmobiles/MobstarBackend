@@ -12,4 +12,8 @@ interface EntryRepository {
 
 	public function addTag($tags, $id, $user_id);
 
+	public function delete($id);
+
+	public function undelete($id);
+
 }

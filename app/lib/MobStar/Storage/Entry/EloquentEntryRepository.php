@@ -214,4 +214,20 @@ class EloquentEntryRepository implements EntryRepository
 		)->get();
 	}
 
+	public function delete($id){
+		$entry = Entry::find($id);
+
+		$entry->entry_deleted = 1;
+
+		$entry->save();
+	}
+
+	public function undelete($id){
+		$entry = Entry::find($id);
+
+		$entry->entry_deleted = 0;
+
+		$entry->save();
+	}
+
 }
