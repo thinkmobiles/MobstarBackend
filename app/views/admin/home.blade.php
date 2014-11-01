@@ -101,7 +101,7 @@ $.ajax({
     }
 }
 ).done(function(){
-$(this).removeClass('disable').addClass('enable').text("Enable Entry");
+$(this).removeClass('disable btn-warning').addClass('enable btn-success').text("Enable Entry");
 });
 
 });
@@ -118,7 +118,7 @@ $.ajax({
     }
 }
 ).done(function(){
-$('a#'+id+'.enable').removeClass('enable').addClass('disable').text("Disable Entry");
+$('a#'+id+'.enable').removeClass('enable btn-success').addClass('disable btn-warning').text("Disable Entry");
 });
 
 });
