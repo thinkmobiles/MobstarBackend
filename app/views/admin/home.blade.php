@@ -33,7 +33,7 @@
             <div class="col-md-6">
                 @if ($entry['entry_type'] == 'video')
 
-                    @if ($entry['entry_file'] != '' && isset($entry['entry_file']))
+                    @if (isset($entry['entry_file']) && $entry['entry_file'] != ''))
                         <video style="width:100%; height:auto" controls>
                           <source src="{{$entry['entry_file']}}" type="video/mp4">
                         Your browser does not support the video tag.
@@ -46,7 +46,7 @@
 
 
                 @if ($entry['entry_type'] == 'audio')
-                    @if ($entry['entry_file'] != '' && isset($entry['entry_file']))
+                    @if (isset($entry['entry_file']) && $entry['entry_file'] != '')
                         @if ( isset($entry['entry_image']) && $entry['entry_image'] != '')
                             <img class="img-responsive" src="{{$entry['entry_image']}}">
                         @endif
@@ -60,6 +60,15 @@
                     @endif
                 @endif
 
+                 @if ($entry['entry_type'] == 'image')
+                    @if ( isset($entry['entry_image'] && $entry['entry_image'] != ''))
+                        @if ( isset($entry['entry_image']) && $entry['entry_image'] != '')
+                            <img class="img-responsive" src="{{$entry['entry_image']}}">
+                        @endif
+                    @else
+                        There is an error with this file, please contact support about this immediately, quote "Entry ID {{$entry['entry_id']}}"
+                    @endif
+                @endif
             </div>
             <div class="col-md-6">
 
