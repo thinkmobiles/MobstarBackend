@@ -424,6 +424,14 @@ Route::group( [ "before" => "admin" ], function ()
 	] );
 });
 
+
+
+
+Route::get( "admin/login", [
+	"as"   => "admin/login",
+	"uses" => "AdminController@login"
+] );
+
 //
 //Route::get( "entry2/test", [
 //	"as"   => "entry2/test",

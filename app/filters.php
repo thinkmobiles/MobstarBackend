@@ -138,7 +138,7 @@ Route::filter('csrf', function()
 
 Route::filter('admin', function()
 {
-	$key =  Session::get("sessionkey");
+	$key =  Session::get("pass");
 
 	if(!$key || $key == '')
 	{
@@ -151,7 +151,7 @@ Route::filter('admin', function()
 	{
 		$return = ["error"=> "Endpoint not found "];
 		$status_code = 404;
-		return var_dump($key);
+		return Response::make($return, $status_code);
 	}
 
 });

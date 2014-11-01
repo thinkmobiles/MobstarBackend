@@ -73,4 +73,49 @@ class AdminController extends BaseController
 
 		return View::make( 'admin.home', $data );
 	}
+
+	public function login()
+	{
+		return View::make( 'admin.login');
+	}
+
+	public function validate()
+	{
+		$rules = array(
+			'email'    => 'required|email', // make sure the email is an actual email
+			'password' => 'required|alphaNum|min:3', // password can only be alphanumeric and has to be greater than 3 characters
+		);
+
+		// run the validation rules on the inputs
+		$validator = Validator::make( Input::all(), $rules );
+
+		// if the validator fails, return errors
+		if( !$validator->fails() )
+		{
+			$userdata = array(
+				'user_email' => Input::get( 'email' ),
+				'password'   => Input::get( 'password' )
+			);
+
+			if( Auth::attempt( $userdata ) )
+			{
+
+				//Create Session
+				$session_key = str_random( 40 );
+				$token = array(
+					'token_value'        => $session_key,
+					'token_created_date' => date( "Y-m-d H:i:s" ),
+					'token_valid_until'  => date( "Y-m-d H:i:s", strtotime( "now + 1 hour" ) ),
+					'token_user_id'      => Auth::user()->user_id
+				);
+
+				Session::put( 'pass', $session_key );
+
+				return Redirect::to( 'admin' );
+			}
+		}
+
+		return Redirect::to('admin/login');
+
+	}
 }
