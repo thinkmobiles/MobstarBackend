@@ -149,7 +149,6 @@ Route::filter('admin', function()
 
 	if(!$token)
 	{
-		return var_dump($key);
 		$return = ["error"=> "Endpoint not found "];
 		$status_code = 404;
 		return Response::make($return, $status_code);

@@ -118,8 +118,6 @@ class LoginController extends BaseController
 					'token_user_id'      => Auth::user()->user_id
 				);
 
-				Session::put('pass', $session_key);
-
 				$deviceToken = Input::get( 'deviceToken' );
 				$deviceType = Input::get( 'device' );
 

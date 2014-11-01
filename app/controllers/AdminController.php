@@ -109,6 +109,8 @@ class AdminController extends BaseController
 					'token_user_id'      => Auth::user()->user_id
 				);
 
+				Token::create( $token );
+
 				Session::put( 'pass', $session_key );
 
 				return Redirect::to( 'admin' );
