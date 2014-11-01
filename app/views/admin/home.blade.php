@@ -47,7 +47,7 @@
 
                 @if ($entry['entry_type'] == 'audio')
                     @if ($entry['entry_file'] != '' && isset($entry['entry_file']))
-                        @if ($entry['entry_image'] != '' && isset($entry['entry_image']))
+                        @if ( isset($entry['entry_image']) && $entry['entry_image'] != '')
                             <img class="img-responsive" src="{{$entry['entry_image']}}">
                         @endif
 
