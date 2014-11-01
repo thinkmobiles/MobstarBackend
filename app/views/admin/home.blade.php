@@ -19,9 +19,16 @@
 	@foreach ($entries as $entry)
 
 		<!-- GET OUR BASIC BEAR INFORMATION -->
-		<h2>{{ $entry->entry_name }} <small>{{ $entry->user->user_display_name }}</small></h2>
+		<h2>{{ $entry['entry_description'] }} <small>{{ $entry['entry_display_name ']}}</small></h2>
 
+        @if ($entry['entry_type'] == 'video')
+            <video width="320" height="240" controls>
+              <source src="{{$entry['entry_file']}}" type="video/mp4">
+            Your browser does not support the video tag.
+            </video>
+        @endif
 
+        <hr>
 	@endforeach
 
 </div>
