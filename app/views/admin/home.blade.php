@@ -71,7 +71,7 @@
                 @endif
             </div>
             <div class="col-md-6">
-
+                <a href="#" class="remove btn btn-warning" id="{{$entry['entry_id']}}">Remove Entry</a>
             </div>
         </div>
 
