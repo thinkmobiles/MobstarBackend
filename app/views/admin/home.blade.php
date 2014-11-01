@@ -15,10 +15,6 @@
 	</style>
 </head>
 <body class="container">
-
-
-<div class="col-sm-8 col-sm-offset-2">
-
 	<!-- BEARS -->
 	<!-- loop over the bears and show off some things -->
 	@foreach ($entries as $entry)
@@ -77,9 +73,9 @@
             </div>
             <div class="col-md-6">
                 @if($entry['entry_deleted'] == 0)
-                    <a href="#" class="disable btn btn-warning toggle" id="{{$entry['entry_id']}}">Disable Entry</a>
+                    <a class="disable btn btn-warning toggle" id="{{$entry['entry_id']}}">Disable Entry</a>
                 @else
-                    <a href="#" class="restore btn btn-success toggle" id="{{$entry['entry_id']}}">Enable Entry</a>
+                    <a class="restore btn btn-success toggle" id="{{$entry['entry_id']}}">Enable Entry</a>
                 @endif
             </div>
         </div>
