@@ -64,6 +64,7 @@ class AdminController extends BaseController
 			$new['entry_name'] = $entry->entry_description;
 			$new['entry_type'] = $entry->entry_type;
 			$new['entry_id'] = $entry->entry_id;
+			$new['entry_deleted'] = $entry->entry_deleted;
 
 			$data['entries'][] = $new;
 

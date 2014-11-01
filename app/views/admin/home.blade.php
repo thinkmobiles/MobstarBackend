@@ -71,7 +71,11 @@
                 @endif
             </div>
             <div class="col-md-6">
-                <a href="#" class="remove btn btn-warning" id="{{$entry['entry_id']}}">Remove Entry</a>
+                @if($entry['entry_deleted'] == 0)
+                    <a href="#" class="disable btn btn-warning" id="{{$entry['entry_id']}}">Disable Entry</a>
+                @else
+                    <a href="#" class="enable btn btn-success" id="{{$entry['entry_id']}}">Enable Entry</a>
+                @endif
             </div>
         </div>
 
