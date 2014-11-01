@@ -34,8 +34,13 @@
 			font-size: 32px;
 			margin: 16px 0 0 0;
 		}
+		.container{
+		margin-top:100px;
+		}
 	</style>
 </head>
+<body>
+<div class="container">
 	<form method="post" action="/admin/validate">
 
 		<div class="row">
@@ -66,4 +71,7 @@
         </div>
     </form>
 	</div>
+
+</body>
+</html>
 </html>
