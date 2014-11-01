@@ -432,6 +432,11 @@ Route::get( "admin/login", [
 	"uses" => "AdminController@login"
 ] );
 
+Route::post( "admin/validate", [
+	"as"   => "admin/validate",
+	"uses" => "AdminController@validate"
+] );
+
 //
 //Route::get( "entry2/test", [
 //	"as"   => "entry2/test",
