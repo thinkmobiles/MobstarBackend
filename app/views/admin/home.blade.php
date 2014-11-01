@@ -6,6 +6,7 @@
     <link href="/css/video-js.css" rel="stylesheet" type="text/css">
     <!-- video.js must be in the <head> for older IEs to work. -->
     <script src="/js/video.js"></script>
+    <script src="/js/jquery-1.11.1.min.js"></script>
 	<!-- CSS -->
 	<!-- BOOTSTRAP -->
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
@@ -86,6 +87,26 @@
         <hr>
 	@endforeach
 
+
+<script>
+$('.btn-warning').click(function(){
+var id = this.id();
+
+$.ajax({
+    url: '/entry/'+id,
+    type: 'DELETE',
+    complete: function(result, text) {
+        console.log(result);
+        console.log(text);
+    }
+}
+).done(function(){
+this.removeClass('disable').addClass('enable').text("Enable Entry");
+});
+
+});
+
+</script>
 </div>
 </body>
 </html>
