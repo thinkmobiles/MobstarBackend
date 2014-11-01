@@ -4,47 +4,9 @@
 	<meta charset="UTF-8">
 	<title>MobStar Admin</title>
     <link href="/css/video-js.css" rel="stylesheet" type="text/css">
-    <script src="/js/jquery-1.11.1.min.js"></script>
-
-<script>
-$('.disable').click(function(){
-var id = $(this).attr('id');
-
-$.ajax({
-    url: '/entry/'+id,
-    type: 'DELETE',
-    complete: function(result, text) {
-        console.log(result);
-        console.log(text);
-    }
-}
-).done(function(){
-$('a#'+id+'.disable').removeClass('disable btn-warning').addClass('restore btn-success').text("Enable Entry");
-});
-
-});
-
-$('.restore').click(function(){
-var id = $(this).attr('id');
-
-$.ajax({
-    url: '/restoreentry/'+id,
-    type: 'GET',
-    complete: function(result, text) {
-        console.log(result);
-        console.log(text);
-    }
-}
-).done(function(){
-$('a#'+id+'.restore').removeClass('restore btn-success').addClass('disable btn-warning').text("Disable Entry");
-});
-
-});
-
-</script>
-
     <!-- video.js must be in the <head> for older IEs to work. -->
     <script src="/js/video.js"></script>
+    <script src="/js/jquery-1.11.1.min.js"></script>
 	<!-- CSS -->
 	<!-- BOOTSTRAP -->
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
@@ -124,6 +86,44 @@ $('a#'+id+'.restore').removeClass('restore btn-success').addClass('disable btn-w
 
         <hr>
 	@endforeach
+
+
+<script>
+$('.disable').click(function(){
+var id = $(this).attr('id');
+
+$.ajax({
+    url: '/entry/'+id,
+    type: 'DELETE',
+    complete: function(result, text) {
+        console.log(result);
+        console.log(text);
+    }
+}
+).done(function(){
+$('a#'+id+'.disable').removeClass('disable btn-warning').addClass('restore btn-success').text("Enable Entry");
+});
+
+});
+
+$('.restore').click(function(){
+var id = $(this).attr('id');
+
+$.ajax({
+    url: '/restoreentry/'+id,
+    type: 'GET',
+    complete: function(result, text) {
+        console.log(result);
+        console.log(text);
+    }
+}
+).done(function(){
+$('a#'+id+'.restore').removeClass('restore btn-success').addClass('disable btn-warning').text("Disable Entry");
+});
+
+});
+
+</script>
 </div>
 </body>
 </html>
