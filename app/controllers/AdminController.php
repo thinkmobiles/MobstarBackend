@@ -1,14 +1,12 @@
 <?php
 
 use MobStar\Storage\Entry\EntryRepository as Entry;
-use MobStar\Storage\Token\TokenRepository as Token;
 
 class AdminController extends BaseController
 {
-	public function __construct( Entry $entry, Token $token )
+	public function __construct( Entry $entry )
 	{
 		$this->entry = $entry;
-		$this->token = $token;
 	}
 
 	public function index()
