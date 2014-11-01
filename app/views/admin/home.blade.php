@@ -61,7 +61,7 @@
                 @endif
 
                  @if ($entry['entry_type'] == 'image')
-                    @if ( isset($entry['entry_image'] && $entry['entry_image'] != ''))
+                    @if ( isset($entry['entry_image']) && $entry['entry_image'] != '')
                         @if ( isset($entry['entry_image']) && $entry['entry_image'] != '')
                             <img class="img-responsive" src="{{$entry['entry_image']}}">
                         @endif
