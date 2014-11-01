@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Eloquent Bears</title>
-
+	<title>MobStar Admin</title>
+    <link href="/css/video-js.css" rel="stylesheet" type="text/css">
+    <!-- video.js must be in the <head> for older IEs to work. -->
+    <script src="/js/video.js"></script>
 	<!-- CSS -->
 	<!-- BOOTSTRAP -->
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
@@ -34,7 +36,9 @@
                 @if ($entry['entry_type'] == 'video')
 
                     @if (isset($entry['entry_file']) && $entry['entry_file'] != '')
-                        <video style="width:100%; height:auto" controls>
+                        <video style="width:100%; height:auto" class="video-js vjs-default-skin"
+                                                                         controls preload="metadata"
+                                                                         poster="{{$entry['entry_image']}}">
                           <source src="{{$entry['entry_file']}}" type="video/mp4">
                         Your browser does not support the video tag.
                         </video>
