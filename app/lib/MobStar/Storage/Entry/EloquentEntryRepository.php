@@ -12,6 +12,8 @@ class EloquentEntryRepository implements EntryRepository
 	{
 		$query = Entry::with( 'category', 'vote', 'user', 'file', 'entryTag.tag', 'comments' )->where( 'entry_id', '>', '0' );
 
+		$query = $query->where('entry_deleted', '=', '0');
+
 		if( $user )
 		{
 			$query = $query->where( 'entry_user_id', '=', $user );
@@ -62,6 +64,8 @@ class EloquentEntryRepository implements EntryRepository
 	public function whereIn( $ids, $user = 0, $category = 0, $limit = 50, $offset = 0, $count = false )
 	{
 		$query = Entry::with( 'category', 'file', 'vote', 'user', 'entryTag.tag', 'comments' )->whereIn( 'entry_id', $ids );
+
+		$query = $query->where('entry_deleted', '=', '0');
 
 		if( $user )
 		{
