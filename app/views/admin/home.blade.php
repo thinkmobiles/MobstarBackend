@@ -77,9 +77,9 @@
             </div>
             <div class="col-md-6">
                 @if($entry['entry_deleted'] == 0)
-                    <a href="#" class="disable btn btn-warning" id="{{$entry['entry_id']}}">Disable Entry</a>
+                    <a href="#" class="disable btn btn-warning disable" id="{{$entry['entry_id']}}">Disable Entry</a>
                 @else
-                    <a href="#" class="enable btn btn-success" id="{{$entry['entry_id']}}">Enable Entry</a>
+                    <a href="#" class="enable btn btn-success restore" id="{{$entry['entry_id']}}">Enable Entry</a>
                 @endif
             </div>
         </div>
@@ -89,7 +89,7 @@
 
 
 <script>
-$('.btn-warning').click(function(){
+$('.disable').click(function(){
 var id = $(this).attr('id');
 
 $.ajax({
@@ -101,7 +101,24 @@ $.ajax({
     }
 }
 ).done(function(){
-this.removeClass('disable').addClass('enable').text("Enable Entry");
+$(this).removeClass('disable').addClass('enable').text("Enable Entry");
+});
+
+});
+
+$('.restore').click(function(){
+var id = $(this).attr('id');
+
+$.ajax({
+    url: '/restoreentry/'+id,
+    type: 'GET',
+    complete: function(result, text) {
+        console.log(result);
+        console.log(text);
+    }
+}
+).done(function(){
+$(this).removeClass('disable').addClass('enable').text("Enable Entry");
 });
 
 });

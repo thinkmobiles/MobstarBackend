@@ -2199,7 +2199,7 @@ class EntryController extends BaseController
 	public function delete($id){
 
 		$this->entry->delete($id);
-		
+
 		return Response::make(['status' => 'entry deleted'], 200);
 	}
 
