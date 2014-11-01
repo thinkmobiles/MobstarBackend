@@ -159,7 +159,7 @@ Route::filter('admin', function()
 	{
 		$return = ["error"=> "Endpoint not found "];
 		$status_code = 404;
-		return Response::make($return, $status_code);
+		return var_dump($key);
 	}
 
 });
