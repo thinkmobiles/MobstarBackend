@@ -142,19 +142,7 @@ Route::filter('admin', function()
 
 	if(!$key || $key == '')
 	{
-		Redirect::to('admin/login');
-	}
-	else if (!isset($key))
-	{
-		Redirect::to('admin/login2');
-	}
-	else if (empty($key))
-	{
-		Redirect::to('admin/login3');
-	}
-	else if (is_null($key))
-	{
-		Redirect::to('admin/login3');
+		return Redirect::to('admin/login');
 	}
 
 	$token = Token::where('token_value', '=', $key)->whereIn('token_user_id', [301])->first();
