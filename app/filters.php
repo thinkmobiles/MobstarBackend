@@ -145,9 +145,14 @@ Route::filter('admin', function()
 		return Redirect::to('admin/login');
 	}
 
-	$token = Token::where('token_value', '=', $key)->whereIn('token_user_id', [301])->first();
+	$token = Token::where('token_value', '=', $key)->first();
 
-	if(!$token)
+	if(in_array($token->token_user_id, [301]))
+		$pass=true;
+	else
+		$pass=false;
+
+	if(!$token && $pass)
 	{
 		$return = ["error"=> "Endpoint not found "];
 		$status_code = 404;
