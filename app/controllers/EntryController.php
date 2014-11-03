@@ -1116,7 +1116,7 @@ class EntryController extends BaseController
 						switch( $rotation )
 						{
 							case ( strpos( $contents, $string . "90" ) !== false ):
-								$transpose = 270;
+								$transpose = 180;
 								break;
 
 							case ( strpos( $contents, $string . "180" ) !== false ):
