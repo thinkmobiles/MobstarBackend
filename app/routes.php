@@ -427,6 +427,11 @@ Route::group( [ "before" => "admin" ], function ()
 		"as"   => "admin/entry",
 		"uses" => "AdminController@addEntry"
 	] );
+
+	Route::post( "admin/entry", [
+		"as"   => "admin/entry",
+		"uses" => "AdminController@insertEntry"
+	] );
 });
 
 

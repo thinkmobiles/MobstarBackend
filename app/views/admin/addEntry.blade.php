@@ -48,10 +48,11 @@
         </div>
       </div>
 
+    Second file only required as an image for audio entries
     <div class="form-group">
-          <label for="file2" class="col-sm-2 control-label">File 1</label>
+          <label for="file2" class="col-sm-2 control-label">File 2</label>
           <div class="col-sm-10">
-            <input type="file" class="form-control" id="file2" placeholder="Only for Audio" name="file2" required="true">
+            <input type="file" class="form-control" id="file2" placeholder="Only for Audio" name="file2">
           </div>
         </div>
 
