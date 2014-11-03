@@ -15,6 +15,11 @@
 	</style>
 </head>
 <body class="container">
+
+<div class="jumbotron">
+  <h1>MobStar Admin</h1>
+  <p><a class="btn btn-primary btn-lg" href="/admin/entry" role="button">Add an Entrty</a></p>
+</div>
 	<!-- BEARS -->
 	<!-- loop over the bears and show off some things -->
 	@foreach ($entries as $entry)
