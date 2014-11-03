@@ -9,7 +9,7 @@
     <script src="/js/jquery-1.11.1.min.js"></script>
 	<!-- CSS -->
 	<!-- BOOTSTRAP -->
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/css/bootstrap.min.css">
 	<style>
 		body { padding-top:50px; } /* add some padding to the top of our site */
 	</style>

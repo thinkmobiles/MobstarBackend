@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<title>Please Login</title>
 
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/css/bootstrap.min.css">
 
 	<style>
 		@import url(//fonts.googleapis.com/css?family=Lato:700);
