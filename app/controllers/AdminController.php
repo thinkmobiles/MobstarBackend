@@ -124,6 +124,7 @@ class AdminController extends BaseController
 	}
 
 	public function insertEntry(){
+		echo 'boo';
 
 		//Validate Input
 		$rules = array(
@@ -344,8 +345,8 @@ class AdminController extends BaseController
 				$response[ 'error' ] = "No file included";
 				$status_code = 400;
 
-				return Response::make($response, $status_code);
 			}
+			return Response::make($response, $status_code);
 
 			return Redirect::to( 'admin' );
 
