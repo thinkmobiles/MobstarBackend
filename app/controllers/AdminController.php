@@ -124,11 +124,9 @@ class AdminController extends BaseController
 	}
 
 	public function insertEntry(){
-		echo 'boo';
 
 		//Validate Input
 		$rules = array(
-			'category'    => 'required|numeric',
 			'type'        => 'required',
 			'name'        => 'required',
 			'description' => 'required',
