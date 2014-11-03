@@ -232,21 +232,19 @@ class EntryController extends BaseController
 		$tag = ( Input::get( 'tagId', '0' ) );
 		$tag = ( !is_numeric( $tag ) ) ? 0 : $tag;
 
-		$exclude = [];
+		$exclude = [ ];
 
-		if(Input::get('excludeVotes') == 'true')
+		if( Input::get( 'excludeVotes' ) == 'true' )
 		{
-			$votes = Vote::where('vote_user_id', '=', $session->token_user_id)->get();
-			foreach($votes as $vote){
-				$exclude[] = $vote->vote_entry_id;
+			$votes = Vote::where( 'vote_user_id', '=', $session->token_user_id )->get();
+			foreach( $votes as $vote )
+			{
+				$exclude[ ] = $vote->vote_entry_id;
 			}
 		}
 
-
 		$entries = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false );
 		$count = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, true );
-
-
 
 		if( $count == 0 )
 		{
@@ -331,7 +329,7 @@ class EntryController extends BaseController
 				if( in_array( "userName", $fields ) )
 				{
 
-					$current[ 'user' ] = oneUser($entry->User, $session);
+					$current[ 'user' ] = oneUser( $entry->User, $session );
 
 				}
 
@@ -1094,7 +1092,7 @@ class EntryController extends BaseController
 						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
 
 						// Transcode Video
-						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' .  $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt');
+						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
 						$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', $filename . '-uploaded.' . $extension );
 
 						$extension = 'mp4';
@@ -1105,35 +1103,44 @@ class EntryController extends BaseController
 
 						$thumb = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-thumb.jpg';
 
-						exec('/usr/bin/ffprobe 2>&1 ' . $file_out . ' | grep "rotate          :"', $rotation);
+						exec( '/usr/bin/ffprobe 2>&1 ' . $file_out . ' | grep "rotate          :"', $rotation );
 
-						if(isset($rotation[0]))
-							$rotation = substr($rotation[0], 17);
+						if( isset( $rotation[ 0 ] ) )
+						{
+							$rotation = substr( $rotation[ 0 ], 17 );
+						}
 
-						$contents = file_get_contents($_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt');
+						$contents = file_get_contents( $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
 						$string = "rotate          : ";
 
-						switch($rotation)
+						switch( $rotation )
 						{
-							case (strpos($contents, $string . "90") !== false):
-								$transpose = "transpose=2";
+							case ( strpos( $contents, $string . "90" ) !== false ):
+								$transpose = "90";
 								break;
 
-							case (strpos($contents, $string . "180") !== false):
-								$transpose = "transpose=1";
+							case ( strpos( $contents, $string . "180" ) !== false ):
+								$transpose = "180";
 								break;
 
-							case (strpos($contents, $string . "270") !== false):
-								$transpose = "transpose=2";
+							case ( strpos( $contents, $string . "270" ) !== false ):
+								$transpose = "270";
 								break;
 
 							default:
-								$transpose = "transpose=1,transpose=1,transpose=1,transpose=1";
+								$transpose = null;
 						}
 
+						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
 
+						if( !is_null( $transpose ) )
+						{
+							$image = Image::make( $thumb );
 
-						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -vf ' . $transpose . '  -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
+							$image->rotate( $transpose );
+
+							$image->save( $thumb );
+						}
 
 						$handle = fopen( $thumb, "r" );
 
@@ -2195,20 +2202,20 @@ class EntryController extends BaseController
 //		}
 //	}
 
+	public function delete( $id )
+	{
 
-	public function delete($id){
+		$this->entry->delete( $id );
 
-		$this->entry->delete($id);
-
-		return Response::make(['status' => 'entry deleted'], 200);
+		return Response::make( [ 'status' => 'entry deleted' ], 200 );
 	}
 
+	public function undelete( $id )
+	{
 
-	public function undelete($id){
+		$this->entry->undelete( $id );
 
-		$this->entry->undelete($id);
-
-		return Response::make(['status' => 'entry undeleted'], 200);
+		return Response::make( [ 'status' => 'entry undeleted' ], 200 );
 	}
 
 }
