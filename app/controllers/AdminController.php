@@ -159,6 +159,7 @@ class AdminController extends BaseController
 					'entry_language'     => Input::get( 'language' ),
 					'entry_description'  => Input::get( 'description' ),
 					'entry_created_date' => date( 'Y-m-d H:i:s' ),
+					'entry_deleted'			=> (Input::get('enabled') == 1) ? 0 : 1
 				];
 
 				Eloquent::unguard();
