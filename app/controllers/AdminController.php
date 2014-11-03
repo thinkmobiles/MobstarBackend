@@ -136,6 +136,7 @@ class AdminController extends BaseController
 
 		if( $validator->fails() )
 		{
+			echo 'validation';
 			$response[ 'errors' ] = $validator->messages();
 			$status_code = 400;
 		}
@@ -146,6 +147,7 @@ class AdminController extends BaseController
 
 			if( !empty( $file ) )
 			{
+				echo '150';
 
 				//Will need to do some work here to upload file to CDN
 
@@ -177,6 +179,7 @@ class AdminController extends BaseController
 						$this->entry->addTag( trim( $tag ), $response[ 'entry_id' ], 301 );
 					}
 				}
+				echo '182';
 
 				$dest = 'uploads';
 
@@ -236,6 +239,7 @@ class AdminController extends BaseController
 						preg_match( "#rotate.*?([0-9]{1,3})#im", $contents, $rotationMatches );
 
 						$transpose = '';
+						echo '242';
 
 						if( count( $rotationMatches ) > 0 )
 						{
@@ -296,6 +300,7 @@ class AdminController extends BaseController
 								   ] );
 
 				Eloquent::reguard();
+				echo '303';
 
 				$file = Input::file( 'file2' );
 
@@ -339,11 +344,15 @@ class AdminController extends BaseController
 			}
 			else
 			{
+				echo '347';
+
 
 				$response[ 'error' ] = "No file included";
 				$status_code = 400;
 
 			}
+			echo '354';
+
 			return Response::make($response, $status_code);
 
 			return Redirect::to( 'admin' );
