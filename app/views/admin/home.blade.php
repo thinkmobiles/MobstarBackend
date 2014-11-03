@@ -17,7 +17,7 @@
 <body class="container">
 
 <div class="jumbotron">
-  <h1>MobStar Admin</h1>
+  <h1>Mobstar Admin</h1>
   <p><a class="btn btn-primary btn-lg" href="/admin/entry" role="button">Add an Entry</a></p>
 </div>
 	<!-- BEARS -->
