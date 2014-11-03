@@ -1116,19 +1116,19 @@ class EntryController extends BaseController
 						switch( $rotation )
 						{
 							case ( strpos( $contents, $string . "90" ) !== false ):
-								$transpose = "90";
+								$transpose = 270;
 								break;
 
 							case ( strpos( $contents, $string . "180" ) !== false ):
-								$transpose = "180";
+								$transpose = 180;
 								break;
 
 							case ( strpos( $contents, $string . "270" ) !== false ):
-								$transpose = "270";
+								$transpose = 90;
 								break;
 
 							default:
-								$transpose = null;
+								$transpose = 270;
 						}
 
 						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
