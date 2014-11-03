@@ -128,7 +128,6 @@ class AdminController extends BaseController
 		//Validate Input
 		$rules = array(
 			'type'        => 'required',
-			'name'        => 'required',
 			'description' => 'required',
 		);
 
