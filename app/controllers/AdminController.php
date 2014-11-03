@@ -118,4 +118,8 @@ class AdminController extends BaseController
 		return Redirect::to('admin/login');
 
 	}
+
+	public function addEntry(){
+		return View::make('admin.addEntry');
+	}
 }

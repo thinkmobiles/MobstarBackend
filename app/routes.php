@@ -422,6 +422,11 @@ Route::group( [ "before" => "admin" ], function ()
 		"as"   => "admin/index",
 		"uses" => "AdminController@index"
 	] );
+
+	Route::get( "admin/entry", [
+		"as"   => "admin/entry",
+		"uses" => "AdminController@addEntry"
+	] );
 });
 
 
