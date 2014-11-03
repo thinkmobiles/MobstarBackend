@@ -1111,36 +1111,27 @@ class EntryController extends BaseController
 						}
 
 						$contents = file_get_contents( $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
-						$string = "rotate          : ";
+						preg_match( "#rotate.*?([0-9]{1,3})#im", $contents, $rotationMatches );
 
-						switch( $rotation )
+						$transpose = '';
+
+						if( count( $rotationMatches ) > 0 )
 						{
-							case ( strpos( $contents, $string . "90" ) !== false ):
-								$transpose = 180;
-								break;
-
-							case ( strpos( $contents, $string . "180" ) !== false ):
-								$transpose = 180;
-								break;
-
-							case ( strpos( $contents, $string . "270" ) !== false ):
-								$transpose = 90;
-								break;
-
-							default:
-								$transpose = 270;
+							switch( $rotationMatches[ 1 ] )
+							{
+								case '90':
+									$transpose = ' -vf transpose=1';
+									break;
+								case '180':
+									$transpose = ' -vf vflip,hflip';
+									break;
+								case '270':
+									$transpose = ' -vf transpose=2';
+									break;
+							}
 						}
 
-						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
-
-						if( !is_null( $transpose ) )
-						{
-							$image = Image::make( $thumb );
-
-							$image->rotate( $transpose );
-
-							$image->save( $thumb );
-						}
+						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . $transpose . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
 
 						$handle = fopen( $thumb, "r" );
 
