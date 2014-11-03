@@ -343,6 +343,8 @@ class AdminController extends BaseController
 
 				$response[ 'error' ] = "No file included";
 				$status_code = 400;
+
+				return Response::make($response, $status_code);
 			}
 
 			return Redirect::to( 'admin' );
