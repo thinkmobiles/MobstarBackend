@@ -138,6 +138,7 @@ class AdminController extends BaseController
 		{
 			echo 'validation';
 			$response[ 'errors' ] = $validator->messages();
+			var_dump($response);
 			$status_code = 400;
 		}
 		else
