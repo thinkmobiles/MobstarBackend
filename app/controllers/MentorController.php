@@ -104,7 +104,7 @@ class MentorController extends BaseController
 		}
 
 		//Get limit to calculate pagination 
-		$limit = ( Input::get( 'limit', '5' ) );
+		$limit = ( Input::get( 'limit', '50' ) );
 
 		//If not numeric set it to the default limit
 		$limit = ( !is_numeric( $limit ) || $limit < 1 ) ? 5 : $limit;
