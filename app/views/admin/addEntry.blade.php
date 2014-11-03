@@ -16,7 +16,7 @@
 </head>
 <body class="container">
 
-<form method="post" action="admin/entry" enctype="multipart/form-data" class="form-horizontal" role="form">
+<form method="post" action="/admin/entry" enctype="multipart/form-data" class="form-horizontal" role="form">
 
   <div class="form-group">
     <label for="description" class="col-sm-2 control-label">Name</label>
