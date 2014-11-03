@@ -48,7 +48,9 @@
         </div>
       </div>
 
+    <div class="col-sm-offset-2 col-sm-10">
     Second file only required as an image for audio entries
+    </div>
     <div class="form-group">
           <label for="file2" class="col-sm-2 control-label">File 2</label>
           <div class="col-sm-10">
