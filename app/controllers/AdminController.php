@@ -154,10 +154,10 @@ class AdminController extends BaseController
 					'entry_user_id'      => 301,
 					'entry_category_id'  => 1,
 					'entry_type'         => Input::get( 'type' ),
-					'entry_name'         => Input::get( 'name' ),
+					'entry_name'         => 'Mobstar Team',
 					'entry_language'     => Input::get( 'language' ),
 					'entry_description'  => Input::get( 'description' ),
-					'entry_created_date' => date( 'Y-m-d H:i:s' ),
+					'entry_created_date' => date( '2015-m-d H:i:s' ),
 					'entry_deleted'			=> (Input::get('enabled') == 1) ? 0 : 1
 				];
 
