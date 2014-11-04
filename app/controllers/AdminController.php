@@ -253,7 +253,7 @@ class AdminController extends BaseController
 							}
 						}
 
-						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . $transpose . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
+						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . $transpose . ' -vframes 1 -an -s 300x300 -filter:v scale="300:-1" -ss 00:00:00.10 ' . $thumb );
 
 						$handle = fopen( $thumb, "r" );
 
