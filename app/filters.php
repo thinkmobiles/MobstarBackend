@@ -145,7 +145,7 @@ Route::filter('admin', function()
 		return Redirect::to('admin/login');
 	}
 
-	$token = Token::where('token_value', '=', $key)->whereIn('token_user_id', [301, 429, 311])->first();
+	$token = Token::where('token_value', '=', $key)->whereIn('token_user_id', [301, 429, 311, 307])->first();
 
 	if(!$token)
 	{
