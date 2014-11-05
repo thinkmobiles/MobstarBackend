@@ -12,7 +12,7 @@ class EloquentEntryRepository implements EntryRepository
 	{
 		$query = Entry::with( 'category', 'vote', 'user', 'file', 'entryTag.tag', 'comments' )->where( 'entry_id', '>', '0' );
 
-		$query = $query->where('entry_deleted', '=', '0');
+		$query = $query->where( 'entry_deleted', '=', '0' );
 
 		if( $user )
 		{
@@ -43,9 +43,9 @@ class EloquentEntryRepository implements EntryRepository
 			} );
 		}
 
-		if($exclude)
+		if( $exclude )
 		{
-			$query = $query->whereNotIn('entry_id', $exclude);
+			$query = $query->whereNotIn( 'entry_id', $exclude );
 		}
 
 		return $query->take( $limit )->skip( $offset )->get();
@@ -84,9 +84,9 @@ class EloquentEntryRepository implements EntryRepository
 			} );
 		}
 
-		if($exclude)
+		if( $exclude )
 		{
-			$query = $query->whereNotIn('entry_id', $exclude);
+			$query = $query->whereNotIn( 'entry_id', $exclude );
 		}
 
 		return $query->take( $limit )->skip( $offset )->get();
@@ -106,7 +106,7 @@ class EloquentEntryRepository implements EntryRepository
 	{
 		$query = Entry::with( 'category', 'file', 'vote', 'user', 'entryTag.tag', 'comments' )->whereIn( 'entry_id', $ids );
 
-		$query = $query->where('entry_deleted', '=', '0');
+		$query = $query->where( 'entry_deleted', '=', '0' );
 
 		if( $user )
 		{
@@ -206,24 +206,43 @@ class EloquentEntryRepository implements EntryRepository
 		return $query->take( 50 )->skip( 0 )->get();
 	}
 
-	public function search($term){
+	public function search( $term )
+	{
 
-		return Entry::whereRaw(
-			 "MATCH(entry_name, entry_description) AGAINST(? IN BOOLEAN MODE)",
-			 array( $term )
-		)->where('entry_deleted', '=', 0)->get();
+		$tags = explode (' ', $term);
+
+		$tag_id = Tag::whereIn('tag_name', $tags)->lists('tag_id');
+
+		$query =  Entry::whereRaw(
+			"MATCH(entry_name, entry_description) AGAINST(? IN BOOLEAN MODE)",
+			array( $term )
+		)->where( 'entry_deleted', '=', 0 )->get();
+
+
+		$query = $query->orWhereHas( 'entryTag', function ( $q ) use ( $tag_id )
+		{
+			$q->where( 'entry_tag_tag_id', '=', $tag_id );
+		} );
+
+		return $query->get();
 	}
 
-	public function delete($id){
-		$entry = Entry::find($id);
+	public function undecided($count){
+
+	}
+
+	public function delete( $id )
+	{
+		$entry = Entry::find( $id );
 
 		$entry->entry_deleted = 1;
 
 		$entry->save();
 	}
 
-	public function undelete($id){
-		$entry = Entry::find($id);
+	public function undelete( $id )
+	{
+		$entry = Entry::find( $id );
 
 		$entry->entry_deleted = 0;
 
