@@ -68,9 +68,7 @@
 
                  @if ($entry['entry_type'] == 'image')
                     @if ( isset($entry['entry_image']) && $entry['entry_image'] != '')
-                        @if ( isset($entry['entry_image']) && $entry['entry_image'] != '')
-                            <img class="img-responsive" src="{{$entry['entry_image']}}">
-                        @endif
+                        <img class="img-responsive" src="{{$entry['entry_image']}}">
                     @else
                         There is an error with this file, please contact support about this immediately, quote "Entry ID {{$entry['entry_id']}}"
                     @endif
