@@ -211,7 +211,7 @@ class EloquentEntryRepository implements EntryRepository
 		return Entry::whereRaw(
 			 "MATCH(entry_name, entry_description) AGAINST(? IN BOOLEAN MODE)",
 			 array( $term )
-		)->get();
+		)->where('entry_deleted', '=', 0)->get();
 	}
 
 	public function delete($id){
