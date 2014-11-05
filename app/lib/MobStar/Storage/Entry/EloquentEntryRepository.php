@@ -216,7 +216,7 @@ class EloquentEntryRepository implements EntryRepository
 		$query =  Entry::whereRaw(
 			"MATCH(entry_name, entry_description) AGAINST(? IN BOOLEAN MODE)",
 			array( $term )
-		)->where( 'entry_deleted', '=', 0 )->get();
+		)->where( 'entry_deleted', '=', 0 );
 
 
 		$query = $query->whereHas( 'entryTag', function ( $q ) use ( $tag_id )
