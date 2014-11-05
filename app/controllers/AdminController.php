@@ -52,7 +52,7 @@ class AdminController extends BaseController
 				}
 				elseif( $entry->entry_type == 'image' )
 				{
-					if( $file->entry_file_type == 'jpg' || $file->entry_file_type == 'png' )
+					if( strtolower($file->entry_file_type) == 'jpg' || strtolower($file->entry_file_type) == 'png' )
 					{
 						$new[ 'entry_image' ] = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+60 minutes' );
 					}
