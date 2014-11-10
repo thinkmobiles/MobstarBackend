@@ -221,7 +221,7 @@ class EloquentEntryRepository implements EntryRepository
 
 		$query = $query->orWhereHas( 'entryTag', function ( $q ) use ( $tag_id )
 		{
-			$q->whereIn( 'entry_tag_tag_id', $tag_id );
+			$q->whereIn( 'entry_tag_tag_id', $tag_id )->where('entry_deleted', '=', 0);
 		} )->get();
 
 		return $query;
