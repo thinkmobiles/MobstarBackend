@@ -663,13 +663,14 @@ public function reply()
 
 						$users = [];
 
+						var_dump($stars);
+
 						foreach($stars as $star)
 						{
 
 							var_dump($star);
 							$users[] = $star->user_star_user_id;
 						}
-						var_dump($users);
 						break;
 
 				}
