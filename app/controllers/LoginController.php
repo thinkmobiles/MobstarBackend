@@ -767,6 +767,7 @@ class LoginController extends BaseController
 														$device->device_registration_device_token
 												] );
 
+		$endpointDetails = $endpoint->toArray();
 
 		$client->publish( [
 							  'TargetArn'          => $endpointDetails['EndpointArn'],
