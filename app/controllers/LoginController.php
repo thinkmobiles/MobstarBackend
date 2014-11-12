@@ -767,12 +767,9 @@ class LoginController extends BaseController
 														$device->device_registration_device_token
 												] );
 
-//		var_dump($endpoint->EndpointArn);
-		var_dump($endpoint->toArray());
-		break;
 
 		$client->publish( [
-							  'TargetArn'          => $arn . '/' . $device->device_registration_device_token,
+							  'TargetArn'          => $endpointDetails['EndpointArn'],
 							  'Message'            => 'Welcome to Push Notifications',
 							  'Subject'            => 'MobStar',
 							  'MessageAttributues' => [
