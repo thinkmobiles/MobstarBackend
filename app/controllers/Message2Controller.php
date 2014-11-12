@@ -665,8 +665,11 @@ public function reply()
 
 						foreach($stars as $star)
 						{
+
+							var_dump($star);
 							$users[] = $star->user_star_user_id;
 						}
+						var_dump($users);
 						break;
 
 				}
