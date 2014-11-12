@@ -125,7 +125,7 @@ class LoginController extends BaseController
 				{
 
 					$device = DeviceRegistration::firstOrNew(
-						[ 'device_registration_device_token' => Input::get( 'deviceToken' ) ]
+						[ 'device_registration_device_token' => $deviceToken ]
 					);
 
 					$device->device_registration_user_id = Auth::user()->user_id;
@@ -760,7 +760,7 @@ class LoginController extends BaseController
 
 		$client = getSNSClient();
 
-		$arn = $client->createPlatformEndpoint( [
+		$endpoint = $client->createPlatformEndpoint( [
 													'PlatformApplicationArn' =>
 														$arn,
 													'Token'                  =>
