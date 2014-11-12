@@ -767,7 +767,8 @@ class LoginController extends BaseController
 														$device->device_registration_device_token
 												] );
 
-		var_dump($endpoint);
+		var_dump($endpoint->EndpointArn);
+		var_dump($endpoint->data);
 		break;
 
 		$client->publish( [
