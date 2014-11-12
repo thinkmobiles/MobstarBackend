@@ -652,7 +652,7 @@ public function reply()
 
 						$users = [];
 
-						foreach($entry->comment as $comment)
+						foreach($entry->comments as $comment)
 						{
 							$users[] = $comment->user_id;
 						}
