@@ -780,8 +780,6 @@ class LoginController extends BaseController
 							  ]
 						  ] );
 
-		var_dump($response);
-
 	}
 
 }
