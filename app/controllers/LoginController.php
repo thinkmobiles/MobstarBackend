@@ -769,7 +769,7 @@ class LoginController extends BaseController
 
 		$endpointDetails = $endpoint->toArray();
 
-		$client->publish( [
+		$response = $client->publish( [
 							  'TargetArn'          => $endpointDetails['EndpointArn'],
 							  'Message'            => 'Welcome to Push Notifications',
 							  'Subject'            => 'MobStar',
@@ -779,6 +779,8 @@ class LoginController extends BaseController
 								  ]
 							  ]
 						  ] );
+
+		var_dump($response)
 
 	}
 
