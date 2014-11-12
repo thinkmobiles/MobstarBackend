@@ -647,6 +647,7 @@ public function reply()
 							$users[] = $vote->vote_user_id;
 						}
 						break;
+
 					case "commenters":
 						$entry = $this->entry->find($input['entry']);
 
@@ -665,11 +666,8 @@ public function reply()
 
 						foreach($stars as $star)
 						{
-
-							var_dump($star);
 							$users[] = $star->user_star_user_id;
 						}
-						var_dump($users);
 						break;
 
 				}
