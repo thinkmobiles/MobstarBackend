@@ -676,7 +676,7 @@ public function reply()
 
 				foreach ($users as $user)
 				{
-					$recipients = $user;
+					$recipients = [$user];
 					$message = $input['message'];
 
 					$recipArray = [ ];
