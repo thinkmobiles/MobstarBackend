@@ -768,7 +768,7 @@ class LoginController extends BaseController
 												] );
 
 		$client->publish( [
-							  'TargetArn'          => $endpoint->EndpointArn,
+							  'TargetArn'          => $arn . '/' . $device->device_registration_device_token,
 							  'Message'            => 'Welcome to Push Notifications',
 							  'Subject'            => 'MobStar',
 							  'MessageAttributues' => [
