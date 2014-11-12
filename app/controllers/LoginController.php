@@ -768,7 +768,7 @@ class LoginController extends BaseController
 												] );
 
 		$client->publish( [
-							  'TargetArn'          => $endpoint,
+							  'TargetArn'          => $endpoint->EndpointArn,
 							  'Message'            => 'Welcome to Push Notifications',
 							  'Subject'            => 'MobStar',
 							  'MessageAttributues' => [
