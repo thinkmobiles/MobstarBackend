@@ -659,11 +659,9 @@ public function reply()
 						break;
 
 					case "starred":
-						$stars = Star::where('user_star_star_id', '=', $session->session_user_id);
+						$stars = Star::where('user_star_star_id', '=', $session->session_user_id)->get();
 
 						$users = [];
-
-						var_dump($stars);
 
 						foreach($stars as $star)
 						{
