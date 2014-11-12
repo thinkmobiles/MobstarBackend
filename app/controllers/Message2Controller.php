@@ -669,13 +669,14 @@ public function reply()
 							var_dump($star);
 							$users[] = $star->user_star_user_id;
 						}
+						var_dump($users);
 						break;
 
 				}
 
 				foreach ($users as $user)
 				{
-					$recipients = [$user];
+					$recipients = $user;
 					$message = $input['message'];
 
 					$recipArray = [ ];
