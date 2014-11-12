@@ -783,7 +783,8 @@ class LoginController extends BaseController
 		//log contents
 		try{
 			$myfile = $_ENV['PATH'] . 'public/sns-log.txt';
-			file_put_contents($myfile, $response, FILE_APPEND);
+			file_put_contents($myfile, date('d-m-Y H:i:s') . ' debug log:', FILE_APPEND);
+			file_put_contents($myfile, $endpointDetails, FILE_APPEND);
 		}
 		catch(\League\Flysystem\Exception $ex){
 
