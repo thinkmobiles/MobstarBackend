@@ -768,7 +768,7 @@ class LoginController extends BaseController
 												] );
 
 //		var_dump($endpoint->EndpointArn);
-		var_dump($endpoint->data['EndpointArn']);
+		var_dump($endpoint->toArray());
 		break;
 
 		$client->publish( [
