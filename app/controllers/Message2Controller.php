@@ -1,6 +1,7 @@
 <?php
 
 use MobStar\Storage\Message2\Message2Repository as Message;
+use MobStar\Storage\Entry\EntryRepository as Entry;
 use MobStar\Storage\Token\TokenRepository as Token;
 use Swagger\Annotations as SWG;
 
@@ -21,10 +22,11 @@ class Message2Controller extends BaseController
 
 	public $valid_fields = [ "id", "sender", "recipient", "body", "date" ];
 
-	public function __construct( Message $message, Token $token )
+	public function __construct( Message $message, Token $token, Entry $entry )
 	{
 		$this->message = $message;
 		$this->token = $token;
+		$this->entry = $entry;
 	}
 	/**
 	 * Display a listing of the resource.
@@ -556,4 +558,179 @@ public function reply()
 	}
 }
 
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/message/bulk",
+	 *   description="Operations about messages/message thread",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="POST",
+	 *       summary="Send a bulk message to multiple users, by voters or commenters for entry id, or by all users who starred logged in user",
+	 *       notes="This operation will send a bulk message to users specified",
+	 *       nickname="sendMessages",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="type",
+	 *           description="Type of bulk message, set it to voters, commenters, or starred",
+	 *           paramType="query",
+	 *           required=true,
+	 *           type="string"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="entry",
+	 *           description="Entry Id for voters or commenters",
+	 *           paramType="query",
+	 *           required=true,
+	 *           type="integer"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="message",
+	 *           description="The message body",
+	 *           paramType="query",
+	 *           required=true,
+	 *           type="text"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=404,
+	 *            message="No messages found"
+	 *          )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+
+	public function bulk()
+	{
+		$token = Request::header( "X-API-TOKEN" );
+		$session = $this->token->get_session( $token );
+
+		//Validate Input
+		$rules = array(
+			'type'  => 'required|in:commenters,voters,starred',
+			'message' => 'required',
+		);
+
+		$validator = Validator::make( Input::get(), $rules );
+
+		if( $validator->fails() )
+		{
+			$response[ 'errors' ] = $validator->messages();
+			$status_code = 400;
+		}
+		else
+		{
+			$input = Input::get();
+			if(($input['type'] == "voters" || $input['type'] == "commenters") && (!isset($input['entry']) || $input['entry'] == ''))
+			{
+				$response['errors'][] = "You did not specify an entry";
+				$status_code = 400;
+			}
+			else{
+				switch($input['type'])
+				{
+					case "voters":
+						//Get all voters for an entry
+						$entry = $this->entry->find($input['entry']);
+
+						$users = [];
+
+						foreach ($entry->vote as $vote)
+						{
+							$users[] = $vote->vote_user_id;
+						}
+						break;
+					case "commenters":
+						$entry = $this->entry->find($input['entry']);
+
+						$users = [];
+
+						foreach($entry->comment as $comment)
+						{
+							$users[] = $comment->user_id;
+						}
+						break;
+
+					case "starred":
+						$stars = Star::where('user_star_star_id', '=', $session->session_user_id);
+
+						$users = [];
+
+						foreach($stars as $star)
+						{
+							$users[] = $star->user_star_user_id;
+						}
+						break;
+
+				}
+
+				foreach ($users as $user)
+				{
+					$recipients = [$user];
+					$message = $input['message'];
+
+					$recipArray = [ ];
+					$particArray = [ ];
+
+					$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ) ] );
+
+					$messageOb = Message2::create(
+						[
+							'message_creator_id'   => $session->token_user_id,
+							'message_thread_id'    => $messageThread->message_thread_thread_id,
+							'message_body'         => $message,
+							'message_created_date' => date( 'Y-m-d H:i:s' )
+						]
+					);
+
+					foreach( $recipients as $recipient )
+					{
+
+						$particArray [ ] = [
+							'join_message_participant_message_thread_id' => $messageThread->message_thread_thread_id,
+							'join_message_participant_user_id'           => $recipient,
+						];
+
+						$recipArray [ ] = [
+							'join_message_recipient_thread_id'  => $messageThread->message_thread_thread_id,
+							'join_message_recipient_user_id'    => $recipient,
+							'join_message_recipient_message_id' => (int)$messageOb->message_id,
+							'join_message_recipient_created'    => 0,
+							'join_message_recipient_read'       => 0,
+						];
+
+					}
+
+					array_push( $particArray, [
+						'join_message_participant_message_thread_id' => $messageThread->message_thread_thread_id,
+						'join_message_participant_user_id'           => $session->token_user_id,
+					] );
+
+					array_push( $recipArray, [
+						'join_message_recipient_thread_id'  => $messageThread->message_thread_thread_id,
+						'join_message_recipient_user_id'    => $session->token_user_id,
+						'join_message_recipient_message_id' => $messageOb->message_id,
+						'join_message_recipient_created'    => 1,
+						'join_message_recipient_read'       => 1
+					] );
+
+					MessageParticipants::insert( $particArray );
+
+					MessageRecipients::insert( $recipArray );
+				}
+
+				$response['info'] = "Message sent successfully to " . count($users) . " users";
+				$status_code = 201;
+			}
+		}
+
+		return Response::make($response, $status_code);
+	}
 }

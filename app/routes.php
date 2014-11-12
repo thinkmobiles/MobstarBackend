@@ -263,6 +263,11 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "Message2Controller@reply"
 		] );
 
+		Route::post( "message/bulk", [
+			"as"   => "message/bulk",
+			"uses" => "Message2Controller@bulk"
+		] );
+
 //		Route::delete( "message/", [
 //			"as"   => "message/destroy",
 //			"uses" => "MessageController@destroy"
