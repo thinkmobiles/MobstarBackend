@@ -347,6 +347,11 @@ class UserController extends BaseController
 	 */
 	public function show( $id_commas )
 	{
+
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
 		$client = getS3Client();
 
 		$status_code = 200;
@@ -532,53 +537,10 @@ class UserController extends BaseController
 			//if not just return all info
 			else
 			{
-				$stars = [ ];
+				
 
-				foreach( $user->Stars as $star )
-				{
-					if( $star->user_star_deleted == 0 )
-					{
+				$return[ 'users' ][ ][ 'user' ] = oneUser( $user, $session, true );
 
-						$stars[ ] = [ 'star_id'      => $star->Stars->user_id,
-									  'star_name'    => $star->Stars->user_display_name,
-									  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
-										  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image
-										  : '',
-						];
-
-					}
-				}
-
-				$starredBy = [ ];
-
-				foreach( $user->StarredBy as $starred )
-				{
-					if( $starred->user_star_deleted == 0 )
-					{
-						$starredBy[ ] = [ 'star_id'      => $starred->User->user_id,
-										  'star_name'    => $starred->User->user_display_name,
-										  'profileImage' => ( !empty( $starred->User->user_profile_image ) )
-											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_profile_image
-											  : '',
-						];
-					}
-
-				}
-
-				$return[ 'users' ][ ][ 'user' ] = [ 'id'           => $user->user_id,
-													'userName'     => $user->user_name,
-													'displayName'  => $user->user_display_name,
-													'fullName'     => $user->user_full_name,
-													'email'        => $user->user_email,
-													'profileImage' => ( !empty( $user->user_profile_image ) )
-														? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+10 minutes' )
-														: '',
-													'profileCover' => ( !empty( $user->user_cover_image ) )
-														? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+10 minutes' )
-														: '',
-													'stars'        => $stars,
-													'starredBy'    => $starredBy,
-				];
 
 			}
 		}
