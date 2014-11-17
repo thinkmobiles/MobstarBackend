@@ -751,7 +751,7 @@ class LoginController extends BaseController
 	{
 		if( $device->device_registration_device_type == "apple" )
 		{
-			$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS_SANDBOX/com.mobstar";
+			$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/com.mobstar.prod";
 		}
 		else
 		{
