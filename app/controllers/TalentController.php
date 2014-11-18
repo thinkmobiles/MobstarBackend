@@ -38,7 +38,7 @@ class TalentController extends BaseController
 	 *           description="Current or All time.",
 	 *           paramType="query",
 	 *           required=false,
-	 *           type="string"
+	 *           type="string",
 	 *             enum="['current','allTime']"
 	 *         )
 	 * 		  ),
