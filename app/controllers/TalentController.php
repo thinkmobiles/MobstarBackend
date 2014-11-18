@@ -33,6 +33,14 @@ class TalentController extends BaseController
 	 *       summary="Get the current users top talents",
 	 *       notes="Returns entry objects",
 	 *       nickname="getAllComments",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="period",
+	 *           description="Current or All time.",
+	 *           paramType="query",
+	 *           required=false,
+	 *           type="string"
+	 *         )
 	 *       @SWG\ResponseMessages(
 	 *          @SWG\ResponseMessage(
 	 *            code=401,
