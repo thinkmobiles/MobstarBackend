@@ -177,7 +177,6 @@ function oneEntry( $entry, $session, $includeUser = false )
 		{
 			$down_votes++;
 		}
-
 	}
 
 	$current[ 'id' ] = $entry->entry_id;
