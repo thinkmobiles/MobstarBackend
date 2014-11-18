@@ -56,7 +56,7 @@ class TalentController extends BaseController
 
 		$session = $this->token->get_session( $token );
 
-		$votes = Vote::where( 'vote_user_id', '=', $session->token_user_id )->list( 'vote_entry_id' );
+		$votes = Vote::where( 'vote_user_id', '=', $session->token_user_id )->lists( 'vote_entry_id' );
 
 		$entries = Entry::whereIn( 'entry_id', $votes )->get();
 
