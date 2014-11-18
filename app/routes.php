@@ -167,6 +167,11 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "EntryController@search"
 		] );
 
+		Route::get( "entry/search2", [
+			"as"   => "entry/search2",
+			"uses" => "EntryController@search2"
+		] );
+
 		Route::get( "entry/{id}", [
 			"as"   => "entry/show",
 			"uses" => "EntryController@show"

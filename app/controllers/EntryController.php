@@ -1933,6 +1933,37 @@ class EntryController extends BaseController
 		return Response::make( $return, $status_code );
 	}
 
+	public function search2()
+	{
+
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		$term = Input::get( "term" );
+
+		$results = $this->entry->search( $term );
+
+		$status_code = 200;
+
+		if( count( $results ) == 0 )
+		{
+			$return = json_encode( [ 'error' => 'No Entries Found' ] );
+			$status_code = 404;
+		}
+
+		else
+		{
+			$return = [ ];
+			foreach( $results as $entry )
+			{
+				$return[ 'entries' ][ ][ 'entry' ] = oneEntry( $entry, $session, true );
+			}
+		}
+
+		return Response::make( $return, $status_code );
+	}
+
 	//////////////////////      Rerank function for Cron Job        \\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 	public function rerank()
