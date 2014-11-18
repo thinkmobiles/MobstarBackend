@@ -32,7 +32,6 @@ class TalentController extends BaseController
 	 *       method="GET",
 	 *       summary="Get the current users top talents",
 	 *       notes="Returns entry objects",
-	 *       nickname="getAllComments",
 	 *       @SWG\Parameters(
 	 *         @SWG\Parameter(
 	 *           name="period",
@@ -41,6 +40,7 @@ class TalentController extends BaseController
 	 *           required=false,
 	 *           type="string"
 	 *         )
+	 * 		  )
 	 *       @SWG\ResponseMessages(
 	 *          @SWG\ResponseMessage(
 	 *            code=401,
