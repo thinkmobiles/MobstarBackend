@@ -17,6 +17,11 @@ use Swagger\Annotations as SWG;
 class TalentController extends BaseController
 {
 
+	public function __construct( Token $token )
+	{
+		$this->token = $token;
+	}
+
 	/**
 	 *
 	 * @SWG\Api(
