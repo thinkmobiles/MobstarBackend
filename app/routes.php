@@ -371,6 +371,15 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "PrivacyController@store"
 		] );
 
+		//---------------------------------------------------------
+		// Tallent Connect
+		//---------------------------------------------------------
+
+		Route::get( "talent", [
+			"as"   => "talent/index",
+			"uses" => "TalentController@index"
+		] );
+
 	} );
 
 	// -------------------------------------------------------
