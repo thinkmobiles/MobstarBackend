@@ -39,6 +39,7 @@ class TalentController extends BaseController
 	 *           paramType="query",
 	 *           required=false,
 	 *           type="string"
+	 *             enum="['current','allTime']"
 	 *         )
 	 * 		  ),
 	 *       @SWG\ResponseMessages(
