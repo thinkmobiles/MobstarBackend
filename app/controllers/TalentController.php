@@ -40,7 +40,7 @@ class TalentController extends BaseController
 	 *           required=false,
 	 *           type="string"
 	 *         )
-	 * 		  )
+	 * 		  ),
 	 *       @SWG\ResponseMessages(
 	 *          @SWG\ResponseMessage(
 	 *            code=401,
