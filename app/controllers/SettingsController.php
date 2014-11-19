@@ -100,7 +100,7 @@ class SettingsController extends BaseController
 				'id'          => $google_user->google_user_google_id,
 				'displayName' => $google_user->google_user_display_name,
 				'userName'    => $google_user->google_user_user_name,
-				'fullName'    => $google_user->google_user_email,
+				'fullName'    => $google_user->google_user_full_name,
 			];
 		}
 		else
