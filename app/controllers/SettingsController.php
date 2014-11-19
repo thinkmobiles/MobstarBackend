@@ -121,7 +121,7 @@ class SettingsController extends BaseController
 	 *   description="Operations for settings",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
-	 *       method="GET",
+	 *       method="POST",
 	 *       summary="Get the current users linked accounts details",
 	 *       notes="Returns user account details for the logged in user",
 	 *       @SWG\Parameters(
