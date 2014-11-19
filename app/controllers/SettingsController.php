@@ -173,13 +173,13 @@ class SettingsController extends BaseController
 					break;
 
 				default:
-					$return = [ 'error' => 'Nothing added' ];
+					$return = [ 'error' => 'Nothing added - incorrect type, please select "facebook", "twitter" or "google"' ];
 			}
 
 		}
 		catch( Exception $ex )
 		{
-			return [ 'error' => "oh shit" ];
+			return [ 'error' => "An error occurred, nothing was added" ];
 		}
 
 		return $return;
