@@ -131,7 +131,7 @@ class SettingsController extends BaseController
 					$facebook_user = FacebookUser::firstOrNew( array( 'facebook_user_facebook_id' => Input::get( 'userId' ) ) );
 
 					$facebook_user->facebook_user_display_name = Input::get( 'displayName' );
-					$facebook_user->facebook_usefr_user_name = Input::get( 'userName' );
+					$facebook_user->facebook_user_user_name = Input::get( 'userName' );
 					$facebook_user->facebook_user_email = Input::get( 'email' );
 					$facebook_user->facebook_user_gender = Input::get( 'gender' );
 					$facebook_user->facebook_user_full_name = Input::get( 'fullName' );
