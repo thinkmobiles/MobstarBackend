@@ -25,7 +25,7 @@ class SettingsController extends BaseController
 	/**
 	 *
 	 * @SWG\Api(
-	 *   path="/settings/accounts",
+	 *   path="/settings/account",
 	 *   description="Operations for settings",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
@@ -56,7 +56,7 @@ class SettingsController extends BaseController
 		$session = $this->token->get_session( $token );
 
 		$user = User::find( $session->token_user_id );
-		$return[ 'user' ]['id'] = $session->token_user_id;
+		$return[ 'user' ][ 'id' ] = $session->token_user_id;
 
 		if( $user->user_facebook_id != 0 )
 		{
@@ -111,5 +111,66 @@ class SettingsController extends BaseController
 		$response = Response::make( $return, 200 );
 
 		return $response;
+	}
+
+	public function addAccount(){
+		$type = Input::get('type');
+
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		$user = User::find( $session->token_user_id );
+
+		try{
+			switch($type)
+			{
+				case "facebook":
+					$facebook_user = FacebookUser::firstOrNew( array( 'facebook_user_facebook_id' => Input::get( 'userId' ) ) );
+
+					$facebook_user->facebook_user_display_name = Input::get( 'displayName' );
+					$facebook_user->facebook_usefr_user_name = Input::get( 'userName' );
+					$facebook_user->facebook_user_email = Input::get( 'email' );
+					$facebook_user->facebook_user_gender = Input::get( 'gender' );
+					$facebook_user->facebook_user_full_name = Input::get( 'fullName' );
+
+					$facebook_user->save();
+
+					$user->user_facebook_id = $facebook_user->facebook_user_id;
+					$user->save();
+					break;
+
+				case "twitter":
+					$twitter_user = TwitterUser::firstOrNew( array( 'twitter_user_twitter_id' => Input::get( 'userId' ) ) );
+
+					$twitter_user->twitter_user_twitter_id = Input::get( 'userId' );
+					$twitter_user->twitter_user_display_name = Input::get( 'displayName' );
+					$twitter_user->twitter_user_full_name = Input::get( 'fullName' );
+					$twitter_user->twitter_user_user_name = Input::get( 'userName' );
+
+					$twitter_user->save();
+
+					$user->user_twitter_id = $twitter_user->twitter_user_id;
+					$user->save();
+					break;
+
+				case "twitter":
+					$google_user = GoogleUser::firstOrNew( array( 'google_user_google_id' => Input::get( 'userId' ) ) );
+
+					$google_user->google_user_google_id = Input::get( 'userId' );
+					$google_user->google_user_display_name = Input::get( 'displayName' );
+					$google_user->google_user_user_name = Input::get( 'userName' );
+					$google_user->google_user_full_name = Input::get( 'fullName' );
+
+					$user->user_google_id = $google_user->google_user_id;
+					$user->save();
+					break;
+			}
+
+		}
+		catch(Exception $ex)
+		{
+			return ['error' => "oh shit"];
+		}
 	}
 }
