@@ -154,6 +154,20 @@ class SettingsController extends BaseController
 	 *           type="string"
 	 *         ),
 	 *         @SWG\Parameter(
+	 *           name="email",
+	 *           description="Email address from facebook profile",
+	 *           paramType="form",
+	 *           required=false,
+	 *           type="string"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="gender",
+	 *           description="Gender, from facebook profile",
+	 *           paramType="form",
+	 *           required=false,
+	 *           type="string"
+	 *         ),
+	 *         @SWG\Parameter(
 	 *           name="type",
 	 *           description="Current or All time.",
 	 *           paramType="query",
