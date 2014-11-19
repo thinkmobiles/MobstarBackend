@@ -113,8 +113,9 @@ class SettingsController extends BaseController
 		return $response;
 	}
 
-	public function addAccount(){
-		$type = Input::get('type');
+	public function addAccount()
+	{
+		$type = Input::get( 'type' );
 
 		$token = Request::header( "X-API-TOKEN" );
 
@@ -122,8 +123,9 @@ class SettingsController extends BaseController
 
 		$user = User::find( $session->token_user_id );
 
-		try{
-			switch($type)
+		try
+		{
+			switch( $type )
 			{
 				case "facebook":
 					$facebook_user = FacebookUser::firstOrNew( array( 'facebook_user_facebook_id' => Input::get( 'userId' ) ) );
@@ -138,6 +140,7 @@ class SettingsController extends BaseController
 
 					$user->user_facebook_id = $facebook_user->facebook_user_id;
 					$user->save();
+					$return = [ 'info' => 'Facebook user added' ];
 					break;
 
 				case "twitter":
@@ -152,6 +155,7 @@ class SettingsController extends BaseController
 
 					$user->user_twitter_id = $twitter_user->twitter_user_id;
 					$user->save();
+					$return = [ 'info' => 'Twitter user added' ];
 					break;
 
 				case "twitter":
@@ -164,13 +168,20 @@ class SettingsController extends BaseController
 
 					$user->user_google_id = $google_user->google_user_id;
 					$user->save();
+					$return = [ 'info' => 'Google user added' ];
+
 					break;
+
+				default:
+					$return = [ 'error' => 'Nothing added' ];
 			}
 
 		}
-		catch(Exception $ex)
+		catch( Exception $ex )
 		{
-			return ['error' => "oh shit"];
+			return [ 'error' => "oh shit" ];
 		}
+
+		return $return;
 	}
 }
