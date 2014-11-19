@@ -58,7 +58,7 @@ class SettingsController extends BaseController
 		$user = User::find( $session->token_user_id );
 		$return[ 'user' ]['id'] = $session->token_user_id;
 
-		if( $user->facebook_user_id != 0 )
+		if( $user->user_facebook_id != 0 )
 		{
 			$facebook_user = FacebookUser::find( $user->user_facebook_id );
 
@@ -76,7 +76,7 @@ class SettingsController extends BaseController
 			$return[ 'user' ][ 'facebook' ] = false;
 		}
 
-		if( $user->twitter_user_id != 0 )
+		if( $user->user_twitter_id != 0 )
 		{
 			$twitter_user = TwitterUser::find( $user->user_twitter_id );
 
@@ -92,7 +92,7 @@ class SettingsController extends BaseController
 			$return[ 'user' ][ 'twitter' ] = false;
 		}
 
-		if( $user->google_user_id != 0 )
+		if( $user->user_google_id != 0 )
 		{
 			$google_user = GoogleUser::find( $user->user_google_id );
 

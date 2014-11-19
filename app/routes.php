@@ -384,7 +384,7 @@ Route::group( [ "before" => "auth" ], function ()
 		// Settings
 		//---------------------------------------------------------
 
-		Route::get( "settings", [
+		Route::get( "settings/account", [
 			"as"   => "settings/account",
 			"uses" => "SettingsController@account"
 		] );
