@@ -389,6 +389,11 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "SettingsController@account"
 		] );
 
+		Route::post( "settings/account", [
+			"as"   => "settings/account",
+			"uses" => "SettingsController@addAccount"
+		] );
+
 	} );
 
 	// -------------------------------------------------------
