@@ -113,6 +113,70 @@ class SettingsController extends BaseController
 		return $response;
 	}
 
+
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/settings/account",
+	 *   description="Operations for settings",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="GET",
+	 *       summary="Get the current users linked accounts details",
+	 *       notes="Returns user account details for the logged in user",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="userId",
+	 *           description="Google/Facebook/Twitter user ID",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="integer"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="displayName",
+	 *           description="Name from Google/Facebook/Twitter profile",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="userName",
+	 *           description="Email address from Google/Facebook/Twitter profile",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="fullName",
+	 *           description="Full Name from Google/Facebook/Twitter profile",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="type",
+	 *           description="Current or All time.",
+	 *           paramType="query",
+	 *           required=true,
+	 *           type="string",
+	 *           enum="['google','facebook','twitter']"
+	 *         )
+	 * 		 ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=404,
+	 *            message="No entries found"
+	 *          )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+
 	public function addAccount()
 	{
 		$type = Input::get( 'type' );
