@@ -122,8 +122,8 @@ class SettingsController extends BaseController
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="POST",
-	 *       summary="Get the current users linked accounts details",
-	 *       notes="Returns user account details for the logged in user",
+	 *       summary="Add a new account to users linked accounts",
+	 *       notes="",
 	 *       @SWG\Parameters(
 	 *         @SWG\Parameter(
 	 *           name="userId",
