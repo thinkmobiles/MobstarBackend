@@ -372,12 +372,21 @@ Route::group( [ "before" => "auth" ], function ()
 		] );
 
 		//---------------------------------------------------------
-		// Tallent Connect
+		// Talent Connect
 		//---------------------------------------------------------
 
 		Route::get( "talent", [
 			"as"   => "talent/index",
 			"uses" => "TalentController@index"
+		] );
+
+		//---------------------------------------------------------
+		// Settings
+		//---------------------------------------------------------
+
+		Route::get( "settings", [
+			"as"   => "settings/account",
+			"uses" => "SettingsController@account"
 		] );
 
 	} );
