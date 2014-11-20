@@ -153,10 +153,9 @@ function oneUser( $user, $session, $includeStars = false )
 
 			foreach( $user->StarredBy as $starred )
 			{
-
+				var_dump($starred);
 					if( $starred->user_star_deleted == 0 )
 					{
-						echo $starred->User->user_id;
 
 							$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
 											  'starName'     => $starred->User->user_display_name,
