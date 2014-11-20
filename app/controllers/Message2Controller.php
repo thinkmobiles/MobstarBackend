@@ -614,7 +614,7 @@ public function reply()
 
 		//Validate Input
 		$rules = array(
-			'type'  => 'required|in:commenters,voters,starred',
+			'type'  => 'required|in:commenters,voters,starred,allVoters',
 			'message' => 'required',
 		);
 
