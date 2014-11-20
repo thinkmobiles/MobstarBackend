@@ -622,9 +622,9 @@ class VoteController extends BaseController
 		foreach( $votes as $vote )
 		{
 			$current[ 'id' ] = $vote->vote_id;
-			var_dump($vote->user);
-//			$current[ 'user' ] = oneUser( $vote->user, $session, true );
-//			$current[ 'entry' ] = oneEntry( $vote->entry, $session, true );
+
+			$current[ 'user' ] = oneUser( $vote->user, $session, true );
+			$current[ 'entry' ] = oneEntry( $vote->entry, $session, true );
 
 			if( $vote[ 'vote_up' ] == 1 && $vote[ 'vote_down' ] == 0 )
 			{
