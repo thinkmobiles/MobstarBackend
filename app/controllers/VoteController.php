@@ -562,7 +562,7 @@ class VoteController extends BaseController
 
 		$session = $this->token->get_session( $token );
 
-		$entries = Entry::where('entery_user_id', '=', $session->token_user_id)->lists('entry_id');
+		$entries = Entry::where('entry_user_id', '=', $session->token_user_id)->lists('entry_id');
 
 		//Get subCategory
 		$type = ( Input::get( 'type', '0' ) );
