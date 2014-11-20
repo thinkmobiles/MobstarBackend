@@ -572,7 +572,7 @@ public function reply()
 	 *       @SWG\Parameters(
 	 *         @SWG\Parameter(
 	 *           name="type",
-	 *           description="Type of bulk message, set it to voters, commenters, or starred",
+	 *           description="Type of bulk message, set it to voters, allVoters, commenters, or starred",
 	 *           paramType="query",
 	 *           required=true,
 	 *           type="string"
@@ -670,6 +670,18 @@ public function reply()
 						}
 						break;
 
+					case "allVoters":
+						$entries = $this->entry->all($session->token_user_id, 0, 0, 0, 'desc', 1000000, 0);
+						$users = [];
+						foreach($entries as $entry)
+						{
+							foreach ($entry->votes as $vote)
+							{
+								$users[] = $vote->vote_user_id;
+							}
+						}
+						$users = array_unique($users);
+						break;
 				}
 
 				foreach ($users as $user)
