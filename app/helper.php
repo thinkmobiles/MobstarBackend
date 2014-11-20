@@ -173,16 +173,13 @@ function oneUser( $user, $session, $includeStars = false )
 					var_dump($ex);
 				}
 			}
-
-			}
-
 			$return[ 'starredBy' ] = $starredBy;
+
 		}
-
-
 
 	return $return;
 }
+
 
 function oneEntry( $entry, $session, $includeUser = false )
 {
