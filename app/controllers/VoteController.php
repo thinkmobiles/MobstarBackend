@@ -613,7 +613,7 @@ class VoteController extends BaseController
 		elseif($order == 'date')
 			$orderBy = 'vote_created_date';
 
-		$votes = $this->vote->for_entries($entries, $up, $down, $limit, $offset, $order, false);
+		$votes = $this->vote->for_entries($entries, $up, $down, $limit, $offset, $orderBy, false);
 
 		$count = $this->vote->for_entries($entries, $up, $down, 0, 0, $order, true);
 
