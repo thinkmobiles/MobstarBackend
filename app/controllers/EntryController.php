@@ -253,14 +253,6 @@ class EntryController extends BaseController
 				$user = User::find( $user );
 				$current[ 'id' ] = null;
 				$current[ 'user' ] = oneUser( $user, $session );
-//				$current[ 'user' ][ 'userId' ] = $user->user_id;
-//				$current[ 'user' ][ 'userName' ] = $user->user_name;
-//				$current[ 'user' ][ 'displayName' ] = $user->user_display_name;
-//				$current[ 'user' ][ 'email' ] = $user->user_email;
-//				$current[ 'user' ][ 'profileImage' ] = ( !empty( $user->user_profile_image ) )
-//					? "http://" . $_ENV[ 'URL' ] . "/" . $user->user_profile_image : "";
-//				$current[ 'user' ][ 'profileCover' ] = ( !empty( $user->user_profile_cover ) )
-//					? "http://" . $_ENV[ 'URL' ] . "/" . $user->user_profile_cover : "";
 				$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $user->user_id )->count();
 				$current[ 'category' ] = null;
 				$current[ 'type' ] = null;
