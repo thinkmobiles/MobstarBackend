@@ -157,21 +157,12 @@ function oneUser( $user, $session, $includeStars = false )
 					if( $starred->user_star_deleted == 0 )
 					{
 
-						try
-						{
 							$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
 											  'starName'     => $starred->User->user_display_name,
 											  'profileImage' => ( isset( $starred->User->user_profile_image ) )
 												  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+10 minutes' )
 												  : '',
 							];
-						}
-						catch(\Exception $ex)
-						{
-							$user->user_id;
-
-							var_dump($ex);
-						}
 					}
 			}
 			$return[ 'starredBy' ] = $starredBy;
