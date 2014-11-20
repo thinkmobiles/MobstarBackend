@@ -7,4 +7,6 @@ interface VoteRepository {
 	public function create($input);
 
 	public function delete_previous($delete);
+
+	public function for_entries($entries, $up, $down, $limit, $offset, $order, $count);
 }

@@ -557,4 +557,98 @@ class VoteController extends BaseController
 		return Response::make( $response, $status_code );
 	}
 
+	public function forMe(){
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		$entries = Entry::where('entery_user_id', '=', $session->$token_user_id)->lists('entry_id');
+
+		//Get subCategory
+		$type = ( Input::get( 'type', '0' ) );
+
+		if( $type )
+		{
+			if( $type == "up" )
+			{
+				$up = true;
+				$down = false;
+			}
+			else
+			{
+				if( $type == 'down' )
+				{
+					$down = true;
+					$up = false;
+				}
+			}
+		}
+
+
+		//Get limit to calculate pagination
+		$limit = ( Input::get( 'limit', '50' ) );
+
+		//If not numeric set it to the default limit
+		$limit = ( !is_numeric( $limit ) || $limit < 1 ) ? 50 : $limit;
+
+		//Get page
+		$page = Input::get( 'page', '1' );
+		$page = ( !is_numeric( $page ) ) ? 1 : $page;
+
+		//Calculate offset
+		$offset = ( $page * $limit ) - $limit;
+
+		//If page is greter than one show a previous link
+		if( $page > 1 )
+		{
+			$previous = true;
+		}
+		else
+		{
+			$previous = false;
+		}
+
+		$order = Input::get('order', 'date');
+
+		if($order == 'name')
+			$orderBy = 'user_name';
+
+		elseif($order == 'date')
+			$orderBy = 'vote_created_date';
+
+		$votes = $this->vote->for_entries($entries, $up, $down, $limit, $offset, $order, false);
+
+		$count = $this->vote->for_entries($entries, $up, $down, 0, 0, $order, true);
+
+		$return = [];
+
+		foreach ($votes as $vote)
+		{
+			$current[ 'id' ] = $vote->vote_id;
+			$current[ 'user' ] = oneUser($vote->user, $session,  true);
+			$current[ 'entry' ] = oneEntry($vote->entry, $session, true);
+
+			if( $vote[ 'vote_up' ] == 1 && $vote[ 'vote_down' ] == 0 )
+			{
+				$current[ 'type' ] = "Upvote";
+			}
+			elseif( $vote[ 'vote_up' ] == 0 && $vote[ 'vote_down' ] == 1 )
+			{
+				$current[ 'type' ] = "Downvote";
+			}
+			else
+			{
+				$current[ 'type' ] = "Error";
+			}
+
+			$return[ 'votes' ][ ][ 'vote' ] = $current;
+		}
+
+		$response = Response::make( $return, 200 );
+
+		$response->header( 'X-Total-Count', $count );
+
+		return $response;
+	}
+
 }

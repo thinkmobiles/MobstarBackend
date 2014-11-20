@@ -33,6 +33,34 @@ class EloquentVoteRepository implements VoteRepository {
 	}
 
 
+	public function forEntries($entries,$up = false, $down = false, $limit = 0, $offset = 0, $order = 'vote_created_date',  $count = false){
+		$query = Vote::with('user', 'entry')->where('vote_id', '>', 0);
+
+		$query->whereIn('vote_entry_id', $entries);
+
+		if($up)
+			$query->where('vote_up', '=', '1');
+
+		if($down)
+			$query->where('vote_down', '=', '1');
+
+		if($count)
+			return $query->count();
+
+		//TODO: figure out a way to order by user name
+//
+//		if($order = 'user_display_name')
+//		{
+		//closure goes here
+//			$query = $query->with()
+//		}
+
+		$query->orderBy($order, 'desc');
+
+		return $query->take($limit)->skip($offset)->get();
+	}
+
+
 
 	public function create($input)
 	{

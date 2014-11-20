@@ -235,6 +235,12 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "VoteController@index"
 		] );
 
+
+		Route::get( "vote/forme", [
+			"as"   => "vote/forme",
+			"uses" => "VoteController@forMe"
+		] );
+
 		Route::post( "vote", [
 			"as"   => "vote/store",
 			"uses" => "VoteController@store"
