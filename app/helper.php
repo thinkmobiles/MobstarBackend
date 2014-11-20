@@ -82,7 +82,7 @@ function oneUser( $user, $session, $includeStars = false )
 					? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+10 minutes' ) : '',
 	];
 
-	if( ( $user->user_display_name == '') || ( is_null($user->user_name) ) || ( is_null( $user->user_email ) ) )
+	if( ( $user->user_display_name == '' ) || ( is_null( $user->user_name ) ) || ( is_null( $user->user_email ) ) )
 	{
 		if( $user->user_facebook_id != 0 )
 		{
@@ -115,63 +115,47 @@ function oneUser( $user, $session, $includeStars = false )
 		$return[ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $user->user_id )->where( 'user_star_deleted', '!=', '1' )->count();
 	}
 
-		if( $includeStars )
+	if( $includeStars )
+	{
+		$stars = [ ];
+
+		foreach( $user->Stars as $star )
 		{
-			$stars = [ ];
 
-
-			foreach( $user->Stars as $star )
+			if( $star->user_star_deleted == 0 )
 			{
-
-				try
-				{
-					if( $star->user_star_deleted == 0 )
-					{
-
-						$stars[ ] = [ 'starId'       => $star->Stars->user_id,
-									  'starName'     => $star->Stars->user_display_name,
-									  'profileImage' => ( isset( $star->Stars->user_profile_image ) )
-										  ? $client->getObjectUrl( 'mobstar-1', $star->Stars->user_profile_image, '+10 minutes' )
-										  : '',
-						];
-
-					}
-				}
-
-				catch(Exception $ex)
-				{
-					$user->user_id;
-
-					var_dump($ex);
-				}
+				$stars[ ] = [ 'starId'       => $star->Stars->user_id,
+							  'starName'     => $star->Stars->user_display_name,
+							  'profileImage' => ( isset( $star->Stars->user_profile_image ) )
+								  ? $client->getObjectUrl( 'mobstar-1', $star->Stars->user_profile_image, '+10 minutes' )
+								  : '',
+				];
 			}
-
-			$return[ 'stars' ] = $stars;
-
-			$starredBy = [ ];
-
-
-			foreach( $user->StarredBy as $starred )
-			{
-				var_dump($starred);
-					if( $starred->user_star_deleted == 0 )
-					{
-
-							$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
-											  'starName'     => $starred->User->user_display_name,
-											  'profileImage' => ( isset( $starred->User->user_profile_image ) )
-												  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+10 minutes' )
-												  : '',
-							];
-					}
-			}
-			$return[ 'starredBy' ] = $starredBy;
-
 		}
+
+		$return[ 'stars' ] = $stars;
+
+		$starredBy = [ ];
+
+		foreach( $user->StarredBy as $starred )
+		{
+			if( $starred->user_star_deleted == 0 )
+			{
+
+				$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
+								  'starName'     => $starred->User->user_display_name,
+								  'profileImage' => ( isset( $starred->User->user_profile_image ) )
+									  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+10 minutes' )
+									  : '',
+				];
+			}
+		}
+		$return[ 'starredBy' ] = $starredBy;
+
+	}
 
 	return $return;
 }
-
 
 function oneEntry( $entry, $session, $includeUser = false )
 {
