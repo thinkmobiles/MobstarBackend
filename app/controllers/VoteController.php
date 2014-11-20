@@ -565,22 +565,19 @@ class VoteController extends BaseController
 		$entries = Entry::where('entry_user_id', '=', $session->token_user_id)->lists('entry_id');
 
 		//Get subCategory
-		$type = ( Input::get( 'type', '0' ) );
+		$type = ( Input::get( 'type', 'up' ) );
 
-		if( $type )
+		if( $type == "up" )
 		{
-			if( $type == "up" )
+			$up = true;
+			$down = false;
+		}
+		else
+		{
+			if( $type == 'down' )
 			{
-				$up = true;
-				$down = false;
-			}
-			else
-			{
-				if( $type == 'down' )
-				{
-					$down = true;
-					$up = false;
-				}
+				$down = true;
+				$up = false;
 			}
 		}
 
