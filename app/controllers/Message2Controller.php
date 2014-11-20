@@ -675,7 +675,7 @@ public function reply()
 						$users = [];
 						foreach($entries as $entry)
 						{
-							foreach ($entry->votes as $vote)
+							foreach ($entry->vote as $vote)
 							{
 								$users[] = $vote->vote_user_id;
 							}
