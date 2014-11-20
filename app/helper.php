@@ -166,7 +166,7 @@ function oneUser( $user, $session, $includeStars = false )
 												  : '',
 							];
 						}
-						catch(Exception $ex)
+						catch(\Whoops\Exception\ErrorException $ex)
 						{
 							$user->user_id;
 
