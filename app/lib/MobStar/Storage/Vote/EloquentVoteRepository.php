@@ -33,7 +33,7 @@ class EloquentVoteRepository implements VoteRepository {
 	}
 
 
-	public function forEntries($entries,$up = false, $down = false, $limit = 0, $offset = 0, $order = 'vote_created_date',  $count = false){
+	public function for_entries($entries,$up = false, $down = false, $limit = 0, $offset = 0, $order = 'vote_created_date',  $count = false){
 		$query = Vote::with('user', 'entry')->where('vote_id', '>', 0);
 
 		$query->whereIn('vote_entry_id', $entries);
