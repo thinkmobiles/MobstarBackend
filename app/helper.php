@@ -150,17 +150,29 @@ function oneUser( $user, $session, $includeStars = false )
 
 			$starredBy = [ ];
 
+
 			foreach( $user->StarredBy as $starred )
 			{
-				if( $starred->user_star_deleted == 0 )
+				try
 				{
-					$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
-									  'starName'     => $starred->User->user_display_name,
-									  'profileImage' => ( isset( $starred->User->user_profile_image ) )
-										  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+10 minutes' )
-										  : '',
-					];
+
+					if( $starred->user_star_deleted == 0 )
+					{
+						$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
+										  'starName'     => $starred->User->user_display_name,
+										  'profileImage' => ( isset( $starred->User->user_profile_image ) )
+											  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+10 minutes' )
+											  : '',
+						];
+					}
 				}
+				catch(Exception $ex)
+				{
+					$user->user_id;
+
+					var_dump($ex);
+				}
+			}
 
 			}
 
