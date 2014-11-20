@@ -671,7 +671,7 @@ public function reply()
 						break;
 
 					case "allVoters":
-						$entries = $this->entry->all($session->token_user_id, 0, 0, 0, 'desc', 1000000, 0);
+						$entries = $this->entry->all($session->token_user_id, 0, 0, 0, 0, 'desc', 1000000, 0);
 						$users = [];
 						foreach($entries as $entry)
 						{
