@@ -115,24 +115,34 @@ function oneUser( $user, $session, $includeStars = false )
 		$return[ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $user->user_id )->where( 'user_star_deleted', '!=', '1' )->count();
 	}
 
-	try
-	{
 		if( $includeStars )
 		{
 			$stars = [ ];
 
+
 			foreach( $user->Stars as $star )
 			{
-				if( $star->user_star_deleted == 0 )
+
+				try
 				{
+					if( $star->user_star_deleted == 0 )
+					{
 
-					$stars[ ] = [ 'starId'       => $star->Stars->user_id,
-								  'starName'     => $star->Stars->user_display_name,
-								  'profileImage' => ( isset( $star->Stars->user_profile_image ) )
-									  ? $client->getObjectUrl( 'mobstar-1', $star->Stars->user_profile_image, '+10 minutes' )
-									  : '',
-					];
+						$stars[ ] = [ 'starId'       => $star->Stars->user_id,
+									  'starName'     => $star->Stars->user_display_name,
+									  'profileImage' => ( isset( $star->Stars->user_profile_image ) )
+										  ? $client->getObjectUrl( 'mobstar-1', $star->Stars->user_profile_image, '+10 minutes' )
+										  : '',
+						];
 
+					}
+				}
+
+				catch(Exception $ex)
+				{
+					$user->user_id;
+
+					var_dump($ex);
 				}
 			}
 
@@ -157,13 +167,6 @@ function oneUser( $user, $session, $includeStars = false )
 			$return[ 'starredBy' ] = $starredBy;
 		}
 
-	}
-	catch(Exception $ex)
-	{
-		$user->user_id;
-
-		var_dump($ex);
-	}
 
 
 	return $return;
