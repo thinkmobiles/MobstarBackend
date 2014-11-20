@@ -218,7 +218,6 @@ class VoteController extends BaseController
 
 		$session = $this->token->get_session( $token );
 
-
 		foreach( $votes as $vote )
 		{
 
@@ -235,13 +234,13 @@ class VoteController extends BaseController
 
 				if( in_array( "user", $fields ) )
 				{
-					$current[ 'user' ] = oneUser($vote->user, $session,  true);
+					$current[ 'user' ] = oneUser( $vote->user, $session, true );
 
 				}
 
 				if( in_array( "entry", $fields ) )
 				{
-					$current[ 'entry' ] = oneEntry($vote->entry, $session, true);
+					$current[ 'entry' ] = oneEntry( $vote->entry, $session, true );
 				}
 
 				if( in_array( "type", $fields ) )
@@ -272,8 +271,8 @@ class VoteController extends BaseController
 			{
 
 				$current[ 'id' ] = $vote->vote_id;
-				$current[ 'user' ] = oneUser($vote->user, $session,  true);
-				$current[ 'entry' ] = oneEntry($vote->entry, $session, true);
+				$current[ 'user' ] = oneUser( $vote->user, $session, true );
+				$current[ 'entry' ] = oneEntry( $vote->entry, $session, true );
 
 				if( $vote[ 'vote_up' ] == 1 && $vote[ 'vote_down' ] == 0 )
 				{
@@ -557,33 +556,30 @@ class VoteController extends BaseController
 		return Response::make( $response, $status_code );
 	}
 
-	public function forMe(){
+	public function forMe()
+	{
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
 
-		$entries = Entry::where('entry_user_id', '=', $session->token_user_id)->lists('entry_id');
+		$entries = Entry::where( 'entry_user_id', '=', $session->token_user_id )->lists( 'entry_id' );
 
 		//Get subCategory
 		$type = ( Input::get( 'type', 'up' ) );
 
-		if( $type == "up" )
+		if( $type != "down" )
 		{
 			$up = true;
 			$down = false;
 		}
 		else
 		{
-			if( $type == 'down' )
-			{
-				$down = true;
-				$up = false;
-			}
+			$down = true;
+			$up = false;
 		}
 
-
 		//Get limit to calculate pagination
-		$limit = ( Input::get( 'limit', '50' ) );
+		$limit = Input::get( 'limit', '50' );
 
 		//If not numeric set it to the default limit
 		$limit = ( !is_numeric( $limit ) || $limit < 1 ) ? 50 : $limit;
@@ -605,25 +601,30 @@ class VoteController extends BaseController
 			$previous = false;
 		}
 
-		$order = Input::get('order', 'date');
+		$order = Input::get( 'order', 'date' );
 
-		if($order == 'name')
+		if( $order == 'name' )
+		{
 			$orderBy = 'user_name';
+		}
 
-		elseif($order == 'date')
+		elseif( $order == 'date' )
+		{
 			$orderBy = 'vote_created_date';
+		}
 
-		$votes = $this->vote->for_entries($entries, $up, $down, $limit, $offset, $orderBy, false);
+		$votes = $this->vote->for_entries( $entries, $up, $down, $limit, $offset, $orderBy, false );
 
-		$count = $this->vote->for_entries($entries, $up, $down, 0, 0, $order, true);
+		$count = $this->vote->for_entries( $entries, $up, $down, 0, 0, $order, true );
 
-		$return = [];
+		$return = [ ];
 
-		foreach ($votes as $vote)
+		foreach( $votes as $vote )
 		{
 			$current[ 'id' ] = $vote->vote_id;
-			$current[ 'user' ] = oneUser($vote->user, $session,  true);
-			$current[ 'entry' ] = oneEntry($vote->entry, $session, true);
+			var_dump($vote->user);
+//			$current[ 'user' ] = oneUser( $vote->user, $session, true );
+//			$current[ 'entry' ] = oneEntry( $vote->entry, $session, true );
 
 			if( $vote[ 'vote_up' ] == 1 && $vote[ 'vote_down' ] == 0 )
 			{
