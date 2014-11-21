@@ -1238,7 +1238,7 @@ class UserController extends BaseController
 		else
 		{
 
-			if(Hash::check($user->user_password, Input::get('currentPassword')))
+			if(Hash::check(Input::get('currentPassword'), $user->user_password))
 			{
 				$user->user_password = Hash::make( Input::get( "newPassword" ) );
 
