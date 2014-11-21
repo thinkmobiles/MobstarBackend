@@ -562,7 +562,9 @@ class VoteController extends BaseController
 
 		$session = $this->token->get_session( $token );
 
-		$entries = Entry::where( 'entry_user_id', '=', $session->token_user_id )->lists( 'entry_id' );
+		$user = (Input::get('user', $session->token_user_id));
+
+		$entries = Entry::where( 'entry_user_id', '=', $user )->lists( 'entry_id' );
 
 		if(count($entries) == 0)
 		{
@@ -581,6 +583,7 @@ class VoteController extends BaseController
 			$down = true;
 			$up = false;
 		}
+
 
 		//Get limit to calculate pagination
 		$limit = Input::get( 'limit', '50' );
