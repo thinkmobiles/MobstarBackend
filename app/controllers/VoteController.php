@@ -568,7 +568,7 @@ class VoteController extends BaseController
 
 		if(count($entries) == 0)
 		{
-			return Response::make( ['info' => 'You do not have any entries'], 200 );
+			return Response::make( ['info' => 'You do not have any entries'], 300 );
 		}
 		//Get subCategory
 		$type = ( Input::get( 'type', 'up' ) );
