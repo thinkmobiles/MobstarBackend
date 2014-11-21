@@ -564,6 +564,10 @@ class VoteController extends BaseController
 
 		$entries = Entry::where( 'entry_user_id', '=', $session->token_user_id )->lists( 'entry_id' );
 
+		if(count($entries) == 0)
+		{
+			return Response::make( ['info' => 'You do not have any entries'], 200 );
+		}
 		//Get subCategory
 		$type = ( Input::get( 'type', 'up' ) );
 
@@ -616,6 +620,11 @@ class VoteController extends BaseController
 		$votes = $this->vote->for_entries( $entries, $up, $down, $limit, $offset, $orderBy, false );
 
 		$count = $this->vote->for_entries( $entries, $up, $down, 0, 0, $order, true );
+
+		if($count== 0)
+		{
+			return Response::make( ['info' => 'You do not have any votes on your entries'], 200 );
+		}
 
 		$return = [ ];
 
