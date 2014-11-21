@@ -1214,4 +1214,47 @@ class UserController extends BaseController
 		}
 	}
 
+	public function passwordReset( )
+	{
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		$user = User::find( $session->token_user_id );
+
+		$rules = array(
+			'currentPassword'		=> 'required',
+			'newPassword' 		=> 'required|min:6',
+			'confirmPassword'	=> 'required|same:newPassword'
+		);
+
+
+		$validator = Validator::make( Input::all(), $rules );
+
+		if( $validator->fails() )
+		{
+			return $validator->messages();
+		}
+		else
+		{
+
+			if(Hash::check($user->user_password, Input::get('currentPassword')))
+			{
+				$user->user_password = Hash::make( Input::get( "newPassword" ) );
+
+				$user->save();
+
+				return Response::make( ['info' => 'Password changed successfully'], 200 );
+
+			}
+
+			else
+			{
+				return Response::make( ['info' => 'Invalid password'], 401 );
+			}
+
+		}
+
+	}
+
 }

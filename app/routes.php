@@ -111,6 +111,11 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "UserController@cover"
 		] );
 
+		Route::post( "user/password/", [
+			"as"   => "user/password",
+			"uses" => "UserController@passwordReset"
+		] );
+
 		Route::delete( "user/{user}", [
 			"as"   => "user/destroy",
 			"uses" => "UserController@destroy"
