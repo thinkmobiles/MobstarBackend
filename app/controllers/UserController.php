@@ -1220,8 +1220,6 @@ class UserController extends BaseController
 
 		$session = $this->token->get_session( $token );
 
-		$user = User::find( $session->token_user_id );
-
 		$rules = array(
 			'currentPassword'		=> 'required',
 			'newPassword' 		=> 'required|min:6',
@@ -1237,6 +1235,7 @@ class UserController extends BaseController
 		}
 		else
 		{
+			$user = User::find( $session->token_user_id );
 
 			if(Hash::check(Input::get('currentPassword'), $user->user_password))
 			{
@@ -1250,7 +1249,7 @@ class UserController extends BaseController
 
 			else
 			{
-				return Response::make( ['info' => 'Invalid password'], 401 );
+				return Response::make( ['info' => 'Invalid password'], 300 );
 			}
 
 		}
