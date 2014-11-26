@@ -165,7 +165,7 @@ function oneUser( $user, $session, $includeStars = false )
 	$votes = 0;
 	foreach($entries as $entry)
 	{
-		if($entry->entry_rank < $rank)
+		if($entry->entry_rank < $rank && $entry->entry_rank != 0)
 			$rank = $entry->entry_rank;
 
 		foreach($entry->vote as $vote)
@@ -174,6 +174,9 @@ function oneUser( $user, $session, $includeStars = false )
 				$votes++;
 		}
 	}
+
+	if ($rank = 10000)
+		$rank = 0;
 
 
 	$return['rank'] = $rank;
