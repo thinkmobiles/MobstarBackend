@@ -1964,7 +1964,7 @@ class EntryController extends BaseController
 		$category = 0;
 		$tag = 0;
 
-		$entries = $this->entry->all( $user, $category, $tag, 'entry_rank', 'asc', 10000, 0, false )->toArray();
+		$entries = $this->entry->all( $user, $category, 0, 'entry_rank', 'asc', 10000, 0, false )->toArray();
 
 		$sortArray = array();
 		$i = 0;
@@ -2117,104 +2117,6 @@ class EntryController extends BaseController
 
 		return $current;
 	}
-
-//	public function updateFile()
-//	{
-//		$entries = $this->entry->all( 0, 0, 0, 0, 0, 200, 0, false );
-//		$i = 0;
-//		$n = 0;
-//		$d = 0;
-//		foreach( $entries as $entry )
-//		{
-//			foreach( $entry->file as $file )
-//			{
-//				$i++;
-//				$filename = str_random( 12 );
-//
-//				$date = date( 'Y-m-d H:i:s' );
-//				if( $file->entry_file_type == "mp4" )
-//				{
-//					$file_in = $_ENV[ 'PATH' ] . 'public/uploads/' . $file->entry_file_name . ".mp4";
-//					var_dump($file_in);
-//					var_dump(file_exists( $file_in ));
-//					echo "<br>";
-////					if( !file_exists( $file_in ) )
-////					{
-////
-////						DB::raw( " Delete from entries where entry_id = $file->entry_file_entry_id " );
-////						echo $file_in;
-////						$d++;
-////					}
-////					else
-////					{
-////						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
-////						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2  -b:v 64k -r 20' . $file_out );
-////
-////						Eloquent::unguard();
-////
-////						DB::raw( " update entry_files set entry_file_name = $filename, entry_file_updated_date = $date where entry_file_id $entry->entry_file_id " );
-////
-////						Eloquent::reguard();
-////
-////						$n++;
-////					}
-//
-//
-//				}
-//				else
-//				{
-//				}
-//			}
-//		}
-//
-//		echo $i . " files processed -   " . $n . " files changed - " . $d . " deleted";
-//	}
-//
-//	public function test()
-//	{
-//		$config = array(
-//			'key' => Creds::ENV_KEY,
-//			'secret' => Creds::ENV_SECRET
-//		);
-//
-//		$client = S3Client::factory($config);
-////
-////		$signedUrl = $client->getObjectUrl('mobstar-1', 'hi.txt', '+10 minutes');
-////		return $signedUrl;
-//
-//		$entries = $this->entry->all( 0, 0, 0, 0, 0, 200, 0, false );
-//
-//
-//		$local = Flysystem::connection('localEntry');
-//
-//		foreach( $entries as $entry )
-//		{
-//			foreach( $entry->file as $file )
-//			{
-//
-//				$file_in = "/" . $_ENV[ 'PATH' ] . 'public/uploads/' . $file->entry_file_name . "." . $file->entry_file_type;
-//
-//				if(file_exists($file_in)
-//				   && ($file->entry_file_type == "mp4")
-//				)
-//				{
-//
-//					$video =  $_ENV['PATH']  . 'public/uploads/' . $file->entry_file_name . ".mp4";
-//
-//					$thumb = $_ENV['PATH']  . 'public/uploads/' . $file->entry_file_name . '-thumb.jpg';
-//
-//					shell_exec( '/usr/bin/ffmpeg -i ' . $video . ' -vframes 1 -an -s 100x100 -ss 00:00:00.10 ' . $thumb );
-//
-//					$handle = fopen($thumb, "r");
-//
-//					Flysystem::connection('awss3')->put("thumbs/" . $file->entry_file_name . "-thumb.jpg", fread($handle, filesize($thumb)));
-//
-//					unlink($thumb);
-//				}
-//
-//			}
-//		}
-//	}
 
 	public function delete( $id )
 	{

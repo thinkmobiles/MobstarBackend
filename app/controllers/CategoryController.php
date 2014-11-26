@@ -222,8 +222,6 @@ class CategoryController extends BaseController {
 		return $response;
 	}
 
-
-
 	/**
      *
      * @SWG\Api(
