@@ -175,7 +175,7 @@ function oneUser( $user, $session, $includeStars = false )
 		}
 	}
 
-	if ($rank = 10000)
+	if ($rank == 10000)
 		$rank = 0;
 
 
