@@ -1969,6 +1969,8 @@ class EntryController extends BaseController
 		$sortArray = array();
 		$i = 0;
 
+		var_dump($entries);
+		
 		foreach( $entries as $entry )
 		{
 
