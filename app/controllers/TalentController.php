@@ -67,7 +67,7 @@ class TalentController extends BaseController
 
 		$votes = Vote::where( 'vote_user_id', '=', $session->token_user_id )->where('vote_up', '=', 1)->where('vote_deleted', '=', 0)->lists( 'vote_entry_id' );
 
-		$entries = Entry::whereIn( 'entry_id', $votes )->get();
+		$entries = Entry::whereIn( 'entry_id', $votes )->orderBy( 'entry_rank', 'asc')->get();
 
 		foreach( $entries as $entry )
 		{
