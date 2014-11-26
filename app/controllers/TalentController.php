@@ -91,7 +91,7 @@ class TalentController extends BaseController
 	/**
 	 *
 	 * @SWG\Api(
-	 *   path="/vote",
+	 *   path="/talent",
 	 *   description="Operations for My Talent Screen",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
