@@ -1964,7 +1964,7 @@ class EntryController extends BaseController
 		$category = 0;
 		$tag = 0;
 
-		$entries = $this->entry->all( $user, $category, 0, 0, 'entry_rank', 'asc', 10000, 0, false, false )->toArray();
+		$entries = $this->entry->all( $user, $category, 0, 0, 'entry_rank', 'asc', 10000, 0, false, true )->toArray();
 
 		$sortArray = array();
 		$i = 0;
@@ -2032,7 +2032,7 @@ class EntryController extends BaseController
 			{
 
 				echo $entry->entry_id . "updated to " . $r . "position \n";
-				
+
 				$entry->entry_rank = $rank[ $entry->entry_id ];
 				$entry->save();
 			}
