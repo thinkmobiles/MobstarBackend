@@ -1256,4 +1256,45 @@ class UserController extends BaseController
 
 	}
 
-}
+
+
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/user/me",
+	 *   description="Operation about Users",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="GET",
+	 *       summary="Get Me",
+	 *       notes="Details about current logged in user",
+	 *       nickname="getMe",
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=400,
+	 *            message="Input validation failed"
+	 *          )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+	public function me()
+	{
+
+		$token = Request::header( "X-API-TOKEN" );
+		$session = $this->token->get_session( $token );
+
+		$user = User::find($session['token_user_id']);
+
+		$return['user'] = oneUser($user, $session, true);
+
+		return Response::make( $return , 200 );
+
+	}
+
+	}

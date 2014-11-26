@@ -92,6 +92,11 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "UserController@index"
 		] );
 
+		Route::get( "/user/me", [
+			"as"   => "user/me",
+			"uses" => "UserController@me"
+		] );
+
 		Route::get( "user/{id}", [
 			"as"   => "user/show",
 			"uses" => "UserController@show"

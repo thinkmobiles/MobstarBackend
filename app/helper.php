@@ -115,6 +115,9 @@ function oneUser( $user, $session, $includeStars = false )
 		$return[ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $user->user_id )->where( 'user_star_deleted', '!=', '1' )->count();
 	}
 
+	$stars = [ ];
+	$starredBy = [ ];
+
 	if( $includeStars )
 	{
 		$stars = [ ];
@@ -133,7 +136,6 @@ function oneUser( $user, $session, $includeStars = false )
 			}
 		}
 
-		$return[ 'stars' ] = $stars;
 
 		$starredBy = [ ];
 
@@ -150,9 +152,34 @@ function oneUser( $user, $session, $includeStars = false )
 				];
 			}
 		}
-		$return[ 'starredBy' ] = $starredBy;
 
 	}
+
+	$return[ 'stars' ] = $stars;
+
+	$return[ 'starredBy' ] = $starredBy;
+
+	$entries = Entry::with('vote')->where('entry_user_id', '=', $user->user_id)->get();
+
+	$rank = 100000;
+	$votes = 0;
+	foreach($entries as $entry)
+	{
+		if($entry->entry_rank < $rank)
+			$rank = $entry->entry_rank;
+
+		foreach($entry->vote as $vote)
+		{
+			if($vote->entry_vote_deleted == 0)
+				$votes++;
+		}
+	}
+
+
+	$return['rank'] = $rank;
+	$return['fans'] = count($starredBy);
+	$return['votes'] = count($votes);
+
 
 	return $return;
 }
