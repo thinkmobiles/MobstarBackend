@@ -166,16 +166,23 @@ function oneEntry( $entry, $session, $includeUser = false )
 
 	$up_votes = 0;
 	$down_votes = 0;
-	foreach( $entry->vote as $vote )
+	if(count($entry->vote) != 0)
 	{
-		if( $vote->vote_up == 1 && $vote->vote_deleted == 0 )
+		foreach( $entry->vote as $vote )
 		{
-			$up_votes++;
+			if( $vote->vote_up == 1 && $vote->vote_deleted == 0 )
+			{
+				$up_votes++;
+			}
+			elseif( $vote->vote_down == 1 && $vote->vote_deleted == 0 )
+			{
+				$down_votes++;
+			}
 		}
-		elseif( $vote->vote_down == 1 && $vote->vote_deleted == 0 )
-		{
-			$down_votes++;
-		}
+	}
+	else{
+		$up_votes = 0;
+		$down_votes = 0;
 	}
 
 	$current[ 'id' ] = $entry->entry_id;
