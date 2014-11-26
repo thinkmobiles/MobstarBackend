@@ -139,7 +139,7 @@ class TalentController extends BaseController
 			foreach ($entries as $entry){
 				DB::table('votes')
 					->where('vote_entry_id', $entry )
-					->update(array('vote_delted' => 0));
+					->update(array('vote_deleted' => 0));
 			}
 		});
 
