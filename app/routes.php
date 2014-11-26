@@ -391,6 +391,12 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "TalentController@index"
 		] );
 
+
+		Route::delete( "talent/{user}", [
+			"as"   => "talent/remove",
+			"uses" => "TalentController@delete"
+		] );
+
 		//---------------------------------------------------------
 		// Settings
 		//---------------------------------------------------------

@@ -85,4 +85,68 @@ class TalentController extends BaseController
 
 		return $response;
 	}
+
+
+
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/vote",
+	 *   description="Operations for My Talent Screen",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="DELETE",
+	 *       summary="Remove Talent",
+	 *       notes="Operation for user to remove another user from their talent pool",
+	 *       nickname="deleteTalent",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="user",
+	 *           description="User ID who you want to remove from your talent pool.",
+	 *           paramType="path",
+	 *           required=true,
+	 *           type="integer"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=400,
+	 *            message="Input validation failed"
+	 *          )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+
+
+	public function delete($user)
+	{
+		$return = [ ];
+
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		$entries = Entry::where('entry_user_id', '=', $user)->lists('entry_id');
+
+		DB::transaction(function() use ($entries)
+		{
+			foreach ($entries as $entry){
+				DB::table('votes')
+					->where('vote_entry_id', $entry )
+					->update(array('vote_delted' => 0));
+			}
+		});
+
+		$return['talent'] = "All votes deleted";
+
+		$response = Response::make( $return, 200 );
+
+		return $response;
+	}
 }
