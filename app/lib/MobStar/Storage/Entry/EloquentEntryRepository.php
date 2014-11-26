@@ -45,7 +45,7 @@ class EloquentEntryRepository implements EntryRepository
 
 		if( $exclude )
 		{
-			$query = $query->whereNotIn( 'entry_id', $exclude );
+//			$query = $query->whereNotIn( 'entry_id', $exclude );
 		}
 
 		return $query->take( $limit )->skip( $offset )->get();
