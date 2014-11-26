@@ -649,7 +649,6 @@ class EntryController extends BaseController
 
 		$count = $this->entry->whereIn( $id, $user, $category, $limit, $offset, true );
 
-		//var_dump($entries); 
 		if( $count == 0 )
 		{
 			$return = [ 'error' => 'No Entries Found' ];
@@ -866,7 +865,6 @@ class EntryController extends BaseController
 				$current[ 'downVotes' ] = $down_votes;
 				$current[ 'rank' ] = $entry->entry_rank;
 				$current[ 'language' ] = $entry->entry_language;
-				// /print_r($entry);
 
 				$current[ 'totalComments' ] = $entry->comments->count();
 
@@ -1497,7 +1495,6 @@ class EntryController extends BaseController
 
 		if( $validator->fails() )
 		{
-			var_dump( $validator->messages() );
 			$response[ 'errors' ] = $validator->messages();
 			$status_code = 400;
 		}
@@ -1981,12 +1978,10 @@ class EntryController extends BaseController
 				if( $vote[ 'vote_up' ] && !$vote[ 'vote_deleted' ] )
 				{
 					$up_votes++;
-					echo "vote up\n";
 				}
 				elseif( $vote[ 'vote_down' ] && !$vote[ 'vote_deleted' ] )
 				{
 					$down_votes++;
-					echo "vote down \n";
 				}
 
 			}
@@ -2030,9 +2025,6 @@ class EntryController extends BaseController
 
 			foreach( $entries2 as $entry )
 			{
-
-				echo $entry->entry_id . "updated to " . $r . "position \n";
-
 				$entry->entry_rank = $rank[ $entry->entry_id ];
 				$entry->save();
 			}
@@ -2111,7 +2103,6 @@ class EntryController extends BaseController
 		$current[ 'downVotes' ] = $down_votes;
 		$current[ 'rank' ] = $entry->entry_rank;
 		$current[ 'language' ] = $entry->entry_language;
-		// /print_r($entry);
 
 		if( $entry->entry_deleted )
 		{
