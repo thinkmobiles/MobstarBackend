@@ -1964,13 +1964,12 @@ class EntryController extends BaseController
 		$category = 0;
 		$tag = 0;
 
-		$entries = $this->entry->all( $user, $category, 0, 0, 'entry_rank', 'asc', 10000, 0, false )->toArray();
+		$entries = $this->entry->all( $user, $category, 0, 0, 'entry_rank', 'asc', 10000, 0, false, false )->toArray();
 
 		$sortArray = array();
 		$i = 0;
 
-		var_dump($entries);
-		
+
 		foreach( $entries as $entry )
 		{
 
@@ -1982,11 +1981,14 @@ class EntryController extends BaseController
 				if( $vote[ 'vote_up' ] && !$vote[ 'vote_deleted' ] )
 				{
 					$up_votes++;
+					echo "vote up\n";
 				}
 				elseif( $vote[ 'vote_down' ] && !$vote[ 'vote_deleted' ] )
 				{
 					$down_votes++;
+					echo "vote down \n";
 				}
+
 			}
 
 			$entries[ $i ][ 'entry_up_votes' ] = $up_votes;
@@ -2028,6 +2030,9 @@ class EntryController extends BaseController
 
 			foreach( $entries2 as $entry )
 			{
+
+				echo $entry->entry_id . "updated to " . $r . "position \n";
+				
 				$entry->entry_rank = $rank[ $entry->entry_id ];
 				$entry->save();
 			}
