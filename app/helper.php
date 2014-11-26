@@ -170,7 +170,7 @@ function oneUser( $user, $session, $includeStars = false )
 
 		foreach($entry->vote as $vote)
 		{
-			if($vote->entry_vote_deleted == 0)
+			if($vote->vote_deleted == 0)
 				$votes++;
 		}
 	}
@@ -178,7 +178,7 @@ function oneUser( $user, $session, $includeStars = false )
 
 	$return['rank'] = $rank;
 	$return['fans'] = count($starredBy);
-	$return['votes'] = count($votes);
+	$return['votes'] = $votes;
 
 
 	return $return;
