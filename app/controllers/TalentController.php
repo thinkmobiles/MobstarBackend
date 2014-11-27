@@ -123,6 +123,39 @@ class TalentController extends BaseController
 	 * )
 	 */
 
+	public function top()
+	{
+		$return = [ ];
+
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		$entries = Entry::with( 'user' )->orderBy( 'entry_rank', 'asc' )->get();
+
+		$users = [ ];
+		$return[ 'talents' ];
+
+		$rank = 1;
+
+		foreach( $entries as $entry )
+		{
+			if( !in_array( $entry->entry_user_id, $users ) )
+			{
+				$user = oneUser( $entry->user, $session );
+				$user[ 'rank' ] = $rank;
+				$return[ 'talents' ][ ][ 'talent' ] = $user;
+				$users[ ] = $entry->entry_user_id;
+				$rank++;
+			}
+		}
+
+
+		$response = Response::make( $return, 200 );
+
+		return $response;
+	}
+
 
 	public function delete($user)
 	{

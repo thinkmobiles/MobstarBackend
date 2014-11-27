@@ -402,6 +402,11 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "TalentController@delete"
 		] );
 
+		Route::get( "talent/top", [
+			"as"   => "talent/top",
+			"uses" => "TalentController@top"
+		] );
+
 		//---------------------------------------------------------
 		// Settings
 		//---------------------------------------------------------
