@@ -134,7 +134,7 @@ class TalentController extends BaseController
 		$entries = Entry::with( 'user' )->orderBy( 'entry_rank', 'asc' )->get();
 
 		$users = [ ];
-		$return[ 'talents' ];
+		$return[ 'talents' ] = [];
 
 		$rank = 1;
 
