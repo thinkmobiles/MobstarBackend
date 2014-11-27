@@ -131,7 +131,7 @@ class TalentController extends BaseController
 
 		$session = $this->token->get_session( $token );
 
-		$entries = Entry::with( 'user' )->orderBy( 'entry_rank', 'asc' )->get();
+		$entries = Entry::where('entry_rank', '!=', 0)->with( 'user' )->orderBy( 'entry_rank', 'asc' )->get();
 
 		$users = [ ];
 		$return[ 'talents' ] = [];
