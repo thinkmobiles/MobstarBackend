@@ -262,7 +262,7 @@ class EntryController extends BaseController
 				$current[ 'modified' ] = null;
 
 				$return[ 'entries' ][ ][ 'entry' ] = $current;
-				$status_code = 404;
+				$status_code = 200;
 
 			}
 			else
