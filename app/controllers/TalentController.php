@@ -91,23 +91,14 @@ class TalentController extends BaseController
 	/**
 	 *
 	 * @SWG\Api(
-	 *   path="/talent",
+	 *   path="/talent/top",
 	 *   description="Operations for My Talent Screen",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
-	 *       method="DELETE",
-	 *       summary="Remove Talent",
-	 *       notes="Operation for user to remove another user from their talent pool",
-	 *       nickname="deleteTalent",
-	 *       @SWG\Parameters(
-	 *         @SWG\Parameter(
-	 *           name="user",
-	 *           description="User ID who you want to remove from your talent pool.",
-	 *           paramType="path",
-	 *           required=true,
-	 *           type="integer"
-	 *         )
-	 *       ),
+	 *       method="GET",
+	 *       summary="Get All Talents",
+	 *       notes="Operation to retrieve a list of all users in order of their rank",
+	 *       nickname="allTalents",
 	 *       @SWG\ResponseMessages(
 	 *          @SWG\ResponseMessage(
 	 *            code=401,
@@ -156,6 +147,42 @@ class TalentController extends BaseController
 		return $response;
 	}
 
+
+
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/talent",
+	 *   description="Operations for My Talent Screen",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="DELETE",
+	 *       summary="Remove Talent",
+	 *       notes="Operation for user to remove another user from their talent pool",
+	 *       nickname="deleteTalent",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="user",
+	 *           description="User ID who you want to remove from your talent pool.",
+	 *           paramType="path",
+	 *           required=true,
+	 *           type="integer"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=400,
+	 *            message="Input validation failed"
+	 *          )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
 
 	public function delete($user)
 	{
