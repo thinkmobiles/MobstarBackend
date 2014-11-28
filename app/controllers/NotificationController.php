@@ -245,8 +245,8 @@ class NotificationController extends BaseController
 	/**
 	 *
 	 * @SWG\Api(
-	 *   description="Operations about notifications",
 	 *   path="/notification/",
+	 *   description="Operation about notifications",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
 	 *       method="DELETE",
