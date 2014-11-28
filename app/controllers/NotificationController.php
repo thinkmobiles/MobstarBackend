@@ -276,7 +276,7 @@ class NotificationController extends BaseController
 	 *   )
 	 * )
 	 */
-	
+
 	public function delete($id)
 	{
 		$token = Request::header( "X-API-TOKEN" );
