@@ -327,6 +327,12 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "NotificationController@count"
 		] );
 
+
+		Route::delete( "notification/{id}", [
+			"as"   => "notification/delete",
+			"uses" => "NotificationController@delete"
+		] );
+
 		// -------------------------------------------------------
 		// FAQ(s)
 		//---------------------------------------------------------

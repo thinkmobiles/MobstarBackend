@@ -242,4 +242,60 @@ class NotificationController extends BaseController
 		return $response;
 	}
 
+	/**
+	 *
+	 * @SWG\Api(
+	 *   description="Operations about Notificiations",
+	 *   path="/notification/",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="DELETE",
+	 *       summary="Remove notification",
+	 *       notes="Operation for user to remove a notification from their list ",
+	 *       nickname="removeNotification",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="notification",
+	 *           description="The notificaiton ID.",
+	 *           paramType="path",
+	 *           required=true,
+	 *           type="integer"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=400,
+	 *            message="Input validation failed"
+	 *          )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+	
+	public function delete($id)
+	{
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		$notification = Notification::where('notification_id', '=', $id)->where('notification_user_id', '=', $session->token_user_id)->first();
+		if(!is_null($notification))
+		{
+			$notification->notification_deleted = 1;
+
+			$notification->save();
+
+			$response =Response::make( ['info' => 'notification deleted'], 200);
+		}
+		else
+			$response =Response::make( ['info' => 'notification not found'], 404);
+
+		return $response;
+	}
+
 }
