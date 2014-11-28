@@ -13,7 +13,7 @@ class Notification extends \Eloquent
 
 	public function entry()
 	{
-		return $this->hasOne( 'Entry', 'entry_id', 'notification_entry_id' );
+		return $this->belongsTo( 'Entry', 'notification_entry_id' );
 	}
 
 }
