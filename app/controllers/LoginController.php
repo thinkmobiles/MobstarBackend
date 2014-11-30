@@ -208,20 +208,6 @@ class LoginController extends BaseController
 	 *           type="string"
 	 *         ),
 	 *         @SWG\Parameter(
-	 *           name="email",
-	 *           description="Email address from facebook profile",
-	 *           paramType="form",
-	 *           required=true,
-	 *           type="string"
-	 *         ),
-	 *         @SWG\Parameter(
-	 *           name="dob",
-	 *           description="Date of birth from facebook profile",
-	 *           paramType="form",
-	 *           required=true,
-	 *           type="string"
-	 *         ),
-	 *         @SWG\Parameter(
 	 *           name="gender",
 	 *           description="Gender, from facebook profile",
 	 *           paramType="form",
@@ -270,8 +256,6 @@ class LoginController extends BaseController
 			'userId'      => 'required',
 			'displayName' => 'required',
 			'userName'    => 'required',
-			'email'       => 'required',
-			'dob'         => 'required',
 			'gender'      => 'required',
 			'fullName'    => 'required',
 		);
