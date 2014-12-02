@@ -100,11 +100,11 @@ class FanController extends BaseController
 				{
 					if( !isset( $current[ 'lastComment' ] ) )
 					{
-						$current[ 'lastComment' ] = $comment->comment_created_date;
+						$current[ 'lastComment' ] = $comment->comment_added_date;
 					}
-					elseif( $comment->comment_created_date > $current[ 'lastComment' ] )
+					elseif( $comment->comment_added_date > $current[ 'lastComment' ] )
 					{
-						$current[ 'lastComment' ] = $comment->comment_created_date;
+						$current[ 'lastComment' ] = $comment->comment_added_date;
 					}
 
 				}
