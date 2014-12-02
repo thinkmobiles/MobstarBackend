@@ -14,7 +14,7 @@ use Swagger\Annotations as SWG;
  *  basePath="http://api.mobstar.com"
  * )
  */
-class TalentController extends BaseController
+class FanController extends BaseController
 {
 
 	public function __construct( Token $token )
