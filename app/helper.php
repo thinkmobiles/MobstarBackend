@@ -129,7 +129,7 @@ function oneUser( $user, $session, $includeStars = false )
 			{
 				$stars[ ] = [ 'starId'       => $star->Stars->user_id,
 							  'starName'     => $star->Stars->user_display_name,
-							  'starredDate'  => $star->user_display_name,
+							  'starredDate'  => $star->user_star_created_date,
 							  'profileImage' => ( isset( $star->Stars->user_profile_image ) )
 								  ? $client->getObjectUrl( 'mobstar-1', $star->Stars->user_profile_image, '+10 minutes' )
 								  : '',
@@ -147,7 +147,7 @@ function oneUser( $user, $session, $includeStars = false )
 
 				$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
 								  'starName'     => $starred->User->user_display_name,
-								  'starredDate'  => $starred->user_display_name,
+								  'starredDate'  => $starred->user_star_created_date,
 								  'profileImage' => ( isset( $starred->User->user_profile_image ) )
 									  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+10 minutes' )
 									  : '',
