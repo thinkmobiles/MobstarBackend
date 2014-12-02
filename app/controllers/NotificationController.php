@@ -229,7 +229,10 @@ class NotificationController extends BaseController
 		$session = $this->token->get_session( $token );
 
 		//Find total number to put in header
-		$count = Notification::where( 'notification_user_id', '=', $session->token_user_id )->where('notification_read', '=', 0)->count();
+		$count = Notification::where( 'notification_user_id', '=', $session->token_user_id )
+			->where('notification_read', '=', 0)
+			->where('notification_deleted', '=', 0)
+			->count();
 
 		$return[ 'notifications' ]= $count;
 

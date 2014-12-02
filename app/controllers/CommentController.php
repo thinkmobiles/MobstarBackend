@@ -323,7 +323,7 @@ class CommentController extends BaseController
 	/**
 	 *
 	 * @SWG\Api(
-	 *   description="Operations about Stars",
+	 *   description="Operations about Comments",
 	 *   path="/comment/{comment}",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(

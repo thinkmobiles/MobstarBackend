@@ -660,7 +660,8 @@ public function reply()
 						break;
 
 					case "starred":
-						$stars = Star::where('user_star_star_id', '=', $session->token_user_id)->get();
+						$stars = Star::where('user_star_star_id', '=', $session->token_user_id)
+							->where('user_star_deleted', '=', 0)->get();
 
 						$users = [];
 
