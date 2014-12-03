@@ -418,8 +418,8 @@ Route::group( [ "before" => "auth" ], function ()
 		// Fan Connect
 		//---------------------------------------------------------
 
-		Route::get( "fan/comments", [
-			"as"   => "fan/comments",
+		Route::get( "fan/feedback", [
+			"as"   => "fan/feedback",
 			"uses" => "FanController@comments"
 		] );
 

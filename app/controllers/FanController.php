@@ -25,7 +25,7 @@ class FanController extends BaseController
 	/**
 	 *
 	 * @SWG\Api(
-	 *   path="/fan/comments",
+	 *   path="/fan/feedback",
 	 *   description="Operations for Fan Connect",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
