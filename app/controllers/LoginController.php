@@ -739,7 +739,7 @@ class LoginController extends BaseController
 		}
 		else
 		{
-			return true;
+			$arn = "arn:aws:sns:eu-west-1:830026328040:app/GCM/Mobstar-Android";
 		}
 
 		$client = getSNSClient();
