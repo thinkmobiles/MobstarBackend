@@ -76,7 +76,7 @@ class FanController extends BaseController
 			if( !isset( $returning[ $entry->entry_id ] ) && ( count( $entry->comments ) > 0 ) )
 			{
 				$current[ 'id' ] = $entry->entry_id;
-				$current[ 'entryName ' ] = $entry->entry_name;
+				$current[ 'entryName' ] = $entry->entry_name;
 
 				foreach( $entry->file as $file )
 				{
