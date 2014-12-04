@@ -25,7 +25,7 @@ class StarController extends BaseController
 	/**
 	 *
 	 * @SWG\Api(
-	 * 	path="/star",
+	 *    path="/star",
 	 *   description="Operations about stars",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
@@ -82,13 +82,16 @@ class StarController extends BaseController
 
 			//Get input
 			$input = array(
-				'user_star_user_id'      => $session->token_user_id,
-				'user_star_star_id'      => Input::get( 'star' ),
+				'user_star_user_id' => $session->token_user_id,
+				'user_star_star_id' => Input::get( 'star' ),
+				'user_star_deleted' => 0,
 			);
 
-			$star = Star::firstOrNew($input);
-			if(isset($star->user_star_created_date ))
-				return Response::make(['error' => 'Already a star'], 403);
+			$star = Star::firstOrNew( $input );
+			if( isset( $star->user_star_created_date ) )
+			{
+				return Response::make( [ 'error' => 'Already a star' ], 403 );
+			}
 			$star->user_star_created_date = date( 'Y-m-d H:i:s' );
 			$star->save();
 
@@ -133,22 +136,22 @@ class StarController extends BaseController
 	 *   )
 	 * )
 	 */
-	public function destroy($id)
+	public function destroy( $id )
 	{
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
 
-		$stars = Star::where('user_star_star_id','=', $id)->where('user_star_user_id', '=', $session->token_user_id)->get();
+		$stars = Star::where( 'user_star_star_id', '=', $id )->where( 'user_star_user_id', '=', $session->token_user_id )->get();
 
-		foreach ($stars as $star){
+		foreach( $stars as $star )
+		{
 			$star->user_star_deleted = 1;
 			$star->save();
 		}
 
 		$response[ 'message' ] = "star removed";
 		$status_code = 200;
-
 
 		return Response::make( $response, $status_code );
 	}
