@@ -34,9 +34,6 @@
 	</style>
 </head>
 <body>
-	<div class="welcome">
-		
-		<h1>You have shit yourself.</h1>
-	</div>
+
 </body>
 </html>
