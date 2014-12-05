@@ -631,14 +631,10 @@ class VoteController extends BaseController
 
 		$return = [ ];
 
-		$entries = [];
-
 		foreach( $votes as $vote )
 		{
 			$current = [];
 
-			if(!in_array($vote->entry->entry_id, $entries))
-			{
 				$current[ 'id' ] = $vote->vote_id;
 
 				$current[ 'user' ] = oneUser( $vote->user, $session, true );
@@ -659,8 +655,6 @@ class VoteController extends BaseController
 
 				$return[ 'votes' ][ ][ 'vote' ] = $current;
 
-				$entries[] = $vote->entry->entry_id;
-			}
 		}
 
 		$response = Response::make( $return, 200 );
