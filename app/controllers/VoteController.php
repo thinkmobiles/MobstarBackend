@@ -631,27 +631,36 @@ class VoteController extends BaseController
 
 		$return = [ ];
 
+		$entries = [];
+
 		foreach( $votes as $vote )
 		{
-			$current[ 'id' ] = $vote->vote_id;
+			$current = [];
 
-			$current[ 'user' ] = oneUser( $vote->user, $session, true );
-			$current[ 'entry' ] = oneEntry( $vote->entry, $session, true );
+			if(!in_array($vote->entry->entry_id, $entries))
+			{
+				$current[ 'id' ] = $vote->vote_id;
 
-			if( $vote[ 'vote_up' ] == 1 && $vote[ 'vote_down' ] == 0 )
-			{
-				$current[ 'type' ] = "Upvote";
-			}
-			elseif( $vote[ 'vote_up' ] == 0 && $vote[ 'vote_down' ] == 1 )
-			{
-				$current[ 'type' ] = "Downvote";
-			}
-			else
-			{
-				$current[ 'type' ] = "Error";
-			}
+				$current[ 'user' ] = oneUser( $vote->user, $session, true );
+				$current[ 'entry' ] = oneEntry( $vote->entry, $session, true );
 
-			$return[ 'votes' ][ ][ 'vote' ] = $current;
+				if( $vote[ 'vote_up' ] == 1 && $vote[ 'vote_down' ] == 0 )
+				{
+					$current[ 'type' ] = "Upvote";
+				}
+				elseif( $vote[ 'vote_up' ] == 0 && $vote[ 'vote_down' ] == 1 )
+				{
+					$current[ 'type' ] = "Downvote";
+				}
+				else
+				{
+					$current[ 'type' ] = "Error";
+				}
+
+				$return[ 'votes' ][ ][ 'vote' ] = $current;
+
+				$entries[] = $vote->entry->entry_id;
+			}
 		}
 
 		$response = Response::make( $return, 200 );
