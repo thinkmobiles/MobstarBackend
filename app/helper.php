@@ -127,8 +127,11 @@ function oneUser( $user, $session, $includeStars = false )
 
 			if( $star->user_star_deleted == 0 )
 			{
+				$starNames = [];
+				$starNames = userDetails($star);
+
 				$stars[ ] = [ 'starId'       => $star->Stars->user_id,
-							  'starName'     => $star->Stars->user_display_name,
+							  'starName'     => $starNames['displayName'],
 							  'starredDate'  => $star->user_star_created_date,
 							  'profileImage' => ( isset( $star->Stars->user_profile_image ) )
 								  ? $client->getObjectUrl( 'mobstar-1', $star->Stars->user_profile_image, '+10 minutes' )
@@ -144,9 +147,11 @@ function oneUser( $user, $session, $includeStars = false )
 		{
 			if( $starred->user_star_deleted == 0 )
 			{
+				$starNames = [];
+				$starNames = userDetails($star);
 
 				$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
-								  'starName'     => $starred->User->user_display_name,
+								  'starName'     => $starNames['displayName'],
 								  'starredDate'  => $starred->user_star_created_date,
 								  'profileImage' => ( isset( $starred->User->user_profile_image ) )
 									  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+10 minutes' )
@@ -293,4 +298,34 @@ function getSNSClient()
 	return SnsClient::factory( $config );
 }
 
-?>
+function userDetails($user)
+{
+	if( ( $user->user_display_name == '' ) || ( is_null( $user->user_name ) ) || ( is_null( $user->user_email ) ) )
+	{
+		if( $user->user_facebook_id != 0 )
+		{
+			$return[ 'userName' ] = $user->FacebookUser->facebook_user_user_name;
+			$return[ 'displayName' ] = $user->FacebookUser->facebook_user_display_name;
+			$return[ 'fullName' ] = $user->FacebookUser->facebook_user_full_name;
+		}
+		elseif( $user->user_twitter_id != 0 )
+		{
+			$return[ 'userName' ] = $user->TwitterUser->twitter_user_user_name;
+			$return[ 'displayName' ] = $user->TwitterUser->twitter_user_display_name;
+			$return[ 'fullName' ] = $user->TwitterUser->twitter_user_full_name;
+		}
+		elseif( $user->user_google_id != 0 )
+		{
+			$return[ 'userName' ] = $user->GoogleUser->google_user_user_name;
+			$return[ 'displayName' ] = $user->GoogleUser->google_user_display_name;
+			$return[ 'fullName' ] = $user->GoogleUser->google_user_full_name;
+		}
+	}
+	else
+	{
+		$return[ 'userName' ] = $user->user_name;
+		$return[ 'displayName' ] = $user->user_display_name;
+		$return[ 'fullName' ] = $user->user_full_name;
+	}
+	return $return;
+}

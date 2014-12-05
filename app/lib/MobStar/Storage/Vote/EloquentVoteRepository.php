@@ -54,7 +54,6 @@ class EloquentVoteRepository implements VoteRepository {
 		//closure goes here
 //			$query = $query->with()
 //		}
-
 		$query->orderBy($order, 'desc');
 
 		return $query->take($limit)->skip($offset)->get();
