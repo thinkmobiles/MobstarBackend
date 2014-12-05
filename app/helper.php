@@ -128,7 +128,7 @@ function oneUser( $user, $session, $includeStars = false )
 			if( $star->user_star_deleted == 0 )
 			{
 				$starNames = [];
-				$starNames = userDetails($star);
+				$starNames = userDetails($star->Stars);
 
 				$stars[ ] = [ 'starId'       => $star->Stars->user_id,
 							  'starName'     => $starNames['displayName'],
@@ -148,7 +148,7 @@ function oneUser( $user, $session, $includeStars = false )
 			if( $starred->user_star_deleted == 0 )
 			{
 				$starNames = [];
-				$starNames = userDetails($star);
+				$starNames = userDetails($star->User);
 
 				$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
 								  'starName'     => $starNames['displayName'],
@@ -300,6 +300,7 @@ function getSNSClient()
 
 function userDetails($user)
 {
+	$return = [];
 	if( ( $user->user_display_name == '' ) || ( is_null( $user->user_name ) ) || ( is_null( $user->user_email ) ) )
 	{
 		if( $user->user_facebook_id != 0 )
