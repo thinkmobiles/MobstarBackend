@@ -148,7 +148,7 @@ function oneUser( $user, $session, $includeStars = false )
 			if( $starred->user_star_deleted == 0 )
 			{
 				$starNames = [];
-				$starNames = userDetails($star->User);
+				$starNames = userDetails($starred->User);
 
 				$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
 								  'starName'     => $starNames['displayName'],
