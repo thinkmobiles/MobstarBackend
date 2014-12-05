@@ -44,6 +44,8 @@ class EloquentVoteRepository implements VoteRepository {
 		if($down)
 			$query->where('vote_down', '=', '1');
 
+		$query->where('vote_deleted', '=', '0');
+
 		if($count)
 			return $query->count();
 
