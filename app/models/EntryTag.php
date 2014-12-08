@@ -12,6 +12,6 @@ class EntryTag extends \Eloquent {
 
     public function tag()
     {
-        return $this->belongsTo('Tag', 'tag_id');
+        return $this->belongsTo('Tag', 'entry_tag_tag_id', 'tag_id');
     }
 }
