@@ -189,7 +189,7 @@ class VoteController extends BaseController
 			$down = false;
 		}
 
-		$deleted = ( Input::get( 'delted', '0' ) );
+		$deleted = ( Input::get( 'delted', 0 ) );
 
 		$votes = $this->vote->get_votes( $entry, $user, $up, $down, $deleted, $limit, $offset, false );
 		$count = $this->vote->get_votes( $entry, $user, $up, $down, $deleted, $limit, $offset, true );
