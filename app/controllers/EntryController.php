@@ -179,9 +179,9 @@ class EntryController extends BaseController
 		$page = ( !is_numeric( $page ) ) ? 1 : $page;
 
 		//Get page
-		$order_by = ( Input::get( 'orderBy', '0' ) );
+		$order_by = ( Input::get( 'orderBy', 0 ) );
 
-		if( $order_by )
+		if( $order_by != 0 )
 		{
 			if( $order_by == 'popular' )
 			{
