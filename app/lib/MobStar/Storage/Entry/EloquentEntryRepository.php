@@ -27,12 +27,6 @@ class EloquentEntryRepository implements EntryRepository
 			$query = $query->where( 'entry_user_id', '=', $user );
 		}
 
-		//echo $order_by;
-		if( $order_by )
-		{
-			$query = $query->orderBy( $order_by, $order );
-		}
-
 		if( $category )
 		{
 			$query = $query->where( 'entry_category_id', '=', $category );
@@ -54,6 +48,12 @@ class EloquentEntryRepository implements EntryRepository
 		if( $exclude )
 		{
 			$query = $query->whereNotIn( 'entry_id', $exclude );
+		}
+
+		//echo $order_by;
+		if( $order_by )
+		{
+			$query = $query->orderBy( $order_by, $order );
 		}
 
 		return $query->take( $limit )->skip( $offset )->get();

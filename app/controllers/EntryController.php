@@ -243,7 +243,7 @@ class EntryController extends BaseController
 			}
 		}
 
-		$entries = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false );
+		$entries = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false, true );
 		$count = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, true );
 
 		if( $count == 0 )
