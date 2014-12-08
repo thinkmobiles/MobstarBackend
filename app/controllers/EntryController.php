@@ -179,37 +179,23 @@ class EntryController extends BaseController
 		$page = ( !is_numeric( $page ) ) ? 1 : $page;
 
 		//Get page
-		$order_by = ( Input::get( 'orderBy', 0 ) );
+		$order_by = ( Input::get( 'orderBy', 'id' ) );
 
 		$debug = false;
 
-		if( $order_by != 0 )
+		switch($order_by)
 		{
-			$debug = true;
-			$debug[1] = true;
-			if( $order_by == 'popular' )
-			{
-				$debug[2] = true;
-
+			case "popular":
 				$order = 'entry_rank';
 				$dir = 'asc';
-			}
-			elseif( $order_by == 'latest' )
-			{
-				$debug[3];
+				break;
+			case "latest":
 				$order = 'entry_created_date';
 				$dir = 'desc';
-			}
-			else
-			{
+				break;
+			default:
 				$order = 0;
 				$dir = 0;
-			}
-		}
-		else
-		{
-			$order = 0;
-			$dir = 0;
 		}
 
 		//Calculate offset
