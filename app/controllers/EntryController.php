@@ -438,10 +438,10 @@ class EntryController extends BaseController
 				$current[ 'modified' ] = $entry->entry_modified_date;
 
 				$current[ 'tags' ] = array();
-				foreach( $entry->entryTag as $tag )
+				foreach( $entry->entryTag as $entry_tag )
 				{
 					//TODO: Fix tags so that we do not need to find this
-					$current[ 'tags' ][ ] = Tag::find( $tag->entry_tag_tag_id )->tag_name;
+					$current[ 'tags' ][ ] = $entry_tag->tag->tag_name;
 				}
 
 				foreach( $entry->file as $file )
