@@ -181,15 +181,22 @@ class EntryController extends BaseController
 		//Get page
 		$order_by = ( Input::get( 'orderBy', 0 ) );
 
+		$debug = false;
+
 		if( $order_by != 0 )
 		{
+			$debug = true;
+			$debug[1] = true;
 			if( $order_by == 'popular' )
 			{
+				$debug[2] = true;
+
 				$order = 'entry_rank';
 				$dir = 'asc';
 			}
 			elseif( $order_by == 'latest' )
 			{
+				$debug[3];
 				$order = 'entry_created_date';
 				$dir = 'desc';
 			}
@@ -492,6 +499,8 @@ class EntryController extends BaseController
 
 		$status_code = 200;
 
+		if($debug !== false)
+			$return['debug'] = $debug;
 		//If next is true create next page link
 		if( $next )
 		{
