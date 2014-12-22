@@ -35,7 +35,7 @@
 </head>
 <body>
 <div>
-	<h1>Please clink the link below to reset your password</h1>
+	<h1>Your password has been reset to 111111. Once after login you can change your password.</h1>
 </div>
 </body>
 </html>

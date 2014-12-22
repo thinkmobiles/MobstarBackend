@@ -698,6 +698,9 @@ class LoginController extends BaseController
 
 			if( $user )
 			{
+				$user = User::where( 'user_email', '=', Input::get( 'email' ) );
+				$user->user_password = Hash::make( "111111" );
+				$user->save();
 				//create token to send to user
 
 				//	echo "yes";
