@@ -700,7 +700,18 @@ class LoginController extends BaseController
 			{
 				$user = User::where( 'user_email', '=', Input::get( 'email' ) )->first();
 				$user->user_password = Hash::make( "111111" );
-				$user->save();
+				if($user->save())
+				{
+					$return = [ 'notice' => 'success' ];
+
+					$status_code = 200;
+				}
+				else
+				{
+					$return = array( "error" => "User not found" );
+
+					$status_code = 404;
+				}
 				//create token to send to user
 
 				//	echo "yes";
