@@ -698,14 +698,15 @@ class LoginController extends BaseController
 			$user = User::where( 'user_email', '=', Input::get( 'email' ) )->first();
 			if( $user )
 			{
-				$user->user_password = Hash::make( "111111" );
+				$temporary_password = str_random( 6 );
+				$user->user_password = Hash::make( $temporary_password );
 				$user->save();
 				//create token to send to user
 
 				//	echo "yes";
 				$data = [ ];
 
-				Mail::send( 'emails.password', $data, function ( $message )
+				Mail::send( 'emails.password', array('temporarypassword'=>$temporary_password), function ( $message )
 				{
 					$message->from( 'do-not-reply@mobstar.com', 'MobStar' )->subject( 'Password Reset Link' );;
 
