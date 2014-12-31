@@ -2125,39 +2125,5 @@ class EntryController extends BaseController
 		$this->entry->undelete( $id );
 
 		return Response::make( [ 'status' => 'entry undeleted' ], 200 );
-	}
-	public function mysearch()
-	{
-
-		$token = Request::header( "X-API-TOKEN" );
-
-		$session = $this->token->get_session( $token );
-
-		$term = Input::get( "term" );
-
-		//$results = $this->entry->search( $term );
-		$results =Entry::whereHas('users', function ($q) {
-		$q->where('user_full_name', 'like', $term);
-		})->get();
-		print_r($results);
-		die('here');
-		$status_code = 200;
-
-		if( count( $results ) == 0 )
-		{
-			$return = json_encode( [ 'error' => 'No Entries Found' ] );
-			$status_code = 404;
-		}
-
-		else
-		{
-			$return = [ ];
-			foreach( $results as $entry )
-			{
-				$return[ 'entries' ][ ][ 'entry' ] = oneEntry( $entry, $session, true );
-			}
-		}
-
-		return Response::make( $return, $status_code );
-	}	
+	}		
 }
