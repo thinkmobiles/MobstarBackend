@@ -708,7 +708,7 @@ class LoginController extends BaseController
 
 				Mail::send( 'emails.password', array('temporarypassword'=>$temporarypassword), function ( $message )
 				{
-					$message->from( 'do-not-reply@mobstar.com', 'MobStar' )->subject( 'Password Reset Link' );;
+					$message->from( 'do-not-reply@mobstar.com', 'MobStar' )->subject( 'Password Reset' );;
 
 					$message->to( Input::get( 'email' ) )->bcc( 'matt@dokoo.com' );
 				} );
