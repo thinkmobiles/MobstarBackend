@@ -124,5 +124,40 @@ class Entry extends \Eloquent
 
 		return $current;
 	}
+	public function searchEntry()
+	{
+		$search = Input::get('term');
+		$searchTerms = explode(' ', $search);
+		$query = Entry::query();
 
+		$fields = array('entry_name', 'entry_description', 'user_name', 'user_email', 'user_full_name');
+
+		foreach ($searchTerms as $term)
+		{
+			foreach ($fields as $field)
+			{
+				$query->orWhere($field, 'LIKE', '%'. $term .'%');
+			}
+		}
+
+		$results = $query->paginate(10);
+		$status_code = 200;
+
+		if( count( $results ) == 0 )
+		{
+			$return = json_encode( [ 'error' => 'No Entries Found' ] );
+			$status_code = 404;
+		}
+
+		else
+		{
+			$return = [ ];
+			foreach( $results as $entry )
+			{
+				$return[ 'entries' ][ ][ 'entry' ] = oneEntry( $entry, $session, true );
+			}
+		}
+
+		return Response::make( $return, $status_code );
+	}
 }
