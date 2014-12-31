@@ -140,24 +140,8 @@ class Entry extends \Eloquent
 			}
 		}
 
-		$results = $query->paginate(10);
-		$status_code = 200;
+		$results = $query->paginate(10);		
 
-		if( count( $results ) == 0 )
-		{
-			$return = json_encode( [ 'error' => 'No Entries Found' ] );
-			$status_code = 404;
-		}
-
-		else
-		{
-			$return = [ ];
-			foreach( $results as $entry )
-			{
-				$return[ 'entries' ][ ][ 'entry' ] = oneEntry( $entry, $session, true );
-			}
-		}
-
-		return Response::make( $return, $status_code );
+		return $results;
 	}
 }
