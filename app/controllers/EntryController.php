@@ -2129,7 +2129,7 @@ class EntryController extends BaseController
 	{
 		$term = Input::get( "term" );
 		//$results = Entry::with('user','users')
-		$results = Entry::select('entries.*','users.user_name','users.user_full_name')
+		$results = $this->select('entries.*','users.user_name','users.user_full_name')
 		->join('users', 'entries.entry_user_id', '=', 'users.listing_id')
 		->where('entries.entry_name', 'LIKE', "%$term%")
 		->or_where('entries.entry_description', 'LIKE', "%$term%")
