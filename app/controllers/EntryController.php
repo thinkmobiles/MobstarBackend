@@ -2139,7 +2139,8 @@ class EntryController extends BaseController
 		$results =Entry::whereHas('users', function ($q) {
 		$q->where('user_full_name', 'like', $term);
 		})->get();
-
+		print_r($results);
+		die('here');
 		$status_code = 200;
 
 		if( count( $results ) == 0 )
