@@ -2138,7 +2138,7 @@ class EntryController extends BaseController
 		{
 			foreach ($fields as $field)
 			{
-				$query->orWhere($field, 'LIKE', '%'. $term .'%');
+				$query->orWhere($field, 'LIKE', "%{$term}%");
 			}
 		}
 
