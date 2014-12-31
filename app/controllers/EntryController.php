@@ -1926,7 +1926,14 @@ class EntryController extends BaseController
 
 		$term = Input::get( "term" );
 
-		$results = $this->entry->search( $term );
+		//$results = $this->entry->search( $term );
+		$results = Entry::join('users', 'entry.entry_user_id', '=', 'users.user_id')
+					->where('entry.entry_name', 'LIKE', "%$term%")
+					->or_where('entry.entry_description', 'LIKE', "%$term%")
+					->or_where('users.user_name', 'LIKE', "%$term%")
+					->or_where('users.user_email', 'LIKE', "%$term%")
+					->or_where('users.user_full_name', 'LIKE', "%$term%")
+					->get('entry.*');
 
 		$status_code = 200;
 
