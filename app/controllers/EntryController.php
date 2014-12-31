@@ -2128,7 +2128,7 @@ class EntryController extends BaseController
 	public function mysearch()
 	{
 		$term = Input::get( "term" );
-		$results = Entry::with('users')
+		$results = $this->with('users')
 		->where('entry_name', 'like', '%'.$term.'%')
 		->or_where('entry_description', 'like', '%'.$term.'%')
 		->orWhereHas('users', function($q) use ($term) { 
