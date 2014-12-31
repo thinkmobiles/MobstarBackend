@@ -2124,5 +2124,20 @@ class EntryController extends BaseController
 		$this->entry->undelete( $id );
 
 		return Response::make( [ 'status' => 'entry undeleted' ], 200 );
-	}	
+	}
+	public function mysearch()
+	{
+		$term = Input::get( "term" );
+		//$results = Entry::with('user','users')
+		$results = Entry::select('entries.*','users.user_name','users.user_full_name')
+		->join('users', 'entries.entry_user_id', '=', 'users.listing_id')
+		->where('entries.entry_name', 'LIKE', "%$term%")
+		->or_where('entries.entry_description', 'LIKE', "%$term%")
+		->or_where('users.user_name', 'LIKE', "%$term%")
+		->or_where('users.user_full_name', 'LIKE', "%$term%")
+		->groupBy('entries.entry_id')
+		->paginate(15);
+		print_r($results);
+		die;
+	}
 }
