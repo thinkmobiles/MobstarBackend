@@ -2129,7 +2129,10 @@ class EntryController extends BaseController
 	public function searchEntry()
 	{
 		$search = Input::get('term');
-		$searchTerms = explode(' ', $search);
+		$results =Entry::whereHas('user', function ($q) {
+		   $q->where('user_full_name', 'like', "%{$search}%");
+		})->get();
+		/*$searchTerms = explode(' ', $search);
 		$query = Entry::query();
 
 		$fields = array('entry_name', 'entry_description', 'user_name', 'user_email', 'user_full_name');
@@ -2142,7 +2145,7 @@ class EntryController extends BaseController
 			}
 		}
 
-		$results = $query->paginate(10);
+		$results = $query->paginate(10);*/
 		$status_code = 200;
 
 		if( count( $results ) == 0 )
