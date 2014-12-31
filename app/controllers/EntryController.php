@@ -2126,26 +2126,17 @@ class EntryController extends BaseController
 
 		return Response::make( [ 'status' => 'entry undeleted' ], 200 );
 	}
-	public function searchEntry()
+	public function mysearch()
 	{
-		$search = Input::get('term');
-		$results =Entry::whereHas('user', function ($q) {
-		   $q->where('user_full_name', 'like', "%{$search}%");
-		})->get();
-		/*$searchTerms = explode(' ', $search);
-		$query = Entry::query();
 
-		$fields = array('entry_name', 'entry_description', 'user_name', 'user_email', 'user_full_name');
+		$token = Request::header( "X-API-TOKEN" );
 
-		foreach ($searchTerms as $term)
-		{
-			foreach ($fields as $field)
-			{
-				$query->orWhere($field, 'LIKE', "%{$term}%");
-			}
-		}
+		$session = $this->token->get_session( $token );
 
-		$results = $query->paginate(10);*/
+		$term = Input::get( "term" );
+
+		$results = $this->entry->search( $term );
+
 		$status_code = 200;
 
 		if( count( $results ) == 0 )
@@ -2164,5 +2155,5 @@ class EntryController extends BaseController
 		}
 
 		return Response::make( $return, $status_code );
-	}
+	}	
 }
