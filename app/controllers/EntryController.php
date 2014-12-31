@@ -2135,7 +2135,10 @@ class EntryController extends BaseController
 
 		$term = Input::get( "term" );
 
-		$results = $this->entry->search( $term );
+		//$results = $this->entry->search( $term );
+		$results =Entry::whereHas('users', function ($q) {
+		$q->where('user_full_name', 'like', $term);
+		})->get();
 
 		$status_code = 200;
 
