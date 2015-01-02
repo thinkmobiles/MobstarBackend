@@ -2149,12 +2149,12 @@ class EntryController extends BaseController
 		{
 			$return = [ ];
 			$return[ 'entries' ][ ][ 'entry' ] =$results;
-			mail('anil@spaceotechnologies.com',time().'mysearch',print_r($results,true));
-			mail('anil@spaceotechnologies.com',time().'mysearchone',print_r($results[0]->entry_id,true));
-			for($i=0;$i<count($results);$i++)
+			//mail('anil@spaceotechnologies.com',time().'mysearch',print_r($results,true));
+			//mail('anil@spaceotechnologies.com',time().'mysearchone',print_r($results[0]->entry_id,true));
+			/*for($i=0;$i<count($results);$i++)
 			{
 				$return[ 'entries' ][ ][ 'entry' ] = oneEntry( $results[$i], $session, true );
-			}
+			}*/
 			/*foreach( $results as $entry )
 			{
 				$return[ 'entries' ][ ][ 'entry' ] = oneEntry( $entry, $session, true );
