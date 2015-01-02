@@ -2171,6 +2171,7 @@ class EntryController extends BaseController
 			{
 				if($results[$i]->entry_deleted === 1)
 				continue;
+				else
 				$return[ 'entries' ][ ][ 'entry' ] = $this->oneEntryNew( $results[$i], $session, true );
 			}		
 		}
