@@ -2178,7 +2178,7 @@ class EntryController extends BaseController
 		}*/
 
 		$current[ 'id' ] = $entry->entry_id;
-		$current[ 'category' ] = $entry->category->category_name;
+		//$current[ 'category' ] = $entry->category->category_name;
 		$current[ 'type' ] = $entry->entry_type;
 
 		if( $includeUser )
