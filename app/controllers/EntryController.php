@@ -2148,10 +2148,11 @@ class EntryController extends BaseController
 		else
 		{
 			$return = [ ];
-			foreach( $results as $entry )
+			$return[ 'entries' ][ ][ 'entry' ] =$results;
+			/*foreach( $results as $entry )
 			{
 				$return[ 'entries' ][ ][ 'entry' ] = oneEntry( $entry, $session, true );
-			}
+			}*/
 		}
 		return Response::make( $return, $status_code );
 	}	
