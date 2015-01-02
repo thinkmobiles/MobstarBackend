@@ -2177,30 +2177,18 @@ class EntryController extends BaseController
 			}
 
 		}
-
 		$current[ 'id' ] = $entry->entry_id;
 		$column = 'category_id';
 		//$category_name = Category::where($column , '=', $entry->entry_category_id)->first();
 		$category_name = DB::table('categories')->where('category_id', '=', $entry->entry_category_id)->pluck('category_name');
-		//mail('anil@spaceotechnologies.com',time(),print_r($category_name,true));
 		$current[ 'category' ] = $category_name;
 		//$current[ 'category' ] = $entry->category->category_name;
 		$current[ 'type' ] = $entry->entry_type;
 
 		if( $includeUser )
 		{
-			//$current[ 'user' ] = oneUser( $entry->User, $session );
-
-//			$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
-//			$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
-//			$current[ 'user' ][ 'displayName' ] = $entry->User->user_display_name;
-//			$current[ 'user' ][ 'email' ] = $entry->User->user_email;
-//			$current[ 'user' ][ 'profileImage' ] = ( !empty( $entry->User->user_profile_image ) )
-//				? "http://" . $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
-//			$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
-//				? "http://" . $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
-//			xdebug_break();
-//			$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $entry->entry_user_id )->count();
+			$User = User::where('user_id' , '=', $entry->entry_user_id)->first();
+			$current[ 'user' ] = oneUser( $User, $session );
 		}
 
 		$current[ 'name' ] = $entry->entry_name;
