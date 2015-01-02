@@ -2164,7 +2164,7 @@ class EntryController extends BaseController
 
 		$up_votes = 0;
 		$down_votes = 0;
-		$votes = Shop::where('vote_entry_id','=',$entry->entry_user_id)->get();
+		$votes = Vote::where('vote_entry_id','=',$entry->entry_user_id)->get();
 		foreach( $votes as $vote )
 		{
 			if( $vote->vote_up == 1 && $vote->vote_deleted == 0 )
