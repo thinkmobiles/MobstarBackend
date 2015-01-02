@@ -2125,7 +2125,7 @@ class EntryController extends BaseController
 
 		return Response::make( [ 'status' => 'entry undeleted' ], 200 );
 	}
-	public function mysearch()
+	/*public function mysearch()
 	{
 		$term = Input::get( "term" );
 		$results = DB::table('entries')
@@ -2139,5 +2139,5 @@ class EntryController extends BaseController
 		->paginate(15);
 		print_r($results);
 		die;
-	}	
+	}*/	
 }
