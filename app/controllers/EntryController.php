@@ -2127,6 +2127,8 @@ class EntryController extends BaseController
 	}
 	public function mysearch()
 	{
+		$token = Request::header( "X-API-TOKEN" );
+		$session = $this->token->get_session( $token );		
 		$term = Input::get( "term" );
 		$results = DB::table('entries')
 		->select('entries.*','users.user_name','users.user_full_name')
@@ -2136,8 +2138,21 @@ class EntryController extends BaseController
 		->orWhere('users.user_name', 'LIKE', "%'.$term.'%")
 		->orWhere('users.user_full_name', 'LIKE', "%'.$term.'%")
 		->groupBy('entries.entry_id')
-		->paginate(15);
-		print_r($results);
-		return Response::make( $results,200 );
+		->get();
+		$status_code = 200;
+		if( count( $results ) == 0 )
+		{
+			$return = json_encode( [ 'error' => 'No Entries Found' ] );
+			$status_code = 404;
+		}
+		else
+		{
+			$return = [ ];
+			foreach( $results as $entry )
+			{
+				$return[ 'entries' ][ ][ 'entry' ] = oneEntry( $entry, $session, true );
+			}
+		}
+		return Response::make( $return, $status_code );
 	}	
 }
