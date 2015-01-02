@@ -2197,10 +2197,11 @@ class EntryController extends BaseController
 		$current[ 'modified' ] = $entry->entry_modified_date;
 
 		$current[ 'tags' ] = array();
-		/*foreach( $entry->entryTag as $tag )
+		$entryTag = EntryTag::where('entry_tag_entry_id','=',$entry->entry_id)->get();
+		foreach( $entryTag as $tag )
 		{
 			$current[ 'tags' ][ ] = Tag::find( $tag->entry_tag_tag_id )->tag_name;
-		}*/
+		}
 
 		//break;
 
