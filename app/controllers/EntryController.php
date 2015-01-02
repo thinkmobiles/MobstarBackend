@@ -2133,10 +2133,10 @@ class EntryController extends BaseController
 		$results = DB::table('entries')
 		->select('entries.*','users.user_name','users.user_full_name')
 		->join('users', 'entries.entry_user_id', '=', 'users.user_id')
-		->where('entries.entry_name', 'LIKE', "%'.$term.'%")
-		->orWhere('entries.entry_description', 'LIKE', "%'.$term.'%")
-		->orWhere('users.user_name', 'LIKE', "%'.$term.'%")
-		->orWhere('users.user_full_name', 'LIKE', "%'.$term.'%")
+		->where('entries.entry_name', 'LIKE', "%$term%")
+		->orWhere('entries.entry_description', 'LIKE', "%$term%")
+		->orWhere('users.user_name', 'LIKE', "%$term%")
+		->orWhere('users.user_full_name', 'LIKE', "%$term%")
 		->groupBy('entries.entry_id')
 		->get();
 		dd(DB::getQueryLog());
