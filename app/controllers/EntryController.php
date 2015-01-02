@@ -1940,7 +1940,6 @@ class EntryController extends BaseController
 			$return = [ ];
 			foreach( $results as $entry )
 			{
-				mail('anil@spaceotechnologies.com',time().'search2entry',print_r($entry,true));
 				$return[ 'entries' ][ ][ 'entry' ] = oneEntry( $entry, $session, true );
 			}
 		}
