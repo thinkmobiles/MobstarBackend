@@ -2151,10 +2151,11 @@ class EntryController extends BaseController
 			$return = [ ];
 			$return[ 'entries' ][ ][ 'entry' ] =$results;
 			mail('anil@spaceotechnologies.com',time().'mysearch',print_r($results,true));
-			foreach( $results as $entry )
+			mail('anil@spaceotechnologies.com',time().'mysearchone',print_r($results[0]->entry_id,true));
+			/*foreach( $results as $entry )
 			{
 				$return[ 'entries' ][ ][ 'entry' ] = oneEntry( $entry, $session, true );
-			}
+			}*/
 		}
 		return Response::make( $return, $status_code );
 	}	
