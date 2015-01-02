@@ -2144,16 +2144,14 @@ class EntryController extends BaseController
 		$results = DB::table('entries')
 		->select('entries.*')
 		->join('users', 'entries.entry_user_id', '=', 'users.user_id')
-		->where('entries.entry_deleted', '>', "0")
-		->orWhere(function($query)
-		{
+		->where(function ($query) {
+			$query->where('entries.entry_deleted', '=', 0)
+		})->where(function ($query) {
 			$query->where('entries.entry_name', 'LIKE', "%$term%")
-					->orWhere('entries.entry_description', 'LIKE', "%$term%")
-					->orWhere('users.user_name', 'LIKE', "%$term%")
-					->orWhere('users.user_full_name', 'LIKE', "%$term%");
-		})
-		->groupBy('entries.entry_id')
-		->get();
+				 ->orWhere('entries.entry_description', 'LIKE', "%$term%")
+				->orWhere('users.user_name', 'LIKE', "%$term%")
+				->orWhere('users.user_full_name', 'LIKE', "%$term%")
+		});
 		/////
 		
 		$status_code = 200;
