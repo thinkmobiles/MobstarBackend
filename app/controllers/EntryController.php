@@ -2137,7 +2137,6 @@ class EntryController extends BaseController
 		->orWhere('users.user_full_name', 'LIKE', "%'.$term.'%")
 		->groupBy('entries.entry_id')
 		->paginate(15);
-		print_r($results);
-		die;
+		return Response::make( $results,200 );
 	}	
 }
