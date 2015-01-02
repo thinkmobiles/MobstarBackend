@@ -2132,7 +2132,7 @@ class EntryController extends BaseController
 		$session = $this->token->get_session( $token );		
 		$term = Input::get( "term" );
 		$results = DB::table('entries')
-		->select('entries.*','users.user_name','users.user_full_name')
+		->select('entries.*')
 		->join('users', 'entries.entry_user_id', '=', 'users.user_id')
 		->where('entries.entry_name', 'LIKE', "%$term%")
 		->orWhere('entries.entry_description', 'LIKE', "%$term%")
@@ -2140,7 +2140,6 @@ class EntryController extends BaseController
 		->orWhere('users.user_full_name', 'LIKE', "%$term%")
 		->groupBy('entries.entry_id')
 		->get();
-		//dd(DB::getQueryLog());
 		$status_code = 200;
 		if( count( $results ) == 0 )
 		{
@@ -2152,10 +2151,10 @@ class EntryController extends BaseController
 			$return = [ ];
 			$return[ 'entries' ][ ][ 'entry' ] =$results;
 			mail('anil@spaceotechnologies.com',time().'mysearch',print_r($results,true));
-			/*foreach( $results as $entry )
+			foreach( $results as $entry )
 			{
 				$return[ 'entries' ][ ][ 'entry' ] = oneEntry( $entry, $session, true );
-			}*/
+			}
 		}
 		return Response::make( $return, $status_code );
 	}	
