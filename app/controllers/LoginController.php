@@ -710,7 +710,7 @@ class LoginController extends BaseController
 				{
 					$message->from( 'do-not-reply@mobstar.com', 'MobStar' )->subject( 'Password Reset' );;
 
-					$message->to( Input::get( 'email' ) )->bcc( 'matt@dokoo.com' );
+					$message->to( Input::get( 'email' ) );
 				} );
 
 				//do email stuff here
