@@ -2223,7 +2223,7 @@ class EntryController extends BaseController
 		$current[ 'downVotes' ] = $down_votes;
 		$current[ 'rank' ] = $entry->entry_rank;
 		$current[ 'language' ] = $entry->entry_language;
-
+		$current[ 'totalComments' ] = $entry->comments->count();
 		if( $entry->entry_deleted )
 		{
 			$current[ 'deleted' ] = true;
