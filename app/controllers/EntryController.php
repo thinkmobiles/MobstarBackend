@@ -2164,8 +2164,7 @@ class EntryController extends BaseController
 
 		$up_votes = 0;
 		$down_votes = 0;
-		$votes = Vote::where('vote_entry_id','=',$entry->vote_entry_id)->get();
-		mail('anil@spaceotechnologies.com','votes',print_r($votes,true));
+		$votes = Vote::where('vote_entry_id','=',$entry->entry_id)->get();
 		foreach( $votes as $vote )
 		{
 			if( $vote->vote_up == 1 && $vote->vote_deleted == 0 )
