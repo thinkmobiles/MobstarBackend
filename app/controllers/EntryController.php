@@ -2178,7 +2178,7 @@ class EntryController extends BaseController
 		}*/
 
 		$current[ 'id' ] = $entry->entry_id;
-		$column = 'category_name';
+		$column = 'category_id';
 		$category_name = Category::where($column , '=', $entry->entry_category_id)->first();
 		mail('anil@spaceotechnologies.com',time(),print_r($category_name,true));
 		$current[ 'category' ] = $category_name;
