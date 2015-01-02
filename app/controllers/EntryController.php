@@ -1927,7 +1927,6 @@ class EntryController extends BaseController
 		$term = Input::get( "term" );
 
 		$results = $this->entry->search( $term );
-		mail('anil@spaceotechnologies.com',time().'search2',print_r($results,true));
 		$status_code = 200;
 
 		if( count( $results ) == 0 )
@@ -1941,6 +1940,7 @@ class EntryController extends BaseController
 			$return = [ ];
 			foreach( $results as $entry )
 			{
+				mail('anil@spaceotechnologies.com',time().'search2entry',print_r($entry,true));
 				$return[ 'entries' ][ ][ 'entry' ] = oneEntry( $entry, $session, true );
 			}
 		}
