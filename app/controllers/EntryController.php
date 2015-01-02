@@ -2153,7 +2153,7 @@ class EntryController extends BaseController
 			//mail('anil@spaceotechnologies.com',time().'mysearchone',print_r($results[0]->entry_id,true));
 			for($i=0;$i<count($results);$i++)
 			{
-				$return[ 'entries' ][ ][ 'entry' ] = Entry::scopeEntryNew( $results[$i], $session, true );
+				$return[ 'entries' ][ ][ 'entry' ] = DB::scopeEntryNew( $results[$i], $session, true );
 			}
 			/*foreach( $results as $entry )
 			{
