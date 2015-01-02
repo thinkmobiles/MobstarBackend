@@ -2210,7 +2210,7 @@ class EntryController extends BaseController
 
 		//break;
 
-		$current[ 'entryFiles' ] = array();
+		/*$current[ 'entryFiles' ] = array();
 		foreach( $entry->file as $file )
 		{
 			$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
@@ -2221,7 +2221,7 @@ class EntryController extends BaseController
 			$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
 				$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
 				: "";
-		}
+		}*/
 
 		$current[ 'upVotes' ] = $up_votes;
 		$current[ 'downVotes' ] = $down_votes;
