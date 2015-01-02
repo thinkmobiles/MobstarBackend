@@ -2206,8 +2206,8 @@ class EntryController extends BaseController
 		//break;
 
 		$current[ 'entryFiles' ] = array();
-		$files = File::where('entry_file_entry_id','=',$entry->entry_id)->get();
-		foreach( $files as $file )
+		$EntryFile = EntryFile::where('entry_file_entry_id','=',$entry->entry_id)->get();
+		foreach( $EntryFile as $file )
 		{
 			$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
 			$current[ 'entryFiles' ][ ] = [
