@@ -2183,7 +2183,7 @@ class EntryController extends BaseController
 
 		if( $includeUser )
 		{
-			$current[ 'user' ] = oneUser( $entry->User, $session );
+			//$current[ 'user' ] = oneUser( $entry->User, $session );
 
 //			$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
 //			$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
