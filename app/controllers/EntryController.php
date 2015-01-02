@@ -2193,6 +2193,8 @@ class EntryController extends BaseController
 
 		$current[ 'name' ] = $entry->entry_name;
 		$current[ 'description' ] = $entry->entry_description;
+		$totalComments = Comment::where('comment_entry_id','=',$entry->entry_id)->count();
+		$current[ 'totalComments' ] = $totalComments;
 		$current[ 'created' ] = $entry->entry_created_date;
 		$current[ 'modified' ] = $entry->entry_modified_date;
 
@@ -2223,7 +2225,7 @@ class EntryController extends BaseController
 		$current[ 'downVotes' ] = $down_votes;
 		$current[ 'rank' ] = $entry->entry_rank;
 		$current[ 'language' ] = $entry->entry_language;
-		$current[ 'totalComments' ] = $entry->comments->count();
+		
 		if( $entry->entry_deleted )
 		{
 			$current[ 'deleted' ] = true;
