@@ -125,7 +125,7 @@ class Entry extends \Eloquent
 		return $current;
 	}
 	/////
-	public function oneEntryNew( $entry, $session, $includeUser = false )
+	public function scopeoneEntryNew( $entry, $session, $includeUser = false )
 	{
 		mail('anil@spaceotechnologies.com',time().'oneEntryNew',print_r($entry,true));
 		$client = getS3Client();
