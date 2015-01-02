@@ -2148,9 +2148,9 @@ class EntryController extends BaseController
 		else
 		{
 			$return = [ ];
-			foreach( $results as $key=>$val )
+			for($i=0;$i<count($results);$i++)
 			{
-				$return[ 'entries' ][ ][ 'entry' ] = $this->oneEntryNew( $results->$val, $session, true );
+				$return[ 'entries' ][ ][ 'entry' ] = $this->oneEntryNew( $results[$i], $session, true );
 			}		
 		}
 		return Response::make( $return, $status_code );
