@@ -2164,7 +2164,8 @@ class EntryController extends BaseController
 
 		$up_votes = 0;
 		$down_votes = 0;
-		/*foreach( $entry->vote as $vote )
+		$votes = Shop::where('vote_entry_id','=',$entry->entry_user_id)->get();
+		foreach( $votes as $vote )
 		{
 			if( $vote->vote_up == 1 && $vote->vote_deleted == 0 )
 			{
@@ -2175,7 +2176,7 @@ class EntryController extends BaseController
 				$down_votes++;
 			}
 
-		}*/
+		}
 
 		$current[ 'id' ] = $entry->entry_id;
 		$column = 'category_id';
