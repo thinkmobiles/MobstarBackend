@@ -2139,6 +2139,7 @@ class EntryController extends BaseController
 		->orWhere('users.user_full_name', 'LIKE', "%'.$term.'%")
 		->groupBy('entries.entry_id')
 		->get();
+		dd(DB::getQueryLog());
 		$status_code = 200;
 		if( count( $results ) == 0 )
 		{
