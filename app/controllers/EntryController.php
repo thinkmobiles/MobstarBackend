@@ -2179,8 +2179,9 @@ class EntryController extends BaseController
 
 		$current[ 'id' ] = $entry->entry_id;
 		$column = 'category_id';
-		$category_name = Category::where($column , '=', $entry->entry_category_id)->first();
-		mail('anil@spaceotechnologies.com',time(),print_r($category_name,true));
+		//$category_name = Category::where($column , '=', $entry->entry_category_id)->first();
+		$category_name = DB::table('categories')->where('category_id', '=', $entry->entry_category_id)->pluck('category_name');
+		//mail('anil@spaceotechnologies.com',time(),print_r($category_name,true));
 		$current[ 'category' ] = $category_name;
 		//$current[ 'category' ] = $entry->category->category_name;
 		$current[ 'type' ] = $entry->entry_type;
