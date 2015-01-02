@@ -2133,8 +2133,8 @@ class EntryController extends BaseController
 		$results = DB::table('entries')
 		->select('entries.*')
 		->join('users', 'entries.entry_user_id', '=', 'users.user_id')
-		->where('entries.entry_deleted', '=', '0')
-		->orWhere('entries.entry_name', 'LIKE', "%$term%")
+		//->where('entries.entry_deleted', '=', '0')
+		->where('entries.entry_name', 'LIKE', "%$term%")
 		->orWhere('entries.entry_description', 'LIKE', "%$term%")
 		->orWhere('users.user_name', 'LIKE', "%$term%")
 		->orWhere('users.user_full_name', 'LIKE', "%$term%")
@@ -2169,6 +2169,8 @@ class EntryController extends BaseController
 			$return = [ ];
 			for($i=0;$i<count($results);$i++)
 			{
+				if($results[$i]->entry_deleted === 1)
+				continue;
 				$return[ 'entries' ][ ][ 'entry' ] = $this->oneEntryNew( $results[$i], $session, true );
 			}		
 		}
