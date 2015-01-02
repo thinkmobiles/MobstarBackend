@@ -2150,7 +2150,7 @@ class EntryController extends BaseController
 			$return = [ ];
 			foreach( $results as $key=>$val )
 			{
-				$return[ 'entries' ][ ][ 'entry' ] = oneEntryNew( $results->$val, $session, true );
+				$return[ 'entries' ][ ][ 'entry' ] = $this->oneEntryNew( $results->$val, $session, true );
 			}		
 		}
 		return Response::make( $return, $status_code );
