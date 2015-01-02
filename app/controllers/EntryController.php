@@ -2164,7 +2164,7 @@ class EntryController extends BaseController
 
 		$up_votes = 0;
 		$down_votes = 0;
-		foreach( $entry->vote as $vote )
+		/*foreach( $entry->vote as $vote )
 		{
 			if( $vote->vote_up == 1 && $vote->vote_deleted == 0 )
 			{
@@ -2175,7 +2175,7 @@ class EntryController extends BaseController
 				$down_votes++;
 			}
 
-		}
+		}*/
 
 		$current[ 'id' ] = $entry->entry_id;
 		$current[ 'category' ] = $entry->category->category_name;
