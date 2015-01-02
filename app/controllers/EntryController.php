@@ -2130,7 +2130,7 @@ class EntryController extends BaseController
 		$term = Input::get( "term" );
 		$results = DB::table('entries')
 		->select('entries.*','users.user_name','users.user_full_name')
-		->join('users', 'entries.entry_user_id', '=', 'users.listing_id')
+		->join('users', 'entries.entry_user_id', '=', 'users.user_id')
 		->where('entries.entry_name', 'LIKE', "%$term%")
 		->orWhere('entries.entry_description', 'LIKE', "%$term%")
 		->orWhere('users.user_name', 'LIKE', "%$term%")
