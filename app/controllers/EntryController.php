@@ -1931,6 +1931,22 @@ class EntryController extends BaseController
 
 		if( count( $results ) == 0 )
 		{
+			$users = new User;
+			$usersresults = $users->search( $term );
+			if( count( $usersresults ) == 0 )
+			{
+				$return = json_encode( [ 'error' => 'No Entries Found' ] );
+				$status_code = 404;
+			}
+			else
+			{
+				$results = Entry::find($usersresults->user_id)->user;
+				$return = [ ];
+				foreach( $results as $entry )
+				{
+					$return[ 'entries' ][ ][ 'entry' ] = oneEntry( $entry, $session, true );
+				}
+			}
 			$return = json_encode( [ 'error' => 'No Entries Found' ] );
 			$status_code = 404;
 		}
