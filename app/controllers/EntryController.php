@@ -2141,7 +2141,7 @@ class EntryController extends BaseController
 		->groupBy('entries.entry_id')
 		->get();*/
 		/////
-		$results = DB::table('entries')
+		/*$results = DB::table('entries')
 		->select('entries.*')
 		->join('users', 'entries.entry_user_id', '=', 'users.user_id')
 		->where(function($query)  use $term
@@ -2153,7 +2153,7 @@ class EntryController extends BaseController
 		})
 		->where('entries.entry_deleted', '=', '0')		
 		->groupBy('entries.entry_id')
-		->get();		
+		->get();*/		
 		/////
 		
 		$status_code = 200;
