@@ -287,8 +287,8 @@ class EntryController extends BaseController
 
 		foreach( $entries as $entry )
 		{
-			if($entry->entry_rank > 0)
-			{
+			//if($entry->entry_rank > 0)
+			//{
 				$up_votes = 0;
 				$down_votes = 0;
 				foreach( $entry->vote as $vote )
@@ -490,7 +490,7 @@ class EntryController extends BaseController
 
 					$return[ 'entries' ][ ][ 'entry' ] = $current;
 				}
-			}
+			//}
 		}
 
 		$status_code = 200;
