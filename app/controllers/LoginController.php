@@ -706,8 +706,7 @@ class LoginController extends BaseController
 				//	echo "yes";
 				$data = [ ];
 
-				//Mail::send( 'emails.password', array('temporarypassword'=>$temporarypassword), function ( $message )
-				Mail::send( 'Hi', array('temporarypassword'=>$temporarypassword), function ( $message )
+				Mail::send( 'emails.password', array('temporarypassword'=>$temporarypassword), function ( $message )
 				{
 					$message->from( 'do-not-reply@mobstar.com', 'MobStar' )->subject( 'Password Reset' );;
 
