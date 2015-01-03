@@ -187,7 +187,7 @@ class EntryController extends BaseController
 		{
 			case "popular":
 				$order = 'entry_rank';
-				$dir = 'desc';
+				$dir = 'asc';
 				break;
 			case "latest":
 				$order = 'entry_created_date';
