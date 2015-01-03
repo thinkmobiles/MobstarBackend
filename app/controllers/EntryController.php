@@ -235,7 +235,11 @@ class EntryController extends BaseController
 				$exclude[ ] = $vote->vote_entry_id;
 			}
 		}
-
+		if( $order_by == 'popular' )
+		{
+			$entry_rank = Entry::where( 'entry_rank', '>', '0')->get();
+			$exclude[ ] = $entry_rank->entry_rank;
+		}
 		$entries = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false, true );
 		$count = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, true );
 
