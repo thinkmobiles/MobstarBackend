@@ -2160,7 +2160,7 @@ class EntryController extends BaseController
         ->where('entries.entry_name', 'LIKE', "%$term%")
         ->orWhere(function($query)
             {
-                $query->->orWhere('entries.entry_description', 'LIKE', "%$term%")
+                $query->orWhere('entries.entry_description', 'LIKE', "%$term%")
 						->orWhere('users.user_name', 'LIKE', "%$term%")
 						->orWhere('users.user_full_name', 'LIKE', "%$term%");
             })
