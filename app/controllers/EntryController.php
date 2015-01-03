@@ -418,79 +418,80 @@ class EntryController extends BaseController
 
 				else
 				{
-
-					$current[ 'id' ] = $entry->entry_id;
-					$current[ 'user' ] = oneUser( $entry->User, $session );
-
-	//				$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
-	//				$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
-	//				$current[ 'user' ][ 'displayName' ] = $entry->User->user_display_name;
-	//				$current[ 'user' ][ 'email' ] = $entry->User->user_email;
-	//				$current[ 'user' ][ 'profileImage' ] = ( !empty( $entry->user->user_profile_image ) )
-	//					? "http://" . $_ENV[ 'URL' ] . "/" . $entry->user->user_profile_image : "";
-	//				$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
-	//					? "http://" . $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
-	//				$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $entry->entry_user_id )->count();
-					$current[ 'category' ] = $entry->category->category_name;
-					$current[ 'type' ] = $entry->entry_type;
-					$current[ 'name' ] = $entry->entry_name;
-					$current[ 'description' ] = $entry->entry_description;
-					$current[ 'totalComments' ] = $entry->comments->count();
-					$current[ 'created' ] = $entry->entry_created_date;
-					$current[ 'modified' ] = $entry->entry_modified_date;
-
-					$current[ 'tags' ] = array();
-					foreach( $entry->entryTag as $entry_tag )
+					if($entry->entry_rank > 0)
 					{
-						//TODO: Fix tags so that we do not need to find this
-						$current[ 'tags' ][ ] = $entry_tag->tag->tag_name;
-					}
+						$current[ 'id' ] = $entry->entry_id;
+						$current[ 'user' ] = oneUser( $entry->User, $session );
 
-					foreach( $entry->file as $file )
-					{
+		//				$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
+		//				$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
+		//				$current[ 'user' ][ 'displayName' ] = $entry->User->user_display_name;
+		//				$current[ 'user' ][ 'email' ] = $entry->User->user_email;
+		//				$current[ 'user' ][ 'profileImage' ] = ( !empty( $entry->user->user_profile_image ) )
+		//					? "http://" . $_ENV[ 'URL' ] . "/" . $entry->user->user_profile_image : "";
+		//				$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
+		//					? "http://" . $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
+		//				$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $entry->entry_user_id )->count();
+						$current[ 'category' ] = $entry->category->category_name;
+						$current[ 'type' ] = $entry->entry_type;
+						$current[ 'name' ] = $entry->entry_name;
+						$current[ 'description' ] = $entry->entry_description;
+						$current[ 'totalComments' ] = $entry->comments->count();
+						$current[ 'created' ] = $entry->entry_created_date;
+						$current[ 'modified' ] = $entry->entry_modified_date;
 
-						$signedUrl = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
-
-						$current[ 'entryFiles' ][ ] = [
-							'fileType' => $file->entry_file_type,
-							'filePath' => $signedUrl ];
-
-						$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-							$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
-							: "";
-					}
-
-					$current[ 'upVotes' ] = $up_votes;
-					$current[ 'downVotes' ] = $down_votes;
-					$current[ 'rank' ] = $entry->entry_rank;
-					$current[ 'language' ] = $entry->entry_language;
-
-					if( $showFeedback == 1 )
-					{
-						$currentFeedback = [ ];
-
-						foreach( $entry->comments as $comment )
+						$current[ 'tags' ] = array();
+						foreach( $entry->entryTag as $entry_tag )
 						{
-							$currentFeedback[ ] = [
-								'comment'        => $comment->comment_content,
-								'commentDate'    => $comment->comment_added_date,
-								'commentDeleted' => (bool)$comment->comment_deleted ];
+							//TODO: Fix tags so that we do not need to find this
+							$current[ 'tags' ][ ] = $entry_tag->tag->tag_name;
 						}
-						$current[ 'feedback' ] = $currentFeedback;
-					}
 
-					if( $entry->entry_deleted )
-					{
-						$current[ 'deleted' ] = true;
-					}
-					else
-					{
-						$current[ 'deleted' ] = false;
-					}
+						foreach( $entry->file as $file )
+						{
 
-					$return[ 'entries' ][ ][ 'entry' ] = $current;
+							$signedUrl = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
+
+							$current[ 'entryFiles' ][ ] = [
+								'fileType' => $file->entry_file_type,
+								'filePath' => $signedUrl ];
+
+							$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
+								$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
+								: "";
+						}
+
+						$current[ 'upVotes' ] = $up_votes;
+						$current[ 'downVotes' ] = $down_votes;
+						$current[ 'rank' ] = $entry->entry_rank;
+						$current[ 'language' ] = $entry->entry_language;
+
+						if( $showFeedback == 1 )
+						{
+							$currentFeedback = [ ];
+
+							foreach( $entry->comments as $comment )
+							{
+								$currentFeedback[ ] = [
+									'comment'        => $comment->comment_content,
+									'commentDate'    => $comment->comment_added_date,
+									'commentDeleted' => (bool)$comment->comment_deleted ];
+							}
+							$current[ 'feedback' ] = $currentFeedback;
+						}
+
+						if( $entry->entry_deleted )
+						{
+							$current[ 'deleted' ] = true;
+						}
+						else
+						{
+							$current[ 'deleted' ] = false;
+						}
+
+						$return[ 'entries' ][ ][ 'entry' ] = $current;
+					}
 				}
-			//}
 		}
 
 		$status_code = 200;
