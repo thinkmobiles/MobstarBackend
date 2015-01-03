@@ -237,7 +237,7 @@ class EntryController extends BaseController
 		}
 		if( $order_by == 'popular' )
 		{
-			$entry_rank = DB::table('entries')->where( 'entry_rank', '>', '0')->get();
+			$entry_rank = DB::table('entries')->where( 'entry_rank', '<>', '0')->get();
 			foreach( $entry_rank as $rank )
 			{
 				$exclude[ ] = $rank->entry_id;
