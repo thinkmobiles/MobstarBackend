@@ -418,7 +418,9 @@ class EntryController extends BaseController
 
 				else
 				{
-					if($entry->entry_rank > 0)
+					if($entry->entry_rank == '0')
+					continue;
+					else
 					{
 						$current[ 'id' ] = $entry->entry_id;
 						$current[ 'user' ] = oneUser( $entry->User, $session );
