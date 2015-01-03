@@ -238,7 +238,10 @@ class EntryController extends BaseController
 		if( $order_by == 'popular' )
 		{
 			$entry_rank = DB::table('entries')->where( 'entry_rank', '>', '0')->get();
-			$exclude[ ] = $entry_rank->entry_rank;
+			foreach( $entry_rank as $rank )
+			{
+				$exclude[ ] = $rank->entry_id;
+			}
 		}
 		$entries = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false, true );
 		$count = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, true );
