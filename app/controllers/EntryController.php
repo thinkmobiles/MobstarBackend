@@ -2280,6 +2280,7 @@ class EntryController extends BaseController
 	//////
 	public function dummytest()
 	{
+		die('here');
 		$client = getS3Client();
 
 		$token = Request::header( "X-API-TOKEN" );
