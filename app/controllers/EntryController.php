@@ -2169,8 +2169,8 @@ class EntryController extends BaseController
 		$session = $this->token->get_session( $token );		
 		$term = Input::get( "term" );		
 		
-		$results = $this->entry->search( $term );
-		dd(DB::getQueryLog());
+		/*$results = $this->entry->search( $term );
+		//dd(DB::getQueryLog());
 		$status_code = 200;
 
 		if( count( $results ) == 0 )
@@ -2188,8 +2188,8 @@ class EntryController extends BaseController
 			}
 		}
 
-		return Response::make( $return, $status_code );
-		/*$results = DB::table('entries')
+		return Response::make( $return, $status_code );*/
+		$results = DB::table('entries')
 		->select('entries.*')
 		->join('users', 'entries.entry_user_id', '=', 'users.user_id')
         ->where('entries.entry_name', 'LIKE', '%'.$term.'%')
@@ -2201,6 +2201,7 @@ class EntryController extends BaseController
             })
 		->where('entries.entry_deleted', '=', '0')
         ->get();		
+		dd(DB::getQueryLog());
 		$status_code = 200;
 		if( count( $results ) == 0 )
 		{
@@ -2218,7 +2219,7 @@ class EntryController extends BaseController
 				$return[ 'entries' ][ ][ 'entry' ] = $this->oneEntryNew( $results[$i], $session, true );
 			}		
 		}
-		return Response::make( $return, $status_code );*/
+		return Response::make( $return, $status_code );
 	}
 	public function oneEntryNew( $entry, $session, $includeUser = false )
 	{
