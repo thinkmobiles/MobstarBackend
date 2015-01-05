@@ -2201,7 +2201,7 @@ class EntryController extends BaseController
             })
 		->where('entries.entry_deleted', '=', '0')
         ->get();		
-		dd(DB::getQueryLog());
+		//dd(DB::getQueryLog());
 		$status_code = 200;
 		if( count( $results ) == 0 )
 		{
