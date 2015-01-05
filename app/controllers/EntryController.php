@@ -2170,7 +2170,7 @@ class EntryController extends BaseController
 		$term = Input::get( "term" );		
 		
 		$results = $this->entry->search( $term );
-		dd(DB::getQueryLog());
+		//dd(DB::getQueryLog());
 		$status_code = 200;
 
 		if( count( $results ) == 0 )
