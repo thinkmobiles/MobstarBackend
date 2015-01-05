@@ -2191,7 +2191,7 @@ class EntryController extends BaseController
 		return Response::make( $return, $status_code );*/
 		$results = DB::table('entries')
 		->select('entries.*')
-		->join('users', 'entries.entry_user_id', '=', 'users.user_id AND entries.entry_deleted', '=', '0')
+		->join('users', 'entries.entry_user_id', '=', 'users.user_id')
         ->where('entries.entry_name', 'LIKE', '%'.$term.'%')
         ->orWhere(function($query) use ($term)
             {
@@ -2199,9 +2199,13 @@ class EntryController extends BaseController
 						->orWhere('users.user_name', 'LIKE', '%'.$term.'%')
 						->orWhere('users.user_full_name', 'LIKE', '%'.$term.'%');
             })
-		->where('entries.entry_deleted', '=', '0')
+		->andWhere(function($query)
+            {
+                $query->andWhere('entries.entry_deleted', '=', '0');						
+            })	
+		//->where('entries.entry_deleted', '=', '0')
         ->get();		
-		//dd(DB::getQueryLog());
+		dd(DB::getQueryLog());
 		$status_code = 200;
 		if( count( $results ) == 0 )
 		{
