@@ -2197,12 +2197,9 @@ class EntryController extends BaseController
             {
                 $query->orWhere('entries.entry_description', 'LIKE', '%'.$term.'%')
 						->orWhere('users.user_name', 'LIKE', '%'.$term.'%')
-						->orWhere('users.user_full_name', 'LIKE', '%'.$term.'%');
-            })
-		->andWhere(function($query)
-            {
-                $query->andWhere('entries.entry_deleted', '=', '0');						
-            })	
+						->orWhere('users.user_full_name', 'LIKE', '%'.$term.'%')
+						->where('entries.entry_deleted', '=', '0');
+            })			
 		//->where('entries.entry_deleted', '=', '0')
         ->get();		
 		dd(DB::getQueryLog());
