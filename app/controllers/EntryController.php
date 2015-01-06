@@ -2315,104 +2315,10 @@ class EntryController extends BaseController
 	//////
 	public function dummytest()
 	{
-		/*$client = getS3Client();
-
-		$token = Request::header( "X-API-TOKEN" );
-
-		$session = $this->token->get_session( $token );
-
-		$fields = array_values( explode( ',', Input::get( "fields" ) ) );
-		
-		require "/var/www/api/vendor/twilio/Services/Twilio.php";
-		// set your AccountSid and AuthToken from www.twilio.com/user/account
-		$AccountSid = "AC77fca1e17b7508e848be713a6994893c";
-		$AuthToken = "4ade7277e9e0c53f4c37c5f02ef83fe7";
-		$client = new Services_Twilio($AccountSid, $AuthToken);
-		$message = $client->account->messages->create(array(
-		"From" => "+15129603908",
-		"To" => "+918673098008",
-		"Body" => "Test message!",
-		));
-		// Display a confirmation message on the screen
-		echo "Sent message {$message->sid}";*/
-		
-		// validate the info, create rules for the inputs
-		/*$rules = array(
-			'email'    => 'required|email', // make sure the email is an actual email
-			'password' => 'required|alphaNum|min:3', // password can only be alphanumeric and has to be greater than 3 characters
-			'device'   => 'in:apple,google', // device type, must be google or apple
-//			'deviceToken'    => 'required' // token is required
-		);
-
-		// run the validation rules on the inputs
-		$validator = Validator::make( Input::all(), $rules );
-
-		// if the validator fails, return errors
-		if( $validator->fails() )
-		{
-			$return = $validator->messages();
-			$status_code = 401;
-		}
-		else
-		{*/
-
-			// create our user data for the authentication
-			$userdata = array(
-				'user_email' => Input::get( 'email' ),
-				'password'   => Input::get( 'password' )
-			);
-
-			// attempt to do the login
-			if( Auth::attempt( $userdata ) )
-			{
-
-				//Create Session
-				$session_key = str_random( 40 );
-				$token = array(
-					'token_value'        => $session_key,
-					'token_created_date' => date( "Y-m-d H:i:s" ),
-					'token_valid_until'  => date( "Y-m-d H:i:s", strtotime( "now + 1 hour" ) ),
-					'token_user_id'      => Auth::user()->user_id
-				);
-
-
-				
-				//$entry = DB::table('entries')->where( 'entry_user_id', '=', Auth::user()->user_id )->first();
-				$entry = DB::table('user_phones')->where('user_phone_user_id', '=', Auth::user()->user_id)->pluck('user_phone_verified');
-				print_r($entry);
-				die;
-				//Return user id and token details:
-				$return = array(
-					'token'           => $session_key,
-					'userId'          => Auth::user()->user_id,
-					'userName'        => Auth::user()->user_name,
-					'userFullName'    => Auth::user()->user_full_name,
-					'userDisplayName' => Auth::user()->user_display_name,
-					'userTagline'     => Auth::user()->user_tagline,
-					'profileImage'    => ( !empty( Auth::user()->user_profile_image ) )
-						? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_profile_image : '',
-					'profileCover'    => ( !empty( Auth::user()->user_cover_image ) )
-						? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_cover_image : '',
-				);
-
-				$status_code = 200;
-
-			}
-			else
-			{
-
-				// validation not successful, send back to form	
-				$return = array( "error" => "You have provided wrong credentials" );
-
-				$status_code = 401;
-
-			}
-
-		//}
+		$return = json_encode( [ 'error' => 'No Entries Found' ] );
+		$status_code = 404;
 		$response = Response::make( $return, $status_code );
-
 		return $response;
-	}
-	
+	}	
 	///////	
 }
