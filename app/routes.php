@@ -187,7 +187,7 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "EntryController@mysearch"
 		] );
 		
-		Route::get( "entry/dummytest", [
+		Route::post( "entry/dummytest", [
 			"as"   => "entry/dummytest",
 			"uses" => "EntryController@dummytest"
 		] );
