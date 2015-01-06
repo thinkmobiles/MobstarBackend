@@ -2323,7 +2323,7 @@ class EntryController extends BaseController
 
 		$fields = array_values( explode( ',', Input::get( "fields" ) ) );
 		
-		require "/vendor/twilio/Services/Twilio.php";
+		require "var/www/api/vendor/twilio/Services/Twilio.php";
 		// set your AccountSid and AuthToken from www.twilio.com/user/account
 		$AccountSid = "AC77fca1e17b7508e848be713a6994893c";
 		$AuthToken = "4ade7277e9e0c53f4c37c5f02ef83fe7";
