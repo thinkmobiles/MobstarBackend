@@ -2335,6 +2335,7 @@ class EntryController extends BaseController
 		));
 		// Display a confirmation message on the screen
 		echo "Sent message {$message->sid}";
-
+	}
+	
 	///////	
 }
