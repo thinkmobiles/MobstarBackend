@@ -140,13 +140,14 @@ class LoginController extends BaseController
 				}
 
 				Token::create( $token );
-				$isVerifiedPhone = DB::table('user_phones')->where('user_phone_user_id', '=', Auth::user()->user_id)->pluck('user_phone_verified');
+				/*$isVerifiedPhone = DB::table('user_phones')->where('user_phone_user_id', '=', Auth::user()->user_id)->pluck('user_phone_verified');
 				if(empty($isVerifiedPhone))
 				{
 					$isVerifiedPhone = '0';
 				}
 				else
 					$isVerifiedPhone = $isVerifiedPhone;
+				*/
 				//Return user id and token details:
 				$return = array(
 					'token'           => $session_key,
@@ -159,7 +160,7 @@ class LoginController extends BaseController
 						? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_profile_image : '',
 					'profileCover'    => ( !empty( Auth::user()->user_cover_image ) )
 						? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_cover_image : '',
-					'userPhone'     => $isVerifiedPhone,	
+					//'userPhone'     => $isVerifiedPhone,	
 				);
 
 				$status_code = 200;
