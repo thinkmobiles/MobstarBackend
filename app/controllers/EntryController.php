@@ -2375,28 +2375,7 @@ class EntryController extends BaseController
 					'token_user_id'      => Auth::user()->user_id
 				);
 
-				$deviceToken = Input::get( 'deviceToken' );
-				$deviceType = Input::get( 'device' );
 
-				if( isset( $deviceType ) && isset( $deviceToken ) )
-				{
-
-					$device = DeviceRegistration::firstOrNew(
-						[ 'device_registration_device_token' => $deviceToken ]
-					);
-
-					$device->device_registration_user_id = Auth::user()->user_id;
-					$device->device_registration_device_type = $deviceType;
-					$device->device_registration_device_token = $deviceToken;
-					$device->device_registration_date_created = date( "Y-m-d H:i:s" );
-
-					$device->save();
-
-					$this->registerSNSEndpoint( $device );
-
-				}
-
-				Token::create( $token );
 				print_r(Auth::user());
 				die;
 				//Return user id and token details:
