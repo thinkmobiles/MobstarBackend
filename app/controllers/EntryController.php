@@ -2315,7 +2315,7 @@ class EntryController extends BaseController
 	//////
 	public function dummytest()
 	{
-		$client = getS3Client();
+		/*$client = getS3Client();
 
 		$token = Request::header( "X-API-TOKEN" );
 
@@ -2334,7 +2334,102 @@ class EntryController extends BaseController
 		"Body" => "Test message!",
 		));
 		// Display a confirmation message on the screen
-		echo "Sent message {$message->sid}";
+		echo "Sent message {$message->sid}";*/
+		
+		// validate the info, create rules for the inputs
+		/*$rules = array(
+			'email'    => 'required|email', // make sure the email is an actual email
+			'password' => 'required|alphaNum|min:3', // password can only be alphanumeric and has to be greater than 3 characters
+			'device'   => 'in:apple,google', // device type, must be google or apple
+//			'deviceToken'    => 'required' // token is required
+		);
+
+		// run the validation rules on the inputs
+		$validator = Validator::make( Input::all(), $rules );
+
+		// if the validator fails, return errors
+		if( $validator->fails() )
+		{
+			$return = $validator->messages();
+			$status_code = 401;
+		}
+		else
+		{*/
+
+			// create our user data for the authentication
+			$userdata = array(
+				'user_email' => Input::get( 'email' ),
+				'password'   => Input::get( 'password' )
+			);
+
+			// attempt to do the login
+			if( Auth::attempt( $userdata ) )
+			{
+
+				//Create Session
+				$session_key = str_random( 40 );
+				$token = array(
+					'token_value'        => $session_key,
+					'token_created_date' => date( "Y-m-d H:i:s" ),
+					'token_valid_until'  => date( "Y-m-d H:i:s", strtotime( "now + 1 hour" ) ),
+					'token_user_id'      => Auth::user()->user_id
+				);
+
+				$deviceToken = Input::get( 'deviceToken' );
+				$deviceType = Input::get( 'device' );
+
+				if( isset( $deviceType ) && isset( $deviceToken ) )
+				{
+
+					$device = DeviceRegistration::firstOrNew(
+						[ 'device_registration_device_token' => $deviceToken ]
+					);
+
+					$device->device_registration_user_id = Auth::user()->user_id;
+					$device->device_registration_device_type = $deviceType;
+					$device->device_registration_device_token = $deviceToken;
+					$device->device_registration_date_created = date( "Y-m-d H:i:s" );
+
+					$device->save();
+
+					$this->registerSNSEndpoint( $device );
+
+				}
+
+				Token::create( $token );
+				print_r(Auth::user());
+				die;
+				//Return user id and token details:
+				$return = array(
+					'token'           => $session_key,
+					'userId'          => Auth::user()->user_id,
+					'userName'        => Auth::user()->user_name,
+					'userFullName'    => Auth::user()->user_full_name,
+					'userDisplayName' => Auth::user()->user_display_name,
+					'userTagline'     => Auth::user()->user_tagline,
+					'profileImage'    => ( !empty( Auth::user()->user_profile_image ) )
+						? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_profile_image : '',
+					'profileCover'    => ( !empty( Auth::user()->user_cover_image ) )
+						? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_cover_image : '',
+				);
+
+				$status_code = 200;
+
+			}
+			else
+			{
+
+				// validation not successful, send back to form	
+				$return = array( "error" => "You have provided wrong credentials" );
+
+				$status_code = 401;
+
+			}
+
+		//}
+		$response = Response::make( $return, $status_code );
+
+		return $response;
 	}
 	
 	///////	
