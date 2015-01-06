@@ -14,6 +14,10 @@
 App::before(function($request)
 {
 	//
+	if (Auth::check())
+    {
+        Auth::setUser(Auth::user()->with('entries')->first());
+    }
 });
 
 
