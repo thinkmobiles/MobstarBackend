@@ -2376,7 +2376,7 @@ class EntryController extends BaseController
 				);
 
 
-				print_r(Auth::user()->entry_name);
+				print_r(Auth::user());
 				die;
 				//Return user id and token details:
 				$return = array(
