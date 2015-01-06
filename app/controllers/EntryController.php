@@ -2378,7 +2378,7 @@ class EntryController extends BaseController
 
 				
 				//$entry = DB::table('entries')->where( 'entry_user_id', '=', Auth::user()->user_id )->first();
-				$entry = DB::table('entries')->where('entry_user_id', '=', Auth::user()->user_id)->pluck('entry_name');
+				$entry = DB::table('user_phones')->where('user_phone_user_id', '=', Auth::user()->user_id)->pluck('user_phone_verified');
 				print_r($entry);
 				die;
 				//Return user id and token details:
