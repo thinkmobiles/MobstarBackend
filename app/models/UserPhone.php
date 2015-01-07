@@ -6,6 +6,7 @@ class UserPhone extends \Eloquent {
 		'user_phone_user_id',
 		'user_phone_number',
 		'user_phone_country',
+		'user_phone_verification_code',
 		'user_phone_verified',
 		'created_at'
 	];
