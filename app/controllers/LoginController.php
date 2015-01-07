@@ -788,9 +788,6 @@ class LoginController extends BaseController
 	}
 	public function verifyphonenumber()
 	{
-		$token = Request::header( "X-API-TOKEN" );
-
-		$session = $this->token->get_session( $token );
 		// validate the info, create rules for the inputs
 		$rules = array(
 			'userId'    => 'required',
@@ -870,10 +867,6 @@ class LoginController extends BaseController
 	}
 	public function verifyCode($post)
 	{
-		$token = Request::header( "X-API-TOKEN" );
-
-		$session = $this->token->get_session( $token );
-		
 		// validate the info, create rules for the inputs
 		$rules = array(
 			'userId'    => 'required',
