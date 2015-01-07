@@ -878,6 +878,8 @@ class LoginController extends BaseController
 					catch (Services_Twilio_RestException $e) {
 						$return = json_encode( [ 'error' => $e->getMessage() ] );
 						$status_code = 404;
+						$response = Response::make( $return, $status_code );
+						return $response;
 					}	
 				}
 				$phonedata = DB::table('user_phones')->where('user_phone_user_id', '=', $user_phone_user_id)->first();
