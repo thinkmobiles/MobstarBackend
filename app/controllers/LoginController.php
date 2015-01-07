@@ -345,7 +345,7 @@ class LoginController extends BaseController
 				{
 					$isVerifiedPhone = $isVerifiedPhone;
 				}
-				$return['userPhone'] = $isVerifiedPhone
+				$return['userPhone'] = $isVerifiedPhone;
 			}
 			$status_code = 200;
 
