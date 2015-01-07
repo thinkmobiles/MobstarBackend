@@ -833,7 +833,7 @@ class LoginController extends BaseController
 					'userId'          => $phonedata->user_phone_user_id,
 					'vPhoneNo'        => $phonedata->user_phone_number,
 					'countryCode'     => $phonedata->user_phone_country,
-					'userPhone'       => $phonedata->isVerifiedPhone,	
+					'userPhone'       => $phonedata->user_phone_verified,	
 					);
 					$status_code = 200;
 				}
