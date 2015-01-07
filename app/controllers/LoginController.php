@@ -876,6 +876,8 @@ class LoginController extends BaseController
 						));
 					}
 					catch (Services_Twilio_RestException $e) {
+						$userphone = UserPhone::find($phone->user_phone_id);
+						$userphone->delete();
 						$return = json_encode( [ 'error' => $e->getMessage() ] );
 						$status_code = 404;
 						$response = Response::make( $return, $status_code );
