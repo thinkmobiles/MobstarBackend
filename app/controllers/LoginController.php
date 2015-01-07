@@ -788,10 +788,13 @@ class LoginController extends BaseController
 	}
 	public function verifyphonenumber()
 	{
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
 		// validate the info, create rules for the inputs
 		$rules = array(
 			'userId'    => 'required',
-			'vPhoneNo' => 'required', // password can only be alphanumeric and has to be greater than 3 characters
+			'vPhoneNo' => 'required',
 			'countryCode'   => 'required'
 		);
 		
@@ -855,6 +858,68 @@ class LoginController extends BaseController
 					$status_code = 404;
 				}
 			}			
+			else
+			{
+				// validation not successful, send back to form	
+				$return = array( "error" => "You have provided wrong details" );
+				$status_code = 401;
+			}
+		}
+		$response = Response::make( $return, $status_code );
+		return $response;
+	}
+	public function verifyCode($post)
+	{
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+		
+		// validate the info, create rules for the inputs
+		$rules = array(
+			'userId'    => 'required',
+			'verificationCode' => 'required',
+		);
+		
+		// run the validation rules on the inputs
+		$validator = Validator::make( Input::all(), $rules );
+
+		// if the validator fails, return errors
+		if( $validator->fails() )
+		{
+			$return = $validator->messages();
+			$status_code = 401;
+		}
+		else
+		{
+			//Create verification code
+			$user_phone_user_id = Input::get( 'userId' );
+			$user_phone_verification_code = Input::get( 'verificationCode' );
+			if( isset( $user_phone_user_id ) && isset( $user_phone_verification_code ))
+			{
+				$phonedata = DB::table('user_phones')->where('user_phone_user_id', '=', $user_phone_user_id)->first();
+				if( $phonedata )
+				{
+					if($phonedata->user_phone_verification_code == $user_phone_verification_code)
+					{
+						$phonedata->user_phone_verified = '1';
+						$phonedata->updated_at = date( "Y-m-d H:i:s" );
+						$phonedata->save();
+						
+						$return = [ 'notice' => 'Phone number verified successfully' ];
+						$status_code = 200;	
+					}
+					else
+					{
+						$return = array( "error" => "Invalid verification code, please try again" );
+						$status_code = 404;
+					}
+				}
+				else
+				{
+					$return = array( "error" => "User not found" );
+					$status_code = 404;
+				}
+			}
 			else
 			{
 				// validation not successful, send back to form	
