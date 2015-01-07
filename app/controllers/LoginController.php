@@ -336,9 +336,7 @@ class LoginController extends BaseController
 			$return = getUserProfile( $user, $session );
 			if(!empty($return))
 			{
-				print_r($return);
-				die('here');
-				$isVerifiedPhone = DB::table('user_phones')->where('user_phone_user_id', '=', $return['id'])->pluck('user_phone_verified');
+				$isVerifiedPhone = DB::table('user_phones')->where('user_phone_user_id', '=', $return['userId'])->pluck('user_phone_verified');
 				if(empty($isVerifiedPhone))
 				{
 					$isVerifiedPhone = '0';
