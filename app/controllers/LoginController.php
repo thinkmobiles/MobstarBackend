@@ -786,5 +786,66 @@ class LoginController extends BaseController
 		}
 
 	}
+	public function verifyPhoneNumber()
+	{
+		// validate the info, create rules for the inputs
+		$rules = array(
+			'userId'    => 'required',
+			'vPhoneNo' => 'required', // password can only be alphanumeric and has to be greater than 3 characters
+			'countryCode'   => 'required'
+		);
+		
+		// run the validation rules on the inputs
+		$validator = Validator::make( Input::all(), $rules );
 
+		// if the validator fails, return errors
+		if( $validator->fails() )
+		{
+			$return = $validator->messages();
+			$status_code = 401;
+		}
+		else
+		{
+			//Create verification code
+			$iVerificationCode = mt_rand(1111, 9999);
+			$user_phone_user_id = Input::get( 'userId' );
+			$user_phone_number = Input::get( 'vPhoneNo' );
+			$user_phone_country = Input::get( 'countryCode' );			
+			if( isset( $user_phone_user_id ) && isset( $user_phone_number ) && isset( $user_phone_country ))
+			{
+				$phone = UserPhone::firstOrNew(
+					[ 'user_phone_user_id' => $user_phone_user_id ]
+				);
+
+				$phone->user_phone_user_id = $user_phone_user_id;
+				$phone->user_phone_number = $user_phone_number;
+				$phone->user_phone_country = $user_phone_country;
+				$phone->user_phone_verification_code = $iVerificationCode;
+				$phone->user_phone_verified = '0';
+				$phone->created_at = date( "Y-m-d H:i:s" );
+
+				$phone->save();
+				$phonedata = DB::table('user_phones')->where('user_phone_id', '=', $phone->user_phone_id)->first();
+				if(!empty($phonedata))
+				{
+					$phonedata->toArray();
+					$return = $phonedata;
+					$status_code = 200;
+				}
+				else
+				{
+					$return = json_encode( [ 'error' => 'No Entries Found' ] );
+					$status_code = 404;
+				}
+			}			
+			else
+			{
+				// validation not successful, send back to form	
+				$return = array( "error" => "You have provided wrong details" );
+				$status_code = 401;
+			}
+		}
+		$response = Response::make( $return, $status_code );
+		return $response;
+	}
 }
