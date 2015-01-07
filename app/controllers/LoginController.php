@@ -146,8 +146,9 @@ class LoginController extends BaseController
 					$isVerifiedPhone = '0';
 				}
 				else
+				{
 					$isVerifiedPhone = $isVerifiedPhone;
-				
+				}
 				//Return user id and token details:
 				$return = array(
 					'token'           => $session_key,
@@ -333,7 +334,19 @@ class LoginController extends BaseController
 			//Return user id and token details not using auth library:
 
 			$return = getUserProfile( $user, $session );
-
+			if(!empty($return))
+			{
+				$isVerifiedPhone = DB::table('user_phones')->where('user_phone_user_id', '=', $return['id'])->pluck('user_phone_verified');
+				if(empty($isVerifiedPhone))
+				{
+					$isVerifiedPhone = '0';
+				}
+				else
+				{
+					$isVerifiedPhone = $isVerifiedPhone;
+				}
+				$return['userPhone'] = $isVerifiedPhone
+			}
 			$status_code = 200;
 
 		}
