@@ -832,7 +832,7 @@ class LoginController extends BaseController
 					'verificationCode'=> $iVerificationCode,
 					'userId'          => $phonedata->user_phone_user_id,
 					'vPhoneNo'        => $phonedata->user_phone_number,
-					'countryCode'     => $phonedata->user_phone_country
+					'countryCode'     => $phonedata->user_phone_country,
 					'userPhone'       => $phonedata->isVerifiedPhone,	
 					);
 					$status_code = 200;
