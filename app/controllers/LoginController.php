@@ -825,11 +825,16 @@ class LoginController extends BaseController
 				$phone->created_at = date( "Y-m-d H:i:s" );
 
 				$phone->save();
-				$phonedata = DB::table('user_phones')->where('user_phone_id', '=', $phone->user_phone_id)->first();
+				$phonedata = DB::table('user_phones')->where('user_phone_user_id', '=', $user_phone_user_id)->first();
 				if(!empty($phonedata))
 				{
-					$phonedata->toArray();
-					$return = $phonedata;
+					$return = array(
+					'verificationCode'=> $iVerificationCode,
+					'userId'          => $phonedata->user_phone_user_id,
+					'vPhoneNo'        => $phonedata->user_phone_number,
+					'countryCode'     => $phonedata->user_phone_country
+					'userPhone'       => $phonedata->isVerifiedPhone,	
+					);
 					$status_code = 200;
 				}
 				else
