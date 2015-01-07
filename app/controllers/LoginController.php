@@ -786,7 +786,7 @@ class LoginController extends BaseController
 		}
 
 	}
-	public function verifyPhoneNumber()
+	public function verifyphonenumber()
 	{
 		// validate the info, create rules for the inputs
 		$rules = array(

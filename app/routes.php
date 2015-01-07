@@ -459,9 +459,9 @@ Route::group( [ "before" => "auth" ], function ()
 		"uses" => "LoginController@index"
 	] );
 	
-	Route::post( "login", [
-		"as"   => "login/verifyPhoneNumber",
-		"uses" => "LoginController@verifyPhoneNumber"
+	Route::post( "login/verifyphonenumber", [
+		"as"   => "login/verifyphonenumber",
+		"uses" => "LoginController@verifyphonenumber"
 	] );
 
 	Route::post( "login/facebook", [
