@@ -889,7 +889,8 @@ class LoginController extends BaseController
 			$user_phone_verification_code = Input::get( 'verificationCode' );
 			if( isset( $user_phone_user_id ) && isset( $user_phone_verification_code ))
 			{
-				$phonedata = DB::table('user_phones')->where('user_phone_user_id', '=', $user_phone_user_id)->first();
+				//$phonedata = DB::table('user_phones')->where('user_phone_user_id', '=', $user_phone_user_id)->first();
+				$phonedata = UserPhone::where( 'user_phone_user_id', '=', $user_phone_user_id )->first();
 				if( $phonedata )
 				{
 					if($phonedata->user_phone_verification_code == $user_phone_verification_code)
