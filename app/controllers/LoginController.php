@@ -824,7 +824,19 @@ class LoginController extends BaseController
 				$phone->user_phone_verified = '0';
 				$phone->created_at = date( "Y-m-d H:i:s" );
 
-				$phone->save();
+				if($phone->save())
+				{
+					require "/var/www/api/vendor/twilio/Services/Twilio.php";
+					// set your AccountSid and AuthToken from www.twilio.com/user/account
+					$AccountSid = "AC77fca1e17b7508e848be713a6994893c";
+					$AuthToken = "4ade7277e9e0c53f4c37c5f02ef83fe7";
+					$client = new Services_Twilio($AccountSid, $AuthToken);
+					$message = $client->account->messages->create(array(
+					"From" => "+15129603908",
+					"To" => "+918673098008",
+					"Body" => "Test message!",
+					));					
+				}
 				$phonedata = DB::table('user_phones')->where('user_phone_user_id', '=', $user_phone_user_id)->first();
 				if(!empty($phonedata))
 				{
