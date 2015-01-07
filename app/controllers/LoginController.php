@@ -865,7 +865,7 @@ class LoginController extends BaseController
 		$response = Response::make( $return, $status_code );
 		return $response;
 	}
-	public function verifycode($post)
+	public function verifycode()
 	{
 		// validate the info, create rules for the inputs
 		$rules = array(
