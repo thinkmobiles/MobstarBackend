@@ -833,8 +833,8 @@ class LoginController extends BaseController
 					$client = new Services_Twilio($AccountSid, $AuthToken);
 					$message = $client->account->messages->create(array(
 					"From" => "+15129603908",
-					"To" => "+918673098008",
-					"Body" => "Test message!",
+					"To" => "+".$user_phone_country.$user_phone_number,
+					"Body" => "Mobstar! Verification Code ".$iVerificationCode."",
 					));					
 				}
 				$phonedata = DB::table('user_phones')->where('user_phone_user_id', '=', $user_phone_user_id)->first();
