@@ -865,12 +865,14 @@ class LoginController extends BaseController
 				{
 					require "/var/www/api/vendor/twilio/Services/Twilio.php";
 					// set your AccountSid and AuthToken from www.twilio.com/user/account
-					$AccountSid = "AC77fca1e17b7508e848be713a6994893c";
-					$AuthToken = "4ade7277e9e0c53f4c37c5f02ef83fe7";
+					//$AccountSid = "AC77fca1e17b7508e848be713a6994893c";
+					$AccountSid = "AC1651a9f031f9450afb7e5bac05434970";
+					//$AuthToken = "4ade7277e9e0c53f4c37c5f02ef83fe7";
+					$AuthToken = "1c4f9735e694ee813d0cca2eab5c2eba";
 					$client = new Services_Twilio($AccountSid, $AuthToken);
 					try {
 						$message = $client->account->messages->create(array(
-						"From" => "+15129603908",
+						"From" => "+353768886622",
 						"To" => "+".$user_phone_country.$user_phone_number,
 						"Body" => "Mobstar! Verification Code ".$iVerificationCode."",
 						));
