@@ -2330,7 +2330,7 @@ class EntryController extends BaseController
 	 *   description="Increase one count everytime when the video plays.",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
-	 *       method="GET",
+	 *       method="POST",
 	 *       @SWG\Parameters(
 	 *         @SWG\Parameter(
 	 *           name="entry_view_entry_id",
