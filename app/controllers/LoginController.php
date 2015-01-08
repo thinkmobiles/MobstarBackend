@@ -873,7 +873,7 @@ class LoginController extends BaseController
 					try {
 						$message = $client->account->messages->create(array(
 						"From" => "+353768886622",
-						"To" => "+".$user_phone_country.$user_phone_number,
+						"To" => $user_phone_country.$user_phone_number,
 						"Body" => "Mobstar! Verification Code ".$iVerificationCode."",
 						));
 					}
