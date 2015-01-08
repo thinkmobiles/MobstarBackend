@@ -2333,16 +2333,16 @@ class EntryController extends BaseController
 	 *       method="POST",
 	 *       @SWG\Parameters(
 	 *         @SWG\Parameter(
-	 *           name="entry_view_entry_id",
+	 *           name="entryId",
 	 *           description="Entry id of the video or audio file.",
-	 *           paramType="query",
+	 *           paramType="form",
 	 *           required=true,
-	 *           type="comma seperated list"
+	 *           type="integer"
 	 *         ),
 	 *         @SWG\Parameter(
-	 *           name="entry_view_user_id",
+	 *           name="userId",
 	 *           description="user id for who played this video or audio.",
-	 *           paramType="query",
+	 *           paramType="form",
 	 *           required=true,
 	 *           type="integer"
 	 *         ),
