@@ -2320,5 +2320,83 @@ class EntryController extends BaseController
 		$response = Response::make( $return, $status_code );
 		return $response;
 	}	
+	///////
 	///////	
+	
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/entry/updateViewCount",
+	 *   description="Increase one count everytime when the video plays.",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="GET",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="entry_view_entry_id",
+	 *           description="Entry id of the video or audio file.",
+	 *           paramType="query",
+	 *           required=true,
+	 *           type="comma seperated list"
+	 *         ),
+	 *         @SWG\Parameter(
+	 *           name="entry_view_user_id",
+	 *           description="user id for who played this video or audio.",
+	 *           paramType="query",
+	 *           required=true,
+	 *           type="integer"
+	 *         ),
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="missing fields"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=404,
+	 *            message="No entry found"
+	 *          )
+	 *        )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+	
+	public function updateViewCount()
+	{
+		$rules = array(
+			'entryId'    => 'required',
+			'userId' => 'required',
+		);
+
+		$validator = Validator::make( Input::all(), $rules );
+
+		if( $validator->fails() )
+		{
+			$return = $validator->messages();
+			$status_code = 401;
+		}
+		else
+		{
+			$viewcount = new EntryView;
+			$viewcount->entry_view_entry_id = Input::get( 'entryId' );
+			$viewcount->entry_view_user_id = Input::get( 'userId' );
+			$viewcount->entry_view_date = date('Y-m-d H:i:s');
+
+			if($viewcount->save())
+			{
+				$return = [ 'notice' => 'success' ];
+				$status_code = 200;
+			}
+			else
+			{
+				$return = [ 'error' => 'No Entries Found' ];
+				$status_code = 404;
+			}
+		}
+
+		$response = Response::make( $return, $status_code );
+		return $response;
+	}	
 }
