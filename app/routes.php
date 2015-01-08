@@ -221,7 +221,12 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "entry/view",
 			"uses" => "EntryController@view"
 		] );
-
+		
+		Route::post( "entry/updateViewCount", [
+			"as"	=> "entry/updateViewCount",	
+			"uses"	=> "EntryController@updateViewCount"
+		] );
+		
 		// -------------------------------------------------------
 		// Entry Feedback
 		//---------------------------------------------------------
