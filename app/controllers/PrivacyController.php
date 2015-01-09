@@ -63,7 +63,7 @@ class PrivacyController extends BaseController
 
 		$user->save();
 
-		$return['privacyPolicy'] = "lorem ipsum dolor";
+		$return['privacyPolicy'] = 'This privacy policy (the "Privacy Policy") describes how and when MobStar, Inc. ("MobStar" "us" "we" "our") collects, uses, and shares your information when you use the MobStar application, software and/or website(s) (the "Services"). This Privacy Policy explains the information gathering, use and sharing practices for the Services, including what information is collected, how that information is acquired, maintained, stored, shared and/or used, and your privacy choices. This Privacy Policy is independent from our offline personal data collection practices. When using any of our Services you consent to the collection, transfer, manipulation, storage, disclosure and other uses of your information as described in this Privacy Policy. Irrespective of which country you reside in or supply information from, you authorize MobStar to use your information in the United States, Ireland, and any other country where MobStar operates.In some cases, you also may visit third party websites through links on the Services who may collect and use your personal information and other non-personal information. We encourage you to review the policies of any such third parties before disclosing your personal information, as we have no control over, and are not liable for, their privacy practices.';
 
 		$response = Response::make( $return, 200 );
 
