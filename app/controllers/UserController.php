@@ -895,6 +895,13 @@ class UserController extends BaseController
 	 *           required=true,
 	 *           type="string"
 	 *         ),
+	 *		@SWG\Parameter(
+	 *           name="bio",
+	 *           description="The about me section on the users profile",
+	 *           paramType="form",
+	 *           required=true,
+	 *           type="string"
+	 *         ),	
 	 *         @SWG\Parameter(
 	 *           name="password",
 	 *           description="Password for the regisering user",
@@ -963,7 +970,12 @@ class UserController extends BaseController
 			{
 				$user->user_tagline = Input::get( 'tagline' );
 			}
-
+			
+			if( isset( $input[ 'bio' ] ) )
+			{
+				$user->user_bio = Input::get( 'bio' );
+			}
+			
 			if( isset( $input[ 'displayName' ] ) )
 			{
 				$user->user_display_name = Input::get( "displayName" );

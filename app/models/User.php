@@ -92,6 +92,7 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 					'fullName'     => $user->user_full_name,
 					'email'        => $user->user_email,
 					'tagLine'      => $user->user_tagline,
+					'bio'      => $user->user_bio,
 					'profileImage' => ( !empty( $user->user_profile_image ) )
 							? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image : '',
 					'profileCover' => ( !empty( $user->user_cover_image ) )
