@@ -71,7 +71,6 @@ function getUserProfile( $user, $session )
 
 function oneUser( $user, $session, $includeStars = false )
 {
-	mail('anil@spaceotechnologies.com',time(),'I am in'); 
 	$client = getS3Client();
 
 	$return = [ 'id'           => $user->user_id,
@@ -137,6 +136,8 @@ function oneUser( $user, $session, $includeStars = false )
 							  'profileImage' => ( isset( $star->Stars->user_profile_image ) )
 								  ? $client->getObjectUrl( 'mobstar-1', $star->Stars->user_profile_image, '+10 minutes' )
 								  : '',
+							  'profileCover' => ( isset( $star->Stars->user_cover_image ) )
+								  ? $client->getObjectUrl( 'mobstar-1', $star->Stars->user_cover_image, '+10 minutes' ) : '',	  
 				];
 			}
 		}
@@ -157,6 +158,8 @@ function oneUser( $user, $session, $includeStars = false )
 								  'profileImage' => ( isset( $starred->User->user_profile_image ) )
 									  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+10 minutes' )
 									  : '',
+								  'profileCover' => ( isset( $starred->User->user_cover_image ) )
+								  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_cover_image, '+10 minutes' ) : '',	  
 				];
 			}
 		}
