@@ -83,7 +83,7 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 		return 'remember_token';
 	}
 
-	public function oneUser( $user, $session, $includeStars = false )
+	public function oneUser( $user, $session, $includeStars = false, $profileCover= false )
 	{
 
 		$return = [ 'id'           => $user->user_id,
@@ -115,6 +115,11 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 								  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
 										  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image : '',
 					];
+					if($profileCover)
+					$stars[ ] = [ 'profileCover' => ( !empty( $star->Stars->user_cover_image ) )
+										  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_cover_image : '',
+					];
+					
 
 				}
 			}
