@@ -83,7 +83,7 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 		return 'remember_token';
 	}
 
-	public function oneUser( $user, $session, $includeStars = false, $profileCover= false )
+	public function oneUser( $user, $session, $includeStars = false, $profileCover = false )
 	{
 
 		$return = [ 'id'           => $user->user_id,
@@ -106,19 +106,28 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 			$stars = [ ];
 
 			foreach( $user->Stars as $star )
-			{
+			{	
 				if( $star->user_star_deleted == 0 )
 				{
 
-					$stars[ ] = [ 'starId'      => $star->Stars->user_id,
+					if($profileCover)
+					{
+						$stars[ ] = [ 'starId'      => $star->Stars->user_id,
 								  'starName'    => $star->Stars->user_display_name,
 								  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
 										  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image : '',
-					];
-					if($profileCover)
-					$stars[ ] = [ 'profileCover' => ( !empty( $star->Stars->user_cover_image ) )
+								  'profileCover' => ( !empty( $star->Stars->user_cover_image ) )
 										  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_cover_image : '',
-					];
+						];
+					}
+					else
+					{
+						$stars[ ] = [ 'starId'      => $star->Stars->user_id,
+								  'starName'    => $star->Stars->user_display_name,
+								  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
+										  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image : '',
+						];
+					}
 					
 
 				}
