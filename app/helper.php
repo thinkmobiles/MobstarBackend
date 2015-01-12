@@ -71,6 +71,7 @@ function getUserProfile( $user, $session )
 
 function oneUser( $user, $session, $includeStars = false )
 {
+	mail('anil@spaceotechnologie.com',time(),'I am in');
 	$client = getS3Client();
 
 	$return = [ 'id'           => $user->user_id,
