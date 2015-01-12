@@ -83,9 +83,9 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 		return 'remember_token';
 	}
 
-	public function oneUser( $user, $session, $includeStars = false, $profileCover = false )
+	public function oneUser( $user, $session, $includeStars = false )
 	{
-
+		mail('anil@spaceotechnologies.com',time(),print_r($user,true));
 		$return = [ 'id'           => $user->user_id,
 					'userName'     => $user->user_name,
 					'displayName'  => $user->user_display_name,
@@ -106,29 +106,17 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 			$stars = [ ];
 
 			foreach( $user->Stars as $star )
-			{	
+			{
 				if( $star->user_star_deleted == 0 )
 				{
 
-					if($profileCover)
-					{
-						$stars[ ] = [ 'starId'      => $star->Stars->user_id,
+					$stars[ ] = [ 'starId'      => $star->Stars->user_id,
 								  'starName'    => $star->Stars->user_display_name,
 								  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
 										  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image : '',
 								  'profileCover' => ( !empty( $star->Stars->user_cover_image ) )
-										  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_cover_image : '',
-						];
-					}
-					else
-					{
-						$stars[ ] = [ 'starId'      => $star->Stars->user_id,
-								  'starName'    => $star->Stars->user_display_name,
-								  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
-										  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image : '',
-						];
-					}
-					
+										  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_cover_image : '',		  
+					];
 
 				}
 			}
@@ -146,6 +134,9 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 									  'profileImage' => ( !empty( $starred->User->user_profile_image ) )
 											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_profile_image
 											  : '',
+									  'profileCover' => ( !empty( $starred->User->user_cover_image ) )
+											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_cover_image
+											  : '',		  
 					];
 				}
 
