@@ -539,7 +539,7 @@ class UserController extends BaseController
 			{
 				
 
-				$return[ 'users' ][ ][ 'user' ] = oneUser( $user, $session, true );
+				$return[ 'users' ][ ][ 'user' ] = oneUser( $user, $session, true, true);
 
 
 			}
