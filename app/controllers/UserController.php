@@ -494,8 +494,8 @@ class UserController extends BaseController
 										  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
 											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image
 											  : '',
-										  'profileCover' => ( !empty( $star->Stars->user_cover_image ) )
-											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_cover_image
+										  'profileCover' => ( !empty( $star->User->user_cover_image ) )
+											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->User->user_cover_image
 											  : '',		
 							];
 
@@ -518,6 +518,9 @@ class UserController extends BaseController
 											  'profileImage' => ( !empty( $starred->User->user_profile_image ) )
 												  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_profile_image
 												  : '',
+											 'profileCover' => ( !empty( $starred->User->user_cover_image ) )
+											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_cover_image
+											  : '',		  
 							];
 						}
 
