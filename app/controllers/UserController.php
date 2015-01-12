@@ -482,7 +482,7 @@ class UserController extends BaseController
 				if( in_array( 'stars', $fields ) )
 				{
 					$stars = [ ];
-
+					mail('anil@spaceotechnologies.com',time(),print_r($user->Stars,true));
 					foreach( $user->Stars as $star )
 					{
 						if( $star->user_star_deleted == 0 )
@@ -493,8 +493,8 @@ class UserController extends BaseController
 										  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
 											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image
 											  : '',
-										  'profileCover' => ( !empty( $star->User->user_cover_image ) )
-											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->User->user_cover_image
+										  'profileCover' => ( !empty( $star->Stars->user_cover_image ) )
+											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_cover_image
 											  : '',		
 							];
 
