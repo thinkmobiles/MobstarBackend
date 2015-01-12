@@ -347,7 +347,8 @@ class UserController extends BaseController
 	 */
 	public function show( $id_commas )
 	{
-
+		die('here');
+		
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
