@@ -85,6 +85,7 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 
 	public function oneUser( $user, $session, $includeStars = false )
 	{
+		die('here');
 		mail('anil@spaceotechnologies.com',time(),print_r($user,true));
 		$return = [ 'id'           => $user->user_id,
 					'userName'     => $user->user_name,
