@@ -85,8 +85,7 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 
 	public function oneUser( $user, $session, $includeStars = false )
 	{
-		die('here');
-		mail('anil@spaceotechnologies.com',time(),print_r($user,true));
+
 		$return = [ 'id'           => $user->user_id,
 					'userName'     => $user->user_name,
 					'displayName'  => $user->user_display_name,
@@ -115,8 +114,6 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 								  'starName'    => $star->Stars->user_display_name,
 								  'profileImage' => ( !empty( $star->Stars->user_profile_image ) )
 										  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_profile_image : '',
-								  'profileCover' => ( !empty( $star->Stars->user_cover_image ) )
-										  ? 'http://' . $_ENV[ 'URL' ] . '/' . $star->Stars->user_cover_image : '',		  
 					];
 
 				}
@@ -135,9 +132,6 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 									  'profileImage' => ( !empty( $starred->User->user_profile_image ) )
 											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_profile_image
 											  : '',
-									  'profileCover' => ( !empty( $starred->User->user_cover_image ) )
-											  ? 'http://' . $_ENV[ 'URL' ] . '/' . $starred->User->user_cover_image
-											  : '',		  
 					];
 				}
 
