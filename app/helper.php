@@ -58,6 +58,7 @@ function getUserProfile( $user, $session )
 	}
 
 	$return[ 'userTagline' ] = $user->user_tagline;
+	$return[ 'userBio' ] = $user->user_bio;
 
 	$return[ 'profileImage' ] = ( isset( $user->user_profile_image ) )
 		? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+10 minutes' ) : '';
