@@ -156,8 +156,8 @@ class LoginController extends BaseController
 					'userName'        => Auth::user()->user_name,
 					'userFullName'    => Auth::user()->user_full_name,
 					'userDisplayName' => Auth::user()->user_display_name,
-					'userTagline'     => Auth::user()->user_tagline,
-					'userBio'         => Auth::user()->user_bio,
+					'userTagline'     => (!empty(Auth::user()->user_tagline)) ? Auth::user()->user_tagline : '',
+					'userBio'         => (!empty(Auth::user()->user_bio)) ? Auth::user()->user_bio : '',
 					'profileImage'    => ( !empty( Auth::user()->user_profile_image ) )
 						? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_profile_image : '',
 					'profileCover'    => ( !empty( Auth::user()->user_cover_image ) )

@@ -57,8 +57,8 @@ function getUserProfile( $user, $session )
 		$return[ 'userName' ] = $user->user_name;
 	}
 
-	$return[ 'userTagline' ] = $user->user_tagline;
-	$return[ 'userBio' ] = $user->user_bio;
+	$return[ 'userTagline' ] = (!empty($user->user_tagline)) ? $user->user_tagline : '';
+	$return[ 'userBio' ] = (!empty($user->user_bio)) ? $user->user_bio : '';
 
 	$return[ 'profileImage' ] = ( isset( $user->user_profile_image ) )
 		? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+10 minutes' ) : '';
@@ -76,8 +76,8 @@ function oneUser( $user, $session, $includeStars = false )
 
 	$return = [ 'id'           => $user->user_id,
 				'email'        => $user->user_email,
-				'tagLine'      => $user->user_tagline,
-				'bio'      	   => $user->user_bio,
+				'tagLine'      => (!empty($user->user_tagline)) ? $user->user_tagline : '',
+				'bio'      	   => (!empty($user->user_bio)) ? $user->user_bio :'',
 				'profileImage' => ( isset( $user->user_profile_image ) )
 					? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+10 minutes' ) : '',
 				'profileCover' => ( isset( $user->user_cover_image ) )
