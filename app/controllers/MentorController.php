@@ -149,9 +149,9 @@ class MentorController extends BaseController
 
 		//$mentors = Mentor::take( $limit )->skip( $offset )->get();
 		//$orderBynames = array('Bill Bennett', 'Roger Birnbaum', 'Karen Diamond', 'Sir John Kennedy', 'Gary Gersh', 'Jimmy Chamberlin', 'Kym and Alexis McClay');
-		$itemIds = array(1, 4, 7, 2, 3, 8, 5);
-		$names = implode(',', $itemIds);
-		$mentors = Mentor::orderByRaw(DB::raw("FIELD(mentor_id, $names)"))->take( $limit )->skip( $offset )->get();
+//		$itemIds = array(1, 4, 7, 2, 3, 8, 5);
+//		$names = implode(',', $itemIds);
+		$mentors = Mentor::orderBy('mentor_order')->get();
 
 		foreach( $mentors as $mentor )
 		{
