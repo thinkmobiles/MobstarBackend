@@ -427,6 +427,23 @@ class VoteController extends BaseController
 						$prev_not->save();
 					}
 				}
+				/* Change Yes vote to follow */
+				//Get input
+				$inputdata = array(
+					'user_star_user_id' => $session->token_user_id,
+					'user_star_star_id' => $entry->entry_user_id,
+					'user_star_deleted' => 0,
+				);
+
+				$star = Star::firstOrNew( $inputdata );
+				if( isset( $star->user_star_created_date ) )
+				{}
+				else
+				{
+					$star->user_star_created_date = date( 'Y-m-d H:i:s' );
+					$star->save();
+				}				
+				/* Change Yes vote to follow End*/
 			}
 			elseif( Input::get( 'type' ) == 'down' )
 			{
