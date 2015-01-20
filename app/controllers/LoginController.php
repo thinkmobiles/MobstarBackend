@@ -871,7 +871,7 @@ class LoginController extends BaseController
 					//$AuthToken = "4ade7277e9e0c53f4c37c5f02ef83fe7";
 					$AuthToken = "1c4f9735e694ee813d0cca2eab5c2eba";
 					$client = new Services_Twilio($AccountSid, $AuthToken);
-					try {
+					/*try {
 						$message = $client->account->messages->create(array(
 						"From" => "+353861800408",
 						"To" => $user_phone_country.$user_phone_number,
@@ -897,6 +897,21 @@ class LoginController extends BaseController
 						$response = Response::make( $return, $status_code );
 						return $response;
 						}						
+					}*/
+					try {
+						$message = $client->account->messages->create(array(
+						"From" => "+353861800408",
+						"To" => $user_phone_country.$user_phone_number,
+						"Body" => "Mobstar! Verification Code ".$iVerificationCode."",
+						));
+					}
+					catch (Services_Twilio_RestException $e) {
+						$userphone = UserPhone::find($phone->user_phone_id);
+						$userphone->delete();
+						$return = json_encode( [ 'error' => $e->getMessage() ] );
+						$status_code = 404;
+						$response = Response::make( $return, $status_code );
+						return $response;
 					}	
 				}
 				$phonedata = DB::table('user_phones')->where('user_phone_user_id', '=', $user_phone_user_id)->first();
