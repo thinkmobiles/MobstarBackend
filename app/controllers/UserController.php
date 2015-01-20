@@ -1307,7 +1307,7 @@ class UserController extends BaseController
 
 		return Response::make( $return , 200 );
 
-	}	
+	}
 	public function team( )
 	{
 		$client = getS3Client();
