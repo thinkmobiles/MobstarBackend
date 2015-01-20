@@ -1344,7 +1344,19 @@ class UserController extends BaseController
 		$return = [ ];
 
 		$valid = false;
-
+		
+		$exclude = [ ];
+		$order = 'entry_rank';
+		$dir = 'asc';
+		$limit = 10;
+		$entry_rank = DB::table('entries')->where( 'entry_rank', '=', '0')->get();
+		foreach( $entry_rank as $rank )
+		{
+			$exclude[ ] = $rank->entry_id;
+		}
+		$entries = $this->entry->all($exclude, $order, $dir, $limit);
+		print_r($entries);
+		die;
 		//Get users greater than the cursor from
 		$users = User::where( 'user_user_group', 4 )->get();
 
