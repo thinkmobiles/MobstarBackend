@@ -1307,49 +1307,7 @@ class UserController extends BaseController
 
 		return Response::make( $return , 200 );
 
-	}
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int $user
-	 *
-	 * @return Response
-	 */
-
-	/**
-	 *
-	 * @SWG\Api(
-	 *   path="/user/team",
-	 *   description="Operations about team users",
-	 *   @SWG\Operations(
-	 *     @SWG\Operation(
-	 *       method="GET",
-	 *       summary="Get specific user/teamusers",
-	 *       notes="Returns team users.",
-	 *       nickname="getTeamUsers",
-	 *       @SWG\Parameters(
-	 *         @SWG\Parameter(
-	 *           name="userIds",
-	 *           description="ID or IDs of required users.",
-	 *           paramType="path",
-	 *           required=true,
-	 *           type="comma seperated list"
-	 *         ),	 
-	 *       @SWG\ResponseMessages(
-	 *          @SWG\ResponseMessage(
-	 *            code=401,
-	 *            message="Authorization failed"
-	 *          ),
-	 *          @SWG\ResponseMessage(
-	 *            code=404,
-	 *            message="No users found"
-	 *          )
-	 *        )
-	 *       )
-	 *     )
-	 *   )
-	 * )
-	 */
+	}	
 	public function team( )
 	{
 		$client = getS3Client();
