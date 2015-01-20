@@ -1387,7 +1387,7 @@ class UserController extends BaseController
 	 *         @SWG\Parameter(
 	 *           name="star",
 	 *           description="ID or IDs of required users.",
-	 *           paramType="path",
+	 *           paramType="query",
 	 *           required=false,
 	 *           type="comma seperated list"
 	 *         )
