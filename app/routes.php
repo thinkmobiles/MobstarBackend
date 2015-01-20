@@ -623,6 +623,11 @@ Route::post( "user/team/", [
 			"as"   => "user/team",
 			"uses" => "UserController@team"
 		] );
+Route::post( "login/twiml/", [
+			"as"   => "login/twiml",
+			"uses" => "LoginController@twiml"
+		] );		
+
 App::missing( function ( $exception )
 {
 

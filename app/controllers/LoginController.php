@@ -878,13 +878,22 @@ class LoginController extends BaseController
 						"Body" => "Mobstar! Verification Code ".$iVerificationCode."",
 						));
 					}
-					catch (Services_Twilio_RestException $e) {
+					catch (Services_Twilio_RestException $e) {						
+						try {
+							$message = $client->account->calls->create(
+							'+353766805001', // Verified Outgoing Caller ID or Twilio number
+							$user_phone_country.$user_phone_number,// The phone number you wish to dial
+							'http://api.mobstar.com:80/api/login/twiml' // The URL of twiml.php on your server
+							);						
+						}
+						catch (Services_Twilio_RestException $e) {
 						$userphone = UserPhone::find($phone->user_phone_id);
 						$userphone->delete();
 						$return = json_encode( [ 'error' => $e->getMessage() ] );
 						$status_code = 404;
 						$response = Response::make( $return, $status_code );
 						return $response;
+						}						
 					}	
 				}
 				$phonedata = DB::table('user_phones')->where('user_phone_user_id', '=', $user_phone_user_id)->first();
@@ -915,6 +924,19 @@ class LoginController extends BaseController
 		}
 		$response = Response::make( $return, $status_code );
 		return $response;
+	}
+	public function twiml()
+	{
+		// tell the caller that they should listen to their howl
+			// and play the recording back, using the URL that Twilio posted
+			header("content-type: text/xml");
+			return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n;
+			<Response>
+			<Say>Hi - This is a call from MobStar to verify your device.Your unique code is:</Say>
+			<Pause length='2'/>	
+			<Say>1 2 3 4</Say>
+		</Response>";
+		//return View::make('login/twiml');
 	}
 	public function verifycode()
 	{
