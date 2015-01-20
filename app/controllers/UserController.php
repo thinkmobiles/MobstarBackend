@@ -1388,7 +1388,7 @@ class UserController extends BaseController
 	 *           name="star",
 	 *           description="ID or IDs of required users.",
 	 *           paramType="path",
-	 *           required=true,
+	 *           required=false,
 	 *           type="comma seperated list"
 	 *         )
 	 *       ),
