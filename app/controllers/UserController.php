@@ -1416,15 +1416,22 @@ class UserController extends BaseController
 
 		//Validate Input
 		$rules = array(
-			'star' => 'required',
+			'star'    => 'required',			
+		);
+		$messages = array(			
 		);
 
-		$validator = Validator::make( Input::get(), $rules );
+		$validator = Validator::make( Input::all(), $rules, $messages );
 
+		// process the login
 		if( $validator->fails() )
 		{
-			$response[ 'errors' ] = $validator->messages()->all();
-			$status_code = 400;
+
+			$return = $validator->messages();
+
+			$response = Response::make( $return, 400 );
+
+			return $response;
 		}
 		else
 		{
