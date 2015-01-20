@@ -1364,5 +1364,97 @@ class UserController extends BaseController
 
 		return $response;
 	}
+	/**
+	 * Display the specified resource.
+	 *
+	 * @param  int $user
+	 *
+	 * @return Response
+	 */
 
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/user/{userIds}",
+	 *   description="Operations about users",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="POST",
+	 *       summary="Add default follow",
+	 *       notes="Returns users requested. API-Token is required for this method.",
+	 *       nickname="postFollowUsers",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="userIds",
+	 *           description="ID or IDs of required users.",
+	 *           paramType="path",
+	 *           required=true,
+	 *           type="comma seperated list"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=404,
+	 *            message="No users found"
+	 *          )
+	 *        )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+	public function follow( )
+	{
+		
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		//Validate Input
+		$rules = array(
+			'star' => 'required',
+		);
+
+		$validator = Validator::make( Input::get(), $rules );
+
+		if( $validator->fails() )
+		{
+			$response[ 'errors' ] = $validator->messages()->all();
+			$status_code = 400;
+		}
+		else
+		{
+			// get ids
+			$id_commas = Input::get( 'star' );
+			$id =  explode( ',', $id_commas );
+			for( $i=0; $i<count($id); $i++ )
+			{
+				//Get input
+				$input = array(
+					'user_star_user_id' => $session->token_user_id,
+					'user_star_star_id' => $id[$i],
+					'user_star_deleted' => 0,
+				);
+
+				$star = Star::firstOrNew( $input );
+				if( isset( $star->user_star_created_date ) )
+				{
+					continue;
+				}
+				else
+				{
+					$star->user_star_created_date = date( 'Y-m-d H:i:s' );
+					$star->save();
+				}
+			}
+			$response[ 'message' ] = "follow successfully";
+			$status_code = 201;
+		}
+
+		return Response::make( $response, $status_code );	
+	}
 }
