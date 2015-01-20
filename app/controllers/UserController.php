@@ -1375,7 +1375,7 @@ class UserController extends BaseController
 	/**
 	 *
 	 * @SWG\Api(
-	 *   path="/user/{userIds}",
+	 *   path="/user/follow",
 	 *   description="Operations about users",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
