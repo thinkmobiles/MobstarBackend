@@ -126,10 +126,7 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "UserController@destroy"
 		] );
 		
-		Route::post( "user/team/", [
-			"as"   => "user/team",
-			"uses" => "UserController@team"
-		] );
+		
 		// -------------------------------------------------------
 		// Category(s)
 		//---------------------------------------------------------
@@ -618,7 +615,10 @@ Route::post( "login/forgotpassword", [
 	"as"   => "login/forgotpassword",
 	"uses" => "LoginController@password"
 ] );
-
+Route::post( "user/team/", [
+			"as"   => "user/team",
+			"uses" => "UserController@team"
+		] );
 App::missing( function ( $exception )
 {
 
