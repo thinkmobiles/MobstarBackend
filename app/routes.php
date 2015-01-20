@@ -126,6 +126,10 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "UserController@destroy"
 		] );
 		
+		Route::delete( "user/follow/", [
+			"as"   => "user/follow",
+			"uses" => "UserController@follow"
+		] );
 		
 		// -------------------------------------------------------
 		// Category(s)
