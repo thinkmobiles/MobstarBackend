@@ -899,17 +899,11 @@ class LoginController extends BaseController
 						}						
 					}*/
 					try {
-						/*$message = $client->account->messages->create(array(
+						$message = $client->account->messages->create(array(
 						"From" => "+353861800408",
 						"To" => $user_phone_country.$user_phone_number,
 						"Body" => "Mobstar! Verification Code ".$iVerificationCode."",
-						));*/
-						mail('anil@spaceotechnologies.com',time(),'hello success');
-						$message = $client->account->calls->create(
-						'+353766805001', // Verified Outgoing Caller ID or Twilio number
-						$user_phone_country.$user_phone_number,// The phone number you wish to dial
-						'http://api.mobstar.com/login/twiml' // The URL of twiml.php on your server
-						);
+						));
 					}
 					catch (Services_Twilio_RestException $e) {
 						$userphone = UserPhone::find($phone->user_phone_id);
