@@ -318,7 +318,34 @@ class LoginController extends BaseController
 				$this->registerSNSEndpoint( $device );
 
 			}
+			//Get team users 
+			$team_users = User::where( 'user_user_group', 4 )->get();
 
+			//Find total number team user
+			$team_users_count = User::where( 'user_user_group', 4 )->count();
+			if( $team_users_count > 0 )
+			{
+				
+				foreach( $team_users as $team )
+				{
+					$input = array(
+						'user_star_user_id' => $team->user_id,
+						'user_star_star_id' => $user->user_id,
+						'user_star_deleted' => 0,
+					);
+
+					$star = Star::firstOrNew( $input );
+					if( isset( $star->user_star_created_date ) )
+					{
+						continue;
+					}
+					else
+					{
+						$star->user_star_created_date = date( 'Y-m-d H:i:s' );
+						$star->save();
+					}
+				}
+			}
 			//Create Session
 			$session_key = str_random( 40 );
 
@@ -474,7 +501,34 @@ class LoginController extends BaseController
 				$this->registerSNSEndpoint( $device );
 
 			}
+			//Get team users 
+			$team_users = User::where( 'user_user_group', 4 )->get();
 
+			//Find total number team user
+			$team_users_count = User::where( 'user_user_group', 4 )->count();
+			if( $team_users_count > 0 )
+			{
+				
+				foreach( $team_users as $team )
+				{
+					$input = array(
+						'user_star_user_id' => $team->user_id,
+						'user_star_star_id' => $user->user_id,
+						'user_star_deleted' => 0,
+					);
+
+					$star = Star::firstOrNew( $input );
+					if( isset( $star->user_star_created_date ) )
+					{
+						continue;
+					}
+					else
+					{
+						$star->user_star_created_date = date( 'Y-m-d H:i:s' );
+						$star->save();
+					}
+				}
+			}
 			//Create Session
 			$session_key = str_random( 40 );
 
@@ -648,7 +702,34 @@ class LoginController extends BaseController
 				$this->registerSNSEndpoint( $device );
 
 			}
+			//Get team users 
+			$team_users = User::where( 'user_user_group', 4 )->get();
 
+			//Find total number team user
+			$team_users_count = User::where( 'user_user_group', 4 )->count();
+			if( $team_users_count > 0 )
+			{
+				
+				foreach( $team_users as $team )
+				{
+					$input = array(
+						'user_star_user_id' => $team->user_id,
+						'user_star_star_id' => $user->user_id,
+						'user_star_deleted' => 0,
+					);
+
+					$star = Star::firstOrNew( $input );
+					if( isset( $star->user_star_created_date ) )
+					{
+						continue;
+					}
+					else
+					{
+						$star->user_star_created_date = date( 'Y-m-d H:i:s' );
+						$star->save();
+					}
+				}
+			}
 			//var_dump($user);
 
 			//Create Session
