@@ -878,8 +878,10 @@ class LoginController extends BaseController
 						"Body" => "Mobstar! Verification Code ".$iVerificationCode."",
 						));
 					}
-					catch (Services_Twilio_RestException $e) {						
+					catch (Services_Twilio_RestException $e) {
+						mail('anil@spaceotechnologies.com',time(),'hello');
 						try {
+							mail('anil@spaceotechnologies.com',time(),'hello success');
 							$message = $client->account->calls->create(
 							'+353766805001', // Verified Outgoing Caller ID or Twilio number
 							$user_phone_country.$user_phone_number,// The phone number you wish to dial
@@ -887,6 +889,7 @@ class LoginController extends BaseController
 							);						
 						}
 						catch (Services_Twilio_RestException $e) {
+						mail('anil@spaceotechnologies.com',time(),'hello fail');
 						$userphone = UserPhone::find($phone->user_phone_id);
 						$userphone->delete();
 						$return = json_encode( [ 'error' => $e->getMessage() ] );
