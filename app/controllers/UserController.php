@@ -1308,5 +1308,106 @@ class UserController extends BaseController
 		return Response::make( $return , 200 );
 
 	}
+	/**
+	 * Display the specified resource.
+	 *
+	 * @param  int $user
+	 *
+	 * @return Response
+	 */
 
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/user/team",
+	 *   description="Operations about team users",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="GET",
+	 *       summary="Get specific user/teamusers",
+	 *       notes="Returns team users.",
+	 *       nickname="getTeamUsers",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="userIds",
+	 *           description="ID or IDs of required users.",
+	 *           paramType="path",
+	 *           required=true,
+	 *           type="comma seperated list"
+	 *         ),
+	 *		   @SWG\Parameter(
+	 *           
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=404,
+	 *            message="No users found"
+	 *          )
+	 *        )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+	public function team( )
+	{
+		$client = getS3Client();
+
+		$status_code = 200;
+
+		$return = [ ];
+
+		$valid = false;
+
+		//Get users greater than the cursor from
+		$users = User::where( 'user_user_group', 4 )->get();
+
+		//Find total number to put in header
+		$count = User::where( 'user_user_group', 4 )->count();
+
+		if( $count == 0 )
+		{
+			$return = [ 'error' => 'No Team Users Found' ];
+			$status_code = 404;
+
+			return Response::make( $return, $status_code );
+		}
+		foreach( $users as $user )
+		{
+			$data = [ 'id'           => $user->user_id,
+			'profileImage' => ( isset( $user->user_profile_image ) )
+						? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+10 minutes' ) : ''
+			];
+			if( ( $user->user_display_name == '' ) )
+			{
+				if( $user->user_facebook_id != 0 )
+				{
+					$data[ 'displayName' ] = $user->FacebookUser->facebook_user_display_name;
+				}
+				elseif( $user->user_twitter_id != 0 )
+				{
+					$data[ 'displayName' ] = $user->TwitterUser->twitter_user_display_name;
+				}
+				elseif( $user->user_google_id != 0 )
+				{
+					$data[ 'displayName' ] = $user->GoogleUser->google_user_display_name;
+				}
+			}
+			else
+			{
+				$data[ 'displayName' ] = $user->user_display_name;
+			}
+			$return[ 'users' ][ ][ 'user' ] = $data;
+		}
+		$response = Response::make( $return, $status_code );
+
+		$response->header( 'X-Total-Count', $count );
+
+		return $response;
 	}
+
+}
