@@ -1354,7 +1354,7 @@ class UserController extends BaseController
 		{
 			$exclude[ ] = $rank->entry_id;
 		}
-		$entries = $this->entry->all($exclude, $order, $dir, $limit);
+		$entries = DB::table('entries')->all($exclude, $order, $dir, $limit);
 		print_r($entries);
 		die;
 		//Get users greater than the cursor from
