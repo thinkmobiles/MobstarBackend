@@ -1385,7 +1385,7 @@ class UserController extends BaseController
 	 *       nickname="postFollowUsers",
 	 *       @SWG\Parameters(
 	 *         @SWG\Parameter(
-	 *           name="userIds",
+	 *           name="star",
 	 *           description="ID or IDs of required users.",
 	 *           paramType="path",
 	 *           required=true,
