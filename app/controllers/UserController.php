@@ -1334,10 +1334,7 @@ class UserController extends BaseController
 	 *           paramType="path",
 	 *           required=true,
 	 *           type="comma seperated list"
-	 *         ),
-	 *		   @SWG\Parameter(
-	 *           
-	 *       ),
+	 *         ),	 
 	 *       @SWG\ResponseMessages(
 	 *          @SWG\ResponseMessage(
 	 *            code=401,
