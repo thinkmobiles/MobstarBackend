@@ -125,7 +125,11 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "user/destroy",
 			"uses" => "UserController@destroy"
 		] );
-
+		
+		Route::post( "user/team/", [
+			"as"   => "user/team",
+			"uses" => "UserController@team"
+		] );
 		// -------------------------------------------------------
 		// Category(s)
 		//---------------------------------------------------------
