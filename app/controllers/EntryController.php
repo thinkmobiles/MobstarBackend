@@ -2319,7 +2319,9 @@ class EntryController extends BaseController
 		$status_code = 404;
 		$response = Response::make( $return, $status_code );
 		return $response;*/
-		$team = DB::table('users')->where( 'user_user_group', 4 );
+		$team = DB::table('users')
+		->select('user_id', 'user_display_name', 'user_profile_image')
+		->where( 'user_user_group', 4 );
 		$order = 'entry_rank';
 		$dir = 'asc';
 		$query = DB::table('entries')
@@ -2329,7 +2331,8 @@ class EntryController extends BaseController
 		->leftJoin('entry_files', 'entry_files.entry_file_entry_id', '=', 'entries.entry_id')
 		->leftJoin('entry_tags', 'entry_tags.entry_tag_entry_id', '=', 'entries.entry_id')
 		->leftJoin('tags', 'entry_tags.entry_tag_tag_id', '=', 'tags.tag_id')
-   	    ->where( 'entry_id', '>', '0' );
+   	    ->select('users.user_id', 'users.user_display_name', 'users.user_profile_image')
+		->where( 'entry_id', '>', '0' );
 		$query = $query->where( 'entry_rank', '>', 0 );
 		$query = $query->where( 'entry_deleted', '=', 0 );
 		$entries = $query->orderBy( $order, $dir )->limit( 10 );
