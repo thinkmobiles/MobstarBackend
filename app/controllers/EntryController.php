@@ -2319,7 +2319,7 @@ class EntryController extends BaseController
 		$status_code = 404;
 		$response = Response::make( $return, $status_code );
 		return $response;*/
-		$exclude[ ];
+		$exclude = [ ];
 		$entry_rank = DB::table('entries')->where( 'entry_rank', '=', '0')->get();
 		foreach( $entry_rank as $rank )
 		{
