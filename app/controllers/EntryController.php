@@ -2341,11 +2341,13 @@ class EntryController extends BaseController
 		{
 			$ids[] = $users->user_id;
 		}
-		echo "<pre>";
-		print_r($ids);
-		$users = User::whereIn( 'user_id', $ids )->get();
 		//echo "<pre>";
-		//print_r($users);
+		//print_r($ids);
+		//$mentors = Mentor::orderByRaw(DB::raw("FIELD(mentor_id, $names)"))->take( $limit )->skip( $offset )->get();
+		$newOrderBy = implode(",",$ids);
+		$users = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, $newOrderBy)"))->get();
+		echo "<pre>";
+		print_r($users);
 	}
 	/**
 	 *
