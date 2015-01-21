@@ -2319,6 +2319,12 @@ class EntryController extends BaseController
 		$status_code = 404;
 		$response = Response::make( $return, $status_code );
 		return $response;*/
+		$exclude[ ];
+		$entry_rank = DB::table('entries')->where( 'entry_rank', '=', '0')->get();
+		foreach( $entry_rank as $rank )
+		{
+			$exclude[ ] = $rank->entry_id;
+		}
 		$team = DB::table('users')
 		->select('user_id', 'user_display_name', 'user_profile_image')
 		->where( 'user_user_group', 4 );
@@ -2335,6 +2341,7 @@ class EntryController extends BaseController
 		->where( 'entry_id', '>', '0' );
 		$query = $query->where( 'entry_rank', '>', 0 );
 		$query = $query->where( 'entry_deleted', '=', 0 );
+		$query = $query->whereNotIn( 'entriesentry_id',$exclude );
 		$entries = $query->orderBy( $order, $dir )->limit( 10 );
 		$combined = $team->union($entries)->get();
 		dd(DB::getQueryLog());
