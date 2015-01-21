@@ -2326,9 +2326,9 @@ class EntryController extends BaseController
 			$exclude[ ] = $rank->entry_id;
 		}
 		$team = DB::table('users')
-		->select('user_id')
+		->select('user_id', 'user_display_name', 'user_profile_image')
 		->where( 'user_user_group', 4 );
-		/*$order = 'entry_rank';
+		$order = 'entry_rank';
 		$dir = 'asc';
 		$query = DB::table('entries')
 		->leftJoin('categories', 'categories.category_id', '=', 'entries.entry_category_id')
@@ -2342,21 +2342,8 @@ class EntryController extends BaseController
 		$query = $query->where( 'entry_rank', '>', 0 );
 		$query = $query->where( 'entry_deleted', '=', 0 );
 		$query = $query->whereNotIn( 'entries.entry_id',$exclude );
-		$entries = $query->orderBy( $order, $dir );*/
-		$query = DB::table('entries')
-		->select('entry_user_id')
-		->where( 'entry_rank', '<>', 0 )
-		->where( 'entry_deleted', '=', 0 )
-		//->orderBy( 'entry_rank', 'asc' )
-		//->limit( 0,10 )
-		/*
-		SELECT *
-FROM `entries`
-WHERE entry_rank <>0
-AND entry_deleted =0
-ORDER BY entry_rank ASC
-		*/
-		$combined = $team->union($query)->orderUnionBy( 'entry_rank', 'asc' )->limitUnion(10)->get();
+		$entries = $query->orderBy( $order, $dir )->limit( 10 );
+		$combined = $team->union($entries)->get();
 		var_dump($combined);
 		//dd(DB::getQueryLog());
 	}	
