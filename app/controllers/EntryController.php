@@ -2357,7 +2357,7 @@ class EntryController extends BaseController
 		$query = $query->orderBy( $order, $dir );		
 		$query = $query->limit( 10 );
 		$entries = $query->get();
-		var_dump($entries);
+		var_dump($entries->entry_user_id);
 		dd(DB::getQueryLog());
 	}	
 	///////
