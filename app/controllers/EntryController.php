@@ -2341,9 +2341,11 @@ class EntryController extends BaseController
 		{
 			$ids[] = $users->user_id;
 		}
-		$users = User::whereIn( 'user_id', $ids )->get();
 		echo "<pre>";
-		print_r($users);
+		print_r($ids);
+		$users = User::whereIn( 'user_id', $ids )->get();
+		//echo "<pre>";
+		//print_r($users);
 	}
 	/**
 	 *
