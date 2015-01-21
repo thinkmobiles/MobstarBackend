@@ -2315,10 +2315,20 @@ class EntryController extends BaseController
 	//////
 	public function dummytest()
 	{
-		$return = json_encode( [ 'error' => 'No Entries Found' ] );
+		/*$return = json_encode( [ 'error' => 'No Entries Found' ] );
 		$status_code = 404;
 		$response = Response::make( $return, $status_code );
-		return $response;
+		return $response;*/
+		$team = DB::table('users')->where( 'user_user_group', 4 );
+		$order = 'entry_rank';
+		$dir = 'asc';
+		$query = DB::table('entries')->with( 'category', 'vote', 'user', 'file', 'entryTag.tag' )
+							  ->where( 'entry_id', '>', '0' );
+		$query = $query->where( 'entry_rank', '>', 0 );
+		$query = $query->where( 'entry_deleted', '=', 0 );
+		$entries = $query->orderBy( $order, $dir )->limit( 10 );
+		$combined = $team->union($entries)->get();
+		dd(DB::getQueryLog());
 	}	
 	///////
 	///////	
