@@ -2349,7 +2349,7 @@ class EntryController extends BaseController
 		//$entries = $query;
 		//$combined = $team->union($entries)->get();
 		var_dump($entries);
-		//dd(DB::getQueryLog());
+		dd(DB::getQueryLog());
 	}	
 	///////
 	///////	
