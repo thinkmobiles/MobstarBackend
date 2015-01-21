@@ -2322,8 +2322,14 @@ class EntryController extends BaseController
 		$team = DB::table('users')->where( 'user_user_group', 4 );
 		$order = 'entry_rank';
 		$dir = 'asc';
-		$query = DB::table('entries')->with( 'category', 'vote', 'user', 'file', 'entryTag.tag' )
-							  ->where( 'entry_id', '>', '0' );
+		$query = DB::table('entries')
+		->leftJoin('categories', 'categories.category_id', '=', 'entries.entry_category_id')
+		->leftJoin('votes', 'votes.vote_entry_id', '=', 'entries.entry_id')
+		->leftJoin('users', 'users.user_id', '=', 'entries.entry_user_id')
+		->leftJoin('entry_files', 'entry_files.entry_file_entry_id', '=', 'entries.entry_id')
+		->leftJoin('entry_tags', 'entry_tags.entry_tag_entry_id', '=', 'entries.entry_id')
+		->leftJoin('tags', 'entry_tags.entry_tag_tag_id', '=', 'tags.tag_id')
+   	    ->where( 'entry_id', '>', '0' );
 		$query = $query->where( 'entry_rank', '>', 0 );
 		$query = $query->where( 'entry_deleted', '=', 0 );
 		$entries = $query->orderBy( $order, $dir )->limit( 10 );
