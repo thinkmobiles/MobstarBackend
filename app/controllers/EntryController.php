@@ -2347,7 +2347,8 @@ class EntryController extends BaseController
 		->select('entry_user_id')
 		->where( 'entry_rank', '<>', 0 )
 		->where( 'entry_deleted', '=', 0 )
-		->orderBy( 'entry_rank', 'asc' );
+		//->orderBy( 'entry_rank', 'asc' )
+		//->limit( 0,10 )
 		/*
 		SELECT *
 FROM `entries`
@@ -2355,7 +2356,7 @@ WHERE entry_rank <>0
 AND entry_deleted =0
 ORDER BY entry_rank ASC
 		*/
-		$combined = $team->union($query)->get();
+		$combined = $team->union($query)->orderUnionBy( 'entry_rank', 'asc' )->limitUnion(10)->get();
 		var_dump($combined);
 		//dd(DB::getQueryLog());
 	}	
