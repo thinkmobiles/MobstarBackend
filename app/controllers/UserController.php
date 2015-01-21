@@ -1373,10 +1373,10 @@ class UserController extends BaseController
 		{
 			$ids[] = $teamusers->user_id;
 		}
-		$users = User::whereIn( 'user_id', $ids )->get();
+		$users = User::whereIn( 'user_id', $ids )->orderBy( 'user_user_group', 'desc' )->get();
 		//Find total number to put in header
 		//$count = User::where( 'user_user_group', 4 )->count();
-		$count = User::whereIn( 'user_id', $ids )->count();
+		$count = User::whereIn( 'user_id', $ids )->orderBy( 'user_user_group', 'desc' )->count();
 
 		if( $count == 0 )
 		{
