@@ -1346,10 +1346,37 @@ class UserController extends BaseController
 		$valid = false;
 	
 		//Get users greater than the cursor from
-		$users = User::where( 'user_user_group', 4 )->get();
-
+		//$users = User::where( 'user_user_group', 4 )->get();
+		$exclude = [ ];
+		$entry_rank = DB::table('entries')->where( 'entry_rank', '=', '0')->get();
+		foreach( $entry_rank as $rank )
+		{
+			$exclude[ ] = $rank->entry_id;
+		}
+		$team = DB::table('users')
+		->select('user_id')
+		->where( 'user_user_group', 4 );
+		$order = 'entry_rank';
+		$dir = 'asc';
+		$query = DB::table('entries')
+		->select('entries.entry_user_id as user_id')
+		->where( 'entry_id', '>', '0' );
+		$query = $query->where( 'entry_rank', '>', 0 );
+		$query = $query->where( 'entry_deleted', '=', 0 );
+		$query = $query->whereNotIn( 'entries.entry_id',$exclude );
+		$query = $query->orderBy( $order, $dir );		
+		$query = $query->take( 10 );
+		$entries = $query;
+		$combined = $team->union($entries)->get();	
+		$ids= [];
+		foreach( $combined as $teamusers )
+		{
+			$ids[] = $teamusers->user_id;
+		}
+		$users = User::whereIn( 'user_id', $ids )->get();
 		//Find total number to put in header
-		$count = User::where( 'user_user_group', 4 )->count();
+		//$count = User::where( 'user_user_group', 4 )->count();
+		$count = User::whereIn( 'user_id', $ids )->count();
 
 		if( $count == 0 )
 		{
