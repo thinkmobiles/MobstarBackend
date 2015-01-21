@@ -2342,8 +2342,8 @@ class EntryController extends BaseController
 		$query = $query->where( 'entry_rank', '>', 0 );
 		$query = $query->where( 'entry_deleted', '=', 0 );
 		$query = $query->whereNotIn( 'entries.entry_id',$exclude );
-		$query = $query->orderBy( $order, $dir );
-		$query = $query->groupBy( 'entries.entry_user_id' );
+		$query = $query->groupBy( 'users.user_id' );
+		$query = $query->orderBy( $order, $dir );		
 		$query = $query->limit( 10 );
 		$entries = $query->get();
 		//$entries = $query;
