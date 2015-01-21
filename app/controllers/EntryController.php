@@ -2330,7 +2330,7 @@ class EntryController extends BaseController
 		->where( 'user_user_group', 4 );
 		$order = 'entry_rank';
 		$dir = 'asc';
-		$query = DB::table('entries')
+		/*$query = DB::table('entries')
 		->leftJoin('categories', 'categories.category_id', '=', 'entries.entry_category_id')
 		->leftJoin('votes', 'votes.vote_entry_id', '=', 'entries.entry_id')
 		->leftJoin('users', 'users.user_id', '=', 'entries.entry_user_id')
@@ -2345,9 +2345,18 @@ class EntryController extends BaseController
 		$query = $query->groupBy( 'users.user_id' );
 		$query = $query->orderBy( $order, $dir );		
 		$query = $query->limit( 10 );
-		$entries = $query->get();
+		$entries = $query->get();*/
 		//$entries = $query;
 		//$combined = $team->union($entries)->get();
+		//var_dump($entries);
+		$query = DB::table('entries')
+		->where( 'entry_id', '>', '0' );
+		$query = $query->where( 'entry_rank', '>', 0 );
+		$query = $query->where( 'entry_deleted', '=', 0 );
+		$query = $query->whereNotIn( 'entries.entry_id',$exclude );
+		$query = $query->orderBy( $order, $dir );		
+		$query = $query->limit( 10 );
+		$entries = $query->get();
 		var_dump($entries);
 		dd(DB::getQueryLog());
 	}	
