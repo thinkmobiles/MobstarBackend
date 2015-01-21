@@ -2356,7 +2356,7 @@ class EntryController extends BaseController
 		$query = $query->where( 'entry_deleted', '=', 0 );
 		$query = $query->whereNotIn( 'entries.entry_id',$exclude );
 		$query = $query->orderBy( $order, $dir );		
-		$query = $query->limit( 0 , 10 );
+		$query = $query->take( 10 );
 		$entries = $query;
 		$combined = $team->union($entries)->get();
 		var_dump($combined);
