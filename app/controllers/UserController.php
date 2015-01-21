@@ -1373,11 +1373,11 @@ class UserController extends BaseController
 		{
 			$ids[] = $teamusers->user_id;
 		}
-		$users = User::whereIn( 'user_id', $ids )->orderBy( 'user_user_group', 'desc' )->get();
+		$newOrderBy = implode(",",$ids);
+		$users = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, $newOrderBy)"))->get();
 		//Find total number to put in header
 		//$count = User::where( 'user_user_group', 4 )->count();
-		$count = User::whereIn( 'user_id', $ids )->orderBy( 'user_user_group', 'desc' )->count();
-
+		$count = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, $newOrderBy)"))->count();
 		if( $count == 0 )
 		{
 			$return = [ 'error' => 'No Team Users Found' ];
