@@ -2312,13 +2312,9 @@ class EntryController extends BaseController
 
 		return $current;
 	}
-	//////
+		
 	public function dummytest()
 	{
-		/*$return = json_encode( [ 'error' => 'No Entries Found' ] );
-		$status_code = 404;
-		$response = Response::make( $return, $status_code );
-		return $response;*/
 		$exclude = [ ];
 		$entry_rank = DB::table('entries')->where( 'entry_rank', '=', '0')->get();
 		foreach( $entry_rank as $rank )
@@ -2330,25 +2326,6 @@ class EntryController extends BaseController
 		->where( 'user_user_group', 4 );
 		$order = 'entry_rank';
 		$dir = 'asc';
-		/*$query = DB::table('entries')
-		->leftJoin('categories', 'categories.category_id', '=', 'entries.entry_category_id')
-		->leftJoin('votes', 'votes.vote_entry_id', '=', 'entries.entry_id')
-		->leftJoin('users', 'users.user_id', '=', 'entries.entry_user_id')
-		->leftJoin('entry_files', 'entry_files.entry_file_entry_id', '=', 'entries.entry_id')
-		->leftJoin('entry_tags', 'entry_tags.entry_tag_entry_id', '=', 'entries.entry_id')
-		->leftJoin('tags', 'entry_tags.entry_tag_tag_id', '=', 'tags.tag_id')
-   	    ->select('users.user_id', 'users.user_display_name', 'users.user_profile_image')
-		->where( 'entry_id', '>', '0' );
-		$query = $query->where( 'entry_rank', '>', 0 );
-		$query = $query->where( 'entry_deleted', '=', 0 );
-		$query = $query->whereNotIn( 'entries.entry_id',$exclude );
-		$query = $query->groupBy( 'users.user_id' );
-		$query = $query->orderBy( $order, $dir );		
-		$query = $query->limit( 10 );
-		$entries = $query->get();*/
-		//$entries = $query;
-		//$combined = $team->union($entries)->get();
-		//var_dump($entries);
 		$query = DB::table('entries')
 		->select('entries.entry_user_id as user_id')
 		->where( 'entry_id', '>', '0' );
@@ -2358,13 +2335,15 @@ class EntryController extends BaseController
 		$query = $query->orderBy( $order, $dir );		
 		$query = $query->take( 10 );
 		$entries = $query;
-		$combined = $team->union($entries)->get();
-		var_dump($combined);
-		//dd(DB::getQueryLog());
-	}	
-	///////
-	///////	
-	
+		$combined = $team->union($entries)->get();	
+		$ids= [];
+		foreach( $combined as $users )
+		{
+			$ids[] = $users->user_id;
+		}
+		echo "<pre>";
+		print_r($ids);
+	}
 	/**
 	 *
 	 * @SWG\Api(
