@@ -2350,6 +2350,7 @@ class EntryController extends BaseController
 		//$combined = $team->union($entries)->get();
 		//var_dump($entries);
 		$query = DB::table('entries')
+		->select('entries.entry_user_id')
 		->where( 'entry_id', '>', '0' );
 		$query = $query->where( 'entry_rank', '>', 0 );
 		$query = $query->where( 'entry_deleted', '=', 0 );
@@ -2357,7 +2358,7 @@ class EntryController extends BaseController
 		$query = $query->orderBy( $order, $dir );		
 		$query = $query->limit( 10 );
 		$entries = $query->get();
-		var_dump($entries->entry_user_id);
+		var_dump($entries);
 		dd(DB::getQueryLog());
 	}	
 	///////
