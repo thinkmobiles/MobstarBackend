@@ -2326,7 +2326,7 @@ class EntryController extends BaseController
 			$exclude[ ] = $rank->entry_id;
 		}
 		$team = DB::table('users')
-		->select('user_id', 'user_display_name', 'user_profile_image')
+		->select('user_id')
 		->where( 'user_user_group', 4 );
 		$order = 'entry_rank';
 		$dir = 'asc';
@@ -2350,15 +2350,16 @@ class EntryController extends BaseController
 		//$combined = $team->union($entries)->get();
 		//var_dump($entries);
 		$query = DB::table('entries')
-		->select('entries.entry_user_id')
+		->select('entries.entry_user_id as user_id')
 		->where( 'entry_id', '>', '0' );
 		$query = $query->where( 'entry_rank', '>', 0 );
 		$query = $query->where( 'entry_deleted', '=', 0 );
 		$query = $query->whereNotIn( 'entries.entry_id',$exclude );
 		$query = $query->orderBy( $order, $dir );		
 		$query = $query->limit( 10 );
-		$entries = $query->get();
-		var_dump($entries);
+		$entries = $query;
+		$combined = $team->union($entries)->get();
+		var_dump($combined);
 		dd(DB::getQueryLog());
 	}	
 	///////
