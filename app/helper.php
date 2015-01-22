@@ -78,6 +78,7 @@ function oneUser( $user, $session, $includeStars = false )
 				'email'        => $user->user_email,
 				'tagLine'      => (!empty($user->user_tagline)) ? $user->user_tagline : '',
 				'bio'      	   => (!empty($user->user_bio)) ? $user->user_bio :'',
+				'usergroup'      	   => (!empty($user->user_user_group)) ? $user->user_user_group :'',
 				'profileImage' => ( isset( $user->user_profile_image ) )
 					? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+10 minutes' ) : '',
 				'profileCover' => ( isset( $user->user_cover_image ) )
