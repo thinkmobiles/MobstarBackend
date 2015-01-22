@@ -45,7 +45,12 @@ class Entry extends \Eloquent
 	{
 		return $this->hasMany( 'Comment', 'comment_entry_id' )->where( 'comment_deleted', '=', '0' );
 	}
-
+	
+	public function entryViews()
+	{
+		return $this->hasMany( 'EntryView', 'entry_view_entry_id' );
+	}
+	
 	public function oneEntry( $entry, $session, $includeUser = false )
 	{
 
