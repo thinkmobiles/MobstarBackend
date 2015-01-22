@@ -241,6 +241,7 @@ function oneEntry( $entry, $session, $includeUser = false )
 	$current[ 'name' ] = $entry->entry_name;
 	$current[ 'description' ] = $entry->entry_description;
 	$current[ 'totalComments' ] = $entry->comments->count();
+	$current[ 'totalviews' ] = $entry->entryViews->count();
 	$current[ 'created' ] = $entry->entry_created_date;
 	$current[ 'modified' ] = $entry->entry_modified_date;
 

@@ -2272,7 +2272,9 @@ class EntryController extends BaseController
 		$current[ 'name' ] = $entry->entry_name;
 		$current[ 'description' ] = $entry->entry_description;
 		$totalComments = Comment::where('comment_entry_id','=',$entry->entry_id)->count();
+		$totalviews = EntryView::where('entry_view_entry_id','=',$entry->entry_id)->count();
 		$current[ 'totalComments' ] = $totalComments;
+		$current[ 'totalviews' ] = $totalviews;
 		$current[ 'created' ] = $entry->entry_created_date;
 		$current[ 'modified' ] = $entry->entry_modified_date;
 
