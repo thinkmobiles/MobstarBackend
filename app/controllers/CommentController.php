@@ -131,7 +131,7 @@ class CommentController extends BaseController
 		{
 			$comments = $comments->where( 'comment_deleted', '=', '0' );
 		}
-		$comments = $comments->orderBy('user_user_group', 'desc');
+		//$comments = $comments->orderBy('user_user_group', 'desc');
 		$comments = $comments->get();
 
 		$count = $comments->count();
