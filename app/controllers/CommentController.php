@@ -115,23 +115,27 @@ class CommentController extends BaseController
 
 		$deleted = ( Input::get( 'delted', '0' ) );
 
-		$comments = Comment::with( 'User', 'Entry' );
+		//$comments = Comment::with( 'User', 'Entry' );
+		$comments = Comment::join('users','comments.comment_user_id','=','users.user_id')
+		 ->orderBy('users.user_user_group', 'desc')
+		 ->with('User', 'Entry');
 		if( $user )
 		{
-			$comments = $comments->where( 'comment_user_id', '=', $user );
+			$comments = $comments->where( 'comments.comment_user_id', '=', $user );
 		}
 
 		if( $entry )
 		{
-			$comments = $comments->where( 'comment_entry_id', '=', $entry );
+			$comments = $comments->where( 'comments.comment_entry_id', '=', $entry );
 		}
 
 		if( !$deleted )
 		{
-			$comments = $comments->where( 'comment_deleted', '=', '0' );
+			$comments = $comments->where( 'comments.comment_deleted', '=', '0' );
 		}
 		//$comments = $comments->orderBy('user_user_group', 'desc');
-		$comments = $comments->get();
+		$comments = $comments->->get(['comments.*']);
+		//$comments = $comments->get();
 
 		$count = $comments->count();
 
