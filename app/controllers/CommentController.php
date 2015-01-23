@@ -118,7 +118,7 @@ class CommentController extends BaseController
 		//$comments = Comment::with( 'User', 'Entry' );
 		$comments = Comment::join('users','comments.comment_user_id','=','users.user_id')
 		 ->orderBy('users.user_user_group', 'desc')
-		 ->with('User', 'Entry');
+		 with('User', 'Entry');
 		if( $user )
 		{
 			$comments = $comments->where( 'comments.comment_user_id', '=', $user );
