@@ -73,7 +73,7 @@ function getUserProfile( $user, $session )
 function oneUser( $user, $session, $includeStars = false )
 {
 	$client = getS3Client();
-	$content_name = DB::table('profile_contents')->join('content_files', 'content_files.content_file_content_id', '=', 'profile_contents.content_id')->where('profile_contents.content_user_id', '=', $user->user_id)->pluck('content_files.content_file_name');
+	$content_name = DB::table('profile_contents')->join('content_files', 'content_files.content_file_content_id', '=', 'profile_contents.content_id')->where('profile_contents.content_user_id', '=', $user->user_id)->pluck('CONCAT(content_files.content_file_name,'.',content_files.content_file_type)');
 
 	$return = [ 'id'           => $user->user_id,
 				'email'        => $user->user_email,
