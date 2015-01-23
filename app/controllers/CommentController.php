@@ -115,7 +115,11 @@ class CommentController extends BaseController
 
 		$deleted = ( Input::get( 'delted', '0' ) );
 
-		$comments = Comment::with( 'User', 'Entry' );
+		//$comments = Comment::with( 'User', 'Entry' );
+		$comments = Comment::join('users as u', 'u.user_id', '=', 'comments.comment_user_id')
+		   ->orderBy('u.user_user_group', 'desc')
+		   ->select('comments.*')       // just to avoid fetching anything from joined table
+		   ->with('User', 'Entry');
 
 		if( $user )
 		{
@@ -133,7 +137,7 @@ class CommentController extends BaseController
 		}
 
 		$comments = $comments->get();
-
+		dd(DB::getQueryLog());
 		$count = $comments->count();
 
 		if( $count == 0 )
