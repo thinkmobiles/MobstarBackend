@@ -379,6 +379,14 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "feedback/store",
 			"uses" => "FeedbackController@store"
 		] );
+		
+		// -------------------------------------------------------
+		// Profile Content
+		//---------------------------------------------------------
+
+		Route::post( "profilecontent", [
+			"as"   => "profilecontent/store",
+			"uses" => "ProfileContentController@store"
 
 		// -------------------------------------------------------
 		// Comments
