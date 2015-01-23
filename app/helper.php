@@ -83,6 +83,8 @@ function oneUser( $user, $session, $includeStars = false )
 					? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+10 minutes' ) : '',
 				'profileCover' => ( isset( $user->user_cover_image ) )
 					? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+10 minutes' ) : '',
+				'profileContentFiles' => ( isset( $user->ProfileContent->content_name ) )
+					? $user->ProfileContent->content_name : '',	
 	];
 
 	if( ( $user->user_display_name == '' ) || ( is_null( $user->user_name ) ) || ( is_null( $user->user_email ) ) )
