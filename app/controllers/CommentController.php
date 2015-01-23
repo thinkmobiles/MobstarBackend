@@ -116,7 +116,6 @@ class CommentController extends BaseController
 		$deleted = ( Input::get( 'delted', '0' ) );
 
 		$comments = Comment::with( 'User', 'Entry' );
-
 		if( $user )
 		{
 			$comments = $comments->where( 'comment_user_id', '=', $user );
@@ -131,7 +130,7 @@ class CommentController extends BaseController
 		{
 			$comments = $comments->where( 'comment_deleted', '=', '0' );
 		}
-		//$comments = $comments->orderBy('user_user_group', 'desc');
+		$comments = $comments->orderBy('User.user_user_group', 'desc');
 		$comments = $comments->get();
 
 		$count = $comments->count();
