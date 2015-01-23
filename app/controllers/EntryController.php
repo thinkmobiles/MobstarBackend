@@ -2318,7 +2318,7 @@ class EntryController extends BaseController
 		
 	public function dummytest()
 	{
-		/*$exclude = [ ];
+		$exclude = [ ];
 		$entry_rank = DB::table('entries')->where( 'entry_rank', '=', '0')->get();
 		foreach( $entry_rank as $rank )
 		{
@@ -2346,16 +2346,7 @@ class EntryController extends BaseController
 		}
 		//$mentors = Mentor::orderByRaw(DB::raw("FIELD(mentor_id, $names)"))->take( $limit )->skip( $offset )->get();
 		$newOrderBy = implode(",",$ids);
-		$users = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, $newOrderBy)"))->get();*/
-		$comments = Comment::join('users as u', 'u.user_id', '=', 'comments.comment_user_id')
-		   ->orderBy('u.user_user_group', 'desc')
-		   ->select('comments.*')       // just to avoid fetching anything from joined table
-		   ->with('User', 'Entry')         // if you need options data anyway
-		   ->where( 'comment_entry_id', '=', '711' )
-		   ->get();
-		dd(DB::getQueryLog());
-		//print_r($comments);
-		die;
+		$users = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, $newOrderBy)"))->get();
 		//echo "<pre>";
 		//print_r($users);
 	}
