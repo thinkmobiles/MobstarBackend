@@ -73,6 +73,7 @@ function getUserProfile( $user, $session )
 function oneUser( $user, $session, $includeStars = false )
 {
 	$client = getS3Client();
+	$content_name = DB::table('profile_contents')->where('content_user_id', '=', $user->user_id)->pluck('content_name');
 
 	$return = [ 'id'           => $user->user_id,
 				'email'        => $user->user_email,
@@ -83,8 +84,8 @@ function oneUser( $user, $session, $includeStars = false )
 					? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+10 minutes' ) : '',
 				'profileCover' => ( isset( $user->user_cover_image ) )
 					? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+10 minutes' ) : '',
-				'profileContentFiles' => ( isset( $user->ProfileContent->content_name ) )
-					? $user->ProfileContent->content_name : '',	
+				'profileContentFiles' => ( isset( $content_name ) )
+					? $content_name : '',	
 	];
 
 	if( ( $user->user_display_name == '' ) || ( is_null( $user->user_name ) ) || ( is_null( $user->user_email ) ) )
