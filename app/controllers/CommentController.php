@@ -115,8 +115,13 @@ class CommentController extends BaseController
 
 		$deleted = ( Input::get( 'delted', '0' ) );
 
-		$comments = Comment::with( 'User', 'Entry' );
-
+		//$comments = Comment::with( 'User', 'Entry' );
+		$comments = Comment::join('users as u', 'u.user_id', '=', 'comments.comment_user_id')
+		   ->orderBy('u.user_user_group', 'desc')
+		   ->select('comments.*')       // just to avoid fetching anything from joined table
+		   ->with('User', 'Entry')         // if you need options data anyway
+		//   ->get();
+		
 		if( $user )
 		{
 			$comments = $comments->where( 'comment_user_id', '=', $user );
