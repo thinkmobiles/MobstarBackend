@@ -137,7 +137,7 @@ class CommentController extends BaseController
 		}
 
 		$comments = $comments->get();
-		dd(DB::getQueryLog());
+		//dd(DB::getQueryLog());
 		$count = $comments->count();
 
 		if( $count == 0 )
