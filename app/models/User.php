@@ -17,7 +17,10 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 	{
 		return $this->hasMany( 'Entry', 'entry_user_id', 'user_id' );
 	}
-
+	public function ProfileContent()
+	{
+		return $this->hasMany( 'ProfileContent', 'content_user_id', 'user_id' );
+	}
 	public function TwitterUser()
 	{
 		return $this->hasOne( 'TwitterUser', 'twitter_user_id', 'user_twitter_id' );
