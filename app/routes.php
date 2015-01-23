@@ -387,7 +387,7 @@ Route::group( [ "before" => "auth" ], function ()
 		Route::post( "profilecontent", [
 			"as"   => "profilecontent/store",
 			"uses" => "ProfileContentController@store"
-
+		] );
 		// -------------------------------------------------------
 		// Comments
 		//---------------------------------------------------------
