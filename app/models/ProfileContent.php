@@ -6,7 +6,7 @@ class ProfileContent extends \Eloquent
 	public $timestamps = false;
 	protected $primaryKey = 'content_id';
 
-	public function user()
+	public function User()
 	{
 		return $this->belongsTo( 'User', 'content_user_id' );
 	}
