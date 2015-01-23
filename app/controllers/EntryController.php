@@ -2351,7 +2351,7 @@ class EntryController extends BaseController
 		   ->orderBy('u.user_user_group', 'desc')
 		   ->select('comments.*')       // just to avoid fetching anything from joined table
 		   ->with('User', 'Entry')         // if you need options data anyway
-		   ->where( 'comment_user_id', '=', '711' )
+		   ->where( 'comment_entry_id', '=', '711' )
 		   ->get();
 		dd(DB::getQueryLog());
 		//print_r($comments);
