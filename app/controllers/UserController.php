@@ -1367,7 +1367,7 @@ class UserController extends BaseController
 		$query = $query->orderBy( $order, $dir );		
 		$query = $query->take( 10 );
 		$entries = $query;
-		$combined = $team->union($entries)->get();	
+		$combined = $entries->union($team)->get();
 		$ids= [];
 		foreach( $combined as $teamusers )
 		{
