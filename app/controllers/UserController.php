@@ -1355,21 +1355,21 @@ class UserController extends BaseController
 		}
 		$team = DB::table('users')
 		->select('user_id')
-		->where( 'user_user_group', 4 );
+		->where( 'user_user_group', 4 )->get();
 		$order = 'entry_rank';
 		$dir = 'asc';
-		$query = DB::table('entries')
-		->select('entries.entry_user_id as user_id')
-		->where( 'entry_id', '>', '0' );
-		$query = $query->where( 'entry_rank', '>', 0 );
-		$query = $query->where( 'entry_deleted', '=', 0 );
-		$query = $query->whereNotIn( 'entries.entry_id',$exclude );
-		$query = $query->orderBy( $order, $dir );		
-		$query = $query->take( 10 );
-		$entries = $query;
-		$combined = $entries->union($team)->get();
+//		$query = DB::table('entries')
+//		->select('entries.entry_user_id as user_id')
+//		->where( 'entry_id', '>', '0' )->get();
+//		$query = $query->where( 'entry_rank', '>', 0 );
+//		$query = $query->where( 'entry_deleted', '=', 0 );
+//		$query = $query->whereNotIn( 'entries.entry_id',$exclude );
+//		$query = $query->orderBy( $order, $dir );
+//		$query = $query->take( 10 );
+//		$entries = $query;
+//		$combined = $entries->union($team)->get();
 		$ids= [];
-		foreach( $combined as $teamusers )
+		foreach( $team as $teamusers )
 		{
 			$ids[] = $teamusers->user_id;
 		}
