@@ -1374,7 +1374,7 @@ class UserController extends BaseController
 			$ids[] = $teamusers->user_id;
 		}
 		$newOrderBy = implode(",",$ids);
-		$users = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, $newOrderBy)"))->get();
+		$users = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, '544, 426, 593, 386, 489, 519, 473')"))->get();
 		//Find total number to put in header
 		//$count = User::where( 'user_user_group', 4 )->count();
 		$count = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, $newOrderBy)"))->count();
