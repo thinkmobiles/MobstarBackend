@@ -1359,7 +1359,7 @@ class UserController extends BaseController
 		->select('user_id')
 		//->where( 'user_user_group', 4 )->get();
 		->whereIn( 'user_user_group',$include )
-		->orderBy( 'user_user_group', 'asc' );
+		->orderBy( 'user_user_group', 'asc' )->get();
 		$order = 'entry_rank';
 		$dir = 'asc';
 //		$query = DB::table('entries')
