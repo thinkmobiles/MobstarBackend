@@ -1359,26 +1359,27 @@ class UserController extends BaseController
 		->select('user_id')
 		//->where( 'user_user_group', 4 )->get();
 		->whereIn( 'user_user_group',$include )
-		->orderBy( 'user_user_group', 'asc' )->get();
+		->orderBy( 'user_user_group', 'asc' );
 		$order = 'entry_rank';
 		$dir = 'asc';
-//		$query = DB::table('entries')
-//		->select('entries.entry_user_id as user_id')
-//		->where( 'entry_id', '>', '0' )->get();
-//		$query = $query->where( 'entry_rank', '>', 0 );
-//		$query = $query->where( 'entry_deleted', '=', 0 );
-//		$query = $query->whereNotIn( 'entries.entry_id',$exclude );
-//		$query = $query->orderBy( $order, $dir );
-//		$query = $query->take( 10 );
-//		$entries = $query;
-//		$combined = $entries->union($team)->get();
+		$query = DB::table('entries')
+		->select('entries.entry_user_id as user_id')
+		->where( 'entry_id', '>', '0' )->get();
+		$query = $query->where( 'entry_rank', '>', 0 );
+		$query = $query->where( 'entry_deleted', '=', 0 );
+		$query = $query->whereNotIn( 'entries.entry_id',$exclude );
+		$query = $query->orderBy( $order, $dir );
+		$query = $query->take( 10 );
+		$entries = $query;
+		$combined = $entries->union($team)->get();
 		$ids= [];
 		foreach( $team as $teamusers )
 		{
 			$ids[] = $teamusers->user_id;
 		}
 		$newOrderBy = implode(",",$ids);
-		$users = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, 544, 426, 593, 386, 489, 519, 473, 557)"))->get();
+		//$users = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, 544, 426, 593, 386, 489, 519, 473, 557)"))->get();
+		$users = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, $newOrderBy)"))->get();
 //		$users = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, 473, 519, 489, 386, 593, 426, 544)"))->get();
 		//Find total number to put in header
 		//$count = User::where( 'user_user_group', 4 )->count();
