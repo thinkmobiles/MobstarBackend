@@ -135,7 +135,7 @@ class LoginController extends BaseController
 
 					$device->save();
 
-					$this->registerSNSEndpoint( $device );
+					//$this->registerSNSEndpoint( $device );
 
 				}
 
@@ -315,7 +315,7 @@ class LoginController extends BaseController
 
 				$device->save();
 
-				$this->registerSNSEndpoint( $device );
+				//$this->registerSNSEndpoint( $device );
 
 			}
 			//Get team users 
@@ -498,7 +498,7 @@ class LoginController extends BaseController
 
 				$device->save();
 
-				$this->registerSNSEndpoint( $device );
+				//$this->registerSNSEndpoint( $device );
 
 			}
 			//Get team users 
@@ -699,7 +699,7 @@ class LoginController extends BaseController
 
 				$device->save();
 
-				$this->registerSNSEndpoint( $device );
+				//$this->registerSNSEndpoint( $device );
 
 			}
 			//Get team users 
