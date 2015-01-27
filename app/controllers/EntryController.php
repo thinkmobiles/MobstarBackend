@@ -2385,8 +2385,14 @@ class EntryController extends BaseController
 		//$count = User::where( 'user_user_group', 4 )->count();
 		$count = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, $newOrderBy)"))->count();
 		
+		
+		//print_r($users);
+		foreach( $users as $user )
+		{
+			$idstmp[] = $user->user_id;
+		}
 		echo "<pre>";
-		print_r($users);
+		print_r($idstmp);
 	}
 	/**
 	 *
