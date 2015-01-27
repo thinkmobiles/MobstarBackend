@@ -1347,8 +1347,6 @@ class UserController extends BaseController
 	
 		//Get users greater than the cursor from
 		//$users = User::where( 'user_user_group', 4 )->get();
-		$include = [ ];
-		$include = [4,5];
 		$exclude = [ ];
 		$entry_rank = DB::table('entries')->where( 'entry_rank', '=', '0')->get();
 		foreach( $entry_rank as $rank )
@@ -1357,13 +1355,7 @@ class UserController extends BaseController
 		}
 		$team = DB::table('users')
 		->select('user_id')
-<<<<<<< HEAD
-		//->where( 'user_user_group', 4 );
-		->whereIn( 'user_user_group',$include )
-		->orderBy( 'user_user_group', 'asc' );
-=======
 		->where( 'user_user_group', 4 )->get();
->>>>>>> b8732657142009c750872636b8ddd526bab7d215
 		$order = 'entry_rank';
 		$dir = 'asc';
 //		$query = DB::table('entries')
