@@ -1390,7 +1390,7 @@ class UserController extends BaseController
 		{
 			$data = [ 'id'           => $user->user_id,
 			'profileImage' => ( isset( $user->user_profile_image ) )
-						? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+10 minutes' ) : ''
+						? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+60 minutes' ) : ''
 			];
 			if( ( $user->user_display_name == '' ) )
 			{

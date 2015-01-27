@@ -371,13 +371,13 @@ class EntryController extends BaseController
 					foreach( $entry->file as $file )
 					{
 
-						$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
+						$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+60 minutes' );
 						$current[ 'entryFiles' ][ ] = [
 							'fileType' => $file->entry_file_type,
 							'filePath' => $url ];
 
 						$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-							$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
+							$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+60 minutes' )
 							: "";
 					}
 				}
@@ -449,14 +449,14 @@ class EntryController extends BaseController
 				foreach( $entry->file as $file )
 				{
 
-					$signedUrl = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
+					$signedUrl = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+60 minutes' );
 
 					$current[ 'entryFiles' ][ ] = [
 						'fileType' => $file->entry_file_type,
 						'filePath' => $signedUrl ];
 
 					$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-						$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
+						$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+60 minutes' )
 						: "";
 				}
 
@@ -763,13 +763,13 @@ class EntryController extends BaseController
 					$current[ 'entryFiles' ] = array();
 					foreach( $entry->file as $file )
 					{
-						$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
+						$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+60 minutes' );
 						$current[ 'entryFiles' ][ ] = [
 							'fileType' => $file->entry_file_type,
 							'filePath' => $url ];
 
 						$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-							$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
+							$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+60 minutes' )
 							: "";
 					}
 
@@ -841,13 +841,13 @@ class EntryController extends BaseController
 				$current[ 'entryFiles' ] = array();
 				foreach( $entry->file as $file )
 				{
-					$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
+					$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+60 minutes' );
 					$current[ 'entryFiles' ][ ] = [
 						'fileType' => $file->entry_file_type,
 						'filePath' => $url ];
 
 					$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-						$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
+						$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+60 minutes' )
 						: "";
 				}
 
@@ -2134,13 +2134,13 @@ class EntryController extends BaseController
 		$current[ 'entryFiles' ] = array();
 		foreach( $entry->file as $file )
 		{
-			$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
+			$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+60 minutes' );
 			$current[ 'entryFiles' ][ ] = [
 				'fileType' => $file->entry_file_type,
 				'filePath' => $url ];
 
 			$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-				$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
+				$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+60 minutes' )
 				: "";
 		}
 
@@ -2289,13 +2289,13 @@ class EntryController extends BaseController
 		$EntryFile = EntryFile::where('entry_file_entry_id','=',$entry->entry_id)->get();
 		foreach( $EntryFile as $file )
 		{
-			$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
+			$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+60 minutes' );
 			$current[ 'entryFiles' ][ ] = [
 				'fileType' => $file->entry_file_type,
 				'filePath' => $url ];
 
 			$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-				$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
+				$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+60 minutes' )
 				: "";
 		}
 
