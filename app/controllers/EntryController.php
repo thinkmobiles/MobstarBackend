@@ -2393,6 +2393,7 @@ class EntryController extends BaseController
 		}
 		echo "<pre>";
 		print_r($idstmp);
+		dd(DB::getQueryLog());
 	}
 	/**
 	 *
