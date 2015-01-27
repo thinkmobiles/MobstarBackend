@@ -2360,8 +2360,8 @@ class EntryController extends BaseController
 		$team = DB::table('users')
 		->select('user_id')
 		//->where( 'user_user_group', 4 );
-		->whereIn( 'user_user_group',$include )
-		->orderBy( 'user_user_group','asc');
+		->whereIn( 'user_user_group',$include );
+		//->orderBy( 'user_user_group','asc');
 		$order = 'entry_rank';
 		$dir = 'asc';
 		$query = DB::table('entries')
