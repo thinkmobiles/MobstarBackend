@@ -2350,7 +2350,7 @@ class EntryController extends BaseController
 		*/
 		//Get users greater than the cursor from
 		//$users = User::where( 'user_user_group', 4 )->get();
-		$include = [ 4, 5 ];
+		/*$include = [ 4, 5 ];
 		$exclude = [ ];
 		$entry_rank = DB::table('entries')->where( 'entry_rank', '=', '0')->get();
 		foreach( $entry_rank as $rank )
@@ -2393,7 +2393,8 @@ class EntryController extends BaseController
 		}
 		echo "<pre>";
 		print_r($idstmp);
-		dd(DB::getQueryLog());
+		dd(DB::getQueryLog());*/
+		echo "hello";
 	}
 	/**
 	 *
