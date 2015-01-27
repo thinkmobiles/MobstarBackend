@@ -2350,8 +2350,7 @@ class EntryController extends BaseController
 		*/
 		//Get users greater than the cursor from
 		//$users = User::where( 'user_user_group', 4 )->get();
-		$include = [ ];
-		$include = [4,5];
+		$include = [ 4, 5 ];
 		$exclude = [ ];
 		$entry_rank = DB::table('entries')->where( 'entry_rank', '=', '0')->get();
 		foreach( $entry_rank as $rank )
@@ -2360,9 +2359,9 @@ class EntryController extends BaseController
 		}
 		$team = DB::table('users')
 		->select('user_id')
-		//->where( 'user_user_group', 4 )->get();
+		//->where( 'user_user_group', 4 );
 		->whereIn( 'user_user_group',$include )
-		->orderBy( 'user_user_group', 'asc' );
+		->orderBy( 'user_user_group','asc');
 		$order = 'entry_rank';
 		$dir = 'asc';
 		$query = DB::table('entries')
@@ -2371,19 +2370,17 @@ class EntryController extends BaseController
 		$query = $query->where( 'entry_rank', '>', 0 );
 		$query = $query->where( 'entry_deleted', '=', 0 );
 		$query = $query->whereNotIn( 'entries.entry_id',$exclude );
-		$query = $query->orderBy( $order, $dir );
+		$query = $query->orderBy( $order, $dir );		
 		$query = $query->take( 10 );
 		$entries = $query;
-		$combined = $entries->union($team)->get();
+		$combined = $team->union($entries)->get();	
 		$ids= [];
-		foreach( $team as $teamusers )
+		foreach( $combined as $teamusers )
 		{
 			$ids[] = $teamusers->user_id;
 		}
 		$newOrderBy = implode(",",$ids);
-		//$users = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, 544, 426, 593, 386, 489, 519, 473, 557)"))->get();
 		$users = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, $newOrderBy)"))->get();
-//		$users = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, 473, 519, 489, 386, 593, 426, 544)"))->get();
 		//Find total number to put in header
 		//$count = User::where( 'user_user_group', 4 )->count();
 		$count = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, $newOrderBy)"))->count();
