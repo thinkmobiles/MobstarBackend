@@ -1347,6 +1347,8 @@ class UserController extends BaseController
 	
 		//Get users greater than the cursor from
 		//$users = User::where( 'user_user_group', 4 )->get();
+		$include = [ ];
+		$include = [4,5];
 		$exclude = [ ];
 		$entry_rank = DB::table('entries')->where( 'entry_rank', '=', '0')->get();
 		foreach( $entry_rank as $rank )
@@ -1355,7 +1357,9 @@ class UserController extends BaseController
 		}
 		$team = DB::table('users')
 		->select('user_id')
-		->where( 'user_user_group', 4 )->get();
+		//->where( 'user_user_group', 4 )->get();
+		->whereIn( 'user_user_group',$include )
+		->orderBy( 'user_user_group', 'asc' );
 		$order = 'entry_rank';
 		$dir = 'asc';
 //		$query = DB::table('entries')
@@ -1374,7 +1378,7 @@ class UserController extends BaseController
 			$ids[] = $teamusers->user_id;
 		}
 		$newOrderBy = implode(",",$ids);
-		$users = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, 544, 426, 593, 386, 489, 519, 473,557)"))->get();
+		$users = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, 544, 426, 593, 386, 489, 519, 473, 557)"))->get();
 //		$users = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, 473, 519, 489, 386, 593, 426, 544)"))->get();
 		//Find total number to put in header
 		//$count = User::where( 'user_user_group', 4 )->count();
