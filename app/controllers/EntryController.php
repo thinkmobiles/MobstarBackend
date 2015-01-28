@@ -2428,10 +2428,11 @@ class EntryController extends BaseController
 
 		$rank = 1;
 
-		foreach( $entries as $entry )
+		fforeach( $entries as $entry )
 		{
 			if( !in_array( $entry->entry_user_id, $users ) )
 			{
+				$user = oneUser( $entry->user, $session );
 				$user[ 'rank' ] = $rank;
 				$return[ 'talents' ][ ][ 'talent' ] = $user;
 				$users[ ] = $entry->entry_user_id;
