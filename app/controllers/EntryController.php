@@ -2318,6 +2318,7 @@ class EntryController extends BaseController
 		
 	public function dummytest()
 	{
+		$return = [ ];
 		/*$exclude = [ ];
 		$entry_rank = DB::table('entries')->where( 'entry_rank', '=', '0')->get();
 		foreach( $entry_rank as $rank )
@@ -2432,6 +2433,7 @@ class EntryController extends BaseController
 		{
 			if( !in_array( $entry->entry_user_id, $users ) )
 			{
+				$user = oneUser( $entry->user, $session );
 				$user[ 'rank' ] = $rank;
 				$return[ 'talents' ][ ][ 'talent' ] = $user;
 				$users[ ] = $entry->entry_user_id;
@@ -2440,7 +2442,7 @@ class EntryController extends BaseController
 		}
 
 
-		$response = Response::make( $users, 200 );
+		$response = Response::make( $return, 200 );
 
 		return $response;
 	}
