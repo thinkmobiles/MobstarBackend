@@ -2432,7 +2432,6 @@ class EntryController extends BaseController
 		{
 			if( !in_array( $entry->entry_user_id, $users ) )
 			{
-				$user = oneUser( $entry->user, $session );
 				$user[ 'rank' ] = $rank;
 				$return[ 'talents' ][ ][ 'talent' ] = $user;
 				$users[ ] = $entry->entry_user_id;
@@ -2441,7 +2440,7 @@ class EntryController extends BaseController
 		}
 
 
-		$response = Response::make( $return, 200 );
+		$response = Response::make( $users, 200 );
 
 		return $response;
 	}
