@@ -797,7 +797,7 @@ class UserController extends BaseController
 				$device->save();
 
 				$login = new LoginController;
-				$login->registerSNSEndpoint( $device );
+				//$login->registerSNSEndpoint( $device );
 
 			}
 			//Get team users 
