@@ -2409,7 +2409,7 @@ class EntryController extends BaseController
 		->where('entries.entry_deleted', '=', '0')
 	    ->where(function($query)
             {
-                $query->where('entries.entry_rank', '!=', 0)						
+                $query->where('entries.entry_rank', '!=', 0);						
             })			
        ->orderBy( 'entry_rank', 'asc' )->get();
 		
