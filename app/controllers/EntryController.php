@@ -2394,7 +2394,34 @@ class EntryController extends BaseController
 		echo "<pre>";
 		print_r($idstmp);
 		dd(DB::getQueryLog());*/
-		echo "hello";
+		$return = [ ];
+
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+		//->where('entries.entry_deleted', '=', '0')
+		$entries = Entry::where('entry_rank', '!=', 0)->where('entry_deleted', '=', '0')->with( 'user' )->orderBy( 'entry_rank', 'asc' )->get();
+
+		$users = [ ];
+		$return[ 'talents' ] = [];
+
+		$rank = 1;
+
+		foreach( $entries as $entry )
+		{
+			if( !in_array( $entry->entry_user_id, $users ) )
+			{
+				$user[ 'rank' ] = $rank;
+				$return[ 'talents' ][ ][ 'talent' ] = $user;
+				$users[ ] = $entry->entry_user_id;
+				$rank++;
+			}
+		}
+
+
+		$response = Response::make( $return, 200 );
+
+		return $response;
 	}
 	/**
 	 *
