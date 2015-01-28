@@ -2399,9 +2399,10 @@ class EntryController extends BaseController
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
-		//->where('entries.entry_deleted', '=', '0')
-		$entries = Entry::where('entry_rank', '!=', 0)->where('entry_deleted', '=', '0')->with( 'user' )->orderBy( 'entry_rank', 'asc' )->get();
 
+		//$entries = Entry::where('entry_rank', '!=', 0)->with( 'user' )->orderBy( 'entry_rank', 'asc' )->get();
+		$entries = Entry::whereRaw('entry_rank != 0 and entry_deleted = 0')->with( 'user' )->orderBy( 'entry_rank', 'asc' )->get();
+		
 		$users = [ ];
 		$return[ 'talents' ] = [];
 
