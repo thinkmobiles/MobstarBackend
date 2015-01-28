@@ -2400,10 +2400,10 @@ class EntryController extends BaseController
 
 		$session = $this->token->get_session( $token );
 
-		//$entries = Entry::where('entry_rank', '!=', 0)->with( 'user' )->orderBy( 'entry_rank', 'asc' )->get();
+		$entries = Entry::where('entry_rank', '!=', 0)->with( 'user' )->orderBy( 'entry_rank', 'asc' )->get();
 		//$entries = DB::table('entries')whereRaw('entry_rank != 0 and entry_deleted = 0')->with( 'user' )->orderBy( 'entry_rank', 'asc' )->get();
 		
-		$entries = DB::table('entries')
+		/*$entries = DB::table('entries')
 		->select('entries.*')
 		->join('users', 'entries.entry_user_id', '=', 'users.user_id')
 		->where('entries.entry_deleted', '=', '0')
@@ -2411,7 +2411,7 @@ class EntryController extends BaseController
             {
                 $query->where('entries.entry_rank', '!=', 0);						
             })			
-       ->orderBy( 'entry_rank', 'asc' )->get();
+       ->orderBy( 'entry_rank', 'asc' )->get();*/
 		
 		
 		$users = [ ];
