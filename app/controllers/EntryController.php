@@ -2417,7 +2417,7 @@ class EntryController extends BaseController
 		->select('entries.*')
 		->join('users', 'entries.entry_user_id', '=', 'users.user_id')
 		->where('entries.entry_deleted', '=', '0')
-	    ->where(function($query) use ($term)
+	    ->where(function($query)
             {
                 $query->where('entries.entry_rank', '!=', 0);
             })			
