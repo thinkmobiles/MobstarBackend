@@ -2428,7 +2428,7 @@ class EntryController extends BaseController
 
 		$rank = 1;
 
-		fforeach( $entries as $entry )
+		foreach( $entries as $entry )
 		{
 			if( !in_array( $entry->entry_user_id, $users ) )
 			{
