@@ -801,10 +801,12 @@ class UserController extends BaseController
 
 			}
 			//Get team users 
-			$team_users = User::where( 'user_user_group', 4 )->get();
-
+			$ids = [ 4, 5 ];
+			//$team_users = User::where( 'user_user_group', 4 )->get();
+			$team_users = User::whereIn( 'user_user_group', $ids )->get();
 			//Find total number team user
-			$team_users_count = User::where( 'user_user_group', 4 )->count();
+			//$team_users_count = User::where( 'user_user_group', 4 )->count();
+			$team_users_count = User::whereIn( 'user_user_group', $ids )->count();
 			if( $team_users_count > 0 )
 			{
 				
