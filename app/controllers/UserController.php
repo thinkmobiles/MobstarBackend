@@ -933,7 +933,7 @@ class UserController extends BaseController
 	 *           name="password",
 	 *           description="Password for the regisering user",
 	 *           paramType="form",
-	 *           required=true,
+	 *           required=false,
 	 *           type="string"
 	 *         )
 	 *       ),
