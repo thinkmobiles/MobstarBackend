@@ -197,8 +197,7 @@ function oneUser( $user, $session, $includeStars = false )
 			$tmp[]  = $vote->vote_entry_id;
 			if($vote->vote_deleted == 0)
 				$votes++;
-		}
-		mail('anil@spaceotechnologies.com', time(),print_r($tmp,true));
+		}		
 	}
 
 	if ($rank == 100000)
