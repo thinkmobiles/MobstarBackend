@@ -176,7 +176,7 @@ function oneUser( $user, $session, $includeStars = false )
 	//$entries = Entry::with('vote')->where('entry_user_id', '=', $user->user_id)->get();
 	$entries = DB::table('entries')
 		->select('entries.*')
-		->join('vote', 'entries.entry_user_id', '=', 'vote.vote_user_id')
+		->join('votes', 'entries.entry_user_id', '=', 'vote.vote_user_id')
 		->where('entries.entry_deleted', '=', '0')
 	    ->where(function($query)
             {
