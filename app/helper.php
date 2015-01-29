@@ -175,7 +175,7 @@ function oneUser( $user, $session, $includeStars = false )
 
 	$entries = Entry::with('vote')->where('entry_user_id', '=', $user->user_id)->get();
 	//
-	$entriesrank = DB::table('entries')
+	/*$entriesrank = DB::table('entries')
 		->select('entries.*,votes.*')
 		->join('votes', 'entries.entry_user_id', '=', 'votes.vote_user_id')
 		->where('entries.entry_deleted', '=', '0')
@@ -191,7 +191,7 @@ function oneUser( $user, $session, $includeStars = false )
 		$myrank = $ranknew;		
 		$ranknew++;		
 	}
-	mail('anil@spaceotechnologies.com',time(),print_r($myrank,true));
+	mail('anil@spaceotechnologies.com',time(),print_r($myrank,true));*/
 	//
 	$rank = 100000;
 	$votes = 0;
