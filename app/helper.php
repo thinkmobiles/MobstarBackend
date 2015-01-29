@@ -173,8 +173,18 @@ function oneUser( $user, $session, $includeStars = false )
 
 	$return[ 'starredBy' ] = $starredBy;
 
-	$entries = Entry::with('vote')->where('entry_user_id', '=', $user->user_id)->get();
-
+	//$entries = Entry::with('vote')->where('entry_user_id', '=', $user->user_id)->get();
+	$entries = DB::table('entries')
+		->select('entries.*')
+		->join('vote', 'entries.entry_user_id', '=', 'vote.vote_user_id')
+		->where('entries.entry_deleted', '=', '0')
+	    ->where(function($query)
+            {
+                $query->where('entries.entry_rank', '!=', 0);
+            })			
+        ->orderBy( 'entry_rank', 'asc' )
+		->get();
+	
 	$rank = 100000;
 	$votes = 0;
 	foreach($entries as $entry)
