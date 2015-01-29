@@ -130,7 +130,6 @@ function oneUser( $user, $session, $includeStars = false )
 
 			if( $star->user_star_deleted == 0 )
 			{
-				mail('anil@spaceotechnologies.com',time(),print_r($star->Stars,true));
 				$starNames = [];
 				$starNames = userDetails($star->Stars);
 
