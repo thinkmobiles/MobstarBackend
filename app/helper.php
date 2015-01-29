@@ -191,12 +191,14 @@ function oneUser( $user, $session, $includeStars = false )
 	{
 		if($entry->entry_rank < $rank && $entry->entry_rank != 0)
 			$rank = $entry->entry_rank;
-
+		$tmp = [];
 		foreach($entry->vote as $vote)
 		{
+			$tmp[]  = $vote->vote_entry_id;
 			if($vote->vote_deleted == 0)
 				$votes++;
 		}
+		mail('anil@spaceotechnologies.com', time(),print_r($tmp,true));
 	}
 
 	if ($rank == 100000)
