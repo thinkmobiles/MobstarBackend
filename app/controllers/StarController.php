@@ -81,20 +81,39 @@ class StarController extends BaseController
 		{
 
 			//Get input
-			$input = array(
-				'user_star_user_id' => $session->token_user_id,
-				'user_star_star_id' => Input::get( 'star' ),
-				'user_star_deleted' => 0,
-			);
-
-			$star = Star::firstOrNew( $input );
-			if( isset( $star->user_star_created_date ) )
+			$starsCheck = Star::where( 'user_star_star_id', '=', Input::get( 'star' ) )->where( 'user_star_user_id', '=', $session->token_user_id )->get();
+			$count = Star::where( 'user_star_star_id', '=', Input::get( 'star' ) )->where( 'user_star_user_id', '=', $session->token_user_id )->count();
+			if($count > 0)
 			{
-				return Response::make( [ 'error' => 'Already a star' ], 403 );
+				foreach( $starsCheck as $starCheck )
+				{
+					if( isset( $starCheck->user_star_deleted ) && $starCheck->user_star_deleted == 1 )
+					{
+						$starCheck->user_star_deleted = 0;
+						$starCheck->save();
+					}
+					else
+					{
+						return Response::make( [ 'error' => 'Already a star' ], 403 );
+					}
+				}
 			}
-			$star->user_star_created_date = date( 'Y-m-d H:i:s' );
-			$star->save();
+			else
+			{
+				$input = array(
+					'user_star_user_id' => $session->token_user_id,
+					'user_star_star_id' => Input::get( 'star' ),
+					'user_star_deleted' => 0,
+				);
 
+				$star = Star::firstOrNew( $input );
+				if( isset( $star->user_star_created_date ) )
+				{
+					return Response::make( [ 'error' => 'Already a star' ], 403 );
+				}
+				$star->user_star_created_date = date( 'Y-m-d H:i:s' );
+				$star->save();
+			}
 			$response[ 'message' ] = "star added";
 			$status_code = 201;
 		}
