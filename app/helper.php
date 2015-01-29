@@ -173,7 +173,7 @@ function oneUser( $user, $session, $includeStars = false )
 
 	$return[ 'starredBy' ] = $starredBy;
 
-	$entries = Entry::with('vote')->where('entry_user_id', '=', $user->user_id)->get();
+	$entries = Entry::with('vote')->where('entry_user_id', '=', $user->user_id)->where('entry_deleted', '=', '0')->get();
 	//
 	/*$entriesrank = DB::table('entries')
 		->select('entries.*,votes.*')
@@ -183,7 +183,7 @@ function oneUser( $user, $session, $includeStars = false )
             {
                 $query->where('entries.entry_rank', '!=', 0);
             })			
-        ->orderBy( 'entry_rank', 'asc' )
+        ->orderBy( 'entries.entry_rank', 'asc' )
 		->get();
 	$ranknew = 1;
 	foreach( $entriesrank as $entryrank )
