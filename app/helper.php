@@ -156,7 +156,7 @@ function oneUser( $user, $session, $includeStars = false )
 				$starNames = userDetails($starred->User);
 
 				$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
-								  'starName'     => $starNames['displayName'],
+								  'starName'     => (isset( $starNames['displayName'] ) ) ? $starNames['displayName'] : '',
 								  'starredDate'  => $starred->user_star_created_date,
 								  'profileImage' => ( isset( $starred->User->user_profile_image ) )
 									  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+60 minutes' )
