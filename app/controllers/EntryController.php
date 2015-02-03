@@ -871,7 +871,7 @@ class EntryController extends BaseController
 				$current[ 'language' ] = $entry->entry_language;
 
 				$current[ 'totalComments' ] = $entry->comments->count();
-
+				$current[ 'totalviews' ] = $entry->entryViews->count();
 				if( $entry->entry_deleted )
 				{
 					$current[ 'deleted' ] = true;
