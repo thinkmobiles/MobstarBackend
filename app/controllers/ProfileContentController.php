@@ -280,13 +280,13 @@ class ProfileContentController extends BaseController
 
 
 		//log contents
-		try{
+		/*try{
 			$myfile = 'sns-log.txt';
 			file_put_contents($myfile, date('d-m-Y H:i:s') . ' debug log:', FILE_APPEND);
 			file_put_contents($myfile, print_r($endpointDetails, true), FILE_APPEND);
 		}
 		catch(\League\Flysystem\Exception $ex){
 
-		}
+		}*/
 	}	
 }
