@@ -3,6 +3,7 @@ use MobStar\Storage\Token\TokenRepository as Token;
 use Swagger\Annotations as SWG;
 use Aws\S3\S3Client;
 use Aws\Common\Credentials\Credentials as Creds;
+use Aws\Sns\SnsClient;
 
 class ProfileContentController extends BaseController
 {
@@ -224,5 +225,64 @@ class ProfileContentController extends BaseController
 		}
 
 		return Response::make( $response, $status_code );
-	}		
+	}
+	public function pushmessage()
+	{
+		$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushmessage";
+		$client = getSNSClient();
+		$result1 = $client->listEndpointsByPlatformApplication(array(
+		    // PlatformApplicationArn is required
+		    'PlatformApplicationArn' => $arn,
+		));
+
+		foreach($result1['Endpoints'] as $Endpoint){
+			$EndpointArn = $Endpoint['EndpointArn']; 
+			$EndpointToken = $Endpoint['Attributes'];
+			foreach($EndpointToken as $key=>$newVals){
+				if($key=="Token"){
+					if('7d63172f1eed74ae8a8992b4c6f2d44c0e391439a6a02f0b1c156e80c432d1cb'==$newVals){
+					//Delete ARN
+						$result = $client->deleteEndpoint(array(
+							// EndpointArn is required
+							'EndpointArn' => $EndpointArn,
+						));
+					}
+				}
+			}
+		}
+
+		$endpoint = $client->createPlatformEndpoint( [
+													'PlatformApplicationArn' =>
+														$arn,
+													'Token'                  =>'7d63172f1eed74ae8a8992b4c6f2d44c0e391439a6a02f0b1c156e80c432d1cb'
+														//$device->device_registration_device_token
+												] );
+
+		$endpointDetails = $endpoint->toArray();
+
+		$response = $client->publish( [
+							  'TargetArn'          => $endpointDetails['EndpointArn'],
+							  'MessageStructure' => 'json',
+							  'Message'            => json_encode(array(
+							  	'default' => 'Hello World!!!'
+							  	)),
+							  'Subject'            => 'MobStar',
+							  'MessageAttributues' => [
+								  'String' => [
+									  'DataType' => 'string',
+								  ]
+							  ]
+						  ] );
+
+
+		//log contents
+		try{
+			$myfile = 'sns-log.txt';
+			file_put_contents($myfile, date('d-m-Y H:i:s') . ' debug log:', FILE_APPEND);
+			file_put_contents($myfile, print_r($endpointDetails, true), FILE_APPEND);
+		}
+		catch(\League\Flysystem\Exception $ex){
+
+		}
+	}	
 }
