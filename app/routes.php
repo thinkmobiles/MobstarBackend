@@ -388,7 +388,7 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "profilecontent/store",
 			"uses" => "ProfileContentController@store"
 		] );
-		Route::get( "profilecontent/pushmessage", [
+		Route::get( "pushmessage", [
 			"as"   => "profilecontent/pushmessage",
 			"uses" => "ProfileContentController@pushmessage"
 		] );

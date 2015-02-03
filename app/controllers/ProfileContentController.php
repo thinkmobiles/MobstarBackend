@@ -228,6 +228,10 @@ class ProfileContentController extends BaseController
 	}
 	public function pushmessage()
 	{
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+		
 		$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushmessage";
 		$client = getSNSClient();
 		$result1 = $client->listEndpointsByPlatformApplication(array(
