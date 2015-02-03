@@ -154,7 +154,7 @@ class CategoryController extends BaseController {
 
 				if(in_array("categoryDescription",$fields))
 					$current['categoryDescription'] = $category->category_description;
-
+				/*
 				if(in_array("mentors",$fields)){
 
 					$mentors = $category->mentors()->getResults();
@@ -172,7 +172,7 @@ class CategoryController extends BaseController {
 							'mentorInfo' => $mentor->mentor_bio,
 							];
 					}
-				}
+				}*/
 
 					$return['categories'][]['category'] = $current;
 			}
@@ -184,7 +184,7 @@ class CategoryController extends BaseController {
 				$current['categoryName'] = $category->category_name;
 				$current['categoryActive'] = ($category->category_active) ? true : false;
 				$current['categoryDescription'] = $category->category_description;
-
+				/*
 				$mentors = $category->mentors()->getResults();
 				$current['mentors'] = array();
 
@@ -201,6 +201,7 @@ class CategoryController extends BaseController {
 						];
 
 				}
+				*/
 
 				$return['categories'][]['category'] = $current;
 			}
