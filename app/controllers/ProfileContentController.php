@@ -263,30 +263,27 @@ class ProfileContentController extends BaseController
 												] );
 
 		$endpointDetails = $endpoint->toArray();
-
-		$response = $client->publish( [
-							  'TargetArn'          => $endpointDetails['EndpointArn'],
-							  'MessageStructure' => 'json',
-							  'Message'            => json_encode(array(
-							  	'default' => 'Hello World!!!'
-							  	)),
-							  'Subject'            => 'MobStar',
-							  'MessageAttributues' => [
-								  'String' => [
-									  'DataType' => 'string',
+		try
+		{
+			$response = $client->publish( [
+								  'TargetArn'          => $endpointDetails['EndpointArn'],
+								  'MessageStructure' => 'json',
+								  'Message'            => json_encode(array(
+									'default' => 'Hello World!!!'
+									)),
+								  'Subject'            => 'MobStar',
+								  'MessageAttributues' => [
+									  'String' => [
+										  'DataType' => 'string',
+									  ]
 								  ]
-							  ]
-						  ] );
-
-
-		//log contents
-		/*try{
-			$myfile = 'sns-log.txt';
-			file_put_contents($myfile, date('d-m-Y H:i:s') . ' debug log:', FILE_APPEND);
-			file_put_contents($myfile, print_r($endpointDetails, true), FILE_APPEND);
+							  ] );
+		print($EndpointArn . " - Succeeded!\n"); 
 		}
-		catch(\League\Flysystem\Exception $ex){
-
-		}*/
+		catch (Exception $e)
+		{
+			print($EndpointArn . " - Failed: " . $e->getMessage() . "!\n");
+		}  
+		//log contents	
 	}	
 }
