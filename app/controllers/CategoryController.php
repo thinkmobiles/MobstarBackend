@@ -1,5 +1,6 @@
 <?php
-
+use Aws\S3\S3Client;
+use Aws\Sns\SnsClient;
 use Swagger\Annotations as SWG;
 
 /**
@@ -76,7 +77,7 @@ class CategoryController extends BaseController {
 
 	public function index()
 	{
-
+		$client = getS3Client();
 		$fields = array_values(explode(',',Input::get("fields")));
 
 		if ($fields[0] == "")
@@ -156,7 +157,7 @@ class CategoryController extends BaseController {
 					$current['categoryDescription'] = $category->category_description;
 				
 				if(in_array("categoryIcon",$fields) && !empty( $category->category_icon ))
-					$current['categoryIcon'] = 'http://' . $_ENV[ 'URL' ] . '/' .$category->category_icon;	
+					$current['categoryIcon'] = $client->getObjectUrl( 'mobstar-1', $category->category_icon, '+60 minutes' );	
 				
 				/*
 				if(in_array("mentors",$fields)){
@@ -188,7 +189,7 @@ class CategoryController extends BaseController {
 				$current['categoryName'] = $category->category_name;
 				$current['categoryActive'] = ($category->category_active) ? true : false;
 				$current['categoryDescription'] = $category->category_description;
-				$current['categoryDescription'] = (!empty($category->category_icon)) ? 'http://' . $_ENV[ 'URL' ] . '/' .$category->category_icon : '';
+				$current['categoryDescription'] = (!empty($category->category_icon)) ? $client->getObjectUrl( 'mobstar-1', $category->category_icon, '+60 minutes' ) : '';
 				/*
 				$mentors = $category->mentors()->getResults();
 				$current['mentors'] = array();
