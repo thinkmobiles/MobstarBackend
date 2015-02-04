@@ -17,7 +17,7 @@ use Swagger\Annotations as SWG;
 
 class CategoryController extends BaseController {
 
-	public $valid_fields = ["id", "categoryName", "categoryDescription", "categoryActive", "mentors"];
+	public $valid_fields = ["id", "categoryName", "categoryDescription", "categoryActive", "categoryIcon", "mentors"];
 
 	/**
 	 * Display a listing of the resource.
@@ -154,6 +154,10 @@ class CategoryController extends BaseController {
 
 				if(in_array("categoryDescription",$fields))
 					$current['categoryDescription'] = $category->category_description;
+				
+				if(in_array("categoryIcon",$fields) && !empty( $category->category_icon ))
+					$current['categoryIcon'] = 'http://' . $_ENV[ 'URL' ] . '/' .$category->category_icon;	
+				
 				/*
 				if(in_array("mentors",$fields)){
 
@@ -184,6 +188,7 @@ class CategoryController extends BaseController {
 				$current['categoryName'] = $category->category_name;
 				$current['categoryActive'] = ($category->category_active) ? true : false;
 				$current['categoryDescription'] = $category->category_description;
+				$current['categoryDescription'] = (!empty($category->category_icon)) ? 'http://' . $_ENV[ 'URL' ] . '/' .$category->category_icon : '';
 				/*
 				$mentors = $category->mentors()->getResults();
 				$current['mentors'] = array();
