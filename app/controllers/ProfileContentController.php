@@ -232,7 +232,7 @@ class ProfileContentController extends BaseController
 
 		$session = $this->token->get_session( $token );
 		
-		$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpush";
+		$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushdemo";
 		$client = getSNSClient();
 		$result1 = $client->listEndpointsByPlatformApplication(array(
 		    // PlatformApplicationArn is required
