@@ -232,7 +232,7 @@ class ProfileContentController extends BaseController
 
 		$session = $this->token->get_session( $token );
 		
-		$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS_SANDBOX/DevelopmentPush";
+		$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpush";
 		$client = getSNSClient();
 		$result1 = $client->listEndpointsByPlatformApplication(array(
 		    // PlatformApplicationArn is required
@@ -244,7 +244,7 @@ class ProfileContentController extends BaseController
 			$EndpointToken = $Endpoint['Attributes'];
 			foreach($EndpointToken as $key=>$newVals){
 				if($key=="Token"){
-					if('7d63172f1eed74ae8a8992b4c6f2d44c0e391439a6a02f0b1c156e80c432d1cb'==$newVals){
+					if('6672d02e450121387e3d1054c7231ada71a75731789da6909b25461e10b01d13'==$newVals){
 					//Delete ARN
 						$result = $client->deleteEndpoint(array(
 							// EndpointArn is required
@@ -258,7 +258,7 @@ class ProfileContentController extends BaseController
 		$endpoint = $client->createPlatformEndpoint( [
 													'PlatformApplicationArn' =>
 														$arn,
-													'Token'                  =>'7d63172f1eed74ae8a8992b4c6f2d44c0e391439a6a02f0b1c156e80c432d1cb'
+													'Token'                  =>'6672d02e450121387e3d1054c7231ada71a75731789da6909b25461e10b01d13'
 														//$device->device_registration_device_token
 												] );
 
