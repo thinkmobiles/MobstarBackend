@@ -98,7 +98,12 @@ class CategoryController extends BaseController {
 			}
 
 		}
-
+		$isMobIT = (Input::get('mobit', 'no'));
+		$exclude = array();
+		if($isMobIT=='yes')
+			$exclude = [998];
+		else
+			$exclude = [999,998];
 		//Get limit to calculate pagination
 		$limit = (Input::get('limit', '50'));
 
@@ -119,7 +124,8 @@ class CategoryController extends BaseController {
 			$previous = false;
 
 		//Find total number to put in header
-		$count =  Category::count();
+		//$count =  Category::count();
+		$count =  Category::whereNotIn('category_id', $exclude )->count();
 
 
 		if($count == 0){
@@ -134,7 +140,9 @@ class CategoryController extends BaseController {
 		else
 			$next = false;
 
-		$categories =  Category::take($limit)->skip($offset)->get();
+		//$categories =  Category::take($limit)->skip($offset)->get();
+		$categories =  Category::whereNotIn('category_id', $exclude )->take($limit)->skip($offset)->get();
+
 
 		foreach ($categories as $category){
 
