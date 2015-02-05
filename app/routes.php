@@ -639,7 +639,10 @@ Route::get( "login/twiml/", [
 			"as"   => "login/twiml",
 			"uses" => "LoginController@twiml"
 		] );		
-
+Route::post( "entry/deleteentryfiles", [
+			"as"	=> "entry/deleteentryfiles",	
+			"uses"	=> "EntryController@deleteEntryFiles"
+		] );
 App::missing( function ( $exception )
 {
 
