@@ -140,8 +140,11 @@ class CategoryController extends BaseController {
 		else
 			$next = false;
 
+		array_unshift($ids , '999');		
+		$newOrderBy = '';
+		$newOrderBy = implode(",",$ids);
 		//$categories =  Category::take($limit)->skip($offset)->get();
-		$categories =  Category::whereNotIn('category_id', $exclude )->take($limit)->skip($offset)->get();
+		$categories =  Category::whereNotIn('category_id', $exclude )->orderByRaw(DB::raw("FIELD(category_id,$newOrderBy)"))->take($limit)->skip($offset)->get();
 
 
 		foreach ($categories as $category){
