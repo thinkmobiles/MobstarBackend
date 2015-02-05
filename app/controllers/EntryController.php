@@ -2522,5 +2522,50 @@ class EntryController extends BaseController
 
 		$response = Response::make( $return, $status_code );
 		return $response;
-	}	
+	}
+	// For delete entries
+	public function deleteEntryFiles() 
+	{
+		
+		if(isset($_POST))
+		{
+			$post = $_POST;
+
+			$filename = $post['filename'];
+			$filetype = $post['filetype'];
+
+			$originalfile = 'uploads/'.$filename.'-uploaded.'.$filetype;
+			$mp4file = 'uploads/'.$filename.'.'.$filetype;
+			$logfile = 'uploads/'.$filename.'-log.txt';
+			$thumbfile = 'uploads/'.$filename.'-thumb.jpg';
+
+			if(File::exists($originalfile))
+			{
+				File::delete($originalfile);
+			}
+			if(File::exists($mp4file))
+			{
+				File::delete($mp4file);
+			}
+			if(File::exists($logfile))
+			{
+				File::delete($logfile);
+			}
+			if(File::exists($thumbfile))
+			{
+				File::delete($thumbfile);
+			}
+			$return = [ 'notice' => 'success' ];
+			$status_code = 200;
+		}
+		else
+		{
+			$return = [ 'error' => 'No files deleted' ];
+			$status_code = 404;
+		}
+
+		$response = Response::make( $return, $status_code );
+		return $response;
+	}
+	// End		
 }
