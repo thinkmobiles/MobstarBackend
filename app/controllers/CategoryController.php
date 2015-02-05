@@ -139,7 +139,12 @@ class CategoryController extends BaseController {
 			$next = true;
 		else
 			$next = false;
-
+		$orderby =  Category::where('category_id', '<' ,'998' )->orderBy( 'category_id', 'asc' )->get();
+		$ids= [];
+		foreach( $orderby as $order )
+		{
+			$ids[] = $order->category_id;
+		}
 		array_unshift($ids , '999');		
 		$newOrderBy = '';
 		$newOrderBy = implode(",",$ids);
