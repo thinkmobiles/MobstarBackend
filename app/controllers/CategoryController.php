@@ -101,9 +101,9 @@ class CategoryController extends BaseController {
 		$isMobIT = (Input::get('mobit', 'no'));
 		$exclude = array();
 		if($isMobIT=='yes')
-			$exclude = [998];
+			$exclude = [7];
 		else
-			$exclude = [999,998];
+			$exclude = [7,8];
 		//Get limit to calculate pagination
 		$limit = (Input::get('limit', '50'));
 
@@ -139,13 +139,13 @@ class CategoryController extends BaseController {
 			$next = true;
 		else
 			$next = false;
-		$orderby =  Category::where('category_id', '<' ,'998' )->orderBy( 'category_id', 'asc' )->get();
+		$orderby =  Category::whereNotIn('category_id', $exclude )->orderBy( 'category_id', 'asc' )->get();
 		$ids= [];
 		foreach( $orderby as $order )
 		{
 			$ids[] = $order->category_id;
 		}
-		array_unshift($ids , '999');		
+		array_unshift($ids , '8');		
 		$newOrderBy = '';
 		$newOrderBy = implode(",",$ids);
 		//$categories =  Category::take($limit)->skip($offset)->get();
