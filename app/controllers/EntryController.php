@@ -183,7 +183,7 @@ class EntryController extends BaseController
 
 		$debug = false;
 
-		switch($order_by)
+		switch( $order_by )
 		{
 			case "popular":
 				$order = 'entry_rank';
@@ -237,7 +237,7 @@ class EntryController extends BaseController
 		}
 		if( $order_by == 'popular' )
 		{
-			$entry_rank = DB::table('entries')->where( 'entry_rank', '=', '0')->get();
+			$entry_rank = DB::table( 'entries' )->where( 'entry_rank', '=', '0' )->get();
 			foreach( $entry_rank as $rank )
 			{
 				$exclude[ ] = $rank->entry_id;
@@ -245,23 +245,23 @@ class EntryController extends BaseController
 		}
 		/* Added for exclude MOBIT category in All entry list */
 		$excludeCategory = array();
-		if($category != 8)
+		if( $category != 8 )
 		{
-			$excludeCategory = [7,8];			
-			$entry_category = DB::table('entries')->whereIn( 'entry_category_id', $excludeCategory )->get();
+			$excludeCategory = [ 7, 8 ];
+			$entry_category = DB::table( 'entries' )->whereIn( 'entry_category_id', $excludeCategory )->get();
 			foreach( $entry_category as $c )
 			{
 				$exclude[ ] = $c->entry_id;
 			}
 		}
-		if($category == 8)
+		if( $category == 8 )
 		{
-			$excludeCategory = [7,8];
-			$entry_category = DB::table('entries')->whereNotIn( 'entry_category_id', $excludeCategory )->get();
+			$excludeCategory = [ 7, 8 ];
+			$entry_category = DB::table( 'entries' )->whereNotIn( 'entry_category_id', $excludeCategory )->get();
 			foreach( $entry_category as $c )
 			{
 				$exclude[ ] = $c->entry_id;
-			}	
+			}
 		}
 		/* End */
 		$entries = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false, true );
@@ -308,8 +308,6 @@ class EntryController extends BaseController
 
 		foreach( $entries as $entry )
 		{
-			if( $entry->entry_deleted )
-				continue;
 
 			$up_votes = 0;
 			$down_votes = 0;
@@ -517,8 +515,10 @@ class EntryController extends BaseController
 
 		$status_code = 200;
 
-		if($debug !== false)
-			$return['debug'] = $debug;
+		if( $debug !== false )
+		{
+			$return[ 'debug' ] = $debug;
+		}
 		//If next is true create next page link
 		if( $next )
 		{
@@ -1054,6 +1054,7 @@ class EntryController extends BaseController
 					'entry_language'     => Input::get( 'language' ),
 					'entry_description'  => Input::get( 'description' ),
 					'entry_created_date' => date( 'Y-m-d H:i:s' ),
+					'entry_deleted'      => 1,
 				];
 
 				Eloquent::unguard();
@@ -1989,18 +1990,18 @@ class EntryController extends BaseController
             })
 		->where('entries.entry_deleted', '=', '0')
         ->get();*/
-		$results = DB::table('entries')
-		->select('entries.*')
-		->join('users', 'entries.entry_user_id', '=', 'users.user_id')
-		->where('entries.entry_deleted', '=', '0')
-	    ->where(function($query) use ($term)
-            {
-                $query->orWhere('entries.entry_name', 'LIKE', '%'.$term.'%')
-						->orWhere('entries.entry_description', 'LIKE', '%'.$term.'%')
-						->orWhere('users.user_name', 'LIKE', '%'.$term.'%')
-						->orWhere('users.user_full_name', 'LIKE', '%'.$term.'%');
-            })			
-        ->get();	
+		$results = DB::table( 'entries' )
+					 ->select( 'entries.*' )
+					 ->join( 'users', 'entries.entry_user_id', '=', 'users.user_id' )
+					 ->where( 'entries.entry_deleted', '=', '0' )
+					 ->where( function ( $query ) use ( $term )
+					 {
+						 $query->orWhere( 'entries.entry_name', 'LIKE', '%' . $term . '%' )
+							   ->orWhere( 'entries.entry_description', 'LIKE', '%' . $term . '%' )
+							   ->orWhere( 'users.user_name', 'LIKE', '%' . $term . '%' )
+							   ->orWhere( 'users.user_full_name', 'LIKE', '%' . $term . '%' );
+					 } )
+					 ->get();
 		$status_code = 200;
 		if( count( $results ) == 0 )
 		{
@@ -2010,14 +2011,19 @@ class EntryController extends BaseController
 		else
 		{
 			$return = [ ];
-			for($i=0;$i<count($results);$i++)
+			for( $i = 0; $i < count( $results ); $i++ )
 			{
-				if($results[$i]->entry_deleted === 1)
-				continue;
+				if( $results[ $i ]->entry_deleted === 1 )
+				{
+					continue;
+				}
 				else
-				$return[ 'entries' ][ ][ 'entry' ] = $this->oneEntryNew( $results[$i], $session, true );
-			}		
+				{
+					$return[ 'entries' ][ ][ 'entry' ] = $this->oneEntryNew( $results[ $i ], $session, true );
+				}
+			}
 		}
+
 		return Response::make( $return, $status_code );
 	}
 
@@ -2033,7 +2039,6 @@ class EntryController extends BaseController
 
 		$sortArray = array();
 		$i = 0;
-
 
 		foreach( $entries as $entry )
 		{
@@ -2199,12 +2204,13 @@ class EntryController extends BaseController
 
 		return Response::make( [ 'status' => 'entry undeleted' ], 200 );
 	}
+
 	public function mysearch()
 	{
 		$token = Request::header( "X-API-TOKEN" );
-		$session = $this->token->get_session( $token );		
-		$term = Input::get( "term" );		
-		
+		$session = $this->token->get_session( $token );
+		$term = Input::get( "term" );
+
 		/*$results = $this->entry->search( $term );
 		//dd(DB::getQueryLog());
 		$status_code = 200;
@@ -2225,19 +2231,19 @@ class EntryController extends BaseController
 		}
 
 		return Response::make( $return, $status_code );*/
-		$results = DB::table('entries')
-		->select('entries.*')
-		->join('users', 'entries.entry_user_id', '=', 'users.user_id')
-		->where('entries.entry_deleted', '=', '0')
-	    ->where(function($query) use ($term)
-            {
-                $query->orWhere('entries.entry_name', 'LIKE', '%'.$term.'%')
-						->orWhere('entries.entry_description', 'LIKE', '%'.$term.'%')
-						->orWhere('users.user_name', 'LIKE', '%'.$term.'%')
-						->orWhere('users.user_full_name', 'LIKE', '%'.$term.'%');
-            })			
-		//->where('entries.entry_deleted', '=', '0')
-        ->get();		
+		$results = DB::table( 'entries' )
+					 ->select( 'entries.*' )
+					 ->join( 'users', 'entries.entry_user_id', '=', 'users.user_id' )
+					 ->where( 'entries.entry_deleted', '=', '0' )
+					 ->where( function ( $query ) use ( $term )
+					 {
+						 $query->orWhere( 'entries.entry_name', 'LIKE', '%' . $term . '%' )
+							   ->orWhere( 'entries.entry_description', 'LIKE', '%' . $term . '%' )
+							   ->orWhere( 'users.user_name', 'LIKE', '%' . $term . '%' )
+							   ->orWhere( 'users.user_full_name', 'LIKE', '%' . $term . '%' );
+					 } )
+			//->where('entries.entry_deleted', '=', '0')
+					 ->get();
 		//dd(DB::getQueryLog());
 		$status_code = 200;
 		if( count( $results ) == 0 )
@@ -2248,16 +2254,22 @@ class EntryController extends BaseController
 		else
 		{
 			$return = [ ];
-			for($i=0;$i<count($results);$i++)
+			for( $i = 0; $i < count( $results ); $i++ )
 			{
-				if($results[$i]->entry_deleted === 1)
-				continue;
+				if( $results[ $i ]->entry_deleted === 1 )
+				{
+					continue;
+				}
 				else
-				$return[ 'entries' ][ ][ 'entry' ] = $this->oneEntryNew( $results[$i], $session, true );
-			}		
+				{
+					$return[ 'entries' ][ ][ 'entry' ] = $this->oneEntryNew( $results[ $i ], $session, true );
+				}
+			}
 		}
+
 		return Response::make( $return, $status_code );
 	}
+
 	public function oneEntryNew( $entry, $session, $includeUser = false )
 	{
 
@@ -2267,7 +2279,7 @@ class EntryController extends BaseController
 
 		$up_votes = 0;
 		$down_votes = 0;
-		$votes = Vote::where('vote_entry_id','=',$entry->entry_id)->get();
+		$votes = Vote::where( 'vote_entry_id', '=', $entry->entry_id )->get();
 		foreach( $votes as $vote )
 		{
 			if( $vote->vote_up == 1 && $vote->vote_deleted == 0 )
@@ -2282,34 +2294,34 @@ class EntryController extends BaseController
 		}
 		$current[ 'id' ] = $entry->entry_id;
 		$column = 'category_id';
-		$category_name = DB::table('categories')->where('category_id', '=', $entry->entry_category_id)->pluck('category_name');
+		$category_name = DB::table( 'categories' )->where( 'category_id', '=', $entry->entry_category_id )->pluck( 'category_name' );
 		$current[ 'category' ] = $category_name;
 		$current[ 'type' ] = $entry->entry_type;
 
 		if( $includeUser )
 		{
-			$User = User::where('user_id' , '=', $entry->entry_user_id)->first();
+			$User = User::where( 'user_id', '=', $entry->entry_user_id )->first();
 			$current[ 'user' ] = oneUser( $User, $session );
 		}
 
 		$current[ 'name' ] = $entry->entry_name;
 		$current[ 'description' ] = $entry->entry_description;
-		$totalComments = Comment::where('comment_entry_id','=',$entry->entry_id)->count();
-		$totalviews = EntryView::where('entry_view_entry_id','=',$entry->entry_id)->count();
+		$totalComments = Comment::where( 'comment_entry_id', '=', $entry->entry_id )->count();
+		$totalviews = EntryView::where( 'entry_view_entry_id', '=', $entry->entry_id )->count();
 		$current[ 'totalComments' ] = $totalComments;
 		$current[ 'totalviews' ] = $totalviews;
 		$current[ 'created' ] = $entry->entry_created_date;
 		$current[ 'modified' ] = $entry->entry_modified_date;
 
 		$current[ 'tags' ] = array();
-		$entryTag = EntryTag::where('entry_tag_entry_id','=',$entry->entry_id)->get();
+		$entryTag = EntryTag::where( 'entry_tag_entry_id', '=', $entry->entry_id )->get();
 		foreach( $entryTag as $tag )
 		{
 			$current[ 'tags' ][ ] = Tag::find( $tag->entry_tag_tag_id )->tag_name;
 		}
 
 		$current[ 'entryFiles' ] = array();
-		$EntryFile = EntryFile::where('entry_file_entry_id','=',$entry->entry_id)->get();
+		$EntryFile = EntryFile::where( 'entry_file_entry_id', '=', $entry->entry_id )->get();
 		foreach( $EntryFile as $file )
 		{
 			$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+60 minutes' );
@@ -2326,7 +2338,7 @@ class EntryController extends BaseController
 		$current[ 'downVotes' ] = $down_votes;
 		$current[ 'rank' ] = $entry->entry_rank;
 		$current[ 'language' ] = $entry->entry_language;
-		
+
 		if( $entry->entry_deleted )
 		{
 			$current[ 'deleted' ] = true;
@@ -2338,10 +2350,10 @@ class EntryController extends BaseController
 
 		return $current;
 	}
-		
+
 	public function dummytest()
 	{
-		
+
 		/*$exclude = [ ];
 		$entry_rank = DB::table('entries')->where( 'entry_rank', '=', '0')->get();
 		foreach( $entry_rank as $rank )
@@ -2426,7 +2438,7 @@ class EntryController extends BaseController
 
 		//$entries = Entry::where('entry_rank', '!=', 0)->with( 'user' )->orderBy( 'entry_rank', 'asc' )->get();
 		//$entries = DB::table('entries')whereRaw('entry_rank != 0 and entry_deleted = 0')->with( 'user' )->orderBy( 'entry_rank', 'asc' )->get();
-		
+
 		/*$entries = DB::table('entries')
 		->select('entries.*')
 		->join('users', 'entries.entry_user_id', '=', 'users.user_id')
@@ -2436,19 +2448,19 @@ class EntryController extends BaseController
                 $query->where('entries.entry_rank', '!=', 0);						
             })			
        ->orderBy( 'entry_rank', 'asc' )->get();*/
-		
-		$entries = DB::table('entries')
-		->select('entries.*')
-		->join('users', 'entries.entry_user_id', '=', 'users.user_id')
-		->where('entries.entry_deleted', '=', '0')
-	    ->where(function($query)
-            {
-                $query->where('entries.entry_rank', '!=', 0);
-            })			
-        ->orderBy( 'entry_rank', 'asc' )
-		->get();
+
+		$entries = DB::table( 'entries' )
+					 ->select( 'entries.*' )
+					 ->join( 'users', 'entries.entry_user_id', '=', 'users.user_id' )
+					 ->where( 'entries.entry_deleted', '=', '0' )
+					 ->where( function ( $query )
+					 {
+						 $query->where( 'entries.entry_rank', '!=', 0 );
+					 } )
+					 ->orderBy( 'entry_rank', 'asc' )
+					 ->get();
 		$users = [ ];
-		$return[ 'talents' ] = [];
+		$return[ 'talents' ] = [ ];
 
 		$rank = 1;
 
@@ -2456,7 +2468,7 @@ class EntryController extends BaseController
 		{
 			if( !in_array( $entry->entry_user_id, $users ) )
 			{
-				$User = User::where('user_id' , '=', $entry->entry_user_id)->first();
+				$User = User::where( 'user_id', '=', $entry->entry_user_id )->first();
 				$user = oneUser( $User, $session );
 				$user[ 'rank' ] = $rank;
 				$return[ 'talents' ][ ][ 'talent' ] = $user;
@@ -2465,11 +2477,11 @@ class EntryController extends BaseController
 			}
 		}
 
-
 		$response = Response::make( $return, 200 );
 
 		return $response;
 	}
+
 	/**
 	 *
 	 * @SWG\Api(
@@ -2509,12 +2521,12 @@ class EntryController extends BaseController
 	 *   )
 	 * )
 	 */
-	
+
 	public function updateViewCount()
 	{
 		$rules = array(
-			'entryId'    => 'required',
-			'userId' => 'required',
+			'entryId' => 'required',
+			'userId'  => 'required',
 		);
 
 		$validator = Validator::make( Input::all(), $rules );
@@ -2529,9 +2541,9 @@ class EntryController extends BaseController
 			$viewcount = new EntryView;
 			$viewcount->entry_view_entry_id = Input::get( 'entryId' );
 			$viewcount->entry_view_user_id = Input::get( 'userId' );
-			$viewcount->entry_view_date = date('Y-m-d H:i:s');
+			$viewcount->entry_view_date = date( 'Y-m-d H:i:s' );
 
-			if($viewcount->save())
+			if( $viewcount->save() )
 			{
 				$return = [ 'notice' => 'success' ];
 				$status_code = 200;
@@ -2544,39 +2556,41 @@ class EntryController extends BaseController
 		}
 
 		$response = Response::make( $return, $status_code );
+
 		return $response;
 	}
+
 	// For delete entries
-	public function deleteEntryFiles() 
+	public function deleteEntryFiles()
 	{
-		
-		if(isset($_POST))
+
+		if( isset( $_POST ) )
 		{
 			$post = $_POST;
 
-			$filename = $post['filename'];
-			$filetype = $post['filetype'];
+			$filename = $post[ 'filename' ];
+			$filetype = $post[ 'filetype' ];
 
-			$originalfile = 'uploads/'.$filename.'-uploaded.'.$filetype;
-			$mp4file = 'uploads/'.$filename.'.'.$filetype;
-			$logfile = 'uploads/'.$filename.'-log.txt';
-			$thumbfile = 'uploads/'.$filename.'-thumb.jpg';
+			$originalfile = 'uploads/' . $filename . '-uploaded.' . $filetype;
+			$mp4file = 'uploads/' . $filename . '.' . $filetype;
+			$logfile = 'uploads/' . $filename . '-log.txt';
+			$thumbfile = 'uploads/' . $filename . '-thumb.jpg';
 
-			if(File::exists($originalfile))
+			if( File::exists( $originalfile ) )
 			{
-				File::delete($originalfile);
+				File::delete( $originalfile );
 			}
-			if(File::exists($mp4file))
+			if( File::exists( $mp4file ) )
 			{
-				File::delete($mp4file);
+				File::delete( $mp4file );
 			}
-			if(File::exists($logfile))
+			if( File::exists( $logfile ) )
 			{
-				File::delete($logfile);
+				File::delete( $logfile );
 			}
-			if(File::exists($thumbfile))
+			if( File::exists( $thumbfile ) )
 			{
-				File::delete($thumbfile);
+				File::delete( $thumbfile );
 			}
 			$return = [ 'notice' => 'success' ];
 			$status_code = 200;
@@ -2588,6 +2602,7 @@ class EntryController extends BaseController
 		}
 
 		$response = Response::make( $return, $status_code );
+
 		return $response;
 	}
 	// End		
