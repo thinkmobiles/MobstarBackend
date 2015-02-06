@@ -308,6 +308,8 @@ class EntryController extends BaseController
 
 		foreach( $entries as $entry )
 		{
+			if( $entry->entry_deleted )
+				continue;
 
 			$up_votes = 0;
 			$down_votes = 0;
