@@ -243,6 +243,27 @@ class EntryController extends BaseController
 				$exclude[ ] = $rank->entry_id;
 			}
 		}
+		/* Added for exclude MOBIT category in All entry list */
+		$excludeCategory = array();
+		if($category != 8)
+		{
+			$excludeCategory = [7,8];			
+			$entry_category = DB::table('entries')->whereIn( 'entry_category_id', $excludeCategory )->get();
+			foreach( $entry_category as $c )
+			{
+				$exclude[ ] = $c->entry_id;
+			}
+		}
+		if($category == 8)
+		{
+			$excludeCategory = [7,8];
+			$entry_category = DB::table('entries')->whereNotIn( 'entry_category_id', $excludeCategory )->get();
+			foreach( $entry_category as $c )
+			{
+				$exclude[ ] = $c->entry_id;
+			}	
+		}
+		/* End */
 		$entries = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false, true );
 		//dd(DB::getQueryLog());
 		$count = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, true );
