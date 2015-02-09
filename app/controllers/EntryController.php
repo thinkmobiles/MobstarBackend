@@ -1063,7 +1063,7 @@ class EntryController extends BaseController
 					'entry_language'     => Input::get( 'language' ),
 					'entry_description'  => Input::get( 'description' ),
 					'entry_created_date' => date( 'Y-m-d H:i:s' ),
-					'entry_deleted'      => 1,
+					'entry_deleted'      => 0,
 				];
 
 				Eloquent::unguard();
