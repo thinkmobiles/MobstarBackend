@@ -256,7 +256,16 @@ class EntryController extends BaseController
 		}
 		if($category == 8)
 		{
-			$excludeCategory = [7,8];
+			$excludeCategory = [8];
+			$entry_category = DB::table('entries')->whereNotIn( 'entry_category_id', $excludeCategory )->get();
+			foreach( $entry_category as $c )
+			{
+				$exclude[ ] = $c->entry_id;
+			}	
+		}
+		if($category == 7)
+		{
+			$excludeCategory = [7];
 			$entry_category = DB::table('entries')->whereNotIn( 'entry_category_id', $excludeCategory )->get();
 			foreach( $entry_category as $c )
 			{
