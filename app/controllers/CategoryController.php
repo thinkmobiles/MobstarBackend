@@ -139,7 +139,8 @@ class CategoryController extends BaseController {
 			$next = true;
 		else
 			$next = false;
-		$orderby =  Category::whereNotIn('category_id', $exclude )->orderBy( 'category_id', 'asc' )->get();
+		//$orderby =  Category::whereNotIn('category_id', $exclude )->orderBy( 'category_id', 'asc' )->get();
+		$orderby =  Category::whereNotIn('category_id', $exclude )->orderBy( 'category_active', 'desc' )->get();
 		$ids= [];
 		foreach( $orderby as $order )
 		{
