@@ -153,7 +153,8 @@ class NotificationController extends BaseController
 			$nameArray = [ ];
 			foreach( $names as $name )
 			{
-				$nameArray[ ] = $name->user_display_name;
+				//$nameArray[ ] = $name->user_display_name;
+				$nameArray[ ] = getusernamebyid($name->user_id);
 			}
 
 			if( $subject_count > 2 )
@@ -172,8 +173,8 @@ class NotificationController extends BaseController
 			$current[ 'notificationDate' ] = $notification->notification_updated_date;
 			$current[ 'notificationRead' ] = ($notification->notification_read == 1);
 			$current[ 'notificationType' ] = $notification->notification_type;
-			$current['entry']['entry_id'] = $notification->entry->entry_id;
-			$current['entry']['entry_name'] = $notification->entry->entry_name;
+			$current['entry']['entry_id'] = @$notification->entry->entry_id;
+			$current['entry']['entry_name'] = @$notification->entry->entry_name;
 
 
 			$return[ 'notifications' ][] = $current;
