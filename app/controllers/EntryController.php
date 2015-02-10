@@ -442,7 +442,11 @@ class EntryController extends BaseController
 				}
 
 				$return[ 'entries' ][ ][ 'entry' ] = $current;
-
+				if($user == 307)
+				{
+					$a = $count.'---'.$user;
+					mail('anil@spaceotechnologies.com', time(),print_r($a,true));
+				}
 			}
 
 			else
