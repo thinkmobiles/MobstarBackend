@@ -245,7 +245,7 @@ class EntryController extends BaseController
 		}
 		/* Added for exclude MOBIT category in All entry list */
 		$excludeCategory = array();
-		if($category != 8)
+		if($category != 8 && $category != 7)
 		{
 			$excludeCategory = [7,8];			
 			$entry_category = DB::table('entries')->whereIn( 'entry_category_id', $excludeCategory )->get();
