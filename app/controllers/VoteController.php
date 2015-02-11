@@ -582,7 +582,8 @@ class VoteController extends BaseController
 		$user = (Input::get('user', $session->token_user_id));
 		$excludeCategory = [7,8];
 		//$entries = Entry::where( 'entry_user_id', '=', $user )->lists( 'entry_id' );
-		$entries = Entry::where( 'entry_user_id', '=', $user )->whereNotIn( 'entry_category_id', $excludeCategory )->lists( 'entry_id' );
+		//$entries = Entry::where( 'entry_user_id', '=', $user )->whereNotIn( 'entry_category_id', $excludeCategory )->lists( 'entry_id' );
+		$entries = Entry::where( 'entry_user_id', '=', $user )->where( 'entry_deleted', '=', '0' )->whereNotIn( 'entry_category_id', $excludeCategory )->lists( 'entry_id' );
 
 
 		if(count($entries) == 0)
