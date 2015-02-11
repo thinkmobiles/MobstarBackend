@@ -13,7 +13,11 @@ class EloquentVoteRepository implements VoteRepository {
 		{
 			$exclude[ ] = $c->entry_id;
 		}
-		
+		$entry_deleted = Entry::where('entry_deleted', '=', '1')->get();
+		foreach( $entry_deleted as $d )
+		{
+			$exclude[ ] = $d->entry_id;
+		}
 		$query = Vote::with('user', 'entry')->where('vote_id', '>', 0);
 		
 		$query->whereNotIn( 'vote_entry_id', $exclude );
