@@ -2042,8 +2042,15 @@ class EntryController extends BaseController
 		$user = 0;
 		$category = 0;
 		$tag = 0;
-
-		$entries = $this->entry->all( $user, $category, 0, 0, 'entry_rank', 'asc', 10000, 0, false, true )->toArray();
+		$excludeCategory = array();
+		$excludeCategory = [7,8];			
+		$entry_category = DB::table('entries')->whereIn( 'entry_category_id', $excludeCategory )->get();
+		foreach( $entry_category as $c )
+		{
+			$exclude[ ] = $c->entry_id;
+		}
+		//$entries = $this->entry->all( $user, $category, 0, 0, 'entry_rank', 'asc', 10000, 0, false, true )->toArray();
+		$entries = $this->entry->all( $user, $category, 0, $exclude, 'entry_rank', 'asc', 10000, 0, false, true )->toArray();
 
 		$sortArray = array();
 		$i = 0;
