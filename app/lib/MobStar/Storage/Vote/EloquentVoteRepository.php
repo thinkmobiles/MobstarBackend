@@ -1,12 +1,23 @@
 <?php namespace MobStar\Storage\Vote;
 
 use Vote;
+use Entry;
 
 class EloquentVoteRepository implements VoteRepository {
 	
 	public function get_votes($entry = 0, $user = 0, $up = false, $down = false, $deleted=false, $limit = 50, $offset = 0, $count = false){
+		$excludeCategory = array();
+		$excludeCategory = [7,8];
+		$entry_category = Entry::whereIn( 'entry_category_id', $excludeCategory )->get();
+		foreach( $entry_category as $c )
+		{
+			$exclude[ ] = $c->entry_id;
+		}
+		
 		$query = Vote::with('user', 'entry')->where('vote_id', '>', 0);
-
+		
+		$query->whereNotIn( 'vote_entry_id', $exclude );
+		
 		if($entry)
 			$query->where('vote_entry_id', '=', $entry);
 
