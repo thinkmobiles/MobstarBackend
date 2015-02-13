@@ -231,7 +231,10 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"	=> "entry/updateViewCount",	
 			"uses"	=> "EntryController@updateViewCount"
 		] );
-		
+		Route::delete( "entry/{entry}", [
+			"as"   => "entry/delete",
+			"uses" => "EntryController@delete"
+		] );
 		// -------------------------------------------------------
 		// Entry Feedback
 		//---------------------------------------------------------
@@ -527,10 +530,10 @@ Route::get( "entry2/fixfile", [
 
 Route::group( [ "before" => "admin" ], function ()
 {
-	Route::delete( "entry/{entry}", [
+	/*Route::delete( "entry/{entry}", [
 		"as"   => "entry/delete",
 		"uses" => "EntryController@delete"
-	] );
+	] );*/
 
 	Route::get( "restoreentry/{entry}", [
 		"as"   => "entry/undelete",
