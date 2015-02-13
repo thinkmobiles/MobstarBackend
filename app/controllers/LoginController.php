@@ -123,7 +123,7 @@ class LoginController extends BaseController
 
 				if( isset( $deviceType ) && isset( $deviceToken ) )
 				{
-
+					/* commented on 13-Feb-2015
 					$device = DeviceRegistration::firstOrNew(
 						[ 'device_registration_device_token' => $deviceToken ]
 					);
@@ -134,7 +134,7 @@ class LoginController extends BaseController
 					$device->device_registration_date_created = date( "Y-m-d H:i:s" );
 
 					$device->save();
-
+					*/
 					//$this->registerSNSEndpoint( $device );
 
 				}
