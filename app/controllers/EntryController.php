@@ -1054,6 +1054,14 @@ class EntryController extends BaseController
 				//Will need to do some work here to upload file to CDN
 
 				//Get input
+				if( Input::get( 'category' ) == 7 || Input::get( 'category' ) == 8 )
+				{
+					$entry_deleted = 0;
+				}
+				else
+				{
+					$entry_deleted = 1;
+				}
 				$input = [
 					'entry_user_id'      => $session->token_user_id,
 					'entry_category_id'  => Input::get( 'category' ),
@@ -1062,7 +1070,7 @@ class EntryController extends BaseController
 					'entry_language'     => Input::get( 'language' ),
 					'entry_description'  => Input::get( 'description' ),
 					'entry_created_date' => date( 'Y-m-d H:i:s' ),
-					'entry_deleted'      => 1,
+					'entry_deleted'      => $entry_deleted,
 				];
 
 				Eloquent::unguard();
