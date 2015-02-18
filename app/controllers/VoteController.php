@@ -394,9 +394,18 @@ class VoteController extends BaseController
 			{
 //				return $session;
 				$input[ 'vote_up' ] = 1;
+				$msg = 'has voted up your entry';
+				if( $entry->entry_category_id == 7 || $entry->entry_category_id == 8 )
+				{
+					$msg = 'has liked your entry';
+				}
+				else
+				{
+					$msg = 'has voted up your entry';
+				}
 				$prev_not = Notification::where( 'notification_user_id', '=', $entry->entry_user_id, 'and' )
 										->where( 'notification_entry_id', '=', $entry->entry_id, 'and' )
-										->where( 'notification_details', '=', 'has voted up your entry', 'and' )
+										->where( 'notification_details', '=', $msg, 'and' )
 										->orderBy( 'notification_updated_date', 'desc' )
 										->first();
 
@@ -404,7 +413,7 @@ class VoteController extends BaseController
 				{
 					Notification::create( [ 'notification_user_id'      => $entry->entry_user_id,
 											'notification_subject_ids'  => json_encode( [ $session->token_user_id ] ),
-											'notification_details'      => 'has voted up your entry',
+											'notification_details'      => $msg,
 											'notification_read'         => 0,
 											'notification_entry_id'     => $entry->entry_id,
 											'notification_type'         => 'Entry Vote',
@@ -448,10 +457,18 @@ class VoteController extends BaseController
 			elseif( Input::get( 'type' ) == 'down' )
 			{
 				$input[ 'vote_down' ] = 1;
-
+				$msg = 'has voted down your entry';
+				if( $entry->entry_category_id == 7 || $entry->entry_category_id == 8 )
+				{
+					$msg = 'has unliked your entry';
+				}
+				else
+				{
+					$msg = 'has voted down your entry';
+				}
 				$prev_not = Notification::where( 'notification_user_id', '=', $entry->entry_user_id, 'and' )
 										->where( 'notification_entry_id', '=', $entry->entry_id, 'and' )
-										->where( 'notification_details', '=', 'has voted down your entry', 'and' )
+										->where( 'notification_details', '=', $msg, 'and' )
 										->orderBy( 'notification_updated_date', 'desc' )
 										->first();
 
@@ -459,7 +476,7 @@ class VoteController extends BaseController
 				{
 					Notification::create( [ 'notification_user_id'      => $entry->entry_user_id,
 											'notification_subject_ids'  => json_encode( [ $session->token_user_id ] ),
-											'notification_details'      => 'has voted down your entry',
+											'notification_details'      => $msg,
 											'notification_read'         => 0,
 											'notification_entry_id'     => $entry->entry_id,
 											'notification_type'         => 'Entry Vote',
