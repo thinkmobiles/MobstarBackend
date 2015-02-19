@@ -2006,9 +2006,11 @@ class EntryController extends BaseController
             })
 		->where('entries.entry_deleted', '=', '0')
         ->get();*/
+		$excludeCategory = [7,8];
 		$results = DB::table( 'entries' )
 					 ->select( 'entries.*' )
 					 ->join( 'users', 'entries.entry_user_id', '=', 'users.user_id' )
+					 ->whereNotIn( 'entries.entry_category_id', $excludeCategory )
 					 ->where( 'entries.entry_deleted', '=', '0' )
 					 ->where( function ( $query ) use ( $term )
 					 {
