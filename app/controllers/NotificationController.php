@@ -287,9 +287,7 @@ class NotificationController extends BaseController
 
 		$session = $this->token->get_session( $token );
 
-		$id =  explode( ',', $id );
-		//$notification = Notification::where('notification_id', '=', $id)->where('notification_user_id', '=', $session->token_user_id)->first();
-		$notification = Notification::whereIn( 'notification_id', $id )->where('notification_user_id', '=', $session->token_user_id)->first();
+		$notification = Notification::where('notification_id', '=', $id)->where('notification_user_id', '=', $session->token_user_id)->first();
 		if(!is_null($notification))
 		{
 			$notification->notification_deleted = 1;
