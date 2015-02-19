@@ -301,5 +301,90 @@ class NotificationController extends BaseController
 
 		return $response;
 	}
+	
+	/**
+	*
+	* @SWG\Api(
+	*   path="/notification/markread",
+	*   description="Operations about notification",
+	*   @SWG\Operations(
+	*     @SWG\Operation(
+	*       method="POST",
+	*       summary="Mark notifcation read",
+	*       notes="Read all resulted notification.",
+	*       nickname="markreadNotifications",
+	*       @SWG\Parameters(
+	*         @SWG\Parameter(
+	*           name="notificationIds",
+	*           description="ID or IDs of required notifications.",
+	*           paramType="query",
+	*           required=true,
+	*           type="comma seperated list"
+	*         )
+	*       ),
+	*       @SWG\ResponseMessages(
+	*          @SWG\ResponseMessage(
+	*            code=401,
+	*            message="Authorization failed"
+	*          ),
+	*          @SWG\ResponseMessage(
+	*            code=404,
+	*            message="No users found"
+	*          )
+	*        )
+	*       )
+	*     )
+	*   )
+	* )
+	*/
+	public function markread( )
+	{
 
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		//Validate Input
+		$rules = array(
+			'notificationIds'    => 'required',			
+		);
+		$messages = array(			
+		);
+
+		$validator = Validator::make( Input::all(), $rules, $messages );
+
+		// process the login
+		if( $validator->fails() )
+		{
+
+			$return = $validator->messages();
+
+			$response = Response::make( $return, 400 );
+
+			return $response;
+		}
+		else
+		{
+			// get ids
+			$id_commas = Input::get( 'notificationIds' );
+			$id =  explode( ',', $id_commas );
+			for( $i=0; $i<count($id); $i++ )
+			{
+				$notification = Notification::where('notification_id', '=', $id[$i])->where('notification_user_id', '=', $session->token_user_id)->first();
+				if(!is_null($notification))
+				{
+					$notification->notification_read = 1;
+					$notification->save();
+				}
+				else
+				{
+					continue;
+				}			
+			}
+			$response[ 'message' ] = "Notification read successfully";
+			$status_code = 201;
+		}
+
+		return Response::make( $response, $status_code );	
+	}
 }

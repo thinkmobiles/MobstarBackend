@@ -360,6 +360,11 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "notification/delete",
 			"uses" => "NotificationController@delete"
 		] );
+		
+		Route::post( "notification/markread", [
+			"as"   => "notification/markread",
+			"uses" => "NotificationController@markread"
+		] );
 
 		// -------------------------------------------------------
 		// FAQ(s)
