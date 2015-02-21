@@ -157,7 +157,7 @@ function oneUser( $user, $session, $includeStars = false )
 				$starNames = userDetails($starred->User);
 
 				$starredBy[ ] = [ 'starId'       => ( isset( $starred->User->user_id ) ) ? $starred->User->user_id : '',
-	  							  'isMyStar'     => Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $star->Stars->user_id )->count();
+	  							  'isMyStar'     => Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $starred->User->user_id )->count();
 								  'starName'     => ( isset( $starNames['displayName'] ) ) ? $starNames['displayName'] : '',
 								  'starredDate'  => $starred->user_star_created_date,
 								  'profileImage' => ( isset( $starred->User->user_profile_image ) )
