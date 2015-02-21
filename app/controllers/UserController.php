@@ -1333,6 +1333,7 @@ class UserController extends BaseController
 		$user = User::find($session['token_user_id']);
 
 		$return['user'] = oneUser($user, $session, true);
+
 		return Response::make( $return , 200 );
 
 	}
