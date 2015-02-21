@@ -1333,7 +1333,7 @@ class UserController extends BaseController
 		$user = User::find($session['token_user_id']);
 
 		$return['user'] = oneUser($user, $session, true);
-
+		$return[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $user->user_id )->count();
 		return Response::make( $return , 200 );
 
 	}
