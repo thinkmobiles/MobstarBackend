@@ -1157,7 +1157,12 @@ class UserController extends BaseController
 
 			if($session->user_id != 307)
 			{
+				mail('anil@spaceotechnologies.com', 'if', 'One');
 				$img->resize( 200, 200 );
+			}
+			else
+			{
+				mail('anil@spaceotechnologies.com','else', 'Two');
 			}
 
 			$img->save( $_ENV[ 'PATH' ] . '/public/' . $file_out, 80 );
