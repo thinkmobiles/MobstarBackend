@@ -1155,15 +1155,7 @@ class UserController extends BaseController
 
 			$img = Image::make( $file_in );
 
-			if($session->token_user_id != 307)
-			{
-				mail('anil@spaceotechnologies.com', 'if', print_r($session->token_user_id,true));
-				$img->resize( 200, 200 );
-			}
-			else
-			{
-				mail('anil@spaceotechnologies.com','else', print_r($session->token_user_id,true));
-			}
+			$img->resize( 200, 200 );
 
 			$img->save( $_ENV[ 'PATH' ] . '/public/' . $file_out, 80 );
 
