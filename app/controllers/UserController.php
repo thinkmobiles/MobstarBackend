@@ -1155,6 +1155,7 @@ class UserController extends BaseController
 
 			$img = Image::make( $file_in );
 
+			if($session->user_id != 307)
 			$img->resize( 200, 200 );
 
 			$img->save( $_ENV[ 'PATH' ] . '/public/' . $file_out, 80 );
