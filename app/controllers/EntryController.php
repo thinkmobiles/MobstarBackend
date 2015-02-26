@@ -293,6 +293,29 @@ class EntryController extends BaseController
 				$current[ 'modified' ] = null;
 
 				$return[ 'entries' ][ ][ 'entry' ] = $current;
+				/* Added By AJ for getting followrs */
+				$starredBy = [ ];
+				foreach( $user->StarredBy as $starred )
+				{
+					if( $starred->user_star_deleted == 0 )
+					{
+						$starNames = [];
+						$starNames = userDetails($starred->User);
+
+						$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
+										  'starName'     => $starNames['displayName'],
+										  'starredDate'  => $starred->user_star_created_date,
+										  'profileImage' => ( isset( $starred->User->user_profile_image ) )
+											  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+60 minutes' )
+											  : '',
+										  'profileCover' => ( isset( $starred->User->user_cover_image ) )
+										  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_cover_image, '+60 minutes' ) : '',	  
+						];
+					}
+				}
+				$return[ 'starredBy' ] = $starredBy;
+				$return['fans'] = count($starredBy);
+				/* End */
 				$status_code = 200;
 
 			}
@@ -521,6 +544,33 @@ class EntryController extends BaseController
 			}			
 		}
 
+		/* Added By AJ for getting followers */
+		if( $user != 0 )
+		{
+			$aj = User::find( $user );
+			$starredBy = [ ];
+			foreach( $aj->StarredBy as $starred )
+			{
+				if( $starred->user_star_deleted == 0 )
+				{
+					$starNames = [];
+					$starNames = userDetails($starred->User);
+
+					$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
+									  'starName'     => $starNames['displayName'],
+									  'starredDate'  => $starred->user_star_created_date,
+									  'profileImage' => ( isset( $starred->User->user_profile_image ) )
+										  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+60 minutes' )
+										  : '',
+									  'profileCover' => ( isset( $starred->User->user_cover_image ) )
+									  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_cover_image, '+60 minutes' ) : '',	  
+					];
+				}
+			}
+			$return[ 'starredBy' ] = $starredBy;
+			$return['fans'] = count($starredBy);
+		}
+		/* End */
 		$status_code = 200;
 
 		if( $debug !== false )
@@ -2860,8 +2910,30 @@ class EntryController extends BaseController
 				$current[ 'modified' ] = null;
 
 				$return[ 'entries' ][ ][ 'entry' ] = $current;
-				$status_code = 200;
+				/* Added By AJ for getting followrs */
+				$starredBy = [ ];
+				foreach( $user->StarredBy as $starred )
+				{
+					if( $starred->user_star_deleted == 0 )
+					{
+						$starNames = [];
+						$starNames = userDetails($starred->User);
 
+						$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
+										  'starName'     => $starNames['displayName'],
+										  'starredDate'  => $starred->user_star_created_date,
+										  'profileImage' => ( isset( $starred->User->user_profile_image ) )
+											  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+60 minutes' )
+											  : '',
+										  'profileCover' => ( isset( $starred->User->user_cover_image ) )
+										  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_cover_image, '+60 minutes' ) : '',	  
+						];
+					}
+				}
+				$return[ 'starredBy' ] = $starredBy;
+				$return['fans'] = count($starredBy);
+				/* End */
+				$status_code = 200;	
 			}
 			else
 			{
@@ -3096,7 +3168,33 @@ class EntryController extends BaseController
 				$return[ 'entries' ][ ][ 'entry' ] = $current;
 			}			
 		}
+		/* Added By AJ for getting followrs */
+		if( $user != 0 )
+		{
+			$aj = User::find( $user );
+			$starredBy = [ ];
+			foreach( $aj->StarredBy as $starred )
+			{
+				if( $starred->user_star_deleted == 0 )
+				{
+					$starNames = [];
+					$starNames = userDetails($starred->User);
 
+					$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
+									  'starName'     => $starNames['displayName'],
+									  'starredDate'  => $starred->user_star_created_date,
+									  'profileImage' => ( isset( $starred->User->user_profile_image ) )
+										  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+60 minutes' )
+										  : '',
+									  'profileCover' => ( isset( $starred->User->user_cover_image ) )
+									  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_cover_image, '+60 minutes' ) : '',	  
+					];
+				}
+			}
+			$return[ 'starredBy' ] = $starredBy;
+			$return['fans'] = count($starredBy);
+		}
+		/* End */
 		$status_code = 200;
 
 		if($debug !== false)
