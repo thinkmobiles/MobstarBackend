@@ -1536,6 +1536,15 @@ class UserController extends BaseController
 	 *       summary="Get user follower",
 	 *       notes="Details about follower for passed user id",
 	 *       nickname="followers",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="user",
+	 *           description="ID of required users.",
+	 *           paramType="query",
+	 *           required=true,
+	 *           type="integer"
+	 *         )
+	 *       ),
 	 *       @SWG\ResponseMessages(
 	 *          @SWG\ResponseMessage(
 	 *            code=401,
