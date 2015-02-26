@@ -131,6 +131,10 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "UserController@follow"
 		] );
 		
+		Route::post( "user/follower/", [
+			"as"   => "user/follower",
+			"uses" => "UserController@follower"
+		] );	
 		// -------------------------------------------------------
 		// Category(s)
 		//---------------------------------------------------------

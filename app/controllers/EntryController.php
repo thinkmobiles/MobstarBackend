@@ -3216,4 +3216,74 @@ class EntryController extends BaseController
 
 		return $response;
 	}
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/user/follower",
+	 *   description="Operation about Users",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="POST",
+	 *       summary="Get user follower",
+	 *       notes="Details about follower for passed user id",
+	 *       nickname="followers",
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=400,
+	 *            message="Input validation failed"
+	 *          )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+	public function follower()
+	{
+		$client = getS3Client();
+		$token = Request::header( "X-API-TOKEN" );
+		$session = $this->token->get_session( $token );
+		
+		//Get user
+		$user = ( Input::get( 'user', '0' ) );
+		$user = ( !is_numeric( $user ) ) ? 0 : $user;
+		/* Added By AJ */
+		if( $user != 0 )
+		{
+			$user = User::find( $user );
+			$starredBy = [ ];
+			foreach( $user->StarredBy as $starred )
+			{
+				if( $starred->user_star_deleted == 0 )
+				{
+					$starNames = [];
+					$starNames = userDetails($starred->User);
+
+					$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
+									  'starName'     => $starNames['displayName'],
+									  'starredDate'  => $starred->user_star_created_date,
+									  'profileImage' => ( isset( $starred->User->user_profile_image ) )
+										  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+60 minutes' )
+										  : '',
+									  'profileCover' => ( isset( $starred->User->user_cover_image ) )
+									  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_cover_image, '+60 minutes' ) : '',	  
+					];
+				}
+			}
+			$return[ 'starredBy' ] = $starredBy;
+			$return['fans'] = count($starredBy);
+			$status_code = 200;
+
+		}
+		else
+		{
+			$return = [ 'error' => 'No Entries Found' ];
+			$status_code = 404;
+		}
+		/* End */
+		return Response::make( $return , 200 );
+	}
 }
