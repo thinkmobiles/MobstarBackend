@@ -70,19 +70,32 @@ function getUserProfile( $user, $session )
 
 }
 
-function oneUser( $user, $session, $includeStars = false )
+function oneUser( $user, $session, $includeStars = false, $normal = false )
 {
 	$client = getS3Client();
-
+	$profileImage = '';
+	$profileCover = '';
+	if($normal)
+	{
+		$profileImage = ( isset( $user->user_profile_image ) ) ? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image : '';
+		$profileCover = ( isset( $user->user_cover_image ) )   ? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image : '';
+	}
+	else
+	{
+		$profileImage = ( isset( $user->user_profile_image ) ) ? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+60 minutes' ) : '';
+		$profileCover = ( isset( $user->user_cover_image ) )   ? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+60 minutes' ) : '';
+	}
 	$return = [ 'id'           => $user->user_id,
 				'email'        => $user->user_email,
 				'tagLine'      => (!empty($user->user_tagline)) ? $user->user_tagline : '',
 				'bio'      	   => (!empty($user->user_bio)) ? $user->user_bio :'',
 				'usergroup'      	   => (!empty($user->user_user_group)) ? $user->user_user_group :'',
-				'profileImage' => ( isset( $user->user_profile_image ) )
+				/*'profileImage' => ( isset( $user->user_profile_image ) )
 					? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+60 minutes' ) : '',
 				'profileCover' => ( isset( $user->user_cover_image ) )
-					? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+60 minutes' ) : '',
+					? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+60 minutes' ) : '',*/
+				'profileImage' => $profileImage	,
+				'profileCover' => $profileCover,
 	];
 
 	if( ( $user->user_display_name == '' ) || ( is_null( $user->user_name ) ) || ( is_null( $user->user_email ) ) )

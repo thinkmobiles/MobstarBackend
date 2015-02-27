@@ -1097,7 +1097,7 @@ class UserController extends BaseController
 
 		$user->save();
 
-		$return[ 'user' ] = oneUser( $user, $session, true );
+		$return[ 'user' ] = oneUser( $user, $session, true, true );
 
 		return Response::make( $return, 200 );
 
