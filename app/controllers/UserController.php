@@ -1571,7 +1571,6 @@ class UserController extends BaseController
 		/* Added By AJ */
 		if( $user != 0 )
 		{
-			mail('anil@spaceotechnologies.com',time(),print_r($session->token_user_id,true));
 			$user = User::find( $user );
 			$starredBy = [ ];
 			foreach( $user->StarredBy as $starred )
