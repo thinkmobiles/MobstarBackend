@@ -766,6 +766,7 @@ class VoteController extends BaseController
 					 $return[$i]['profileCover'] = ( isset( $user->user_cover_image ) )
 							? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+60 minutes' )
 							: '';
+					$return[ $i ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $user->user_id )->count();
 				  $i++;
 				}
 				$status_code = 200;
