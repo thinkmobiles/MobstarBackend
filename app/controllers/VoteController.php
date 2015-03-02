@@ -3,7 +3,8 @@
 use MobStar\Storage\Vote\VoteRepository as Vote;
 use MobStar\Storage\Token\TokenRepository as Token;
 use Swagger\Annotations as SWG;
-
+use Aws\S3\S3Client;
+use Aws\Common\Credentials\Credentials as Creds;
 /**
  * @package
  * @category
@@ -699,6 +700,93 @@ class VoteController extends BaseController
 		$response->header( 'X-Total-Count', $count );
 
 		return $response;
+	}
+	public function likes()
+	{
+		$client = getS3Client();
+
+		$token = Request::header( "X-API-TOKEN" );
+		$session = $this->token->get_session( $token );
+		
+		//Get entry
+		$entry = ( Input::get( 'entry', '0' ) );
+		$entry = ( !is_numeric( $entry ) ) ? 0 : $entry;
+
+		/* Added By AJ */
+		if( $entry != 0 )
+		{
+			$user = DB::table('votes')
+                    ->select('vote_user_id')
+                    ->groupBy('vote_user_id')
+                    ->where('vote_entry_id', '=', $entry)
+                    ->where('vote_up', '=', '1')
+                    ->where('vote_deleted', '=', '0')
+                    ->get();
+			$return= array();		
+			$i = 0;
+			if(count($user)>0)
+			{
+				foreach( $user as $vote )
+				{  
+					$user = User::find( $vote->vote_user_id );
+					$return[$i]['userId'] = $user->user_id;
+					 if( ( $user->user_display_name == '' ) || ( is_null( $user->user_name ) ) || ( is_null( $user->user_email ) ) )
+					 {
+						  if( $user->user_facebook_id != 0 )
+						  {
+						   //$return[$i][ 'userName' ] = $user->FacebookUser->facebook_user_user_name;
+						   $return[$i][ 'displayName' ] = $user->FacebookUser->facebook_user_display_name;
+						   //$return[$i][ 'fullName' ] = $user->FacebookUser->facebook_user_full_name;
+						  }
+						  elseif( $user->user_twitter_id != 0 )
+						  {
+						   //$return[$i][ 'userName' ] = $user->TwitterUser->twitter_user_user_name;
+						   $return[$i][ 'displayName' ] = $user->TwitterUser->twitter_user_display_name;
+						   //$return[$i][ 'fullName' ] = $user->TwitterUser->twitter_user_full_name;
+						  }
+						  elseif( $user->user_google_id != 0 )
+						  {
+						   //$return[$i][ 'userName' ] = $user->GoogleUser->google_user_user_name;
+						   $return[$i][ 'displayName' ] = $user->GoogleUser->google_user_display_name;
+						   //$return[$i][ 'fullName' ] = $user->GoogleUser->google_user_full_name;
+						  }
+						  
+					 }
+					 else
+					 {
+					  //$return[$i][ 'userName' ] = $user->user_name;
+					  $return[$i][ 'displayName' ] = $user->user_display_name;
+					  //$return[$i][ 'fullName' ] = $user->user_full_name;
+			
+					 }
+
+					 $return[$i]['profileImage'] = ( isset( $user->user_profile_image ) )
+							? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+60 minutes' )
+							: '';
+					 $return[$i]['profileCover'] = ( isset( $user->user_cover_image ) )
+							? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+60 minutes' )
+							: '';
+				  $i++;
+				}
+				$status_code = 200;
+			}
+			else
+			{
+				$return = [ 'error' => 'No Entries Found' ];
+				$status_code = 404;
+			}
+				
+			//$return[]['fans'] = count($return);
+			
+
+		}
+		else
+		{
+			$return = [ 'error' => 'No Entries Found' ];
+			$status_code = 404;
+		}
+		/* End */
+		return Response::make( $return ,$status_code);
 	}
 
 }

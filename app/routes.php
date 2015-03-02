@@ -134,6 +134,10 @@ Route::group( [ "before" => "auth" ], function ()
 		Route::post( "user/follower/", [
 			"as"   => "user/follower",
 			"uses" => "UserController@follower"
+		] );
+		Route::post( "vote/likes/", [
+			"as"   => "vote/likes",
+			"uses" => "VoteController@likes"
 		] );	
 		// -------------------------------------------------------
 		// Category(s)
