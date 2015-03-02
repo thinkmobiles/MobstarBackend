@@ -1571,7 +1571,7 @@ class UserController extends BaseController
 		/* Added By AJ */
 		if( $user != 0 )
 		{
-			mail('anil@spaceotechnologies.com',time(),print_r($session->user_id,true));
+			mail('anil@spaceotechnologies.com',time(),print_r($session->token_user_id,true));
 			$user = User::find( $user );
 			$starredBy = [ ];
 			foreach( $user->StarredBy as $starred )
@@ -1589,7 +1589,7 @@ class UserController extends BaseController
 										  : '',
 									  'profileCover' => ( isset( $starred->User->user_cover_image ) )
 									  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_cover_image, '+60 minutes' ) : '',
-				  					  'isMyStar'  => Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $starred->User->user_id )->count(),		
+				  					  'isMyStar'  => Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $starred->User->user_id )->count(),		
 					];
 				}
 			}
