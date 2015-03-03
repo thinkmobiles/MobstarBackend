@@ -192,7 +192,7 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 	$votes = 0;
 	foreach($entries as $entry)
 	{
-		if($entry->entry_category_id != 7 || $entry->entry_category_id != 8)
+		if($entry->entry_category_id != 7 && $entry->entry_category_id != 8)
 		{
 			if($entry->entry_rank < $rank && $entry->entry_rank != 0)
 				$rank = $entry->entry_rank;
