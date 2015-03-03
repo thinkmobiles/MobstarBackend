@@ -388,21 +388,21 @@ class VoteController extends BaseController
 
 			//Delete previous votes for this entry cast by this user
 			$this->vote->delete_previous( $input );
-
+			$entryType = '';
 			$entry = Entry::find( $input[ 'vote_entry_id' ] );
-
+			$entryType = $entry->entry_type;
 			if( Input::get( 'type' ) == 'up' )
 			{
 //				return $session;
 				$input[ 'vote_up' ] = 1;
-				$msg = 'has voted up your entry';
+				$msg = 'has voted up your '.$entryType;
 				if( $entry->entry_category_id == 7 || $entry->entry_category_id == 8 )
 				{
-					$msg = 'has liked your entry';
+					$msg = 'has liked your '.$entryType;
 				}
 				else
 				{
-					$msg = 'has voted up your entry';
+					$msg = 'has voted up your '.$entryType;
 				}
 				$prev_not = Notification::where( 'notification_user_id', '=', $entry->entry_user_id, 'and' )
 										->where( 'notification_entry_id', '=', $entry->entry_id, 'and' )
@@ -458,14 +458,14 @@ class VoteController extends BaseController
 			elseif( Input::get( 'type' ) == 'down' )
 			{
 				$input[ 'vote_down' ] = 1;
-				$msg = 'has voted down your entry';
+				$msg = 'has voted down your '.$entryType;
 				if( $entry->entry_category_id == 7 || $entry->entry_category_id == 8 )
 				{
-					$msg = 'has unliked your entry';
+					$msg = 'has unliked your '.$entryType;
 				}
 				else
 				{
-					$msg = 'has voted down your entry';
+					$msg = 'has voted down your '.$entryType;
 				}
 				$prev_not = Notification::where( 'notification_user_id', '=', $entry->entry_user_id, 'and' )
 										->where( 'notification_entry_id', '=', $entry->entry_id, 'and' )

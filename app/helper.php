@@ -192,14 +192,17 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 	$votes = 0;
 	foreach($entries as $entry)
 	{
-		if($entry->entry_rank < $rank && $entry->entry_rank != 0)
-			$rank = $entry->entry_rank;
-		foreach($entry->vote as $vote)
+		if($entry->entry_category_id != 7 || $entry->entry_category_id != 8)
 		{
-			$tmp[]  = $vote->vote_entry_id;
-			if($vote->vote_deleted == 0)
-				$votes++;
-		}		
+			if($entry->entry_rank < $rank && $entry->entry_rank != 0)
+				$rank = $entry->entry_rank;
+			foreach($entry->vote as $vote)
+			{
+				$tmp[]  = $vote->vote_entry_id;
+				if($vote->vote_deleted == 0)
+					$votes++;
+			}
+		}
 	}
 
 	if ($rank == 100000)
