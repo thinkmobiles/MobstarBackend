@@ -395,14 +395,17 @@ class VoteController extends BaseController
 			{
 //				return $session;
 				$input[ 'vote_up' ] = 1;
-				$msg = 'has voted up your '.$entryType;
+				$msg = 'voted up your '.$entryType;
+				$icon = '';
 				if( $entry->entry_category_id == 7 || $entry->entry_category_id == 8 )
 				{
-					$msg = 'has liked your '.$entryType;
+					$msg = 'liked your '.$entryType;
+   				    $icon = 'like.jpeg';
 				}
 				else
 				{
-					$msg = 'has voted up your '.$entryType;
+					$msg = 'voted up your '.$entryType;
+					$icon = 'voteUp.png';
 				}
 				$prev_not = Notification::where( 'notification_user_id', '=', $entry->entry_user_id, 'and' )
 										->where( 'notification_entry_id', '=', $entry->entry_id, 'and' )
@@ -415,6 +418,7 @@ class VoteController extends BaseController
 					Notification::create( [ 'notification_user_id'      => $entry->entry_user_id,
 											'notification_subject_ids'  => json_encode( [ $session->token_user_id ] ),
 											'notification_details'      => $msg,
+											'notification_icon'			=> $icon,
 											'notification_read'         => 0,
 											'notification_entry_id'     => $entry->entry_id,
 											'notification_type'         => 'Entry Vote',
@@ -458,14 +462,14 @@ class VoteController extends BaseController
 			elseif( Input::get( 'type' ) == 'down' )
 			{
 				$input[ 'vote_down' ] = 1;
-				$msg = 'has voted down your '.$entryType;
+				/*$msg = 'voted down your '.$entryType;
 				if( $entry->entry_category_id == 7 || $entry->entry_category_id == 8 )
 				{
-					$msg = 'has unliked your '.$entryType;
+					$msg = 'unliked your '.$entryType;
 				}
 				else
 				{
-					$msg = 'has voted down your '.$entryType;
+					$msg = 'voted down your '.$entryType;
 				}
 				$prev_not = Notification::where( 'notification_user_id', '=', $entry->entry_user_id, 'and' )
 										->where( 'notification_entry_id', '=', $entry->entry_id, 'and' )
@@ -501,7 +505,7 @@ class VoteController extends BaseController
 						$prev_not->save();
 					}
 
-				}
+				}*/
 			}
 			else
 			{

@@ -125,17 +125,21 @@ class NotificationController extends BaseController
 
 			if( $subject_count > 3 )
 			{
-				$line = "and " . ( $subject_count - 2 ) . " others " . $notification->notification_details;
+				$line = "and " . ( $subject_count - 2 ) . " others have " . $notification->notification_details;
 			}
 			else
 			{
 				if( $subject_count == 3 )
 				{
-					$line = "and " . ( $subject_count - 2 ) . " other " . $notification->notification_details;
+					$line = "and " . ( $subject_count - 2 ) . " other have " . $notification->notification_details;
+				}
+				elseif( $subject_count == 2 )
+				{
+					$line = "have " .$notification->notification_details;
 				}
 				else
 				{
-					$line = $notification->notification_details;
+					$line = "has " .$notification->notification_details;
 				}
 			}
 
@@ -167,9 +171,10 @@ class NotificationController extends BaseController
 			}
 
 			$line = $names . ' ' . $line;
-
+			$icon = ( !empty( $notification->notification_icon ) ) ? 'http://' . $_ENV[ 'URL' ] . '/images/' . $notification->notification_icon : '';
 			$current[ 'notificationId' ] = $notification->notification_id;
 			$current[ 'notificationContent' ] = $line;
+			$current[ 'notificationIcon' ] = $icon;
 			$current[ 'notificationDate' ] = $notification->notification_updated_date;
 			$current[ 'notificationRead' ] = ($notification->notification_read == 1);
 			$current[ 'notificationType' ] = $notification->notification_type;
