@@ -135,7 +135,7 @@ class NotificationController extends BaseController
 				}
 				elseif( $subject_count == 2 )
 				{
-					$line = "have " .$notification->notification_details;
+					$line = "have " .trim($notification->notification_details);
 				}
 				else
 				{
