@@ -125,21 +125,21 @@ class NotificationController extends BaseController
 
 			if( $subject_count > 3 )
 			{
-				$line = "and " . ( $subject_count - 2 ) . " others have " . $notification->notification_details;
+				$line = "and " . ( $subject_count - 2 ) . " others have" . $notification->notification_details;
 			}
 			else
 			{
 				if( $subject_count == 3 )
 				{
-					$line = "and " . ( $subject_count - 2 ) . " other have " . $notification->notification_details;
+					$line = "and " . ( $subject_count - 2 ) . " other have" . $notification->notification_details;
 				}
 				elseif( $subject_count == 2 )
 				{
-					$line = "have " .$notification->notification_details;
+					$line = "have" .$notification->notification_details;
 				}
 				else
 				{
-					$line = "has " .$notification->notification_details;
+					$line = "has" .$notification->notification_details;
 				}
 			}
 
