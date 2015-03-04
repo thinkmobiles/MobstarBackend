@@ -273,7 +273,7 @@ class CommentController extends BaseController
 
 			$prev_not = Notification::where( 'notification_user_id', '=', $record->entry_user_id, 'and' )
 									->where( 'notification_entry_id', '=', $record->entry_id, 'and' )
-									->where( 'notification_details', '=', 'has commented on your entry', 'and' )
+									->where( 'notification_details', '=', 'commented on your entry', 'and' )
 									->orderBy( 'notification_updated_date', 'desc' )
 									->first();
 
@@ -281,7 +281,7 @@ class CommentController extends BaseController
 			{
 				Notification::create( [ 'notification_user_id'      => $record->entry_user_id,
 										'notification_subject_ids'  => json_encode( [ $session->token_user_id ] ),
-										'notification_details'      => 'has commented on your entry',
+										'notification_details'      => 'commented on your entry',
 										'notification_icon'			=> 'comment.png',
 										'notification_read'         => 0,
 										'notification_entry_id'     => $record->entry_id,
