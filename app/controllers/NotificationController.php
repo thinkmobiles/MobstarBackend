@@ -170,7 +170,7 @@ class NotificationController extends BaseController
 				$names = implode( ' and ', $nameArray );
 			}
 
-			$line = $names . ' ' . $line;
+			$line = $names. ' ' .$line;
 			$icon = ( !empty( $notification->notification_icon ) ) ? 'http://' . $_ENV[ 'URL' ] . '/images/' . $notification->notification_icon : '';
 			$current[ 'notificationId' ] = $notification->notification_id;
 			$current[ 'notificationContent' ] = $line;
