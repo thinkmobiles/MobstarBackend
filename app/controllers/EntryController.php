@@ -894,7 +894,7 @@ class EntryController extends BaseController
 				$current[ 'id' ] = $entry->entry_id;
 				$current[ 'category' ] = $entry->category->category_name;
 				$current[ 'type' ] = $entry->entry_type;
-				$current[ 'user' ] = oneUser( $entry->User, $session );
+				$current[ 'user' ] = oneUser( $entry->User, $session , true);
 //
 //				$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
 //				$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
