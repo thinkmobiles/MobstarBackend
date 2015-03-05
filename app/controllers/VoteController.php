@@ -400,7 +400,7 @@ class VoteController extends BaseController
 				if( $entry->entry_category_id == 7 || $entry->entry_category_id == 8 )
 				{
 					$msg = 'liked your '.$entryType;
-   				    $icon = 'like.jpeg';
+   				    $icon = 'like.png';
 				}
 				else
 				{
