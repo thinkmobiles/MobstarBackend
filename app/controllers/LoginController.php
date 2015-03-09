@@ -363,7 +363,7 @@ class LoginController extends BaseController
 
 			//Return user id and token details not using auth library:
 
-			$return = getUserProfile( $user, $session );
+			$return = getUserProfile( $user, $session, true );
 			if(!empty($return))
 			{
 				$isVerifiedPhone = DB::table('user_phones')->where('user_phone_user_id', '=', $return['userId'])->pluck('user_phone_verified');
@@ -550,7 +550,7 @@ class LoginController extends BaseController
 
 			//var_dump($session);
 
-			$return = getUserProfile( $user, $session );
+			$return = getUserProfile( $user, $session, true );
 			if(!empty($return))
 			{
 				$isVerifiedPhone = DB::table('user_phones')->where('user_phone_user_id', '=', $return['userId'])->pluck('user_phone_verified');
@@ -753,7 +753,7 @@ class LoginController extends BaseController
 
 			$session->save();
 
-			$return = getUserProfile( $user, $session );
+			$return = getUserProfile( $user, $session, true );
 			if(!empty($return))
 			{
 				$isVerifiedPhone = DB::table('user_phones')->where('user_phone_user_id', '=', $return['userId'])->pluck('user_phone_verified');

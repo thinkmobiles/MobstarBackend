@@ -3,10 +3,23 @@
 use Aws\S3\S3Client;
 use Aws\Sns\SnsClient;
 
-function getUserProfile( $user, $session )
+function getUserProfile( $user, $session, $normal = false )
 {
 	$client = getS3Client();
-
+	
+	$profileImage = '';
+	$profileCover = '';
+	if($normal)
+	{
+		$profileImage = ( isset( $user->user_profile_image ) ) ? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_profile_image : '';
+		$profileCover = ( isset( $user->user_cover_image ) )   ? 'http://' . $_ENV[ 'URL' ] . '/' . $user->user_cover_image : '';
+	}
+	else
+	{
+		$profileImage = ( isset( $user->user_profile_image ) ) ? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+60 minutes' ) : '';
+		$profileCover = ( isset( $user->user_cover_image ) )   ? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+60 minutes' ) : '';
+	}
+	
 	$return[ 'token' ] = $session->token_value;
 	$return[ 'userId' ] = $user->user_id;
 
@@ -60,12 +73,14 @@ function getUserProfile( $user, $session )
 	$return[ 'userTagline' ] = (!empty($user->user_tagline)) ? $user->user_tagline : '';
 	$return[ 'userBio' ] = (!empty($user->user_bio)) ? $user->user_bio : '';
 
-	$return[ 'profileImage' ] = ( isset( $user->user_profile_image ) )
+	/*$return[ 'profileImage' ] = ( isset( $user->user_profile_image ) )
 		? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+60 minutes' ) : '';
 
 	$return[ 'profileCover' ] = ( isset( $user->user_cover_image ) )
 		? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+60 minutes' ) : '';
-
+	*/
+	$return[ 'profileImage' ] = $profileImage;
+	$return[ 'profileCover' ] = $profileCover;
 	return $return;
 
 }
