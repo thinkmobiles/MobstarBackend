@@ -3218,5 +3218,72 @@ class EntryController extends BaseController
 		$response->header( 'X-Total-Count', $count );
 
 		return $response;
+	}
+	public function search3()
+	{
+
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		$term = Input::get( "term" );		
+		//$excludeCategory = [7,8];
+		$results = DB::table( 'entries' )
+					 ->select( 'entries.*' )
+					 ->join( 'users', 'entries.entry_user_id', '=', 'users.user_id' )
+					 ->join('comments', 'comments.comment_entry_id', '=', 'entries.entry_id')
+					// ->whereNotIn( 'entries.entry_category_id', $excludeCategory )
+					 ->where( 'entries.entry_deleted', '=', '0' )
+					 ->where( function ( $query ) use ( $term )
+					 {
+						 $query->orWhere( 'entries.entry_name', 'LIKE', '%' . $term . '%' )
+							   ->orWhere( 'entries.entry_description', 'LIKE', '%' . $term . '%' )
+							   ->orWhere( 'users.user_name', 'LIKE', '%' . $term . '%' )
+							   ->orWhere( 'users.user_full_name', 'LIKE', '%' . $term . '%' )
+							   ->orWhere( 'comments.comment_content', 'LIKE','%' . $term . '%' );
+					 } )
+					 ->get();
+		$status_code = 200;
+		if( count( $results ) == 0 )
+		{
+			$results = DB::table( 'users' )
+					 ->select( 'users.*' )
+					 ->where( 'users.user_deleted', '=', '0' )
+					 ->where( function ( $query ) use ( $term )
+					 {
+						 $query->orWhere( 'users.user_name', 'LIKE', '%' . $term . '%' )
+							   ->orWhere( 'users.user_full_name', 'LIKE', '%' . $term . '%' );
+					 } )
+					 ->get();
+			if(count($results) > 0)
+			{
+				$User = User::where( 'user_id', '=', $results[0]->user_id )->first();
+				$current[ 'user' ] = oneUser( $User, $session );		 
+				$return[ 'entries' ][ ][ 'entry' ] = $current;
+				$status_code = 404;
+			}
+			else
+			{
+				$return = json_encode( [ 'error' => 'No Entries Found' ] );
+				$status_code = 404;
+			}
+		}
+		else
+		{
+			$return = [ ];
+			for( $i = 0; $i < count( $results ); $i++ )
+			{
+				if( $results[ $i ]->entry_deleted === 1 )
+				{
+					continue;
+				}
+				else
+				{
+					$return[ 'entries' ][ ][ 'entry' ] = $this->oneEntryNew( $results[ $i ], $session, true );
+				}
+			}
+		}
+
+		return Response::make( $return, $status_code );
 	}	
 }
