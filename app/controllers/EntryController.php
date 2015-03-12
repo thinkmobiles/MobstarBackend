@@ -3260,7 +3260,7 @@ class EntryController extends BaseController
 				$User = User::where( 'user_id', '=', $results[0]->user_id )->first();
 				$current[ 'user' ] = oneUser( $User, $session );		 
 				$return[ 'entries' ][ ][ 'entry' ] = $current;
-				$status_code = 404;
+				$status_code = 200;
 			}
 			else
 			{
