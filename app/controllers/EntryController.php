@@ -3258,6 +3258,7 @@ class EntryController extends BaseController
 			if(count($results) > 0)
 			{
 				$User = User::where( 'user_id', '=', $results[0]->user_id )->first();
+				$current[ 'category' ] = 'onlyprofile';
 				$current[ 'user' ] = oneUser( $User, $session );		 
 				$return[ 'entries' ][ ][ 'entry' ] = $current;
 				$status_code = 200;
