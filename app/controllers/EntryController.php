@@ -3230,8 +3230,8 @@ class EntryController extends BaseController
 		//$excludeCategory = [7,8];
 		$results = DB::table( 'entries' )
 					 ->select( 'entries.*' )
-					 ->join( 'users', 'entries.entry_user_id', '=', 'users.user_id' )
-					 ->join('comments', 'comments.comment_entry_id', '=', 'entries.entry_id')
+					 ->leftJoin( 'users', 'entries.entry_user_id', '=', 'users.user_id' )
+					 ->leftJoin('comments', 'comments.comment_entry_id', '=', 'entries.entry_id')
 					// ->whereNotIn( 'entries.entry_category_id', $excludeCategory )
 					 ->where( 'entries.entry_deleted', '=', '0' )
 					 ->where( function ( $query ) use ( $term )
