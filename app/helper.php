@@ -160,7 +160,62 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 			{
 				$starNames = [];
 				$starNames = userDetails($star->Stars);
+				// Stats
+				$entries = Entry::where('entry_user_id', '=', $star->Stars->user_id)->get();
+				$stats = 100000;
+				foreach($entries as $entry)
+				{
+					if(($entry->entry_category_id != 7 || $entry->entry_category_id != 8) && $entry->entry_deleted == 0)
+					{
+						if( $entry->entry_rank < $stats && $entry->entry_rank != 0 )
+						{
+							$stats = $entry->entry_rank;					
+						}						
+					}
+				}
+				if ($stats == 100000)
+					$stats = 0;
+				// End Stats
+				// Rank
+				$entries_star = DB::table('entries')
+				->select('entries.*')
+				->join('users', 'entries.entry_user_id', '=', 'users.user_id')
+				->where('entries.entry_deleted', '=', '0')
+				->where(function($query)
+					{
+						$query->where('entries.entry_rank', '!=', 0);
+					})			
+				->orderBy( 'entry_rank', 'asc' )
+				->get();
+				$users = [ ];
+				$tmp_star[ 'talents' ] = [];
 
+				$rank = 1;
+
+				foreach( $entries_star as $entry_star )
+				{
+					if(($entry_star->entry_category_id != 7 || $entry_star->entry_category_id != 8) && $entry_star->entry_deleted == 0)
+					{
+						if( !in_array( $entry_star->entry_user_id, $users ) )
+						{
+							$User = User::where('user_id' , '=', $entry_star->entry_user_id)->first();
+							$user1[ 'rank' ] = $rank;
+							$user1[ 'id' ] = $User->user_id;
+							$tmp_star[ 'talents' ][ ][ 'talent' ] = $user1;
+							$users[ ] = $entry_star->entry_user_id;
+							$rank++;
+						}
+					}
+				}
+				$myrank = 0;
+				for($i=0;$i<count($tmp_star['talents']);$i++)
+				{
+					if($tmp_star['talents'][$i]['talent']['id'] == $star->Stars->user_id)
+					{
+						$myrank = $tmp_star['talents'][$i]['talent']['rank'];
+					}					
+				}
+				// End Rank
 				$stars[ ] = [ 'starId'       => $star->Stars->user_id,
 							  'starName'     => $starNames['displayName'],
 							  'starredDate'  => $star->user_star_created_date,
@@ -168,7 +223,9 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 								  ? $client->getObjectUrl( 'mobstar-1', $star->Stars->user_profile_image, '+60 minutes' )
 								  : '',
 							  'profileCover' => ( isset( $star->Stars->user_cover_image ) )
-								  ? $client->getObjectUrl( 'mobstar-1', $star->Stars->user_cover_image, '+60 minutes' ) : '',	  
+								  ? $client->getObjectUrl( 'mobstar-1', $star->Stars->user_cover_image, '+60 minutes' ) : '',
+							  'rank'     => $myrank,
+							  'stats'     => $stats,								  
 				];
 			}
 		}
