@@ -3243,6 +3243,7 @@ class EntryController extends BaseController
 							   ->orWhere( 'users.user_full_name', 'LIKE', '%' . $term . '%' )
 							   ->orWhere( 'comments.comment_content', 'LIKE','%' . $term . '%' );
 					 } )
+					 ->groupBy('entry_id')
 					 ->get();
 		$status_code = 200;
 		if( count( $results ) == 0 )
