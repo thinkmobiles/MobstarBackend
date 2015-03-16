@@ -16,8 +16,8 @@ function getUserProfile( $user, $session, $normal = false )
 	}
 	else
 	{
-		$profileImage = ( isset( $user->user_profile_image ) ) ? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+60 minutes' ) : '';
-		$profileCover = ( isset( $user->user_cover_image ) )   ? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+60 minutes' ) : '';
+		$profileImage = ( isset( $user->user_profile_image ) ) ? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+720 minutes' ) : '';
+		$profileCover = ( isset( $user->user_cover_image ) )   ? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+720 minutes' ) : '';
 	}
 	
 	$return[ 'token' ] = $session->token_value;
@@ -97,8 +97,8 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 	}
 	else
 	{
-		$profileImage = ( isset( $user->user_profile_image ) ) ? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+60 minutes' ) : '';
-		$profileCover = ( isset( $user->user_cover_image ) )   ? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+60 minutes' ) : '';
+		$profileImage = ( isset( $user->user_profile_image ) ) ? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+720 minutes' ) : '';
+		$profileCover = ( isset( $user->user_cover_image ) )   ? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+720 minutes' ) : '';
 	}
 	$return = [ 'id'           => $user->user_id,
 				'email'        => $user->user_email,
@@ -220,10 +220,10 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 							  'starName'     => $starNames['displayName'],
 							  'starredDate'  => $star->user_star_created_date,
 							  'profileImage' => ( isset( $star->Stars->user_profile_image ) )
-								  ? $client->getObjectUrl( 'mobstar-1', $star->Stars->user_profile_image, '+60 minutes' )
+								  ? $client->getObjectUrl( 'mobstar-1', $star->Stars->user_profile_image, '+720 minutes' )
 								  : '',
 							  'profileCover' => ( isset( $star->Stars->user_cover_image ) )
-								  ? $client->getObjectUrl( 'mobstar-1', $star->Stars->user_cover_image, '+60 minutes' ) : '',
+								  ? $client->getObjectUrl( 'mobstar-1', $star->Stars->user_cover_image, '+720 minutes' ) : '',
 							  'rank'     => $myrank,
 							  'stats'     => $stats,								  
 				];
@@ -244,10 +244,10 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 								  'starName'     => ( isset( $starNames['displayName'] ) ) ? $starNames['displayName'] : '',
 								  'starredDate'  => $starred->user_star_created_date,
 								  'profileImage' => ( isset( $starred->User->user_profile_image ) )
-									  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+60 minutes' )
+									  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+720 minutes' )
 									  : '',
 								  'profileCover' => ( isset( $starred->User->user_cover_image ) )
-								  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_cover_image, '+60 minutes' ) : '',	  
+								  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_cover_image, '+720 minutes' ) : '',	  
 				];
 			}
 		}
@@ -341,13 +341,13 @@ function oneEntry( $entry, $session, $includeUser = false )
 	$current[ 'entryFiles' ] = array();
 	foreach( $entry->file as $file )
 	{
-		$signedUrl = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+60 minutes' );
+		$signedUrl = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
 		$current[ 'entryFiles' ][ ] = [
 			'fileType' => $file->entry_file_type,
 			'filePath' => $signedUrl ];
 
 		$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-			$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+60 minutes' )
+			$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
 			: "";
 	}
 
