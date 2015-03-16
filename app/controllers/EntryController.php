@@ -1104,9 +1104,9 @@ class EntryController extends BaseController
 				//Will need to do some work here to upload file to CDN
 
 				//Get input
-				//$entry_deleted = 0;
+				$entry_deleted = 0;
 				
-				/* Commented for one Demo as on request 07 March 2015 // Removed Comment on 13 March 2015 as on request */
+				/* Commented for one Demo as on request 07 March 2015 // Removed Comment on 13 March 2015 as on request 
 				if( Input::get( 'category' ) == 7 || Input::get( 'category' ) == 8 )
 				{
 					$entry_deleted = 0;
@@ -1115,7 +1115,7 @@ class EntryController extends BaseController
 				{
 					$entry_deleted = 1;
 				}
-				
+				*/
 				$input = [
 					'entry_user_id'      => $session->token_user_id,
 					'entry_category_id'  => Input::get( 'category' ),
