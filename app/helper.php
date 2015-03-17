@@ -160,6 +160,7 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 			{
 				$starNames = [];
 				$starNames = userDetails($star->Stars);
+				/*
 				// Stats
 				$entries = Entry::where('entry_user_id', '=', $star->Stars->user_id)->get();
 				$stats = 100000;
@@ -216,6 +217,7 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 					}					
 				}
 				// End Rank
+				*/
 				$stars[ ] = [ 'starId'       => $star->Stars->user_id,
 							  'starName'     => $starNames['displayName'],
 							  'starredDate'  => $star->user_star_created_date,
@@ -224,8 +226,10 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 								  : '',
 							  'profileCover' => ( isset( $star->Stars->user_cover_image ) )
 								  ? $client->getObjectUrl( 'mobstar-1', $star->Stars->user_cover_image, '+720 minutes' ) : '',
-							  'rank'     => $myrank,
-							  'stats'     => $stats,								  
+							  //'rank'     => $myrank,
+							  'rank'     => 1,
+							  //'stats'     => $stats,								  
+							  'stats'     => 1,								  
 				];
 			}
 		}
