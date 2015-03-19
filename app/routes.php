@@ -225,7 +225,7 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "EntryController@store"
 		] );
 		
-		Route::post( "entry", [
+		Route::post( "entry/videoupload", [
 			"as"   => "entry/videoupload",
 			"uses" => "EntryController@videoupload"
 		] );
