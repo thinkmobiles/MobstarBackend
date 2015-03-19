@@ -1121,7 +1121,7 @@ class EntryController extends BaseController
 				
 				$input = [
 					'entry_user_id'      => $session->token_user_id,
-					'entry_category_id'  => (isset(Input::get( 'category' )) && Input::get( 'category' ) > 0) ? Input::get( 'category' ) : 1,
+					'entry_category_id'  => (Input::get( 'category' ) > 0) ? Input::get( 'category' ) : 1,
 					'entry_type'         => Input::get( 'type' ),
 					'entry_name'         => Input::get( 'name' ),
 					'entry_language'     => Input::get( 'language' ),
