@@ -1105,6 +1105,12 @@ class EntryController extends BaseController
 
 				//Get input
 				$entry_by_default_enable = DB::table( 'settings' )->where( 'vUniqueName', '=', 'ENTRY_DEFAULT' )->pluck( 'vSettingValue' );
+				$categoryId = DB::table( 'categories' )->where( 'category_id', '=', Input::get( 'category' ) )->pluck( 'category_id' );
+				if(empty($categoryId))
+				{
+					$response[ 'error' ] = "No category selected";
+					$status_code = 400;
+				}
 				
 				/* Commented for one Demo as on request 07 March 2015 // Removed Comment on 13 March 2015 as on request */
 				if( Input::get( 'category' ) == 7 || Input::get( 'category' ) == 8 )
