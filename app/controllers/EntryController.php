@@ -3297,5 +3297,81 @@ class EntryController extends BaseController
 		}
 
 		return Response::make( $return, $status_code );
-	}	
+	}
+	public function videoupload()
+	{
+		$file = Input::file( 'video' );
+
+		if( !empty( $file ) )
+		{
+			$dest = 'uploads';
+
+			$filename = 'Spaceo_'.time();
+
+			$extension = $file->getClientOriginalExtension();
+						
+			$file_in = $file->getRealPath();
+			
+			$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
+
+			// Transcode Video
+			shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
+			$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', $filename . '-uploaded.' . $extension );
+
+			$extension = 'mp4';
+
+			$handle = fopen( $file_out, "r" );
+
+			//Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, fread( $handle, filesize( $file_out ) ) );
+
+			$thumb = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-thumb.jpg';
+
+			exec( '/usr/bin/ffprobe 2>&1 ' . $file_out . ' | grep "rotate          :"', $rotation );
+
+			if( isset( $rotation[ 0 ] ) )
+			{
+				$rotation = substr( $rotation[ 0 ], 17 );
+			}
+
+			$contents = file_get_contents( $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
+			preg_match( "#rotate.*?([0-9]{1,3})#im", $contents, $rotationMatches );
+
+			$transpose = '';
+
+			if( count( $rotationMatches ) > 0 )
+			{
+				switch( $rotationMatches[ 1 ] )
+				{
+					case '90':
+						$transpose = ' -vf transpose=1';
+						break;
+					case '180':
+						$transpose = ' -vf vflip,hflip';
+						break;
+					case '270':
+						$transpose = ' -vf transpose=2';
+						break;
+				}
+			}
+
+			shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . $transpose . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
+
+			$handle = fopen( $thumb, "r" );
+
+			//Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", fread( $handle, filesize( $thumb ) ) );
+
+			//						unlink($file_out);
+			//						unlink($thumb);
+			$response[ 'notice' ] = "success";
+			$status_code = 200;
+		}
+		else
+		{
+
+			$response[ 'error' ] = "error";
+			$status_code = 400;
+		}
+		return Response::make( $response, $status_code );
+	}
+	
 }
