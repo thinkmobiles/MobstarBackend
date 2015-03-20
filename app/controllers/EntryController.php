@@ -3320,7 +3320,7 @@ class EntryController extends BaseController
 
 			$extension = 'mp4';
 
-			$handle = fopen( $file_out, "r" );
+			//$handle = fopen( $file_out, "r" );
 
 			//Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, fread( $handle, filesize( $file_out ) ) );
 
