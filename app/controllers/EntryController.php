@@ -3315,12 +3315,12 @@ class EntryController extends BaseController
 			$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
 
 			// Transcode Video
-			//shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
+			shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
 			$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', $filename . '-uploaded.' . $extension );
 
 			$extension = 'mp4';
 
-			//$handle = fopen( $file_out, "r" );
+			$handle = fopen( $file_out, "r" );
 
 			//Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, fread( $handle, filesize( $file_out ) ) );
 
