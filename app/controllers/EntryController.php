@@ -433,6 +433,10 @@ class EntryController extends BaseController
 							$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
 							: "";
 					}
+					if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
+						continue;
+					if( ( count( $current[ 'entryFiles' ] ) < 1 ) &&  $entry->entry_type === 'video' )
+						continue;	
 				}
 
 				if( in_array( "upVotes", $fields ) )
@@ -511,6 +515,10 @@ class EntryController extends BaseController
 						$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
 						: "";
 				}
+				if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
+						continue;
+				if( ( count( $current[ 'entryFiles' ] ) < 1 ) &&  $entry->entry_type === 'video' )
+					continue;
 
 				$current[ 'upVotes' ] = $up_votes;
 				$current[ 'downVotes' ] = $down_votes;
