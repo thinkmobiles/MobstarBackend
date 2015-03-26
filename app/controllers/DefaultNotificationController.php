@@ -97,7 +97,10 @@ class DefaultNotificationController extends BaseController
 
 				$current[ 'id' ] = $defaultNotification->iDefaultNotificationId;
 				$current[ 'defaultNotificationTitle' ] = $defaultNotification->vDefaultNotificationTitle;
-				$current[ 'defaultNotificationImage' ] = "http://" . $_ENV[ 'URL' ] . '/' . $defaultNotification->vDefaultNotificationImage;
+				if ( file_exists($defaultNotification->vDefaultNotificationImage) )
+					$current[ 'defaultNotificationImage' ] = "http://" . $_ENV[ 'URL' ] . '/' . $defaultNotification->vDefaultNotificationImage;
+				else
+					$current[ 'defaultNotificationImage' ] = "http://admin.mobstar.com/" . $defaultNotification->vDefaultNotificationImage;
 				$current[ 'description' ] = $defaultNotification->txDescription;
 				$current[ 'show_system_notification' ] = $settings;
 			}
