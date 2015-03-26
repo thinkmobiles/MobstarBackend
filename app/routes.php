@@ -168,9 +168,18 @@ Route::group( [ "before" => "auth" ], function ()
 		] );
 
 		// -------------------------------------------------------
-		// Welcome Video
+		// Default Notification(s)
 		//---------------------------------------------------------
 
+		Route::get( "defaultNotification/", [
+			"as"   => "defaultNotification/index",
+			"uses" => "DefaultNotificationController@index"
+		] );
+		
+		// -------------------------------------------------------
+		// Welcome Video
+		//---------------------------------------------------------
+		
 		Route::get( "welcome/", [
 			"as"   => "welcome/index",
 			"uses" => "WelcomeController@index"
