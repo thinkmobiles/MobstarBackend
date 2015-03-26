@@ -1357,7 +1357,7 @@ class UserController extends BaseController
 		{
 			$exclude[ ] = $rank->entry_id;
 		}
-		$users = DB::table('users')->where( 'user_order', '>', 0 )->whereIn( 'user_user_group',$include )->orderBy( 'user_order', 'asc' )->get();
+		$users = User::where( 'user_order', '>', 0 )->whereIn( 'user_user_group',$include )->orderBy( 'user_order', 'asc' )->get();
 //		$order = 'entry_rank';
 //		$dir = 'asc';
 //		$query = DB::table('entries')
@@ -1382,8 +1382,7 @@ class UserController extends BaseController
 		//Find total number to put in header
 		//$count = User::where( 'user_user_group', 4 )->count();
 //		$count = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, $newOrderBy)"))->count();
-		
-		$count = DB::table('users')->select('user_id')->where( 'user_order', '>', 0 )->whereIn( 'user_user_group',$include )->orderBy( 'user_order', 'asc' )->count();
+		$count = User::where( 'user_order', '>', 0 )->whereIn( 'user_user_group',$include )->orderBy( 'user_order', 'asc' )->count();
 		if( $count == 0 )
 		{
 			$return = [ 'error' => 'No Team Users Found' ];
