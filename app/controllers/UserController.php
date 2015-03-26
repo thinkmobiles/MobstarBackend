@@ -1382,6 +1382,8 @@ class UserController extends BaseController
 		//Find total number to put in header
 		//$count = User::where( 'user_user_group', 4 )->count();
 //		$count = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, $newOrderBy)"))->count();
+		print_r($users);
+		die;
 		$count = DB::table('users')->select('user_id')->where( 'user_order', '>', 0 )->whereIn( 'user_user_group',$include )->orderBy( 'user_order', 'asc' )->count();
 		if( $count == 0 )
 		{
