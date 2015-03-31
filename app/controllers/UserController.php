@@ -1672,7 +1672,7 @@ class UserController extends BaseController
 								$message = "You are now in between top 10 and You are at position ".$newrank;
 								
 								$STR == $userID." ,Rank = ".$newrank ;
-								mail("anil@spaceotechnologies.com",time(),$message);
+								//mail("anil@spaceotechnologies.com",time(),$message);
 
 								// $usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
 								// 	(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
@@ -1694,13 +1694,13 @@ class UserController extends BaseController
 								{
 									$message = "You are at position ".$newrank;
 									$STR == $userID." ,Rank = ".$newrank ;
-									mail("anil@spaceotechnologies.com",time(),$message);
+									//mail("anil@spaceotechnologies.com",time(),$message);
 								}
 								elseif ($newrank > 10) 
 								{
 									$message = "You left the position from top 10.";
 									$STR == $userID." ,Rank = ".$newrank ;
-									mail("anil@spaceotechnologies.com",time(),$STR);
+									//mail("anil@spaceotechnologies.com",time(),$STR);
 
 								}
 								// $usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
