@@ -516,7 +516,10 @@ class EntryController extends BaseController
 						: "";
 				}
 				if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
-						continue;
+				{
+					mail('anil@spaceotechnologies.com',time().$entry->entry_type , print_r($current[ 'entryFiles' ],true));
+					continue;
+				}
 				if( ( count( $current[ 'entryFiles' ] ) < 1 ) &&  $entry->entry_type === 'video' )
 					continue;
 
