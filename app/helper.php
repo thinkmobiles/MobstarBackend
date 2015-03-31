@@ -219,8 +219,7 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 				}
 				// End Rank
 				*/
-				if( !in_array( $star->Stars->user_id, $stars ) )
-				{	
+					
 					$stars[ ] = [ 'starId'       => $star->Stars->user_id,
 								  'starName'     => $starNames['displayName'],
 								  'starredDate'  => $star->user_star_created_date,
@@ -234,7 +233,7 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 								  //'stats'     => $stats,								  
 								  'stat'     => DB::table('users')->where( 'user_id', '=', $star->Stars->user_id )->pluck('user_entry_rank'),								  
 					];
-				}
+				
 			}
 		}
 
