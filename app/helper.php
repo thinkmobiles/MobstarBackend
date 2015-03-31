@@ -261,7 +261,7 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 
 	}
 
-	$return[ 'stars' ] = array_unique($stars);
+	$return[ 'stars' ] = $stars;
 
 	$return[ 'starredBy' ] = $starredBy;
 	$excludeCategory = [7,8];
