@@ -152,11 +152,11 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 	if( $includeStars )
 	{
 		$stars = [ ];
-
+		$lookup_array=[ ];
 		foreach( $user->Stars as $star )
 		{
 			
-			if( !in_array( $star->Stars->user_id, $stars ) )
+			if( !in_array( $star->Stars->user_id, $lookup_array ) )
 			{
 				if( $star->user_star_deleted == 0 )
 				{
@@ -221,6 +221,9 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 					}
 					// End Rank
 					*/
+						
+
+						$lookup_array[ ]= [ 'starId'       => $star->Stars->user_id];
 						
 						$stars[ ] = [ 'starId'       => $star->Stars->user_id,
 									  'starName'     => $starNames['displayName'],
