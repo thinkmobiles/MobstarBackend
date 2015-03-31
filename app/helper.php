@@ -227,9 +227,9 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 							  'profileCover' => ( isset( $star->Stars->user_cover_image ) )
 								  ? $client->getObjectUrl( 'mobstar-1', $star->Stars->user_cover_image, '+720 minutes' ) : '',
 							  //'rank'     => $myrank,
-							  'rank'     => 1,
+							  'rank'     => DB::table('users')->where( 'user_id', '=', $star->Stars->user_id )->pluck('user_rank'),
 							  //'stats'     => $stats,								  
-							  'stats'     => 1,								  
+							  'stats'     => DB::table('users')->where( 'user_id', '=', $star->Stars->user_id )->pluck('user_entry_rank'),								  
 				];
 			}
 		}
