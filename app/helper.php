@@ -148,11 +148,10 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 
 	$stars = [ ];
 	$starredBy = [ ];
+	$lookup_array=[ ];
 
 	if( $includeStars )
 	{
-		$stars = [ ];
-		$lookup_array=[ ];
 		foreach( $user->Stars as $star )
 		{
 			
