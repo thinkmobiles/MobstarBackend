@@ -501,7 +501,8 @@ class EntryController extends BaseController
 					//TODO: Fix tags so that we do not need to find this
 					$current[ 'tags' ][ ] = $entry_tag->tag->tag_name;
 				}
-
+				if(count($entry->file) <= 0)
+				continue;
 				foreach( $entry->file as $file )
 				{
 
