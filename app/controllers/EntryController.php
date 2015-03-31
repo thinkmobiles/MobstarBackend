@@ -421,6 +421,8 @@ class EntryController extends BaseController
 				if( in_array( "entryFiles", $fields ) )
 				{
 					$current[ 'entryFiles' ] = array();
+					if(count($entry->file) <= 0)
+					continue;
 					foreach( $entry->file as $file )
 					{
 
