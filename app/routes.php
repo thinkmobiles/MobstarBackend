@@ -558,7 +558,10 @@ Route::get( "entry2/rerank", [
 	"as"   => "entry2/rerank",
 	"uses" => "EntryController@rerank"
 ] );
-
+Route::post( "user/userRank", [
+	"as"   => "user/userRank",
+	"uses" => "UserController@userRank"
+] );
 Route::get( "entry2/fixfile", [
 	"as"   => "entry2/updateFile",
 	"uses" => "EntryController@updateFile"

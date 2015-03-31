@@ -1603,4 +1603,140 @@ class UserController extends BaseController
 		/* End */
 		return Response::make( $return , 200 );
 	}
+	public function userRank()
+	{
+		 // Rank
+	    $entries_star = DB::table('entries')
+		    ->select('entries.*')
+		    ->join('users', 'entries.entry_user_id', '=', 'users.user_id')
+		    ->where('entries.entry_deleted', '=', '0')
+		    ->where(function($query)
+		     {
+		      	$query->where('entries.entry_rank', '!=', 0);
+		     })   
+		    ->orderBy( 'entry_rank', 'asc' )
+		    ->get();
+
+		if(!empty($entries_star))
+		{
+			$users = [ ];
+		    $tmp_star[ 'talents' ] = [];
+		    $rank = 1;
+
+	    	foreach( $entries_star as $entry_star )
+		    {
+			     if(($entry_star->entry_category_id != 7 || $entry_star->entry_category_id != 8) && $entry_star->entry_deleted == 0)
+			     {
+
+				    if( !in_array( $entry_star->entry_user_id, $users ) )
+				    {
+				       $User = User::where('user_id' , '=', $entry_star->entry_user_id)->first();
+				       $entries = Entry::where('entry_user_id', '=', $User->user_id)->get();
+					   $stats = 100000;
+						foreach($entries as $entry)
+						{
+							if(($entry->entry_category_id != 7 || $entry->entry_category_id != 8) && $entry->entry_deleted == 0)
+							{
+								if( $entry->entry_rank < $stats && $entry->entry_rank != 0 )
+								{
+									$stats = $entry->entry_rank;					
+								}						
+							}
+						}
+						if ($stats == 100000)
+							$stats = 0;
+
+						//get user's old rank
+							$userRankData = User::find( $User->user_id );
+							$oldrank = $userRankData->user_rank;
+						//end
+						
+					   // Update user with its rank and stats
+					   $user_update = User::find( $User->user_id );
+					   $user_update->user_rank =$rank;
+					   $user_update->user_entry_rank =$stats;
+					   $user_update->save();
+					   // End
+					  	//get user's new rank
+							$userNewRankData = User::find( $User->user_id );
+							$newrank = $userNewRankData->user_rank;
+						//end
+						
+						// ckeck for position of user
+						if( $oldrank != $newrank)
+						{
+							$STR = "";
+							$userID = $User->user_id;
+							if($oldrank > 10 && $newrank < 11)
+							{
+								$message = "You are now in between top 10 and You are at position ".$newrank;
+								
+								$STR == $userID." ,Rank = ".$newrank ;
+								mail("anil@spaceotechnologies.com",time(),$message);
+
+								// $usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
+								// 	(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
+								// 	from device_registrations where device_registration_device_token  != '' 
+								// 	order by device_registration_date_created desc
+								// 	) t1 left join users u on t1.device_registration_user_id = u.user_id 
+								// 	where u.user_deleted = 0 
+								// 	AND u.user_id = $userID
+								// 	group by u.user_id 
+								// 	order by t1.device_registration_date_created desc"));
+								// if(!empty($usersDeviceData))
+								// {	
+								// 	$this->registerSNSEndpoint($usersDeviceData[0],$message);
+								// }
+							}
+							elseif ($oldrank < 11) 
+							{
+								if($newrank < 11)
+								{
+									$message = "You are at position ".$newrank;
+									$STR == $userID." ,Rank = ".$newrank ;
+									mail("anil@spaceotechnologies.com",time(),$message);
+								}
+								elseif ($newrank > 10) 
+								{
+									$message = "You left the position from top 10.";
+									$STR == $userID." ,Rank = ".$newrank ;
+									mail("anil@spaceotechnologies.com",time(),$STR);
+
+								}
+								// $usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
+								// 	(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
+								// 	from device_registrations where device_registration_device_token  != '' 
+								// 	order by device_registration_date_created desc
+								// 	) t1 left join users u on t1.device_registration_user_id = u.user_id 
+								// 	where u.user_deleted = 0 
+								// 	AND u.user_id = $userID
+								// 	group by u.user_id 
+								// 	order by t1.device_registration_date_created desc"));
+								// if(!empty($usersDeviceData))
+								// {	
+								// 	$this->registerSNSEndpoint($usersDeviceData[0],$message);
+								// }
+							}
+						}
+						//
+					   $user1[ 'rank' ] = $rank;
+				       $user1[ 'id' ] = $User->user_id;
+				       $user1[ 'entry_rank' ] = $stats;
+				       $tmp_star[ 'talents' ][ ][ 'talent' ] = $user1;
+				       $users[ ] = $entry_star->entry_user_id;
+				       $rank++;
+				    }
+			     }
+			}
+			$return['talents'] = $tmp_star[ 'talents' ];
+			$status_code = 200;
+		}
+		else
+		{
+			$return = [ 'error' => 'No Entries Found' ];
+			$status_code = 404;
+		}	    		
+		return Response::make( $return , 200 );
+	}
+	
 }
