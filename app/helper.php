@@ -229,7 +229,7 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 							  //'rank'     => $myrank,
 							  'rank'     => DB::table('users')->where( 'user_id', '=', $star->Stars->user_id )->pluck('user_rank'),
 							  //'stats'     => $stats,								  
-							  'stats'     => DB::table('users')->where( 'user_id', '=', $star->Stars->user_id )->pluck('user_entry_rank'),								  
+							  'stat'     => DB::table('users')->where( 'user_id', '=', $star->Stars->user_id )->pluck('user_entry_rank'),								  
 				];
 			}
 		}
