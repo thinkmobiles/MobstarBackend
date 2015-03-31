@@ -222,7 +222,7 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 					*/
 						
 
-						$lookup_array[ ]= [ 'starId'       => $star->Stars->user_id];
+						$lookup_array[ ]= $star->Stars->user_id;
 						
 						$stars[ ] = [ 'starId'       => $star->Stars->user_id,
 									  'starName'     => $starNames['displayName'],
