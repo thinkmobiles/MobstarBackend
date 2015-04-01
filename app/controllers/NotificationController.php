@@ -98,7 +98,14 @@ class NotificationController extends BaseController
 		}
 
 		//Find total number to put in header
-		$count = Notification::where( 'notification_user_id', '=', $session->token_user_id )->where('notification_deleted', '=', 0)->count();
+		//$count = Notification::where( 'notification_user_id', '=', $session->token_user_id )->where('notification_deleted', '=', 0)->count();
+		$count = DB::table( 'notifications' )
+					->select( 'notifications.*' )
+					->leftJoin('entries', 'entries.entry_id', '=', 'notifications.notification_entry_id')
+					->where( 'notifications.notification_user_id', '=', $session->token_user_id )
+					->where( 'notifications.notification_deleted', '=', 0 )
+					->where( 'entries.entry_deleted', '=', '0' )
+					->count();
 
 		//If the count is greater than the highest number of items displayed show a next link
 		if( $count > ( $limit * $page ) )
@@ -110,7 +117,14 @@ class NotificationController extends BaseController
 			$next = false;
 		}
 
-		$notifications = Notification::where( 'notification_user_id', '=', $session->token_user_id )->where('notification_deleted', '=', 0)->latest('notification_updated_date')->take( $limit )->skip( $offset )->get();
+		//$notifications = Notification::where( 'notification_user_id', '=', $session->token_user_id )->where('notification_deleted', '=', 0)->latest('notification_updated_date')->take( $limit )->skip( $offset )->get();
+		$notifications = DB::table( 'notifications' )
+					->select( 'notifications.*' )
+					->leftJoin('entries', 'entries.entry_id', '=', 'notifications.notification_entry_id')
+					->where( 'notifications.notification_user_id', '=', $session->token_user_id )
+					->where( 'notifications.notification_deleted', '=', 0 )
+					->where( 'entries.entry_deleted', '=', '0' )
+					->latest('notifications.notification_updated_date')->take( $limit )->skip( $offset )->get();
 
 		$return[ 'notifications' ] = [ ];
 
@@ -235,10 +249,18 @@ class NotificationController extends BaseController
 		$session = $this->token->get_session( $token );
 
 		//Find total number to put in header
-		$count = Notification::where( 'notification_user_id', '=', $session->token_user_id )
+		/*$count = Notification::where( 'notification_user_id', '=', $session->token_user_id )
 			->where('notification_read', '=', 0)
 			->where('notification_deleted', '=', 0)
-			->count();
+			->count();*/
+		$count = DB::table( 'notifications' )
+					->select( 'notifications.*' )
+					->leftJoin('entries', 'entries.entry_id', '=', 'notifications.notification_entry_id')
+					->where( 'notifications.notification_user_id', '=', $session->token_user_id )
+					->where('notifications.notification_read', '=', 0)
+					->where( 'notifications.notification_deleted', '=', 0 )
+					->where( 'entries.entry_deleted', '=', '0' )
+					->count();	
 
 		$return[ 'notifications' ]= $count;
 
