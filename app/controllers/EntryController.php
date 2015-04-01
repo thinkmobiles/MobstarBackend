@@ -3258,8 +3258,6 @@ class EntryController extends BaseController
 					 ->select( 'entries.*' )
 					 ->leftJoin( 'users', 'entries.entry_user_id', '=', 'users.user_id' )
 					 ->leftJoin('comments', 'comments.comment_entry_id', '=', 'entries.entry_id')
-					 ->leftJoin('facebook_users', 'user.user_facebook_id', '=', 'facebook_users.facebook_user_id')
-					 ->leftJoin('google_users', 'user.user_google_id', '=', 'google_users.google_user_id')
 					// ->whereNotIn( 'entries.entry_category_id', $excludeCategory )
 					 ->where( 'entries.entry_deleted', '=', '0' )
 					 ->where( function ( $query ) use ( $term )
@@ -3268,10 +3266,6 @@ class EntryController extends BaseController
 							   ->orWhere( 'entries.entry_description', 'LIKE', '%' . $term . '%' )
 							   ->orWhere( 'users.user_name', 'LIKE', '%' . $term . '%' )
 							   ->orWhere( 'users.user_full_name', 'LIKE', '%' . $term . '%' )
-							   ->orWhere( 'facebook_users.facebook_user_display_name', 'LIKE', '%' . $term . '%' )
-							   ->orWhere( 'facebook_users.facebook_user_user_name', 'LIKE', '%' . $term . '%' )
-							   ->orWhere( 'google_users.google_user_display_name', 'LIKE', '%' . $term . '%' )
-							   ->orWhere( 'google_users.google_user_user_name', 'LIKE', '%' . $term . '%' )
 							   ->orWhere( 'comments.comment_content', 'LIKE','%' . $term . '%' );
 					 } )
 					 ->groupBy('entry_id')
@@ -3281,17 +3275,11 @@ class EntryController extends BaseController
 		{
 			$results = DB::table( 'users' )
 					 ->select( 'users.*' )
-					 ->leftJoin('facebook_users', 'user.user_facebook_id', '=', 'facebook_users.facebook_user_id')
-					 ->leftJoin('google_users', 'user.user_google_id', '=', 'google_users.google_user_id')
 					 ->where( 'users.user_deleted', '=', '0' )
 					 ->where( function ( $query ) use ( $term )
 					 {
 						 $query->orWhere( 'users.user_name', 'LIKE', '%' . $term . '%' )
-							   ->orWhere( 'users.user_full_name', 'LIKE', '%' . $term . '%' )
-							   ->orWhere( 'facebook_users.facebook_user_display_name', 'LIKE', '%' . $term . '%' )
-							   ->orWhere( 'facebook_users.facebook_user_user_name', 'LIKE', '%' . $term . '%' )
-							   ->orWhere( 'google_users.google_user_display_name', 'LIKE', '%' . $term . '%' )
-							   ->orWhere( 'google_users.google_user_user_name', 'LIKE', '%' . $term . '%' );
+							   ->orWhere( 'users.user_full_name', 'LIKE', '%' . $term . '%' );
 					 } )
 					 ->get();
 			if(count($results) > 0)
