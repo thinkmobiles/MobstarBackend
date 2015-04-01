@@ -235,7 +235,7 @@ class VoteController extends BaseController
 
 				if( in_array( "user", $fields ) )
 				{
-					$current[ 'user' ] = oneUser( $vote->user, $session, true );
+					$current[ 'user' ] = oneUser( $vote->user, $session );
 
 				}
 
@@ -272,7 +272,7 @@ class VoteController extends BaseController
 			{
 
 				$current[ 'id' ] = $vote->vote_id;
-				$current[ 'user' ] = oneUser( $vote->user, $session, true );
+				$current[ 'user' ] = oneUser( $vote->user, $session );
 				$current[ 'entry' ] = oneEntry( $vote->entry, $session, true );
 
 				if( $vote[ 'vote_up' ] == 1 && $vote[ 'vote_down' ] == 0 )
