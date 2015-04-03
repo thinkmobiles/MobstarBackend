@@ -184,7 +184,12 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "welcome/index",
 			"uses" => "WelcomeController@index"
 		] );
-
+		
+		Route::get( "video/show", [
+		   "as"   => "video/show",
+		   "uses" => "ModelingVideoController@show"
+		] );
+		
 		// -------------------------------------------------------
 		// Entries
 		//---------------------------------------------------------
