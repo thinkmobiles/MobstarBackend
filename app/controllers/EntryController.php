@@ -1138,18 +1138,38 @@ class EntryController extends BaseController
 					else
 					$entry_deleted = 1;	
 				}
-				
-				$input = [
-					'entry_user_id'      => $session->token_user_id,
-					'entry_category_id'  => (Input::get( 'category' ) > 0) ? Input::get( 'category' ) : 1,
-					'entry_type'         => Input::get( 'type' ),
-					'entry_name'         => Input::get( 'name' ),
-					'entry_language'     => Input::get( 'language' ),
-					'entry_description'  => Input::get( 'description' ),
-					'entry_created_date' => date( 'Y-m-d H:i:s' ),
-					'entry_deleted'      => $entry_deleted,
-				];
-
+				if( Input::get( 'category' ) == 3 )
+				{
+					$input = [
+						'entry_user_id'      => $session->token_user_id,
+						'entry_category_id'  => Input::get( 'category' ),
+						'entry_type'         => Input::get( 'type' ),
+						'entry_name'         => Input::get( 'name' ),
+						'entry_language'     => Input::get( 'language' ),
+						'entry_description'  => Input::get( 'description' ),
+						'entry_created_date' => date( 'Y-m-d H:i:s' ),
+						'entry_deleted'      => $entry_deleted,
+						'entry_subcategory'  => Input::get( 'subCategory' ),
+						'entry_age'          => Input::get( 'age' ),
+						'entry_height'       => Input::get( 'height' ),
+					];	
+				}
+				else
+				{
+					$input = [
+						'entry_user_id'      => $session->token_user_id,
+						'entry_category_id'  => (Input::get( 'category' ) > 0) ? Input::get( 'category' ) : 1,
+						'entry_type'         => Input::get( 'type' ),
+						'entry_name'         => Input::get( 'name' ),
+						'entry_language'     => Input::get( 'language' ),
+						'entry_description'  => Input::get( 'description' ),
+						'entry_created_date' => date( 'Y-m-d H:i:s' ),
+						'entry_deleted'      => $entry_deleted,
+						'entry_subcategory'  => '',
+						'entry_age'      	 => '',
+						'entry_height'       => '',
+					];
+				}
 				Eloquent::unguard();
 				$response[ 'entry_id' ] = $this->entry->create( $input )->entry_id;
 				$status_code = 201;
