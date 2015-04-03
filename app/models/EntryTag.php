@@ -1,7 +1,7 @@
 <?php
 
 class EntryTag extends \Eloquent {
-	protected $fillable = ["entry_tag_id", "entry_tag_entry_id", "entry_tag_tag_id", "entry_tag_created_date", "entry_tag_deleted_date", "entry_tag_deleted"];
+	protected $fillable = ["entry_tag_id", "entry_tag_entry_id", "entry_tag_tag_id", "entry_tag_added_by", "entry_tag_created_date", "entry_tag_deleted_date", "entry_tag_deleted"];
     public $timestamps = false;
     protected $primaryKey = 'entry_tag_id';
 
