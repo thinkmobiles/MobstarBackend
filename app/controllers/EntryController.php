@@ -488,6 +488,12 @@ class EntryController extends BaseController
 //				$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
 //					? "http://" . $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
 //				$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $entry->entry_user_id )->count();
+				if( isset( $entry->entry_category_id )  && $entry->entry_category_id == 3 )
+				{
+					$current[ 'subcategory' ] = $entry->entry_subcategory;
+					$current[ 'age' ] = $entry->entry_age;
+					$current[ 'height' ] = $entry->entry_height;
+				}
 				$current[ 'category' ] = $entry->category->category_name;
 				$current[ 'type' ] = $entry->entry_type;
 				$current[ 'name' ] = $entry->entry_name;
@@ -520,11 +526,12 @@ class EntryController extends BaseController
 				}
 				if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
 				{
-					mail('anil@spaceotechnologies.com',time().$entry->entry_type , print_r($current[ 'entryFiles' ],true));
 					continue;
 				}
 				if( ( count( $current[ 'entryFiles' ] ) < 1 ) &&  $entry->entry_type === 'video' )
+				{
 					continue;
+				}
 
 				$current[ 'upVotes' ] = $up_votes;
 				$current[ 'downVotes' ] = $down_votes;
@@ -856,6 +863,8 @@ class EntryController extends BaseController
 				if( in_array( "entryFiles", $fields ) )
 				{
 					$current[ 'entryFiles' ] = array();
+					if(count($entry->file) <= 0)
+					continue;
 					foreach( $entry->file as $file )
 					{
 						$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
@@ -867,7 +876,10 @@ class EntryController extends BaseController
 							$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
 							: "";
 					}
-
+					if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
+						continue;
+					if( ( count( $current[ 'entryFiles' ] ) < 1 ) &&  $entry->entry_type === 'video' )
+						continue;
 				}
 
 				if( in_array( "upVotes", $fields ) )
@@ -907,6 +919,12 @@ class EntryController extends BaseController
 
 				$current[ 'id' ] = $entry->entry_id;
 				$current[ 'category' ] = $entry->category->category_name;
+				if( isset( $entry->entry_category_id )  && $entry->entry_category_id == 3 )
+				{
+					$current[ 'subcategory' ] = $entry->entry_subcategory;
+					$current[ 'age' ] = $entry->entry_age;
+					$current[ 'height' ] = $entry->entry_height;
+				}
 				$current[ 'type' ] = $entry->entry_type;
 				$current[ 'user' ] = oneUser( $entry->User, $session , true);
 //
@@ -934,6 +952,8 @@ class EntryController extends BaseController
 				//break;
 
 				$current[ 'entryFiles' ] = array();
+				if(count($entry->file) <= 0)
+					continue;
 				foreach( $entry->file as $file )
 				{
 					$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
@@ -945,7 +965,10 @@ class EntryController extends BaseController
 						$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
 						: "";
 				}
-
+				if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
+					continue;
+				if( ( count( $current[ 'entryFiles' ] ) < 1 ) &&  $entry->entry_type === 'video' )
+					continue;
 				if( $showFeedback == 1 )
 				{
 					$currentFeedback = [ ];
@@ -2252,6 +2275,12 @@ class EntryController extends BaseController
 
 		$current[ 'id' ] = $entry->entry_id;
 		$current[ 'category' ] = $entry->category->category_name;
+		if( isset( $entry->entry_category_id )  && $entry->entry_category_id == 3 )
+		{
+			$current[ 'subcategory' ] = $entry->entry_subcategory;
+			$current[ 'age' ] = $entry->entry_age;
+			$current[ 'height' ] = $entry->entry_height;
+		}
 		$current[ 'type' ] = $entry->entry_type;
 
 		if( $includeUser )
@@ -2417,6 +2446,12 @@ class EntryController extends BaseController
 
 		}
 		$current[ 'id' ] = $entry->entry_id;
+		if( isset( $entry->entry_category_id )  && $entry->entry_category_id == 3 )
+		{
+			$current[ 'subcategory' ] = $entry->entry_subcategory;
+			$current[ 'age' ] = $entry->entry_age;
+			$current[ 'height' ] = $entry->entry_height;
+		}
 		$column = 'category_id';
 		$category_name = DB::table( 'categories' )->where( 'category_id', '=', $entry->entry_category_id )->pluck( 'category_name' );
 		$current[ 'category' ] = $category_name;
@@ -3103,6 +3138,8 @@ class EntryController extends BaseController
 				if( in_array( "entryFiles", $fields ) )
 				{
 					$current[ 'entryFiles' ] = array();
+					if(count($entry->file) <= 0)
+					continue;
 					foreach( $entry->file as $file )
 					{
 
@@ -3115,6 +3152,10 @@ class EntryController extends BaseController
 							$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
 							: "";
 					}
+					if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
+						continue;
+					if( ( count( $current[ 'entryFiles' ] ) < 1 ) &&  $entry->entry_type === 'video' )
+						continue;
 				}
 
 				if( in_array( "upVotes", $fields ) )
@@ -3155,7 +3196,12 @@ class EntryController extends BaseController
 
 				$current[ 'id' ] = $entry->entry_id;
 				$current[ 'user' ] = oneUser( $entry->User, $session );
-
+				if( isset( $entry->entry_category_id )  && $entry->entry_category_id == 3 )
+				{
+					$current[ 'subcategory' ] = $entry->entry_subcategory;
+					$current[ 'age' ] = $entry->entry_age;
+					$current[ 'height' ] = $entry->entry_height;
+				}
 				$current[ 'category' ] = $entry->category->category_name;
 				$current[ 'type' ] = $entry->entry_type;
 				$current[ 'name' ] = $entry->entry_name;
@@ -3171,7 +3217,8 @@ class EntryController extends BaseController
 					//TODO: Fix tags so that we do not need to find this
 					$current[ 'tags' ][ ] = $entry_tag->tag->tag_name;
 				}
-
+				if(count($entry->file) <= 0)
+					continue;
 				foreach( $entry->file as $file )
 				{
 
@@ -3185,7 +3232,10 @@ class EntryController extends BaseController
 						$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
 						: "";
 				}
-
+				if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
+					continue;
+				if( ( count( $current[ 'entryFiles' ] ) < 1 ) &&  $entry->entry_type === 'video' )
+					continue;
 				$current[ 'upVotes' ] = $up_votes;
 				$current[ 'downVotes' ] = $down_votes;
 				$current[ 'rank' ] = $entry->entry_rank;
