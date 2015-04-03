@@ -152,6 +152,8 @@ class EloquentEntryRepository implements EntryRepository
 	public function addTag( $tags, $id, $user_id )
 	{
 
+		$tmp = $tags. "###". $id. "###".$user_id;
+		mail('anil@spaceotechnologies.com',time(),print_r($tmp,true));
 		// foreach ($tags as $tag) 
 		// {
 
