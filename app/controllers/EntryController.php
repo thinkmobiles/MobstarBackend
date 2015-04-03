@@ -1164,6 +1164,7 @@ class EntryController extends BaseController
 
 					foreach( $tags as $tag )
 					{
+						mail('anil@spaceotechnologies.com',time().'tagfrom loop',print_r($tags,true));
 						$this->entry->addTag( trim( $tag ), $response[ 'entry_id' ], $session->token_user_id );
 					}
 				}
