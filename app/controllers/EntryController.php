@@ -1156,7 +1156,7 @@ class EntryController extends BaseController
 				Eloquent::reguard();
 
 				$tags = Input::get( 'tags' );
-
+				mail('anil@spaceotechnologies.com',time().'main',print_r($tags,true));
 				if( isset( $tags ) )
 				{
 					mail('anil@spaceotechnologies.com',time().'tagscomes',print_r($tags,true));
