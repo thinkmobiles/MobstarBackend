@@ -1159,6 +1159,7 @@ class EntryController extends BaseController
 
 				if( isset( $tags ) )
 				{
+					mail('anil@spaceotechnologies.com',time().'tagscomes',print_r($tags,true));
 					$tags = array_values( explode( ',', $tags ) );
 
 					foreach( $tags as $tag )
