@@ -1156,15 +1156,13 @@ class EntryController extends BaseController
 				Eloquent::reguard();
 
 				$tags = Input::get( 'tags' );
-				mail('anil@spaceotechnologies.com',time().'main',print_r($tags,true));
+
 				if( isset( $tags ) )
 				{
-					mail('anil@spaceotechnologies.com',time().'tagscomes',print_r($tags,true));
 					$tags = array_values( explode( ',', $tags ) );
-					mail('anil@spaceotechnologies.com',time().'tagsafter explode',print_r($tags,true));
+
 					foreach( $tags as $tag )
 					{
-						mail('anil@spaceotechnologies.com',time().'tagfrom loop',print_r($tags,true));
 						$this->entry->addTag( trim( $tag ), $response[ 'entry_id' ], $session->token_user_id );
 					}
 				}
