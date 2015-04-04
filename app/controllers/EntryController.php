@@ -3472,4 +3472,78 @@ class EntryController extends BaseController
 		return Response::make( $response, $status_code );
 	}
 	
+	public function search4()
+	{
+
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		$term = Input::get( "term" );		
+		$return = [ ];
+		//$excludeCategory = [7,8];
+		$results = DB::table( 'entries' )
+					 ->select( 'entries.*' )
+					 ->leftJoin( 'users', 'entries.entry_user_id', '=', 'users.user_id' )
+					 ->leftJoin('comments', 'comments.comment_entry_id', '=', 'entries.entry_id')
+					 ->leftJoin('facebook_users', 'users.user_facebook_id', '=', 'facebook_users.facebook_user_id')
+					 ->leftJoin('google_users', 'users.user_google_id', '=', 'google_users.google_user_id')
+					// ->whereNotIn( 'entries.entry_category_id', $excludeCategory )
+					 ->where( 'entries.entry_deleted', '=', '0' )
+					 ->where( function ( $query ) use ( $term )
+					 {
+						 $query->orWhere( 'entries.entry_name', 'LIKE', '%' . $term . '%' )
+							   ->orWhere( 'entries.entry_description', 'LIKE', '%' . $term . '%' )
+							   ->orWhere( 'users.user_name', 'LIKE', '%' . $term . '%' )
+							   ->orWhere( 'users.user_full_name', 'LIKE', '%' . $term . '%' )
+							   ->orWhere( 'facebook_users.facebook_user_display_name', 'LIKE', '%' . $term . '%' )
+							   ->orWhere( 'facebook_users.facebook_user_user_name', 'LIKE', '%' . $term . '%' )
+							   ->orWhere( 'google_users.google_user_display_name', 'LIKE', '%' . $term . '%' )
+							   ->orWhere( 'google_users.google_user_user_name', 'LIKE', '%' . $term . '%' )
+							   ->orWhere( 'comments.comment_content', 'LIKE','%' . $term . '%' );
+					 } )
+					 ->groupBy('entry_id')
+					 ->get();
+		$status_code = 200;
+		
+		$results_user = DB::table( 'users' )
+				 ->select( 'users.*' )
+				 ->leftJoin('facebook_users', 'users.user_facebook_id', '=', 'facebook_users.facebook_user_id')
+				 ->leftJoin('google_users', 'users.user_google_id', '=', 'google_users.google_user_id')
+				 ->where( 'users.user_deleted', '=', '0' )
+				 ->where( function ( $query ) use ( $term )
+				 {
+					 $query->orWhere( 'users.user_name', 'LIKE', '%' . $term . '%' )
+						   ->orWhere( 'users.user_full_name', 'LIKE', '%' . $term . '%' )
+						   ->orWhere( 'facebook_users.facebook_user_display_name', 'LIKE', '%' . $term . '%' )
+						   ->orWhere( 'facebook_users.facebook_user_user_name', 'LIKE', '%' . $term . '%' )
+						   ->orWhere( 'google_users.google_user_display_name', 'LIKE', '%' . $term . '%' )
+						   ->orWhere( 'google_users.google_user_user_name', 'LIKE', '%' . $term . '%' );
+				 } )
+				 ->get();
+		if(count($results_user) > 0)
+		{
+			for( $i = 0; $i < count( $results_user ); $i++ )
+			{
+				$User = User::where( 'user_id', '=', $results_user[$i]->user_id )->first();
+				$current[ 'category' ] = 'onlyprofile';
+				$current[ 'user' ] = oneUser( $User, $session );		 
+				$return[ 'entries' ][ ][ 'entry' ] = $current;
+			}				
+		}			
+		for( $i = 0; $i < count( $results ); $i++ )
+		{
+			if( $results[ $i ]->entry_deleted === 1 )
+			{
+				continue;
+			}
+			else
+			{
+				$return[ 'entries' ][ ][ 'entry' ] = $this->oneEntryNew( $results[ $i ], $session, true );
+			}
+		}
+		return Response::make( $return, $status_code );
+	}
+
+	
 }
