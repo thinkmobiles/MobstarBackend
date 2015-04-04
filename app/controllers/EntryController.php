@@ -1110,7 +1110,7 @@ class EntryController extends BaseController
 
 	public function store()
 	{
-			
+
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
@@ -3345,7 +3345,6 @@ class EntryController extends BaseController
 							   ->orWhere( 'comments.comment_content', 'LIKE','%' . $term . '%' );
 					 } )
 					 ->groupBy('entry_id')
-					 ->orderBy( 'entry_category_id', 7 )
 					 ->get();
 		$status_code = 200;
 		if( count( $results ) == 0 )
