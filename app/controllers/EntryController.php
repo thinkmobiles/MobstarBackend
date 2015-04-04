@@ -3474,7 +3474,6 @@ class EntryController extends BaseController
 	
 	public function search4()
 	{
-
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
