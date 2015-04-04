@@ -3323,6 +3323,7 @@ class EntryController extends BaseController
 		$session = $this->token->get_session( $token );
 
 		$term = Input::get( "term" );		
+		$return = [ ];
 		//$excludeCategory = [7,8];
 		$results = DB::table( 'entries' )
 					 ->select( 'entries.*' )
@@ -3347,53 +3348,43 @@ class EntryController extends BaseController
 					 ->groupBy('entry_id')
 					 ->get();
 		$status_code = 200;
-		if( count( $results ) == 0 )
+		
+		$results_user = DB::table( 'users' )
+				 ->select( 'users.*' )
+				 ->leftJoin('facebook_users', 'users.user_facebook_id', '=', 'facebook_users.facebook_user_id')
+				 ->leftJoin('google_users', 'users.user_google_id', '=', 'google_users.google_user_id')
+				 ->where( 'users.user_deleted', '=', '0' )
+				 ->where( function ( $query ) use ( $term )
+				 {
+					 $query->orWhere( 'users.user_name', 'LIKE', '%' . $term . '%' )
+						   ->orWhere( 'users.user_full_name', 'LIKE', '%' . $term . '%' )
+						   ->orWhere( 'facebook_users.facebook_user_display_name', 'LIKE', '%' . $term . '%' )
+						   ->orWhere( 'facebook_users.facebook_user_user_name', 'LIKE', '%' . $term . '%' )
+						   ->orWhere( 'google_users.google_user_display_name', 'LIKE', '%' . $term . '%' )
+						   ->orWhere( 'google_users.google_user_user_name', 'LIKE', '%' . $term . '%' );
+				 } )
+				 ->get();
+		if(count($results_user) > 0)
 		{
-			$results = DB::table( 'users' )
-					 ->select( 'users.*' )
-					 ->leftJoin('facebook_users', 'users.user_facebook_id', '=', 'facebook_users.facebook_user_id')
-					 ->leftJoin('google_users', 'users.user_google_id', '=', 'google_users.google_user_id')
-					 ->where( 'users.user_deleted', '=', '0' )
-					 ->where( function ( $query ) use ( $term )
-					 {
-						 $query->orWhere( 'users.user_name', 'LIKE', '%' . $term . '%' )
-							   ->orWhere( 'users.user_full_name', 'LIKE', '%' . $term . '%' )
-							   ->orWhere( 'facebook_users.facebook_user_display_name', 'LIKE', '%' . $term . '%' )
-							   ->orWhere( 'facebook_users.facebook_user_user_name', 'LIKE', '%' . $term . '%' )
-							   ->orWhere( 'google_users.google_user_display_name', 'LIKE', '%' . $term . '%' )
-							   ->orWhere( 'google_users.google_user_user_name', 'LIKE', '%' . $term . '%' );
-					 } )
-					 ->get();
-			if(count($results) > 0)
+			for( $i = 0; $i < count( $results_user ); $i++ )
 			{
-				$User = User::where( 'user_id', '=', $results[0]->user_id )->first();
+				$User = User::where( 'user_id', '=', $results_user[$i]->user_id )->first();
 				$current[ 'category' ] = 'onlyprofile';
 				$current[ 'user' ] = oneUser( $User, $session );		 
 				$return[ 'entries' ][ ][ 'entry' ] = $current;
-				$status_code = 200;
+			}				
+		}			
+		for( $i = 0; $i < count( $results ); $i++ )
+		{
+			if( $results[ $i ]->entry_deleted === 1 )
+			{
+				continue;
 			}
 			else
 			{
-				$return = json_encode( [ 'error' => 'No Entries Found' ] );
-				$status_code = 404;
+				$return[ 'entries' ][ ][ 'entry' ] = $this->oneEntryNew( $results[ $i ], $session, true );
 			}
 		}
-		else
-		{
-			$return = [ ];
-			for( $i = 0; $i < count( $results ); $i++ )
-			{
-				if( $results[ $i ]->entry_deleted === 1 )
-				{
-					continue;
-				}
-				else
-				{
-					$return[ 'entries' ][ ][ 'entry' ] = $this->oneEntryNew( $results[ $i ], $session, true );
-				}
-			}
-		}
-
 		return Response::make( $return, $status_code );
 	}
 	public function videoupload()
