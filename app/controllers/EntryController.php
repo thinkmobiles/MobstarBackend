@@ -1110,17 +1110,7 @@ class EntryController extends BaseController
 
 	public function store()
 	{
-		try{
-			$myfile = $_ENV['PATH'] . 'public/entrypostlog.txt';
-			file_put_contents($myfile, date('d-m-Y H:i:s') . ' Post log:', FILE_APPEND);
-			file_put_contents($myfile, print_r($_POST, true), FILE_APPEND);
-			file_put_contents($myfile, '================++++++++++++++++++', FILE_APPEND);
-			file_put_contents($myfile, print_r($_FILES, true), FILE_APPEND);
-		}
-		catch(\League\Flysystem\Exception $ex){
-
-		}
-		
+			
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
