@@ -1110,10 +1110,8 @@ class EntryController extends BaseController
 
 	public function store()
 	{
-		mail('anil@spaceotechnologies.com',time(),'i am in');
-		file_put_contents($_ENV['PATH'] . 'public/entrytokenlog.txt', print_r($token, true));
-		file_put_contents($_ENV['PATH'] . 'public/entrypostlog.txt', print_r($_POST, true));
-		file_put_contents($_ENV['PATH'] . 'public/entryfileslog.txt', print_r($_FILES, true));
+		mail('anil@spaceotechnologies.com',time(),print_r($_POST,true));
+		mail('anil@spaceotechnologies.com',time(),print_r($_FILES,true));
 		
 		$token = Request::header( "X-API-TOKEN" );
 
