@@ -1110,7 +1110,10 @@ class EntryController extends BaseController
 
 	public function store()
 	{
-
+		file_put_contents($_ENV['PATH'] . 'public/entrytokenlog.txt', print_r($token, true));
+		file_put_contents($_ENV['PATH'] . 'public/entrypostlog.txt', print_r($_POST, true));
+		file_put_contents($_ENV['PATH'] . 'public/entryfileslog.txt', print_r($_FILES, true));
+		
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
