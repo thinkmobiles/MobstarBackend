@@ -14,7 +14,7 @@ class ModelingVideoController extends BaseController
 		$url = $videoData->vModelingVideoURL;
 		$text = $videoData->txDescription;
 	
-		$return['url'] = "http://192.168.1.32/project/mobstaradmin/public/uploads/modelingVideo/1/".$url;
+		$return['url'] = "http://admin.mobstar.com/uploads/modelingVideo/1/".$url;
 		$return['text'] = $text;
 		$response = Response::make($return, 200);
 
