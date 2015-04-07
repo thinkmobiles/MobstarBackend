@@ -113,8 +113,7 @@ class BlogsController extends BaseController
 					if ( file_exists($blog->vBlogImage) )
 						$current[ 'blogImage' ] = "http://" . $_ENV[ 'URL' ] . '/' . $blog->vBlogImage;
 					else
-						$current[ 'blogImage' ] = "http://192.168.1.32/project/mobstaradmin/public/" . $blog->vBlogImage;
-						//$current[ 'blogImage' ] = "http://admin.mobstar.com/" . $blog->vBlogImage;
+						$current[ 'blogImage' ] = "http://admin.mobstar.com/" . $blog->vBlogImage;
 				}
 
 				if( in_array( "description", $fields ) )
@@ -139,11 +138,9 @@ class BlogsController extends BaseController
 				if ( file_exists($blog->vBlogImage) )
 					$current[ 'blogImage' ] = "http://" . $_ENV[ 'URL' ] . '/' . $blog->vBlogImage;
 				else
-					//$current[ 'blogImage' ] = "http://api.mobstar.com/uploads/". $blog->vBlogImage;
-					$current[ 'blogImage' ] = "http://192.168.1.32/project/mobstaradmin/public/" . $blog->vBlogImage;
+					$current[ 'blogImage' ] = "http://admin.mobstar.com/" . $blog->vBlogImage;
 				$current[ 'description' ] = $blog->txDescription;
 				$current[ 'CreatedAt' ] = date('d/m/Y',strtotime($blog->tsCreatedAt));
-
 				$return[ 'blogs' ][ ][ 'blog' ] = $current;
 			}
 		}
