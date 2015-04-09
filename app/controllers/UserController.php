@@ -1586,7 +1586,7 @@ class UserController extends BaseController
 										  : '',
 									  'profileCover' => ( isset( $starred->User->user_cover_image ) )
 									  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_cover_image, '+60 minutes' ) : '',
-				  					  'isMyStar'  => Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $starred->User->user_id )->count(),		
+				  					  'isMyStar'  => Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $starred->User->user_id )->where( 'user_star_deleted', '!=', '1' )->count(),		
 					];
 				}
 			}
