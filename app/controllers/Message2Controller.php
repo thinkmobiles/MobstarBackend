@@ -135,6 +135,8 @@ class Message2Controller extends BaseController
 
 			$current[ 'lastMessage' ][ 'messageContent' ] = $lastMessage->message->message_body;
 			$current[ 'lastMessage' ][ 'messageSender' ] = oneUser( $lastMessage->message->sender, $session );
+			$current[ 'lastMessage' ][ 'messageReceived' ] = $lastMessage->message->message_created_date;
+
 
 			$current[ 'read' ] = $lastMessage->join_message_recipient_read;
 			$current[ 'participants' ] = [ ];
