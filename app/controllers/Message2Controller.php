@@ -76,7 +76,7 @@ class Message2Controller extends BaseController
 	 */
 	public function index()
 	{
-
+		/* Commented On 13-04-2015 
 		//Get limit to calculate pagination
 		$limit = ( Input::get( 'limit', '50' ) );
 
@@ -99,7 +99,7 @@ class Message2Controller extends BaseController
 		{
 			$previous = false;
 		}
-
+		*/
 		//Get current user
 		$token = Request::header( "X-API-TOKEN" );
 		$session = $this->token->get_session( $token );
@@ -107,7 +107,8 @@ class Message2Controller extends BaseController
 		$deleted = 0;
 
 		//Get users threads
-		$messages = $this->message->get_message_thread_new( $session[ 'token_user_id' ], $deleted, $limit, $offset, false );
+		//$messages = $this->message->get_message_thread_new( $session[ 'token_user_id' ], $deleted, $limit, $offset, false );
+		$messages = $this->message->get_message_thread_new( $session[ 'token_user_id' ], $deleted, false );
 		//var_dump($messages);
 		//break;
 
@@ -151,7 +152,7 @@ class Message2Controller extends BaseController
 		}
 
 		$status_code = 200;
-
+		/* Commented On 13-04-2015
 		//If the count is greater than the highest number of items displayed show a next link
 		if( $count > ( $limit * $page ) )
 		{
@@ -172,7 +173,7 @@ class Message2Controller extends BaseController
 		{
 			$return[ 'previous' ] = "http://api.mobstar.com/message/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
 		}
-
+		*/
 		$response = Response::make( $return, $status_code );
 
 		$response->header( 'X-Total-Count', $count );
