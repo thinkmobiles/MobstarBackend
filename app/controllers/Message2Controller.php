@@ -261,15 +261,15 @@ class Message2Controller extends BaseController
 
 		foreach( $thread->messageRecipients as $received )
 		{
-			if( $received->join_message_recipient_user_id == $session->token_user_id )
-			{
+			//if( $received->join_message_recipient_user_id == $session->token_user_id )
+			//{
 				$receivedMessages[ ] = [
 					'message'         => $received->message->message_body,
 					'messageSender'   => oneUser( $received->message->sender, $session ),
 					'messageReceived' => $received->message->message_created_date,
 					'messageRead'     => $received->join_message_recipient_read
 				];
-			}
+			//}
 		}
 
 		$current[ 'messages' ] = $receivedMessages;
