@@ -279,7 +279,7 @@ class Message2Controller extends BaseController
 		$dsort = array();
 		foreach ($receivedMessages as $key => $row)
 		{
-			$dsort[$key] = $row['message_created_date'];
+			$dsort[$key] = $row['messageReceived'];
 		}
 		array_multisort($dsort, SORT_DESC, $receivedMessages);
 		
