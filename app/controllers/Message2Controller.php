@@ -281,7 +281,7 @@ class Message2Controller extends BaseController
 		{
 			$dsort[$key] = $row['messageReceived'];
 		}
-		array_multisort($dsort, SORT_DESC, $receivedMessages);
+		array_multisort($dsort, SORT_ASC, $receivedMessages);
 		
 		$current[ 'messages' ] = $receivedMessages;
 
