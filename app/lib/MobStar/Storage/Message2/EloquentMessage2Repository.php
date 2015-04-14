@@ -70,7 +70,7 @@ class EloquentMessage2Repository implements Message2Repository
 
 			} );
 			
-			return $query->orderBy('join_message_recipient_id', 'asc')->get();
+			return $query->get();
 
 		}
 	}
