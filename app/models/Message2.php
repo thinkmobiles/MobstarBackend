@@ -22,5 +22,9 @@ class Message2 extends \Eloquent {
 	public function sender(){
 		return $this->hasOne('User', 'user_id', 'message_creator_id');
 	}
+	public function scopeOrdered($query)
+	{
+		return $query->orderBy('message_created_date', 'asc')->get();
+	}
 
 }
