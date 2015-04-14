@@ -275,7 +275,6 @@ class Message2Controller extends BaseController
 			}
 			//}
 		}
-		$receivedMessages;
 		$dsort = array();
 		foreach ($receivedMessages as $key => $row)
 		{

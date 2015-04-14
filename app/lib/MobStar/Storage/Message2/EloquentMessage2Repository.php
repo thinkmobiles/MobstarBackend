@@ -69,7 +69,7 @@ class EloquentMessage2Repository implements Message2Repository
 				return $query;
 
 			} );
-			
+
 			return $query->get();
 
 		}
