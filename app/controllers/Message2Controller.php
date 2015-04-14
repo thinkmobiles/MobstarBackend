@@ -258,18 +258,21 @@ class Message2Controller extends BaseController
 		$current[ 'threadId' ] = $thread->message_thread_thread_id;
 
 		$receivedMessages = [ ];
-
+		$tmp_check_msgId = [];
 		foreach( $thread->messageRecipients as $received )
 		{
 			//if( $received->join_message_recipient_user_id == $session->token_user_id )
 			//{
+			if( !in_array($received->join_message_recipient_message_id) , $tmp_check_msgId )
+			{
+				$tmp_check_msgId[ ]  = $received->message->message_id;
 				$receivedMessages[ ] = [
-					'message_id'         => $received->message->message_id,
 					'message'         => $received->message->message_body,
 					'messageSender'   => oneUser( $received->message->sender, $session ),
 					'messageReceived' => $received->message->message_created_date,
 					'messageRead'     => $received->join_message_recipient_read
 				];
+			}
 			//}
 		}
 
