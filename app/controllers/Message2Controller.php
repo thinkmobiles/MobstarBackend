@@ -260,11 +260,11 @@ class Message2Controller extends BaseController
 		$receivedMessages = [ ];
 		$tmp_check_msgId = [ ];
 		$message_created_date = array();
-		foreach ($inventory as $key => $row)
+		foreach ($thread->messageRecipients as $key => $row)
 		{
 			$message_created_date[$key] = $row['message_created_date'];
 		}
-		array_multisort($price, SORT_ASC, $thread->messageRecipients);
+		array_multisort($message_created_date, SORT_ASC, $thread->messageRecipients);
 		foreach( $thread->messageRecipients as $received )
 		{
 			//if( $received->join_message_recipient_user_id == $session->token_user_id )
