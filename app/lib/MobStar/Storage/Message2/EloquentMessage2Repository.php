@@ -54,8 +54,7 @@ class EloquentMessage2Repository implements Message2Repository
 		$query = MessageThread::with( 'messageParticipants', 'messageRecipients', 'messageRecipients');
 
 		if($thread)
-		{}
-			//return $query->find($thread);
+			return $query->find($thread);
 
 		else{
 			$query = $query->whereHas( 'messageParticipants', function ( $query ) use ( $user )
@@ -71,11 +70,9 @@ class EloquentMessage2Repository implements Message2Repository
 
 			} );
 
-			//return $query->get();
+			return $query->get();
 
 		}
-		dd(DB::getQueryLog());
-			die;
 	}
 
 	public function send_message( $input )
