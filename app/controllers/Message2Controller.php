@@ -258,7 +258,7 @@ class Message2Controller extends BaseController
 		$current[ 'threadId' ] = $thread->message_thread_thread_id;
 
 		$receivedMessages = [ ];
-		$tmp_check_msgId = [];
+		$tmp_check_msgId = [ ];
 		foreach( $thread->messageRecipients as $received )
 		{
 			//if( $received->join_message_recipient_user_id == $session->token_user_id )

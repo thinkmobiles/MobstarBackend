@@ -9,7 +9,7 @@ class MessageThread extends \Eloquent {
     public $timestamps = false;
 
 	public function messageRecipients(){
-		return $this->hasMany('MessageRecipients', 'join_message_recipient_thread_id')->orderBy('join_message_recipient_id', 'desc');
+		return $this->hasMany('MessageRecipients', 'join_message_recipient_thread_id')->orderBy('join_message_recipient_id', 'asc');
 	}
 
     public function messageParticipants(){
