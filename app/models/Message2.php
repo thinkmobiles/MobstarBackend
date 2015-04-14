@@ -24,7 +24,7 @@ class Message2 extends \Eloquent {
 	}
 	public function scopeOrdered($query)
 	{
-		return $query->orderBy('message_created_date', 'asc')->get();
+		return $query->orderBy('message_created_date', 'DESC')->get();
 	}
 
 }
