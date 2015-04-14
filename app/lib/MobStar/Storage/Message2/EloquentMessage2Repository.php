@@ -54,28 +54,27 @@ class EloquentMessage2Repository implements Message2Repository
 		$query = MessageThread::with( 'messageParticipants', 'messageRecipients', 'messageRecipients');
 
 		if($thread)
-			return $query->find($thread);
+			//return $query->find($thread);
 
 		else{
 			$query = $query->whereHas( 'messageParticipants', function ( $query ) use ( $user )
 			{
 				$query = $query->where( 'join_message_participant_user_id', '=', $user );
-				//$query = $query->where( 'join_message_participant_message_thread_id', '=', $thread );
 				return $query;
 			} );
 
 			$query = $query->whereHas( 'messageRecipients', function ( $query ) use ( $user )
 			{
 				$query = $query->where( 'join_message_recipient_user_id', '=', $user );
-				//$query = $query->where( 'join_message_recipient_thread_id', '=', $thread );
 				return $query;
 
 			} );
-			dd(DB::getQueryLog());
-			die;
-			return $query->get();
+
+			//return $query->get();
 
 		}
+		dd(DB::getQueryLog());
+			die;
 	}
 
 	public function send_message( $input )
