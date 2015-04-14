@@ -54,6 +54,7 @@ class EloquentMessage2Repository implements Message2Repository
 		$query = MessageThread::with( 'messageParticipants', 'messageRecipients', 'messageRecipients');
 
 		if($thread)
+		{}
 			//return $query->find($thread);
 
 		else{
