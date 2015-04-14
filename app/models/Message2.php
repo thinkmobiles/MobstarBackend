@@ -16,7 +16,7 @@ class Message2 extends \Eloquent {
 	}
 
     public function recipients(){
-        return $this->hasMany('MessageRecipients', 'join_message_recipient_message_id', 'message_id')->orderBy('join_message_recipient_id', 'asc');
+        return $this->hasMany('MessageRecipients', 'join_message_recipient_message_id', 'message_id');
     }
 
 	public function sender(){
