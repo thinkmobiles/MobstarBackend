@@ -314,7 +314,7 @@ class Message2Controller extends BaseController
 		$response = Response::make( $return, $status_code );
 
 //		$response->header( 'X-Total-Count', $count );
-		dd(DB::getQueryLog());
+
 		return $response;
 	}
 
