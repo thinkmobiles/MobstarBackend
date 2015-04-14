@@ -51,25 +51,27 @@ class EloquentMessage2Repository implements Message2Repository
 
 	public function get_message_thread_new( $user = 0, $thread = 0, $deleted = false, $limit = 50, $offset = 0, $count = false )
 	{
-		$query = MessageThread::with( 'messageParticipants', 'messageRecipients');
+		$query = MessageThread::with( 'messageParticipants', 'messageRecipients', 'messageRecipients');
 
 		if($thread)
 			return $query->find($thread);
 
 		else{
-			/*$query = $query->whereHas( 'messageParticipants', function ( $query ) use ( $user )
+			$query = $query->whereHas( 'messageParticipants', function ( $query ) use ( $user )
 			{
-				$query = $query->where( 'join_message_participant_user_id', '=', $user );
+				//$query = $query->where( 'join_message_participant_user_id', '=', $user );
+				$query = $query->where( 'join_message_participant_message_thread_id', '=', $thread );
 				return $query;
 			} );
 
 			$query = $query->whereHas( 'messageRecipients', function ( $query ) use ( $user )
 			{
-				$query = $query->where( 'join_message_recipient_user_id', '=', $user );
+				//$query = $query->where( 'join_message_recipient_user_id', '=', $user );
+				$query = $query->where( 'join_message_recipient_thread_id', '=', $thread );
 				return $query;
 
 			} );
-			*/
+
 			return $query->get();
 
 		}
