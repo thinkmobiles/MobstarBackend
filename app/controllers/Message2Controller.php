@@ -263,8 +263,6 @@ class Message2Controller extends BaseController
 		{
 			//if( $received->join_message_recipient_user_id == $session->token_user_id )
 			//{
-			if( !in_array($received->join_message_recipient_message_id,$receivedMessages))
-			{
 				$receivedMessages[ ] = [
 					'message_id'         => $received->message->message_id,
 					'message'         => $received->message->message_body,
@@ -272,7 +270,6 @@ class Message2Controller extends BaseController
 					'messageReceived' => $received->message->message_created_date,
 					'messageRead'     => $received->join_message_recipient_read
 				];
-			}
 			//}
 		}
 
