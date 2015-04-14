@@ -71,7 +71,8 @@ class EloquentMessage2Repository implements Message2Repository
 				return $query;
 
 			} );
-
+			dd(DB::getQueryLog());
+			die;
 			return $query->get();
 
 		}
