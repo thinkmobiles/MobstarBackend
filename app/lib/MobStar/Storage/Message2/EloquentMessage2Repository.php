@@ -66,12 +66,11 @@ class EloquentMessage2Repository implements Message2Repository
 			$query = $query->whereHas( 'messageRecipients', function ( $query ) use ( $user )
 			{
 				$query = $query->where( 'join_message_recipient_user_id', '=', $user );
-				$query->orderBy('join_message_recipient_id', 'asc');
 				return $query;
 
 			} );
 			
-			return $query->get();
+			return $query->orderBy('join_message_recipient_id', 'asc')->get();
 
 		}
 	}
