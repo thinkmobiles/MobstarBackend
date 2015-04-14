@@ -86,7 +86,7 @@ class EloquentMessage2Repository implements Message2Repository
 			$query = $query->where( 'join_message_participant_deleted_thread', '=', 0 );
 		}
 
-		$query = $query->get()->toArray();
+		$query = $query->get();
 
 		//break;
 		return $query;
