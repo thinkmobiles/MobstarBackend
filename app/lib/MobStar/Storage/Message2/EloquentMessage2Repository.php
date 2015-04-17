@@ -54,8 +54,10 @@ class EloquentMessage2Repository implements Message2Repository
 		$query = MessageThread::with( 'messageParticipants', 'messageRecipients', 'messageRecipients');
 
 		if($thread)
+		{
+			mail('anil@spaceotechnologies.com',time(), 'I am in');
 			return $query->find($thread);
-
+		}
 		else{
 			$query = $query->whereHas( 'messageParticipants', function ( $query ) use ( $user )
 			{
