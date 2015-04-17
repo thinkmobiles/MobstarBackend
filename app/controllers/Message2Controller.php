@@ -127,7 +127,7 @@ class Message2Controller extends BaseController
 
 			foreach( $message->messageRecipients as $received )
 			{
-				if( $received->join_message_recipient_user_id == $session->token_user_id && $received->join_message_recipient_created > $last )
+				if( $received->join_message_recipient_created > $last )
 				{
 					$lastMessage = $received;
 				}
