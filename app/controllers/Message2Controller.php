@@ -127,6 +127,10 @@ class Message2Controller extends BaseController
 
 			foreach( $message->messageRecipients as $received )
 			{
+				if( $received->join_message_recipient_created > $last )
+				{
+					$lastMessage = $received;
+				}
 				if($received->join_message_recipient_user_id == $session->token_user_id)
 				{
 					$msgs = MessageRecipients::where( 'join_message_recipient_id', '=',$received->join_message_recipient_user_id)
@@ -138,10 +142,6 @@ class Message2Controller extends BaseController
 						$msgs->join_message_recipient_read_date = date( "Y-m-d H:i:s" );
 						$msgs->save();
 					}					
-				}
-				if( $received->join_message_recipient_created > $last )
-				{
-					$lastMessage = $received;
 				}
 			}
 
