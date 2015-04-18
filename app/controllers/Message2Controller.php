@@ -131,7 +131,7 @@ class Message2Controller extends BaseController
 				{
 					$msgs = MessageRecipients::where( 'join_message_recipient_id', '=',$received->join_message_recipient_user_id)
 					->where('join_message_recipient_thread_id', '=', $threadId )
-					->where('join_message_recipient_user_id','=',$session->token_user_id)->->first();
+					->where('join_message_recipient_user_id','=',$session->token_user_id)->first();
 					if( $msgs )
 					{
 						$msgs->join_message_recipient_read = '1';
