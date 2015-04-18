@@ -749,7 +749,7 @@ public function reply()
 						'join_message_recipient_read'       => 1
 					] );
 
-					if($input['type'] != 'allVoters' && $input['type'] != 'starred' && $input['type'] != 'voters' && $input['type'] != 'commenters')
+					if($input['type'] != 'allVoters' || $input['type'] != 'starred' || $input['type'] != 'voters' || $input['type'] != 'commenters')
 					MessageParticipants::insert( $particArray );
 
 					MessageRecipients::insert( $recipArray );
