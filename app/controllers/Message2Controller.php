@@ -267,6 +267,7 @@ class Message2Controller extends BaseController
 			{
 				$tmp_check_msgId[ ]  = $received->message->message_id;
 				$receivedMessages[ ] = [
+					'message_id'      => $received->message->message_id,
 					'message'         => $received->message->message_body,
 					'messageSender'   => oneUser( $received->message->sender, $session ),
 					'messageReceived' => $received->message->message_created_date,
