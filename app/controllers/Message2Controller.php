@@ -735,7 +735,7 @@ public function reply()
 						];
 
 					}
-
+					
 					array_push( $particArray, [
 						'join_message_participant_message_thread_id' => $messageThread->message_thread_thread_id,
 						'join_message_participant_user_id'           => $session->token_user_id,
@@ -749,6 +749,7 @@ public function reply()
 						'join_message_recipient_read'       => 1
 					] );
 
+					if($input['type'] != 'allVoters' || $input['type'] != 'starred')
 					MessageParticipants::insert( $particArray );
 
 					MessageRecipients::insert( $recipArray );
