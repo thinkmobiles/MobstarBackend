@@ -762,4 +762,79 @@ public function reply()
 
 		return Response::make($response, $status_code);
 	}
+	public function deleteThread()
+	{
+		$rules = array(
+			'threadId'  => 'required|exists:message_threads,message_thread_thread_id',
+		);
+
+		$validator = Validator::make( Input::get(), $rules );
+		
+		if( $validator->fails() )
+		{
+			$response[ 'errors' ] = $validator->messages();
+			$status_code = 400;
+		}
+		else
+		{
+			$threadId = Input::get( 'threadId' );
+
+			//Get current user
+			$token = Request::header( "X-API-TOKEN" );
+			$session = $this->token->get_session( $token );
+
+			$threads = Message2::where( 'message_thread_id','=', $threadId )
+			->where('message_deleted','=',0)->get();
+
+			foreach( $threads as $thread )
+			{
+				if( $thread->message_deleted == 1 )
+				{
+					continue;
+				}
+				else
+				{
+					$thread->message_deleted = 1;
+
+					$thread->save();
+				}
+			}
+
+			$messageRecipientThread = MessageRecipients::where( 'join_message_recipient_thread_id','=', $threadId )
+			->get();
+			foreach ($messageRecipientThread as $thread) 
+			{
+				$thread->delete();
+			}
+
+			$messageParticipantThread = MessageParticipants::where( 'join_message_participant_message_thread_id','=', $threadId )
+			->get();
+			foreach ($messageParticipantThread as $thread) 
+			{
+				$thread->delete();
+			}
+
+			$messagesThread = Message2::where( 'message_thread_id','=', $threadId )
+			->where('message_deleted','=',1)->get();
+			foreach ($messagesThread as $thread) 
+			{
+				$thread->delete();
+			}
+
+			$threadToDelete = MessageThread::where('message_thread_thread_id','=',$threadId)
+			->get();
+			foreach ($threadToDelete as $thread) 
+			{
+				$thread->delete();
+			}
+
+			
+			$response['message'] = "Thread deleted successfully.";
+			$status_code = 200;
+		}
+
+		return Response::make($response, $status_code);
+	}
+
+
 }
