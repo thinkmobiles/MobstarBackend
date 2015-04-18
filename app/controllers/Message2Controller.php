@@ -735,7 +735,7 @@ public function reply()
 						];
 
 					}
-					if($input['type'] != 'allVoters' || $input['type'] != 'starred' || $input['type'] != 'voters' || $input['type'] != 'commenters')
+					if($input['type'] != 'allVoters' && $input['type'] != 'starred' && $input['type'] != 'voters' && $input['type'] != 'commenters')
 					{
 						array_push( $particArray, [
 							'join_message_participant_message_thread_id' => $messageThread->message_thread_thread_id,
