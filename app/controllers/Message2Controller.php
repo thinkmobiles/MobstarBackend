@@ -735,21 +735,21 @@ public function reply()
 						];
 
 					}
-					
-					array_push( $particArray, [
-						'join_message_participant_message_thread_id' => $messageThread->message_thread_thread_id,
-						'join_message_participant_user_id'           => $session->token_user_id,
-					] );
-
-					array_push( $recipArray, [
-						'join_message_recipient_thread_id'  => $messageThread->message_thread_thread_id,
-						'join_message_recipient_user_id'    => $session->token_user_id,
-						'join_message_recipient_message_id' => $messageOb->message_id,
-						'join_message_recipient_created'    => 1,
-						'join_message_recipient_read'       => 1
-					] );
-
 					if($input['type'] != 'allVoters' || $input['type'] != 'starred' || $input['type'] != 'voters' || $input['type'] != 'commenters')
+					{
+						array_push( $particArray, [
+							'join_message_participant_message_thread_id' => $messageThread->message_thread_thread_id,
+							'join_message_participant_user_id'           => $session->token_user_id,
+						] );
+
+						array_push( $recipArray, [
+							'join_message_recipient_thread_id'  => $messageThread->message_thread_thread_id,
+							'join_message_recipient_user_id'    => $session->token_user_id,
+							'join_message_recipient_message_id' => $messageOb->message_id,
+							'join_message_recipient_created'    => 1,
+							'join_message_recipient_read'       => 1
+						] );
+					}
 					MessageParticipants::insert( $particArray );
 
 					MessageRecipients::insert( $recipArray );
