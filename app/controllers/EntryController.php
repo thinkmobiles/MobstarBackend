@@ -2160,6 +2160,8 @@ class EntryController extends BaseController
 				}
 				else
 				{
+					if(!$this->oneEntryNew( $results[ $i ], $session, true ))
+						continue;
 					$return[ 'entries' ][ ][ 'entry' ] = $this->oneEntryNew( $results[ $i ], $session, true );
 				}
 			}
@@ -2416,6 +2418,8 @@ class EntryController extends BaseController
 				}
 				else
 				{
+					if(!$this->oneEntryNew( $results[ $i ], $session, true ))
+						continue;
 					$return[ 'entries' ][ ][ 'entry' ] = $this->oneEntryNew( $results[ $i ], $session, true );
 				}
 			}
@@ -2482,6 +2486,19 @@ class EntryController extends BaseController
 
 		$current[ 'entryFiles' ] = array();
 		$EntryFile = EntryFile::where( 'entry_file_entry_id', '=', $entry->entry_id )->get();
+		/*foreach( $EntryFile as $file )
+		{
+			$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
+			$current[ 'entryFiles' ][ ] = [
+				'fileType' => $file->entry_file_type,
+				'filePath' => $url ];
+
+			$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
+				$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
+				: "";
+		}*/
+		if(count($EntryFile) <= 0)
+			return false;		
 		foreach( $EntryFile as $file )
 		{
 			$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
@@ -2492,6 +2509,14 @@ class EntryController extends BaseController
 			$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
 				$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
 				: "";
+		}
+		if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
+		{
+			return false;
+		}
+		if( ( count( $current[ 'entryFiles' ] ) < 1 ) &&  $entry->entry_type === 'video' )
+		{
+			return false;
 		}
 
 		$current[ 'upVotes' ] = $up_votes;
@@ -3390,6 +3415,8 @@ class EntryController extends BaseController
 				}
 				else
 				{
+					if(!$this->oneEntryNew( $results[ $i ], $session, true ))
+						continue;
 					$return[ 'entries' ][ ][ 'entry' ] = $this->oneEntryNew( $results[ $i ], $session, true );
 				}
 			}
@@ -3539,6 +3566,8 @@ class EntryController extends BaseController
 			}
 			else
 			{
+				if(!$this->oneEntryNew( $results[ $i ], $session, true ))
+					continue;
 				$return[ 'entries' ][ ][ 'entry' ] = $this->oneEntryNew( $results[ $i ], $session, true );
 			}
 		}
