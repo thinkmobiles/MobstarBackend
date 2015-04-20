@@ -159,6 +159,8 @@ class Message2Controller extends BaseController
 								->pluck( 'join_message_recipient_read' );
 
 			//$current[ 'read' ] = $lastMessage->join_message_recipient_read;
+			if(is_null($msgread))
+			$msgread = 0;
 			$current[ 'read' ] = $msgread;
 			
 			$current[ 'participants' ] = [ ];
