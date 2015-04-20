@@ -1740,6 +1740,8 @@ class UserController extends BaseController
 	}
 	public function msgcount()
 	{
-		die('here');
+		$return = [ 'error' => 'i m in' ];
+		$status_code = 404;
+		return Response::make( $return , 200 );
 	}
 }
