@@ -230,7 +230,7 @@ class Message2Controller extends BaseController
 	 */
 	public function show( $thread )
 	{
-
+		die('here23');
 		//Get limit to calculate pagination
 		$limit = ( Input::get( 'limit', '50' ) );
 
