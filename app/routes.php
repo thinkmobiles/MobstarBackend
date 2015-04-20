@@ -367,9 +367,9 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "message/bulk",
 			"uses" => "Message2Controller@bulk"
 		] );		
-		Route::get( "message/messagecount", [
-			"as"   => "message/messagecount",
-			"uses" => "Message2Controller@messagecount"
+		Route::get( "message/msgnotification", [
+			"as"   => "message/msgnotification",
+			"uses" => "Message2Controller@msgnotification"
 		] );
 		
 //		Route::delete( "message/", [

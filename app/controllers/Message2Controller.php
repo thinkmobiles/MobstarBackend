@@ -28,10 +28,6 @@ class Message2Controller extends BaseController
 		$this->token = $token;
 		$this->entry = $entry;
 	}
-	public function messagecount()
-	{
-		die('here');
-	}
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -851,4 +847,54 @@ public function reply()
 
 		return Response::make($response, $status_code);
 	}
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/message/msgnotification",
+	 *   description="Operation about message",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="GET",
+	 *       summary="Get the total number of unread message for a user",
+	 *       notes="Show message count.",
+	 *       nickname="allMessages",
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+
+	public function msgnotification()
+	{
+		die('here');
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+		$count = DB::table( 'messages' )
+					->select( 'messages.message_id' )
+					->leftJoin('message_threads', 'message_threads.message_thread_thread_id', '=', 'messages.message_thread_id')
+					->leftJoin( 'join_message_participants', 'join_message_participants.join_message_participant_message_thread_id', '=', 'message_threads.message_thread_thread_id' )
+					->leftJoin( 'join_message_recipients', 'join_message_recipients.join_message_recipient_thread_id', '=', 'join_message_recipients.join_message_participant_message_thread_id' )
+					->where( 'join_message_recipients.join_message_recipient_user_id', '=', $session->token_user_id )
+					->where('join_message_recipients.join_message_recipient_read', '=', 0)
+					->where( 'join_message_participants.join_message_participant_deleted_thread', '=', 0)
+					->where( 'messages.message_deleted', '=', '0' )
+					->count();	
+
+		$return[ 'notifications' ]= $count;
+
+		$status_code = 200;
+
+		$response = Response::make( $return, $status_code );
+
+		$response->header( 'X-Total-Count', $count );
+
+		return $response;
+	}
+
 }
