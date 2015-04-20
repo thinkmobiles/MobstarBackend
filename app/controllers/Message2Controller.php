@@ -879,7 +879,6 @@ public function reply()
 	}
 	public function read()
 	{
-		die('ggg');
 		$rules = array(
 			'threadId'  => 'required|exists:message_threads,message_thread_thread_id',
 		);
