@@ -916,5 +916,6 @@ public function reply()
 			$status_code = 200;			
 		}
 		$response = Response::make( $return, $status_code );
+		return $response;
 	}
 }
