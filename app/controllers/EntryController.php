@@ -2550,9 +2550,9 @@ class EntryController extends BaseController
 					->where('join_message_recipients.join_message_recipient_read', '=', 0)
 					->where( 'join_message_participants.join_message_participant_deleted_thread', '=', 0)
 					->where( 'messages.message_deleted', '=', '0' )
-					->groupBy('messages.message_id')
+					->groupBy('messages.join_message_recipient_id')
 					->count();	
-		dd(DB::getQueryLog());
+		//dd(DB::getQueryLog());
 		$return[ 'notifications' ]= $count;
 
 		$status_code = 200;
