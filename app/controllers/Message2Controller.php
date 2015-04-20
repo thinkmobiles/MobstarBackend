@@ -847,4 +847,24 @@ public function reply()
 
 		return Response::make($response, $status_code);
 	}
+	public function newmessagecount()
+	{
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );		
+		$count = DB::table( 'join_message_recipients' )
+					->select( 'join_message_recipients.*' )
+					->where( 'join_message_recipients.join_message_recipient_user_id', '=', $session->token_user_id )
+					->where('join_message_recipients.join_message_recipient_read', '=', 0)
+					->count();	
+		$return[ 'notifications' ]= $count;
+
+		$status_code = 200;
+
+		$response = Response::make( $return, $status_code );
+
+		$response->header( 'X-Total-Count', $count );
+
+		return $response;
+	}
 }
