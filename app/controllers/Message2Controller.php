@@ -847,6 +847,9 @@ public function reply()
 
 		return Response::make($response, $status_code);
 	}
-
+	public function messagecount()
+	{
+		die('here');
+	}
 
 }
