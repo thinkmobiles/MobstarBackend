@@ -848,20 +848,6 @@ public function reply()
 	}
 	public function msgcount()
 	{
-		die('here');
-		$token = Request::header( "X-API-TOKEN" );
-
-		$session = $this->token->get_session( $token );
-			
-
-		$return[ 'notifications' ]= $count;
-
-		$status_code = 200;
-
-		$response = Response::make( $return, $status_code );
-
-		$response->header( 'X-Total-Count', $count );
-
-		return $response;
+		die('here');		
 	}	
 }
