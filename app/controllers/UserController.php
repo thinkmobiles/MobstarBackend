@@ -1740,7 +1740,6 @@ class UserController extends BaseController
 	}
 	public function msgcount()
 	{
-		die('here');
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
