@@ -2538,7 +2538,7 @@ class EntryController extends BaseController
 
 	public function dummytest()
 	{
-
+		die('get shit in');
 		/*$exclude = [ ];
 		$entry_rank = DB::table('entries')->where( 'entry_rank', '=', '0')->get();
 		foreach( $entry_rank as $rank )
