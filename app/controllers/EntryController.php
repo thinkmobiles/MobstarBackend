@@ -2545,7 +2545,7 @@ class EntryController extends BaseController
 					->select( 'messages.message_id' )
 					->leftJoin('message_threads', 'message_threads.message_thread_thread_id', '=', 'messages.message_thread_id')
 					->leftJoin( 'join_message_participants', 'join_message_participants.join_message_participant_message_thread_id', '=', 'message_threads.message_thread_thread_id' )
-					->leftJoin( 'join_message_recipients', 'join_message_recipients.join_message_recipient_thread_id', '=', 'join_message_recipients.join_message_participant_message_thread_id' )
+					->leftJoin( 'join_message_recipients', 'join_message_recipients.join_message_recipient_thread_id', '=', 'message_threads.message_thread_thread_id' )
 					->where( 'join_message_recipients.join_message_recipient_user_id', '=', $session->token_user_id )
 					->where('join_message_recipients.join_message_recipient_read', '=', 0)
 					->where( 'join_message_participants.join_message_participant_deleted_thread', '=', 0)
