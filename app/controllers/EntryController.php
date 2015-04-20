@@ -2552,7 +2552,7 @@ class EntryController extends BaseController
 					->where( 'messages.message_deleted', '=', '0' )
 					->groupBy('messages.message_id')
 					->count();	
-
+		dd(DB::getQueryLog());
 		$return[ 'notifications' ]= $count;
 
 		$status_code = 200;
