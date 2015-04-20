@@ -847,28 +847,6 @@ public function reply()
 
 		return Response::make($response, $status_code);
 	}
-	/**
-	 *
-	 * @SWG\Api(
-	 *   path="/message/msgnotification",
-	 *   description="Operation about message",
-	 *   @SWG\Operations(
-	 *     @SWG\Operation(
-	 *       method="GET",
-	 *       summary="Get the total number of unread message for a user",
-	 *       notes="Show message count.",
-	 *       nickname="allMessages",
-	 *       @SWG\ResponseMessages(
-	 *          @SWG\ResponseMessage(
-	 *            code=401,
-	 *            message="Authorization failed"
-	 *          )
-	 *       )
-	 *     )
-	 *   )
-	 * )
-	 */
-
 	public function msgnotification()
 	{
 		die('here');
