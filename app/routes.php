@@ -368,9 +368,9 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "Message2Controller@bulk"
 		] );
 		
-		Route::post( "message/newmessagecount", [
-			"as"   => "message/newmessagecount",
-			"uses" => "Message2Controller@newmessagecount"
+		Route::post( "message/msgcount", [
+			"as"   => "message/msgcount",
+			"uses" => "Message2Controller@msgcount"
 		] );
 //		Route::delete( "message/", [
 //			"as"   => "message/destroy",

@@ -847,7 +847,7 @@ public function reply()
 
 		return Response::make($response, $status_code);
 	}
-	public function newmessagecount()
+	public function msgcount()
 	{
 		$token = Request::header( "X-API-TOKEN" );
 
