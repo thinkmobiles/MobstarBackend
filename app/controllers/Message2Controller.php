@@ -124,9 +124,13 @@ class Message2Controller extends BaseController
 			$current[ 'threadId' ] = $message->message_thread_thread_id;
 
 			$last = -1;
-
+			$msgread = '0';
 			foreach( $message->messageRecipients as $received )
 			{
+				if($received->join_message_recipient_user_id != $session->token_user_id)
+				{
+					$msgread = $received->join_message_recipient_read;
+				}
 				if( $received->join_message_recipient_created > $last )
 				{
 					$lastMessage = $received;
@@ -149,8 +153,15 @@ class Message2Controller extends BaseController
 			$current[ 'lastMessage' ][ 'messageSender' ] = oneUser( $lastMessage->message->sender, $session );
 			$current[ 'lastMessage' ][ 'messageReceived' ] = $lastMessage->message->message_created_date;
 
-
-			$current[ 'read' ] = $lastMessage->join_message_recipient_read;
+			if($received->join_message_recipient_user_id != $session->token_user_id)
+			{
+				$current[ 'read' ] = $msgread;
+			}
+			else
+			{
+				$current[ 'read' ] = $lastMessage->join_message_recipient_read;
+			}
+			
 			$current[ 'participants' ] = [ ];
 
 			foreach( $message->messageParticipants as $participant )
