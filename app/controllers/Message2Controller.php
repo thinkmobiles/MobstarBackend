@@ -872,7 +872,7 @@ public function reply()
 
 	public function count()
 	{
-
+		die('here');
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
