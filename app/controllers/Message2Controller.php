@@ -230,7 +230,6 @@ class Message2Controller extends BaseController
 	 */
 	public function show( $thread )
 	{
-		die('here23');
 		//Get limit to calculate pagination
 		$limit = ( Input::get( 'limit', '50' ) );
 
@@ -851,7 +850,7 @@ public function reply()
 	/**
 	 *
 	 * @SWG\Api(
-	 *   path="/message/count",
+	 *   path="/message/msgcount",
 	 *   description="Operation about message",
 	 *   @SWG\Operations(
 	 *     @SWG\Operation(
@@ -870,7 +869,7 @@ public function reply()
 	 * )
 	 */
 
-	public function count()
+	public function msgcount()
 	{
 		die('here');
 		$token = Request::header( "X-API-TOKEN" );
