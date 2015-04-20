@@ -28,6 +28,10 @@ class Message2Controller extends BaseController
 		$this->token = $token;
 		$this->entry = $entry;
 	}
+	public function messagecount()
+	{
+		die('here');
+	}
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -847,9 +851,4 @@ public function reply()
 
 		return Response::make($response, $status_code);
 	}
-	public function messagecount()
-	{
-		die('here');
-	}
-
 }
