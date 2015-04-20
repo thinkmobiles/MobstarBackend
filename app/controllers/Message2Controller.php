@@ -915,6 +915,7 @@ public function reply()
 					$msg->save();
 				}
 			}					
+			$response['message'] = "Thread read successfully.";
 			$status_code = 200;			
 		}
 		$response = Response::make( $response, $status_code );
