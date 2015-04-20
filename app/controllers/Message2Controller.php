@@ -867,4 +867,43 @@ public function reply()
 
 		return $response;
 	}
+	public function read()
+	{
+		$rules = array(
+			'threadId'  => 'required|exists:message_threads,message_thread_thread_id',
+		);
+		$validator = Validator::make( Input::get(), $rules );
+
+		if( $validator->fails() )
+		{
+			$response[ 'errors' ] = $validator->messages();
+			$status_code = 400;
+		}
+		else
+		{
+			$threadId = Input::get( 'threadId' );
+
+			//Get current user
+			$token = Request::header( "X-API-TOKEN" );
+			$session = $this->token->get_session( $token );
+
+			
+			$messageToRead = MessageRecipients::where('join_message_recipient_user_id','=',$session->token_user_id)
+								->where('join_message_recipient_thread_id','=',$threadId)
+								->get();
+			foreach ($messageToRead as $msg) 
+			{
+				if( $msg->join_message_recipient_read == 1 )
+				{
+					continue;
+				}
+				else
+				{
+					$msg->join_message_recipient_read = 1;
+					$msg->save();
+				}
+			}					
+
+		}
+	}
 }
