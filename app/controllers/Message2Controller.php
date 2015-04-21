@@ -994,12 +994,13 @@ public function reply()
 			 	'TargetArn' => $endpointDetails['EndpointArn'],
 			 	'MessageStructure' => 'json',
 			 	 'Message' => json_encode(array(
-					'default' => '',
+					'default' => 'New message from MobStar',
 					//'APNS_SANDBOX' => json_encode(array(
 					'APNS' => json_encode(array(
 						'aps' => array(
 							"sound" => "default",
-							"badge"=> intval(0),
+							"alert"=> 'New message from MobStar',
+							"badge"=> intval(0),							
 						)
 					)),
 				))
@@ -1011,10 +1012,10 @@ public function reply()
 			 	'TargetArn' => $endpointDetails['EndpointArn'],
 			 	'MessageStructure' => 'json',
 			 	'Message' => json_encode(array(
-					'default' => '',
+					'default' => 'New message from MobStar',
 					'GCM'=>json_encode(array(
 						'data'=>array(
-							'message'=> ''
+							'message'=> 'New message from MobStar'
 						)
 					))
 				))
