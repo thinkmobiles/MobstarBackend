@@ -468,7 +468,7 @@ public function store()
 			'join_message_recipient_read'       => 1
 		] );
 		print_r($recipArray);
-		die($recipArray[1]);
+		die($recipArray[1]['join_message_recipient_user_id']);
 		MessageParticipants::insert( $particArray );
 
 		MessageRecipients::insert( $recipArray );
