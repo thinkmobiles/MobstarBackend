@@ -467,14 +467,14 @@ public function store()
 			'join_message_recipient_created'    => 1,
 			'join_message_recipient_read'       => 1
 		] );
-
+		die($recipArray[1]);
 		MessageParticipants::insert( $particArray );
 
 		MessageRecipients::insert( $recipArray );
 		
 		for($i=0; $i<count($recipArray);$i++)
 		{	
-			$u = $recipArray[$i];
+			echo $u = $recipArray[$i];
 			if($u != $session->token_user_id)
 			{
 				$usersData = DB::select( DB::raw("SELECT t1.* FROM 
