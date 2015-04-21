@@ -1048,7 +1048,8 @@ public function reply()
 					'APNS' => json_encode(array(
 						'aps' => array(
 							"sound" => "default",
-							"alert"=> 'New message from MobStar',
+							"content-available" => 1,
+							//"alert"=> 'New message from MobStar',
 							"badge"=> intval(1),							
 						)
 					)),
