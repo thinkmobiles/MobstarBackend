@@ -3315,15 +3315,22 @@ class EntryController extends BaseController
 					{
 						$starNames = [];
 						$starNames = userDetails($starred->User);
-						$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
-										  'starName'     => $starNames['displayName'],
-										  'starredDate'  => $starred->user_star_created_date,
-										  'profileImage' => ( isset( $starred->User->user_profile_image ) )
-											  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+720 minutes' )
-											  : '',
-										  'profileCover' => ( isset( $starred->User->user_cover_image ) )
-										  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_cover_image, '+720 minutes' ) : '',	  
-						];
+						if(!empty($starNames))
+						{
+							$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
+											  'starName'     => $starNames['displayName'],
+											  'starredDate'  => $starred->user_star_created_date,
+											  'profileImage' => ( isset( $starred->User->user_profile_image ) )
+												  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+720 minutes' )
+												  : '',
+											  'profileCover' => ( isset( $starred->User->user_cover_image ) )
+											  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_cover_image, '+720 minutes' ) : '',	  
+							];
+						}
+						else
+						{
+							continue;
+						}
 					}
 				}
 			//}
