@@ -1000,7 +1000,7 @@ public function reply()
 						'aps' => array(
 							"sound" => "default",
 							"alert"=> 'New message from MobStar',
-							"badge"=> intval(0),							
+							"badge"=> intval(1),							
 						)
 					)),
 				))
