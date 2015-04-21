@@ -467,15 +467,13 @@ public function store()
 			'join_message_recipient_created'    => 1,
 			'join_message_recipient_read'       => 1
 		] );
-		print_r($recipArray);
-		die($recipArray[1]['join_message_recipient_user_id']);
 		MessageParticipants::insert( $particArray );
 
 		MessageRecipients::insert( $recipArray );
 		
 		for($i=0; $i<count($recipArray);$i++)
 		{	
-			echo $u = $recipArray[$i];
+			$u = $recipArray[$i]['join_message_recipient_user_id'];
 			if($u != $session->token_user_id)
 			{
 				$usersData = DB::select( DB::raw("SELECT t1.* FROM 
@@ -484,7 +482,7 @@ public function store()
 							order by device_registration_date_created desc
 							) t1 left join users u on t1.device_registration_user_id = u.user_id 
 							where u.user_deleted = 0 
-							AND u.user_id = ".$u."
+							AND u.user_id = $u
 							group by u.user_id 
 							order by t1.device_registration_date_created desc"));
 
