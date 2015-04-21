@@ -405,7 +405,6 @@ function getSNSClient()
 
 function userDetails($user)
 {
-	mail('anil@spaceotechnologies.com','in user',print_r($user));
 	$return = [];
 	if( ( $user->user_display_name == '' ) || ( is_null( $user->user_name ) ) || ( is_null( $user->user_email ) ) )
 	{
@@ -434,7 +433,6 @@ function userDetails($user)
 		$return[ 'displayName' ] = $user->user_display_name;
 		$return[ 'fullName' ] = $user->user_full_name;
 	}
-	mail('anil@spaceotechnologies.com','out user',print_r($return));
 	return $return;
 }
 function getusernamebyid($userid)

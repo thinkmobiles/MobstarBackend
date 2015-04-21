@@ -3298,23 +3298,24 @@ class EntryController extends BaseController
 		{
 			$aj = User::find( $user );
 			$starredBy = [ ];
-			
-			foreach( $aj->StarredBy as $starred )
+			if(!empty($aj->StarredBy))
 			{
-				if( $starred->user_star_deleted == 0 )
+				foreach( $aj->StarredBy as $starred )
 				{
-					$starNames = [];
-					$starNames = userDetails($starred->User);
-					mail('anil@spaceotechnologies.com',time(),print_r($starNames));
-					$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
-									  'starName'     => $starNames['displayName'],
-									  'starredDate'  => $starred->user_star_created_date,
-									  'profileImage' => ( isset( $starred->User->user_profile_image ) )
-										  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+720 minutes' )
-										  : '',
-									  'profileCover' => ( isset( $starred->User->user_cover_image ) )
-									  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_cover_image, '+720 minutes' ) : '',	  
-					];
+					if( $starred->user_star_deleted == 0 )
+					{
+						$starNames = [];
+						$starNames = userDetails($starred->User);
+						$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
+										  'starName'     => $starNames['displayName'],
+										  'starredDate'  => $starred->user_star_created_date,
+										  'profileImage' => ( isset( $starred->User->user_profile_image ) )
+											  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+720 minutes' )
+											  : '',
+										  'profileCover' => ( isset( $starred->User->user_cover_image ) )
+										  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_cover_image, '+720 minutes' ) : '',	  
+						];
+					}
 				}
 			}
 			$return[ 'starredBy' ] = $starredBy;
