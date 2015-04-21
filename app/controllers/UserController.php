@@ -1570,7 +1570,9 @@ class UserController extends BaseController
 		if( $user != 0 )
 		{
 			$user = User::find( $user );
-			mail('anil@spaceotechnologies.com', time(), print_r($user, true));
+			$results = DB::table( 'user_stars' )
+					 ->select( 'user_stars.*' )					 
+					 ->get();
 			$starredBy = [ ];
 			foreach( $user->StarredBy as $starred )
 			{
