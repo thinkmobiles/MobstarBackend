@@ -1573,7 +1573,7 @@ class UserController extends BaseController
 			$results = DB::table( 'user_stars' )
 					 ->select( 'user_stars.*' )					 
 					 ->join( 'users', 'user_stars.user_star_star_id', '=', 'users.user_id' )
-					 ->where( 'user_stars.entry_deleted', '=', '0' )
+					 ->where( 'user_stars.user_star_deleted', '=', '0' )
 					 ->where( 'users.user_deleted', '=', '0' )
 					 ->where( 'users.user_star_user_id', '=', $user )
 					 ->get();
