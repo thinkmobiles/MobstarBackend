@@ -483,7 +483,7 @@ public function store()
 							order by device_registration_date_created desc
 							) t1 left join users u on t1.device_registration_user_id = u.user_id 
 							where u.user_deleted = 0 
-							AND u.user_id = $u
+							AND u.user_id = ".$u."
 							group by u.user_id 
 							order by t1.device_registration_date_created desc"));
 
@@ -1012,10 +1012,10 @@ public function reply()
 			 	'TargetArn' => $endpointDetails['EndpointArn'],
 			 	'MessageStructure' => 'json',
 			 	'Message' => json_encode(array(
-					'default' => $message,
+					'default' => '',
 					'GCM'=>json_encode(array(
 						'data'=>array(
-							'message'=> $message
+							'message'=> ''
 						)
 					))
 				))
