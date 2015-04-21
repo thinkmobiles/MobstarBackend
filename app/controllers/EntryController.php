@@ -3307,8 +3307,8 @@ class EntryController extends BaseController
 		{
 			$aj = User::find( $user );
 			$starredBy = [ ];
-			if(!empty($aj->StarredBy))
-			{
+			//if(!empty($aj->StarredBy))
+			//{
 				foreach( $aj->StarredBy as $starred )
 				{
 					if( $starred->user_star_deleted == 0 )
@@ -3326,7 +3326,7 @@ class EntryController extends BaseController
 						];
 					}
 				}
-			}
+			//}
 			$return[ 'starredBy' ] = $starredBy;
 			$return['fans'] = count($starredBy);
 		}
