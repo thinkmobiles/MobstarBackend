@@ -1570,11 +1570,16 @@ class UserController extends BaseController
 		if( $user != 0 )
 		{
 			$user = User::find( $user );
-			/*$results = DB::table( 'user_stars' )
+			$results = DB::table( 'user_stars' )
 					 ->select( 'user_stars.*' )					 
-					 ->get();*/
+					 ->join( 'users', 'user_stars.user_star_star_id', '=', 'users.user_id' )
+					 ->where( 'user_stars.entry_deleted', '=', '0' )
+					 ->where( 'users.user_deleted', '=', '0' )
+					 ->where( 'users.user_star_user_id', '=', $user )
+					 ->get();
 			$starredBy = [ ];
-			foreach( $user->StarredBy as $starred )
+			//foreach( $user->StarredBy as $starred )
+			foreach( $results as $starred )
 			{
 				if( $starred->user_star_deleted == 0 )
 				{
