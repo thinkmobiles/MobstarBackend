@@ -4,6 +4,8 @@ use MobStar\Storage\Message2\Message2Repository as Message;
 use MobStar\Storage\Entry\EntryRepository as Entry;
 use MobStar\Storage\Token\TokenRepository as Token;
 use Swagger\Annotations as SWG;
+use Aws\Sns\SnsClient;
+use Aws\Common\Credentials\Credentials as Creds;
 
 /**
  * @package
@@ -469,6 +471,28 @@ public function store()
 		MessageParticipants::insert( $particArray );
 
 		MessageRecipients::insert( $recipArray );
+		
+		for($i=0; $i<count($recipArray);$i++)
+		{	
+			$u = $recipArray[$i];
+			if($u != $session->token_user_id)
+			{
+				$usersData = DB::select( DB::raw("SELECT t1.* FROM 
+							(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
+							from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar' AND device_registration_device_type = 'apple'
+							order by device_registration_date_created desc
+							) t1 left join users u on t1.device_registration_user_id = u.user_id 
+							where u.user_deleted = 0 
+							AND u.user_id = $u
+							group by u.user_id 
+							order by t1.device_registration_date_created desc"));
+
+				if(!empty($usersData))
+				{	
+						$this->registerSNSEndpoint($usersData[0]);
+				}
+			}
+		}
 
 	}
 }
@@ -921,4 +945,94 @@ public function reply()
 		$response = Response::make( $response, $status_code );
 		return $response;
 	}
+	public function registerSNSEndpoint( $device , $message=NULL)
+	{
+		if( $device->device_registration_device_type == "apple" )
+		{
+			$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushdemo";
+		}
+		else
+		{
+			$arn = "arn:aws:sns:eu-west-1:830026328040:app/GCM/admin-android-notification";
+		}
+
+		$sns = getSNSClient();
+
+		$Model1 = $sns->listPlatformApplications();  
+		
+		$result1 = $sns->listEndpointsByPlatformApplication(array(
+			// PlatformApplicationArn is required
+			'PlatformApplicationArn' => $arn,
+		));
+		foreach($result1['Endpoints'] as $Endpoint){
+			$EndpointArn = $Endpoint['EndpointArn']; 
+			$EndpointToken = $Endpoint['Attributes'];
+			foreach($EndpointToken as $key=>$newVals){
+				if($key=="Token"){
+					if($device->device_registration_device_token==$newVals){
+					//Delete ARN
+						$result = $sns->deleteEndpoint(array(
+							// EndpointArn is required
+							'EndpointArn' => $EndpointArn,
+						));
+					}
+				}
+			}
+		}
+
+		 $result = $sns->createPlatformEndpoint(array(
+			 // PlatformApplicationArn is required
+			 'PlatformApplicationArn' => $arn,
+			 // Token is required
+			 'Token' => $device->device_registration_device_token,
+
+		 ));
+
+		 $endpointDetails = $result->toArray();		 
+		 if($device->device_registration_device_type == "apple")
+		 {	
+			 $publisharray = array(
+			 	'TargetArn' => $endpointDetails['EndpointArn'],
+			 	'MessageStructure' => 'json',
+			 	 'Message' => json_encode(array(
+					'default' => '',
+					//'APNS_SANDBOX' => json_encode(array(
+					'APNS' => json_encode(array(
+						'aps' => array(
+							"sound" => "default",
+							"badge"=> intval(0),
+						)
+					)),
+				))
+			 );
+		 }
+		 else
+		 {
+			 $publisharray = array(
+			 	'TargetArn' => $endpointDetails['EndpointArn'],
+			 	'MessageStructure' => 'json',
+			 	'Message' => json_encode(array(
+					'default' => $message,
+					'GCM'=>json_encode(array(
+						'data'=>array(
+							'message'=> $message
+						)
+					))
+				))
+			 );
+		 }
+		try
+		{
+			$sns->publish($publisharray);
+
+			$myfile = 'sns-log.txt';
+			file_put_contents($myfile, date('d-m-Y H:i:s') . ' debug log:', FILE_APPEND);
+			file_put_contents($myfile, print_r($endpointDetails, true), FILE_APPEND);
+		}   
+		catch (Exception $e)
+		{
+			return true;
+		}
+	}
+
 }
