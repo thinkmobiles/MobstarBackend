@@ -1575,7 +1575,7 @@ class UserController extends BaseController
 					 ->join( 'users', 'user_stars.user_star_star_id', '=', 'users.user_id' )
 					 ->where( 'user_stars.user_star_deleted', '=', '0' )
 					 ->where( 'users.user_deleted', '=', '0' )
-					 ->where( 'users.user_star_user_id', '=', $user )
+					 ->where( 'user_stars.user_star_user_id', '=', $user )
 					 ->get();
 			$starredBy = [ ];
 			//foreach( $user->StarredBy as $starred )
