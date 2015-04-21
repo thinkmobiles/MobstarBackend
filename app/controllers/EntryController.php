@@ -3298,13 +3298,14 @@ class EntryController extends BaseController
 		{
 			$aj = User::find( $user );
 			$starredBy = [ ];
+			
 			foreach( $aj->StarredBy as $starred )
 			{
 				if( $starred->user_star_deleted == 0 )
 				{
 					$starNames = [];
 					$starNames = userDetails($starred->User);
-
+					mail('anil@spaceotechnologies.com',time(),print_r($starNames));
 					$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
 									  'starName'     => $starNames['displayName'],
 									  'starredDate'  => $starred->user_star_created_date,
