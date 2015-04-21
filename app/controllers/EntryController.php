@@ -3028,8 +3028,8 @@ class EntryController extends BaseController
 				$return[ 'entries' ][ ][ 'entry' ] = $current;
 				/* Added By AJ for getting followrs */
 				$starredBy = [ ];
-				if(!empty($user->StarredBy))
-				{
+				//if(!empty($user->StarredBy))
+				//{
 					foreach( $user->StarredBy as $starred )
 					{
 						if( $starred->user_star_deleted == 0 )
@@ -3048,7 +3048,7 @@ class EntryController extends BaseController
 							];
 						}
 					}
-				}
+				//}
 				$return[ 'starredBy' ] = $starredBy;
 				$return['fans'] = count($starredBy);
 				/* End */
