@@ -1570,9 +1570,9 @@ class UserController extends BaseController
 		if( $user != 0 )
 		{
 			$user = User::find( $user );
-			$results = DB::table( 'user_stars' )
+			/*$results = DB::table( 'user_stars' )
 					 ->select( 'user_stars.*' )					 
-					 ->get();
+					 ->get();*/
 			$starredBy = [ ];
 			foreach( $user->StarredBy as $starred )
 			{
