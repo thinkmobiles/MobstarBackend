@@ -427,7 +427,7 @@ public function store()
 		$particArray = [ ];
 
 		$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ) ] );
-
+		
 		$messageOb = Message2::create(
 							 [
 								 'message_creator_id'   => $session->token_user_id,
@@ -578,7 +578,11 @@ public function reply()
 								 'message_created_date' => date( 'Y-m-d H:i:s' )
 							 ]
 		);
-
+		
+		DB::table('message_threads')
+            ->where('message_thread_thread_id', $thread )
+            ->update(array('message_thread_created_date' => date( 'Y-m-d H:i:s' )));
+			
 		foreach( $recipients as $recipient )
 		{
 			if( $recipient->join_message_participant_user_id == $session->token_user_id )

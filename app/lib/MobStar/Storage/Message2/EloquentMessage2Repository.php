@@ -70,7 +70,7 @@ class EloquentMessage2Repository implements Message2Repository
 				return $query;
 
 			} );
-
+			$query = $query->orderBy( 'message_thread_created_date', 'DESC' );
 			return $query->get();
 
 		}
