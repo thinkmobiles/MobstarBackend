@@ -15,8 +15,5 @@ class MessageThread extends \Eloquent {
     public function messageParticipants(){
         return $this->hasMany('MessageParticipants', 'join_message_participant_message_thread_id', 'message_thread_thread_id');
     }
-	
-	public function messages(){
-        return $this->hasMany('Message2', 'message_thread_id', 'message_thread_thread_id')->orderBy('message_created_date', 'DESC');
-    }
+
 }

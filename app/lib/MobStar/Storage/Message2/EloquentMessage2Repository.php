@@ -51,7 +51,7 @@ class EloquentMessage2Repository implements Message2Repository
 
 	public function get_message_thread_new( $user = 0, $thread = 0, $deleted = false, $limit = 50, $offset = 0, $count = false )
 	{
-		$query = MessageThread::with( 'messageParticipants', 'messageRecipients', 'messages');
+		$query = MessageThread::with( 'messageParticipants', 'messageRecipients', 'messageRecipients');
 
 		if($thread)
 		{
@@ -70,7 +70,7 @@ class EloquentMessage2Repository implements Message2Repository
 				return $query;
 
 			} );
-			$query = $query->orderBy( 'messages.message_created_date', 'DESC' );
+
 			return $query->get();
 
 		}
