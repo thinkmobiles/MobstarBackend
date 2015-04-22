@@ -580,7 +580,7 @@ public function reply()
 								 'message_created_date' => date( 'Y-m-d H:i:s' )
 							 ]
 		);
-
+		print_r($recipients);
 		foreach( $recipients as $recipient )
 		{
 			if( $recipient->join_message_participant_user_id == $session->token_user_id )
@@ -619,7 +619,7 @@ public function reply()
 		MessageParticipants::insert( $particArray );
 
 		MessageRecipients::insert( $recipArray );
-		if(!empty($recipArray))
+		/*if(!empty($recipArray))
 		{
 			for($i=0; $i<count($recipArray);$i++)
 			{	
@@ -642,7 +642,7 @@ public function reply()
 					}
 				}
 			}
-		}
+		}*/
 	}
 }
 
