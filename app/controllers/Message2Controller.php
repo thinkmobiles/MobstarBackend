@@ -565,8 +565,11 @@ public function reply()
 		$token = Request::header( "X-API-TOKEN" );
 		$session = $this->token->get_session( $token );
 
-		$recipients = MessageParticipants::where( 'join_message_participant_message_thread_id', $thread );
-
+		//$recipients = MessageParticipants::where( 'join_message_participant_message_thread_id', $thread );
+   	    $recipients = MessageParticipants::where('join_message_participant_message_thread_id','=',$thread)->groupBy('join_message_participant_user_id')->get();
+		print_r($recipients);
+		dd(DB::getQueryLog());
+		die('here');
 		$recipArray = [ ];
 		$particArray = [ ];
 
