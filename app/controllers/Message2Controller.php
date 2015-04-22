@@ -162,7 +162,13 @@ class Message2Controller extends BaseController
 
 			//$current[ 'read' ] = $lastMessage->join_message_recipient_read;
 			if(is_null($msgread))
-			$msgread = 0;
+			{
+				die('here');
+				$msgread = 0;
+			}
+			else{
+				die('else');
+			}
 			$current[ 'read' ] = $msgread;
 			
 			$current[ 'participants' ] = [ ];
