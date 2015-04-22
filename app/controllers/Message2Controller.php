@@ -175,12 +175,13 @@ class Message2Controller extends BaseController
 				}
 				$current[ 'participants' ][ ] = oneUser( $participant->user, $session, false );
 			}
-			$dsort = array();
+			mail('anil@spaceotechnologies.com',time(),print_r($current));
+			/*$dsort = array();
 			foreach ($current as $key => $row)
 			{
 				$dsort[$key] = $row['messageReceived'];
 			}
-			array_multisort($dsort, SORT_ASC, $current);
+			array_multisort($dsort, SORT_ASC, $current);*/
 			$return[ 'threads' ][ ][ 'thread' ] = $current;
 		}
 
