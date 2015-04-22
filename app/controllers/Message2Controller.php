@@ -175,7 +175,6 @@ class Message2Controller extends BaseController
 				}
 				$current[ 'participants' ][ ] = oneUser( $participant->user, $session, false );
 			}
-			mail('anil@spaceotechnologies.com',time(),print_r($current));
 			/*$dsort = array();
 			foreach ($current as $key => $row)
 			{
