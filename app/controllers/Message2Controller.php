@@ -583,7 +583,7 @@ public function reply()
 		{
 			if( $recipient->join_message_participant_user_id == $session->token_user_id )
 			{
-				continute;
+				continue;
 			}
 
 			$particArray [ ] = [
