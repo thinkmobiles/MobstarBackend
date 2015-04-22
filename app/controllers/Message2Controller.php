@@ -567,9 +567,6 @@ public function reply()
 
 		//$recipients = MessageParticipants::where( 'join_message_participant_message_thread_id', $thread );
    	    $recipients = MessageParticipants::where('join_message_participant_message_thread_id','=',$thread)->groupBy('join_message_participant_user_id')->get();
-		print_r($recipients);
-		dd(DB::getQueryLog());
-		die('here');
 		$recipArray = [ ];
 		$particArray = [ ];
 
