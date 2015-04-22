@@ -580,8 +580,6 @@ public function reply()
 								 'message_created_date' => date( 'Y-m-d H:i:s' )
 							 ]
 		);
-		print_r($recipients);
-		die('here');
 		foreach( $recipients as $recipient )
 		{
 			if( $recipient->join_message_participant_user_id == $session->token_user_id )
