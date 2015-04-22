@@ -162,9 +162,7 @@ class Message2Controller extends BaseController
 
 			//$current[ 'read' ] = $lastMessage->join_message_recipient_read;
 			if(is_null($msgread))
-			{
-				$msgread = 0;
-			}
+			$msgread = 0;
 			$current[ 'read' ] = $msgread;
 			
 			$current[ 'participants' ] = [ ];
@@ -567,14 +565,8 @@ public function reply()
 		$token = Request::header( "X-API-TOKEN" );
 		$session = $this->token->get_session( $token );
 
-		//$recipients = MessageParticipants::where( 'join_message_participant_message_thread_id', $thread )->groupBy('join_message_participant_user_id');
-		
-		///
-		$recipients = MessageParticipants::where('join_message_participant_message_thread_id','=',$thread)->groupBy('join_message_participant_user_id')->get();
-		//
-		
-		
-		
+		$recipients = MessageParticipants::where( 'join_message_participant_message_thread_id', $thread );
+
 		$recipArray = [ ];
 		$particArray = [ ];
 
@@ -586,6 +578,7 @@ public function reply()
 								 'message_created_date' => date( 'Y-m-d H:i:s' )
 							 ]
 		);
+
 		foreach( $recipients as $recipient )
 		{
 			if( $recipient->join_message_participant_user_id == $session->token_user_id )
@@ -624,7 +617,7 @@ public function reply()
 		MessageParticipants::insert( $particArray );
 
 		MessageRecipients::insert( $recipArray );
-		/*if(!empty($recipArray))
+		if(!empty($recipArray))
 		{
 			for($i=0; $i<count($recipArray);$i++)
 			{	
@@ -647,7 +640,7 @@ public function reply()
 					}
 				}
 			}
-		}*/
+		}
 	}
 }
 
