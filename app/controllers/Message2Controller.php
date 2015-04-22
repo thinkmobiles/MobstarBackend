@@ -155,7 +155,7 @@ class Message2Controller extends BaseController
 			$current[ 'lastMessage' ][ 'messageSender' ] = oneUser( $lastMessage->message->sender, $session );
 			$current[ 'lastMessage' ][ 'messageReceived' ] = $lastMessage->message->message_created_date;
 
-			$msgread = MessageRecipients::where('join_message_recipient_user_id','=',$session->token_user_id)
+			echo $msgread = MessageRecipients::where('join_message_recipient_user_id','=',$session->token_user_id)
 								->where('join_message_recipient_thread_id','=',$message->message_thread_thread_id)
 								->where('join_message_recipient_message_id','=',$lastMessage->message->message_id)
 								->pluck( 'join_message_recipient_read' );
@@ -163,7 +163,6 @@ class Message2Controller extends BaseController
 			//$current[ 'read' ] = $lastMessage->join_message_recipient_read;
 			if(is_null($msgread))
 			{
-				die('here');
 				$msgread = 0;
 			}
 			else{
