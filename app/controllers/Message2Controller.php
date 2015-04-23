@@ -174,7 +174,7 @@ class Message2Controller extends BaseController
 				{
 					continue;
 				}
-				if(isset($current[ 'participants' ][$n]->id) && $current[ 'participants' ][$n]->id == $participant->join_message_participant_user_id )
+				if(isset($current[ 'participants' ][$n]->id) && count($current[ 'participants' ] > 0) && $current[ 'participants' ][$n-1]->id == $participant->join_message_participant_user_id )
 				{
 					$n++;
 					continue;
