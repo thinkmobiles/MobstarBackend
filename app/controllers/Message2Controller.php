@@ -176,7 +176,7 @@ class Message2Controller extends BaseController
 				}
 				$current[ 'participants' ][ ] = oneUser( $participant->user, $session, false );
 			}
-
+			dd(DB::getQueryLog());
 			$return[ 'threads' ][ ][ 'thread' ] = $current;
 		}
 
