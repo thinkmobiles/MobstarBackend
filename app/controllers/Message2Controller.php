@@ -179,9 +179,9 @@ class Message2Controller extends BaseController
 			$finalArr = array();
             for($n=0;$n<count($current[ 'participants' ]); $n++)
 			{
-				if(!in_array($participantnew[$n]->id, $finalArr))
+				if(!in_array($current[ 'participants' ][$n]->id, $finalArr))
 				{
-                    $finalArr[$n] = $participantnew[$n];
+                    $finalArr[$n] = $current[ 'participants' ][$n];
                     $n++;
                 }
 			}
