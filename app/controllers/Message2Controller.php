@@ -152,6 +152,8 @@ class Message2Controller extends BaseController
 				}*/
 			}
 			$user = User::find( $newlastMessage->message->join_message_recipient_user_id);
+			print_r($user);
+			die;
 			$current[ 'lastMessage' ][ 'messageContent' ] = $lastMessage->message->message_body;
 			$current[ 'lastMessage' ][ 'messageSender' ] = oneUser( $user, $session );
 			$current[ 'lastMessage' ][ 'messageReceived' ] = $lastMessage->message->message_created_date;
