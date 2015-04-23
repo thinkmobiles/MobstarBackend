@@ -176,7 +176,17 @@ class Message2Controller extends BaseController
 				}
 				$current[ 'participants' ][ ] = oneUser( $participant->user, $session, false );
 			}
-
+			$finalArr = array();
+            $n = 0;
+			foreach( $current[ 'participants' ] as $participantnew )
+			{
+				if(!in_array($participantnew->id, $finalArr))
+				{
+                    $finalArr[$n] = $participantnew;
+                    $n++;
+                }
+			}
+			$current[ 'newparticipants' ] = $finalArr;
 			$return[ 'threads' ][ ][ 'thread' ] = $current;
 		}
 
