@@ -177,7 +177,7 @@ class Message2Controller extends BaseController
 				$current[ 'participants' ][ ] = oneUser( $participant->user, $session, false );
 			}
 			///
-			foreach($current[ 'participants' ] as $vals){
+			/*foreach($current[ 'participants' ] as $vals){
 				if(isset($catArr) && !empty($catArr)){
 					if(in_array($vals['id'], $catArr)){
 						$finalArr[$n] = $vals;
@@ -187,8 +187,8 @@ class Message2Controller extends BaseController
 					$finalArr[$n] = $vals;
 					$n++;
 				}
-			}
-			print_r($finalArr);
+			}*/
+			print_r($current[ 'participants' ]);
 			die;
 			////
 
