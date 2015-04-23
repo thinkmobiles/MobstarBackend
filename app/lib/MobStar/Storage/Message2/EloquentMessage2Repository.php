@@ -70,7 +70,6 @@ class EloquentMessage2Repository implements Message2Repository
 				return $query;
 
 			} );
-			$query = $query->groupBy( 'messageParticipants.join_message_participant_user_id');
 			$query = $query->orderBy( 'message_thread_created_date', 'DESC' );
 			return $query->get();
 
