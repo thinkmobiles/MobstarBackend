@@ -133,7 +133,6 @@ class Message2Controller extends BaseController
 				{
 					$msgread = $received->join_message_recipient_read;
 					$newlastMessage = $received;
-					print_r($newlastMessage);
 				}				
 				if( $received->join_message_recipient_created > $last )
 				{
