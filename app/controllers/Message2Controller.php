@@ -151,9 +151,9 @@ class Message2Controller extends BaseController
 					}					
 				}*/
 			}
-
+			$user = User::find( $newlastMessage->message->join_message_recipient_user_id);
 			$current[ 'lastMessage' ][ 'messageContent' ] = $lastMessage->message->message_body;
-			$current[ 'lastMessage' ][ 'messageSender' ] = oneUser( $newlastMessage->message->join_message_recipient_user_id, $session );
+			$current[ 'lastMessage' ][ 'messageSender' ] = oneUser( $user, $session );
 			$current[ 'lastMessage' ][ 'messageReceived' ] = $lastMessage->message->message_created_date;
 
 			$msgread = MessageRecipients::where('join_message_recipient_user_id','=',$session->token_user_id)
