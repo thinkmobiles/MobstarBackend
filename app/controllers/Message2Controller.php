@@ -155,6 +155,7 @@ class Message2Controller extends BaseController
 			$current[ 'lastMessage' ][ 'messageContent' ] = $lastMessage->message->message_body;
 			$current[ 'lastMessage' ][ 'messageSender' ] = oneUser( $user, $session );
 			$current[ 'lastMessage' ][ 'messageReceived' ] = $lastMessage->message->message_created_date;
+			$current[ 'lastMessage' ][ 'messageGroup' ] = $lastMessage->message->message_group;
 
 			$msgread = MessageRecipients::where('join_message_recipient_user_id','=',$session->token_user_id)
 								->where('join_message_recipient_thread_id','=',$message->message_thread_thread_id)
@@ -298,6 +299,7 @@ class Message2Controller extends BaseController
 					'message'         => $received->message->message_body,
 					'messageSender'   => oneUser( $received->message->sender, $session ),
 					'messageReceived' => $received->message->message_created_date,
+					'messageGroup'    => $received->message->message_group,
 					'messageRead'     => $received->join_message_recipient_read
 				];
 			}
