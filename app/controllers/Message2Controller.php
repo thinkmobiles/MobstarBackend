@@ -132,8 +132,9 @@ class Message2Controller extends BaseController
 				if($received->join_message_recipient_user_id != $session->token_user_id)
 				{
 					$msgread = $received->join_message_recipient_read;
-					$newlastMessage = $received;					
-				}
+					$newlastMessage = $received;
+					print_r($newlastMessage);
+				}				
 				if( $received->join_message_recipient_created > $last )
 				{
 					$lastMessage = $received;
