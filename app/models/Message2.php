@@ -22,5 +22,8 @@ class Message2 extends \Eloquent {
 	public function sender(){
 		return $this->hasOne('User', 'user_id', 'message_creator_id');
 	}
+	public function reciver(){
+		return $this->hasOne('User', 'user_id', 'join_message_recipient_user_id');
+	}
 
 }
