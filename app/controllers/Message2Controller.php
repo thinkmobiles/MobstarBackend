@@ -176,12 +176,12 @@ class Message2Controller extends BaseController
 				}
 				$current[ 'participants' ][ ] = oneUser( $participant->user, $session, false );
 			}
-			$finalArr = array();
+			$finalArr['participants'] = array();
             for($n=0;$n<count($current[ 'participants' ]); $n++)
 			{
-				if(!in_array($current[ 'participants' ][$n]['id'], $finalArr))
+				if(!in_array($current[ 'participants' ][$n]['id'], $finalArr['participants']))
 				{
-                    $finalArr[$n] = $current[ 'participants' ][$n];
+                    $finalArr['participants'][] = $current[ 'participants' ][$n];
                     $n++;
                 }
 			}
