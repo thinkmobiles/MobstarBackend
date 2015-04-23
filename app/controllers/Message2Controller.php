@@ -477,7 +477,7 @@ public function store()
 		MessageParticipants::insert( $particArray );
 
 		MessageRecipients::insert( $recipArray );
-		if(!empty($recipArray))
+		/*if(!empty($recipArray))
 		{
 			for($i=0; $i<count($recipArray);$i++)
 			{	
@@ -500,7 +500,7 @@ public function store()
 					}
 				}
 			}
-		}
+		}*/
 
 	}
 }
@@ -632,7 +632,7 @@ public function reply()
 		MessageParticipants::insert( $particArray );
 
 		MessageRecipients::insert( $recipArray );
-		if(!empty($recipArray))
+		/*if(!empty($recipArray))
 		{
 			for($i=0; $i<count($recipArray);$i++)
 			{	
@@ -655,7 +655,7 @@ public function reply()
 					}
 				}
 			}
-		}
+		}*/
 	}
 }
 
@@ -841,7 +841,7 @@ public function reply()
 					MessageParticipants::insert( $particArray );
 
 					MessageRecipients::insert( $recipArray );
-					if(!empty($recipArray))
+					/*if(!empty($recipArray))
 					{
 						for($i=0; $i<count($recipArray);$i++)
 						{	
@@ -864,7 +864,7 @@ public function reply()
 								}
 							}
 						}
-					}
+					}*/
 				}
 
 				$response['info'] = "Message sent successfully to " . count($users) . " users";
