@@ -180,7 +180,7 @@ class Message2Controller extends BaseController
             $n = 0;
 			foreach( $current[ 'participants' ] as $participantnew )
 			{
-				if(!in_array($participantnew->id, $finalArr))
+				if(!in_array($participantnew[$n]->id, $finalArr))
 				{
                     $finalArr[$n] = $participantnew;
                     $n++;
