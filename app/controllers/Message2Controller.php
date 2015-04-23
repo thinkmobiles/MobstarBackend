@@ -132,8 +132,8 @@ class Message2Controller extends BaseController
 				if($received->join_message_recipient_user_id != $session->token_user_id)
 				{
 					$msgread = $received->join_message_recipient_read;
-					$newlastMessage = $received;
-				}				
+					$newlastMessage = $received;					
+				}
 				if( $received->join_message_recipient_created > $last )
 				{
 					$lastMessage = $received;
@@ -151,10 +151,9 @@ class Message2Controller extends BaseController
 					}					
 				}*/
 			}
-			$user = User::find( $newlastMessage->message->join_message_recipient_user_id);
 			print_r($newlastMessage->message->join_message_recipient_user_id);
 			$current[ 'lastMessage' ][ 'messageContent' ] = $lastMessage->message->message_body;
-			$current[ 'lastMessage' ][ 'messageSender' ] = oneUser( $user, $session );
+			$current[ 'lastMessage' ][ 'messageSender' ] = oneUser( $lastMessage->message->sender, $session );
 			$current[ 'lastMessage' ][ 'messageReceived' ] = $lastMessage->message->message_created_date;
 
 			$msgread = MessageRecipients::where('join_message_recipient_user_id','=',$session->token_user_id)
