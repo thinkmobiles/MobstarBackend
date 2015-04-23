@@ -174,12 +174,16 @@ class Message2Controller extends BaseController
 				{
 					continue;
 				}
-				/*if(isset($current[ 'participants' ][$n]->id) && $current[ 'participants' ][$n]->id == $participant->join_message_participant_user_id )
+				if(isset($current[ 'participants' ][$n]->id) && $current[ 'participants' ][$n]->id == $participant->join_message_participant_user_id )
 				{
+					$n++;
 					continue;
 				}
-				else*/
-				$current[ 'participants' ][$n] = oneUser( $participant->user, $session, false );
+				else
+				{
+					$current[ 'participants' ][$n] = oneUser( $participant->user, $session, false );
+					$n++;
+				}
 			}
 			/*$finalArr['participants'] = array();
             for($n=0;$n<count($current[ 'participants' ]); $n++)
