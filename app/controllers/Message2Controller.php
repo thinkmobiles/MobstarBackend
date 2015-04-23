@@ -166,18 +166,14 @@ class Message2Controller extends BaseController
 			$current[ 'read' ] = $msgread;
 			
 			$current[ 'participants' ] = [ ];
-			$i=0;
+
 			foreach( $message->messageParticipants as $participant )
 			{
-				if(isset($current[ 'participants' ][$i]['id']) && !in_array($current[ 'participants' ][$i]['id']))
+				if( $participant->user->user_id == $session->token_user_id )
 				{
-					if( $participant->user->user_id == $session->token_user_id )
-					{
-						continue;
-					}
-					$current[ 'participants' ][ ] = oneUser( $participant->user, $session, false );
+					continue;
 				}
-				$i++;
+				$current[ 'participants' ][ ] = oneUser( $participant->user, $session, false );
 			}
 
 			$return[ 'threads' ][ ][ 'thread' ] = $current;
