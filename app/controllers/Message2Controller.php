@@ -166,8 +166,7 @@ class Message2Controller extends BaseController
 			$current[ 'read' ] = $msgread;
 			
 			$current[ 'participants' ] = [ ];
-			$finalArr = array();
-			$n = 0;
+
 			foreach( $message->messageParticipants as $participant )
 			{
 				if( $participant->user->user_id == $session->token_user_id )
@@ -176,21 +175,6 @@ class Message2Controller extends BaseController
 				}
 				$current[ 'participants' ][ ] = oneUser( $participant->user, $session, false );
 			}
-			///
-			/*foreach($current[ 'participants' ] as $vals){
-				if(isset($catArr) && !empty($catArr)){
-					if(in_array($vals['id'], $catArr)){
-						$finalArr[$n] = $vals;
-						$n++;
-					}
-				}else{
-					$finalArr[$n] = $vals;
-					$n++;
-				}
-			}*/
-			print_r($current[ 'participants' ]);
-			die;
-			////
 
 			$return[ 'threads' ][ ][ 'thread' ] = $current;
 		}
