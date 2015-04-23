@@ -467,9 +467,8 @@ public function store()
 			'join_message_recipient_created'    => 1,
 			'join_message_recipient_read'       => 1
 		] );
-		array_reverse($particArray);
 		MessageParticipants::insert( $particArray );
-		array_reverse($recipArray);
+
 		MessageRecipients::insert( $recipArray );
 		if(!empty($recipArray))
 		{
@@ -619,12 +618,8 @@ public function reply()
 			'join_message_recipient_read'       => 1
 		] );
 
-		//MessageParticipants::insert( $particArray );
-
-		//MessageRecipients::insert( $recipArray );
-		array_reverse($particArray);
 		MessageParticipants::insert( $particArray );
-		array_reverse($recipArray);
+
 		MessageRecipients::insert( $recipArray );
 		if(!empty($recipArray))
 		{
@@ -831,12 +826,8 @@ public function reply()
 							'join_message_recipient_read'       => 1
 						] );
 					}
-					//MessageParticipants::insert( $particArray );
-
-					//MessageRecipients::insert( $recipArray );
-					array_reverse($particArray);
 					MessageParticipants::insert( $particArray );
-					array_reverse($recipArray);
+
 					MessageRecipients::insert( $recipArray );
 					if(!empty($recipArray))
 					{
