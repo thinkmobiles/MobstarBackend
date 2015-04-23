@@ -423,7 +423,10 @@ public function store()
 		$session = $this->token->get_session( $token );
 
 		$recipients = array_values( explode( ',', $recipients ) );
-
+		if(count($recipients) > 1) 
+			$message_group = 1;
+		else
+			$message_group = 0;
 		$recipArray = [ ];
 		$particArray = [ ];
 
@@ -434,7 +437,8 @@ public function store()
 								 'message_creator_id'   => $session->token_user_id,
 								 'message_thread_id'    => $messageThread->message_thread_thread_id,
 								 'message_body'         => $message,
-								 'message_created_date' => date( 'Y-m-d H:i:s' )
+								 'message_created_date' => date( 'Y-m-d H:i:s' ),
+								 'message_group'        => $message_group
 							 ]
 		);
 
@@ -570,13 +574,17 @@ public function reply()
    	    $recipients = MessageParticipants::where('join_message_participant_message_thread_id','=',$thread)->groupBy('join_message_participant_user_id')->get();
 		$recipArray = [ ];
 		$particArray = [ ];
-
+		if(count($recipients) > 1) 
+			$message_group = 1;
+		else
+			$message_group = 0;
 		$messageOb = Message2::create(
 							 [
 								 'message_creator_id'   => $session->token_user_id,
 								 'message_thread_id'    => $thread,
 								 'message_body'         => $message,
-								 'message_created_date' => date( 'Y-m-d H:i:s' )
+								 'message_created_date' => date( 'Y-m-d H:i:s' ),
+								 'message_group'		=> $message_group
 							 ]
 		);
 		
@@ -791,7 +799,8 @@ public function reply()
 							'message_creator_id'   => $session->token_user_id,
 							'message_thread_id'    => $messageThread->message_thread_thread_id,
 							'message_body'         => $message,
-							'message_created_date' => date( 'Y-m-d H:i:s' )
+							'message_created_date' => date( 'Y-m-d H:i:s' ),
+							'message_group'		   => 0
 						]
 					);
 

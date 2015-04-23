@@ -4,7 +4,7 @@ class Message2 extends \Eloquent {
     
     public $timestamps = false;
     protected $primaryKey = 'message_id';
-	protected $fillable = ['message_creator_id', 'message_thread_id', 'message_body', 'message_created_date'];
+	protected $fillable = ['message_creator_id', 'message_thread_id', 'message_body', 'message_created_date', 'message_group'];
     protected $table = 'messages';
 
     public function thread(){
