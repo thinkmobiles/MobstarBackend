@@ -169,14 +169,14 @@ class Message2Controller extends BaseController
 			
 			$current[ 'participants' ] = [ ];
 
-			foreach( $message->messageParticipants as $participant )
+			/*foreach( $message->messageParticipants as $participant )
 			{
 				if( $participant->user->user_id == $session->token_user_id )
 				{
 					continue;
 				}
 				$current[ 'participants' ][ ] = oneUser( $participant->user, $session, false );
-			}
+			}*/
 			//dd(DB::getQueryLog());
 			$return[ 'threads' ][ ][ 'thread' ] = $current;
 		}
@@ -316,14 +316,14 @@ class Message2Controller extends BaseController
 
 		$current[ 'participants' ] = [ ];
 
-		foreach( $thread->messageParticipants as $participant )
+		/*foreach( $thread->messageParticipants as $participant )
 		{
 			if( $participant->user->user_id == $session->token_user_id )
 			{
 				continue;
 			}
 			$current[ 'participants' ][ ] = oneUser( $participant->user,$session, false );
-		}
+		}*/
 
 		$return[ 'thread' ] = $current;
 
