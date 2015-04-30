@@ -220,8 +220,8 @@ class NotificationController extends BaseController
 			else
 			{
 				$current[ 'notificationType' ] = $notification->notification_type;
-				$current['entry']['entry_id'] = @$notification->entry->entry_id;
-				$current['entry']['entry_name'] = @$notification->entry->entry_name;
+				$current['entry']['entry_id'] = @$notification->entry_id;
+				$current['entry']['entry_name'] = @$notification->entry_name;
 			}
 			/*$current[ 'notificationType' ] = $notification->notification_type;
 			//$current['entry']['entry_id'] = @$notification->entry->entry_id;
