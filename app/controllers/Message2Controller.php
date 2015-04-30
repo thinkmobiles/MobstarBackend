@@ -446,6 +446,8 @@ public function store()
 		$userid = $session->token_user_id;
 		$name = getusernamebyid($userid);
 		$msg = $name.' messaged you.';
+		$threadid = $messageThread->message_thread_thread_id;
+		$icon = '';
 		foreach( $recipients as $recipient )
 		{
 
@@ -466,13 +468,13 @@ public function store()
 									->where( 'notification_details', '=', ' message you.', 'and' )
 									->orderBy( 'notification_updated_date', 'desc' )
 									->first();
-
+			$icon = 'message.png';
 			if( !count( $prev_not ) )
 			{
 				Notification::create( [ 'notification_user_id'      => $recipient,
 										'notification_subject_ids'  => json_encode( [ $session->token_user_id ] ),
 										'notification_details'      => ' messaged you.',
-										'notification_icon'			=> '',
+										'notification_icon'			=> $icon,
 										'notification_read'         => 0,
 										'notification_entry_id'     => $messageThread->message_thread_thread_id,
 										'notification_type'         => 'Message',
@@ -510,7 +512,7 @@ public function store()
 
 				if(!empty($usersDeviceData))
 				{	
-					$this->registerSNSEndpoint($usersDeviceData[0],$message,$message_group,$name);
+					$this->registerSNSEndpoint($usersDeviceData[0], $message, $message_group, $name, $icon, $threadid);
 				}
 			}
 
@@ -651,7 +653,8 @@ public function reply()
 		$userid = $session->token_user_id;
 		$name = getusernamebyid($userid);
 		$msg = $name.' messaged you.';	
-			
+		$threadid = $thread;
+		$icon = '';	
 		foreach( $recipients as $recipient )
 		{
 			if( $recipient->join_message_participant_user_id == $session->token_user_id )
@@ -671,10 +674,11 @@ public function reply()
 				'join_message_recipient_created'    => 0,
 				'join_message_recipient_read'       => 0,
 			];
+			$icon = 'message.png';
 			Notification::create( [ 'notification_user_id'      => $recipient->join_message_participant_user_id,
 										'notification_subject_ids'  => json_encode( [ $session->token_user_id ] ),
 										'notification_details'      => ' messaged you.',
-										'notification_icon'			=> '',
+										'notification_icon'			=> $icon,
 										'notification_read'         => 0,
 										'notification_entry_id'     => $thread,
 										'notification_type'         => 'Message',
@@ -719,7 +723,7 @@ public function reply()
 
 					if(!empty($usersData))
 					{	
-							$this->registerSNSEndpoint($usersData[0],$message,$message_group,$name);
+							$this->registerSNSEndpoint($usersData[0], $message, $message_group, $name, $icon, $threadid);
 					}
 				}
 			}
@@ -1077,7 +1081,7 @@ public function reply()
 		$response = Response::make( $response, $status_code );
 		return $response;
 	}
-	public function registerSNSEndpoint( $device , $message,$message_group,$name)
+	public function registerSNSEndpoint( $device , $message, $message_group, $name, $icon, $threadid)
 	{
 		
 		if( $device->device_registration_device_type == "apple" )
@@ -1149,6 +1153,8 @@ public function reply()
 							"badge"=> intval(0),
 							"messageGroup"=>$message_group,
        						"diaplayname"=>$name,
+							"notificationIcon"=>$icon,
+       						"entry_id"=>$threadid,
 						)
 						// 'extra'=> array(
 						// 	"messageGroup"=>$message_group,
