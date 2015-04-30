@@ -499,7 +499,7 @@ public function store()
 			if(!empty($name))
 			{
 				$message = $msg;
-
+				$icon = 'http://' . $_ENV[ 'URL' ] . '/images/message.png';
 				$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
 					(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
 					from device_registrations where device_registration_device_token  != '' 
@@ -705,6 +705,7 @@ public function reply()
 		MessageRecipients::insert( $recipArray );
 		if(!empty($recipArray))
 		{
+			$icon = 'http://' . $_ENV[ 'URL' ] . '/images/message.png';
 			for($i=0; $i<count($recipArray);$i++)
 			{	
 				$u = $recipArray[$i]['join_message_recipient_user_id'];
@@ -1155,11 +1156,8 @@ public function reply()
        						"diaplayname"=>$name,
 							"notificationIcon"=>$icon,
        						"entry_id"=>$threadid,
-						)
-						// 'extra'=> array(
-						// 	"messageGroup"=>$message_group,
-      //  						"diaplayname"=>$name,
-						// 	)
+							"Type"=>'Message',
+						)						
 					)),
 				))
 			 );

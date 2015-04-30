@@ -320,7 +320,7 @@ class CommentController extends BaseController
 			$to = $record->entry_user_id;
 			$fromId = $session->token_user_id;
 			$name = getusernamebyid($fromId);
-
+			$icon = 'http://' . $_ENV[ 'URL' ] . '/images/comment.png';
 			if(!empty($name))
 			{
 				$message = $name." commented on your entry";
@@ -340,7 +340,7 @@ class CommentController extends BaseController
 
 				if(!empty($usersDeviceData))
 				{	
-					$this->registerSNSEndpoint($usersDeviceData[0],$message,$name,$entryid);
+					$this->registerSNSEndpoint($usersDeviceData[0],$message,$name,$entryid,$icon);
 				}
 			}
 
@@ -409,7 +409,7 @@ class CommentController extends BaseController
 
 		return Response::make( $response, $status_code );
 	}
-	public function registerSNSEndpoint( $device , $message, $name, $entryid)
+	public function registerSNSEndpoint( $device , $message, $name, $entryid,$icon = NULL)
 	{
 		if( $device->device_registration_device_type == "apple" )
 		{
@@ -481,6 +481,7 @@ class CommentController extends BaseController
 							"displayname"=>$name,
 							"Type"=>'Entry Comment',
 							"EntryId"=>$entryid,
+							"notificationIcon"=>$icon,
 						)
 					)),
 				))

@@ -461,7 +461,7 @@ class VoteController extends BaseController
 					{
 						$message = $name.' Voted Up your '.$entryType;
 					}
-					
+					$icon = 'http://' . $_ENV[ 'URL' ] . '/images/' . $icon;
 					$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
 						(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
 						from device_registrations where device_registration_device_token  != '' 
@@ -474,7 +474,7 @@ class VoteController extends BaseController
 
 					if(!empty($usersDeviceData))
 					{	
-						$this->registerSNSEndpoint($usersDeviceData[0],$message,$to,$notif_Type,$name);
+						$this->registerSNSEndpoint($usersDeviceData[0],$message,$to,$notif_Type,$name,$icon,$entryId);
 					}
 				}
 				/* Change Yes vote to follow */
@@ -851,7 +851,7 @@ class VoteController extends BaseController
 		/* End */
 		return Response::make( $return ,$status_code);
 	}
-	public function registerSNSEndpoint( $device, $message, $to=NULL, $notif_Type=NULL , $name=NULL)
+	public function registerSNSEndpoint( $device, $message, $to=NULL, $notif_Type=NULL , $name=NULL,$icon = NULL,$entryId= NULL)
 	{
 		if( $device->device_registration_device_type == "apple" )
 		{
@@ -925,6 +925,8 @@ class VoteController extends BaseController
 								"userId"=>$to,
 								"diaplayname"=>$name,
 								"Type"=>$notif_Type,
+								"entry_id"=>$entry_id,
+								"notificationIcon"=>$icon,
 							)
 						)),
 					))
