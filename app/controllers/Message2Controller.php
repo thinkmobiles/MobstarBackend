@@ -1186,7 +1186,7 @@ public function reply()
 		 }   
 		 catch (Exception $e)
 		 {
-			print($endpointDetails['EndpointArn'] . " - Failed: " . $e->getMessage() . "!\n");
+			//print($endpointDetails['EndpointArn'] . " - Failed: " . $e->getMessage() . "!\n");
 		 } 
 
 
