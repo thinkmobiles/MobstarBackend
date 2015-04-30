@@ -397,15 +397,20 @@ class VoteController extends BaseController
 				$input[ 'vote_up' ] = 1;
 				$msg = 'voted up your '.$entryType;
 				$icon = '';
+				$notif_Type = 'Vote';
 				if( $entry->entry_category_id == 7 || $entry->entry_category_id == 8 )
 				{
 					$msg = 'liked your '.$entryType;
    				    $icon = 'like.png';
+					$notif_Type = 'Like';
+					$entryId = $entry->entry_id;
 				}
 				else
 				{
 					$msg = 'voted up your '.$entryType;
 					$icon = 'voteUp.png';
+					$notif_Type = 'Vote';
+					$entryId = $entry->entry_id;
 				}
 				$prev_not = Notification::where( 'notification_user_id', '=', $entry->entry_user_id, 'and' )
 										->where( 'notification_entry_id', '=', $entry->entry_id, 'and' )
@@ -439,6 +444,37 @@ class VoteController extends BaseController
 						$prev_not->notification_updated_date = date( 'Y-m-d H:i:s' );
 
 						$prev_not->save();
+					}
+				}
+				$message = '';
+				$userid = $session->token_user_id;
+				$name = getusernamebyid($userid);
+				$to = $entry->entry_user_id;
+
+				if(!empty($name))
+				{
+					if($notif_Type == 'Like')
+					{
+						$message = $name.' Liked your '.$entryType;
+					}
+					else
+					{
+						$message = $name.' Voted Up your '.$entryType;
+					}
+					
+					$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
+						(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
+						from device_registrations where device_registration_device_token  != '' 
+						order by device_registration_date_created desc
+						) t1 left join users u on t1.device_registration_user_id = u.user_id 
+						where u.user_deleted = 0 
+						AND u.user_id = $to
+						group by u.user_id 
+						order by t1.device_registration_date_created desc"));
+
+					if(!empty($usersDeviceData))
+					{	
+						$this->registerSNSEndpoint($usersDeviceData[0],$message,$to,$notif_Type,$name);
 					}
 				}
 				/* Change Yes vote to follow */
@@ -513,6 +549,28 @@ class VoteController extends BaseController
 			}
 
 			Eloquent::unguard();
+			$userData = DB::table('votes')
+					  	->where('vote_up', '=', '1')
+					  	->where('vote_user_id', '=',$userid )->count();
+
+			if($userData == 10)
+			{
+				$message = "You have 10 votes";
+				$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
+					(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
+					from device_registrations where device_registration_device_token  != '' 
+					order by device_registration_date_created desc
+					) t1 left join users u on t1.device_registration_user_id = u.user_id 
+					where u.user_deleted = 0 
+					AND u.user_id = $userid
+					group by u.user_id 
+					order by t1.device_registration_date_created desc"));
+
+				if(!empty($usersDeviceData))
+				{	
+					$this->registerSNSEndpoint($usersDeviceData[0],$message);
+				}
+			}
 			$this->vote->create( $input );
 			$response[ 'message' ] = "vote added";
 			$status_code = 201;
@@ -793,5 +851,134 @@ class VoteController extends BaseController
 		/* End */
 		return Response::make( $return ,$status_code);
 	}
+	public function registerSNSEndpoint( $device, $message, $to=NULL, $notif_Type=NULL , $name=NULL)
+	{
+		if( $device->device_registration_device_type == "apple" )
+		{
+			$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushdemo";
+			//$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS_SANDBOX/adminsandbox";
+		}
+		else
+		{
+			$arn = "arn:aws:sns:eu-west-1:830026328040:app/GCM/admin-android-notification";
+		}
 
+		$sns = getSNSClient();
+
+		$Model1 = $sns->listPlatformApplications();  
+		
+		$result1 = $sns->listEndpointsByPlatformApplication(array(
+			// PlatformApplicationArn is required
+			'PlatformApplicationArn' => $arn,
+		));
+		//echo '<pre>';
+		//$dtoken = 'APA91bHEx658AQzCM3xUHTVjBGJz8a_HMb65Y_2BIIPXODexYlvuCZpaJRKRchTNqQCXs_w9b0AxJbzIQOFNtYkW0bbsiXhiX7uyhGYNTYC2PBOZzAmvqnvOBBhOKNS7Jl0fdoIdNa_riOlJxQi8COrhbw0odIJKBg';
+		//$dtoken = 'c39bac35f298c66d7398673566179deee27618c2036d8c82dcef565c8d732f84';
+		foreach($result1['Endpoints'] as $Endpoint){
+			$EndpointArn = $Endpoint['EndpointArn']; 
+			$EndpointToken = $Endpoint['Attributes'];
+			foreach($EndpointToken as $key=>$newVals){
+				if($key=="Token"){
+					if($device->device_registration_device_token==$newVals){
+					//if($dtoken==$newVals){
+					//Delete ARN
+						$result = $sns->deleteEndpoint(array(
+							// EndpointArn is required
+							'EndpointArn' => $EndpointArn,
+						));
+					}
+				}
+				//print_r($EndpointToken);
+			}
+			//print_r($Endpoint);
+		}
+
+		 $result = $sns->createPlatformEndpoint(array(
+			 // PlatformApplicationArn is required
+			 'PlatformApplicationArn' => $arn,
+			 // Token is required
+			 //'Token' => $dtoken,
+			 'Token' => $device->device_registration_device_token,
+
+		 ));
+
+		 $endpointDetails = $result->toArray();
+		 
+		 //print_r($device);echo "\n".$message."\n";print_r($result);print_r($endpointDetails);
+
+		 //die;
+		 if($device->device_registration_device_type == "apple")
+		 {	
+			if(!empty($to) && !empty($name) && !empty($notif_Type))
+			{
+				$publisharray = array(
+					'TargetArn' => $endpointDetails['EndpointArn'],
+					'MessageStructure' => 'json',
+					 'Message' => json_encode(array(
+						'default' => $message,
+						//'APNS_SANDBOX' => json_encode(array(
+						'APNS' => json_encode(array(
+							'aps' => array(
+								"sound" => "default",
+								"alert" => $message,
+								"badge"=> intval(0),
+								"userId"=>$to,
+								"diaplayname"=>$name,
+								"Type"=>$notif_Type,
+							)
+						)),
+					))
+				 );
+			}
+			else
+			{
+				$publisharray = array(
+					'TargetArn' => $endpointDetails['EndpointArn'],
+					'MessageStructure' => 'json',
+					 'Message' => json_encode(array(
+						'default' => $message,
+						//'APNS_SANDBOX' => json_encode(array(
+						'APNS' => json_encode(array(
+							'aps' => array(
+								"sound" => "default",
+								"alert" => $message,
+								"badge"=> intval(0),								
+							)
+						)),
+					))
+				 );				
+			}
+		 }
+		 else
+		 {
+			 $publisharray = array(
+			 	'TargetArn' => $endpointDetails['EndpointArn'],
+			 	'MessageStructure' => 'json',
+			 	'Message' => json_encode(array(
+					'default' => $message,
+					'GCM'=>json_encode(array(
+						'data'=>array(
+							'message'=> $message
+						)
+					))
+				))
+			 );
+		 }
+		 try
+		 {
+			$sns->publish($publisharray);
+
+			$myfile = 'sns-log.txt';
+			file_put_contents($myfile, date('d-m-Y H:i:s') . ' debug log:', FILE_APPEND);
+			file_put_contents($myfile, print_r($endpointDetails, true), FILE_APPEND);
+
+			//print($EndpointArn . " - Succeeded!\n");    
+		 }   
+		 catch (Exception $e)
+		 {
+			print($endpointDetails['EndpointArn'] . " - Failed: " . $e->getMessage() . "!\n");
+		 } 
+
+
+	}
 }

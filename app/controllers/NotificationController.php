@@ -191,12 +191,43 @@ class NotificationController extends BaseController
 			$current[ 'notificationIcon' ] = $icon;
 			$current[ 'notificationDate' ] = $notification->notification_updated_date;
 			$current[ 'notificationRead' ] = ($notification->notification_read == 1);
-			$current[ 'notificationType' ] = $notification->notification_type;
+			if($notification->notification_type == 'Message')
+			{
+				$current[ 'notificationType' ] = $notification->notification_type;
+				$current['entry']['entry_id'] = @$notification->notification_entry_id;
+				$user = DB::table('messages')
+							->where('message_thread_id','=',$notification->notification_entry_id)
+							->orderBy( 'message_created_date', 'desc' )
+							->first();
+				$userid = $user->message_creator_id;
+				$displayname = getusernamebyid($userid);
+				$current['entry']['entry_name'] = $displayname;
+
+				$countThread = DB::table('join_message_recipients')
+							->where('join_message_recipient_thread_id','=',$notification->notification_entry_id)
+							->count();
+				if($countThread > 2)
+				{
+					$message_group = 1;
+				}
+				else
+				{
+					$message_group = 0;
+				}
+				$current[ 'messageGroup' ] = $message_group;
+				
+			}
+			else
+			{
+				$current[ 'notificationType' ] = $notification->notification_type;
+				$current['entry']['entry_id'] = @$notification->entry->entry_id;
+				$current['entry']['entry_name'] = @$notification->entry->entry_name;
+			}
+			/*$current[ 'notificationType' ] = $notification->notification_type;
 			//$current['entry']['entry_id'] = @$notification->entry->entry_id;
 			$current['entry']['entry_id'] = @$notification->entry_id;
 			//$current['entry']['entry_name'] = @$notification->entry->entry_name;
-			$current['entry']['entry_name'] = @$notification->entry_name;
-
+			$current['entry']['entry_name'] = @$notification->entry_name;*/
 
 			$return[ 'notifications' ][] = $current;
 		}
