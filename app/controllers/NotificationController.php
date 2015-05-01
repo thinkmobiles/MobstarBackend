@@ -117,119 +117,141 @@ class NotificationController extends BaseController
 			$next = false;
 		}
 
-		//$notifications = Notification::where( 'notification_user_id', '=', $session->token_user_id )->where('notification_deleted', '=', 0)->latest('notification_updated_date')->take( $limit )->skip( $offset )->get();
-		$notifications = DB::table( 'notifications' )
+		$notifications = Notification::where( 'notification_user_id', '=', $session->token_user_id )->where('notification_deleted', '=', 0)->latest('notification_updated_date')->take( $limit )->skip( $offset )->get();
+		/*$notifications = DB::table( 'notifications' )
 					->select( 'notifications.*', 'entries.entry_id', 'entries.entry_name' )
 					->leftJoin('entries', 'entries.entry_id', '=', 'notifications.notification_entry_id')
 					->where( 'notifications.notification_user_id', '=', $session->token_user_id )
 					->where( 'notifications.notification_deleted', '=', 0 )
 					->where( 'entries.entry_deleted', '=', '0' )
-					->latest('notifications.notification_updated_date')->take( $limit )->skip( $offset )->get();
+					->latest('notifications.notification_updated_date')->take( $limit )->skip( $offset )->get();*/
 
 		$return[ 'notifications' ] = [ ];
 
 		foreach( $notifications as $notification )
 		{
-
-			$current = [ ];
-
-			$subjects = json_decode( $notification->notification_subject_ids, true );
-
-			$subject_count = count( $subjects );
-
-			if( $subject_count > 3 )
+			if(!empty(@$notification->entry->entry_id))
 			{
-				$line = "and " . ( $subject_count - 2 ) . " others have " . trim($notification->notification_details);
-			}
-			else
-			{
-				if( $subject_count == 3 )
+				$current = [ ];
+
+				$subjects = json_decode( $notification->notification_subject_ids, true );
+
+				$subject_count = count( $subjects );
+
+				if( $subject_count > 3 )
 				{
-					$line = "and " . ( $subject_count - 2 ) . " other have " . trim($notification->notification_details);
-				}
-				elseif( $subject_count == 2 )
-				{
-					$line = "have " .trim($notification->notification_details);
+					$line = "and " . ( $subject_count - 2 ) . " others have " . trim($notification->notification_details);
 				}
 				else
 				{
-					$line = "has " .trim($notification->notification_details);
+					if( $subject_count == 3 )
+					{
+						$line = "and " . ( $subject_count - 2 ) . " other have " . trim($notification->notification_details);
+					}
+					elseif( $subject_count == 2 )
+					{
+						$line = "have " .trim($notification->notification_details);
+					}
+					else
+					{
+						//$line = "has " .trim($notification->notification_details);
+						if($notification->notification_type == 'Message')
+						{
+							$line = trim($notification->notification_details);
+						}
+						else
+						{
+							$line = "has " .trim($notification->notification_details);
+						}
+					}
 				}
-			}
 
-			$name_ids = [ ];
+				$name_ids = [ ];
 
-			array_push( $name_ids, array_pop( $subjects ) );
-
-			if( isset( $subjects ) )
-			{
 				array_push( $name_ids, array_pop( $subjects ) );
-			}
 
-			$names = User::whereIn( 'user_id', $name_ids )->get();
-
-			$nameArray = [ ];
-			foreach( $names as $name )
-			{
-				//$nameArray[ ] = $name->user_display_name;
-				$nameArray[ ] = getusernamebyid($name->user_id);
-			}
-
-			if( $subject_count > 2 )
-			{
-				$names = implode( ', ', $nameArray );
-			}
-			else
-			{
-				$names = implode( ' and ', $nameArray );
-			}
-
-			$line = $names. ' ' .$line;
-			$icon = ( !empty( $notification->notification_icon ) ) ? 'http://' . $_ENV[ 'URL' ] . '/images/' . $notification->notification_icon : '';
-			$current[ 'notificationId' ] = $notification->notification_id;
-			$current[ 'notificationContent' ] = $line;
-			$current[ 'notificationIcon' ] = $icon;
-			$current[ 'notificationDate' ] = $notification->notification_updated_date;
-			$current[ 'notificationRead' ] = ($notification->notification_read == 1);
-			if($notification->notification_type == 'Message')
-			{
-				$current[ 'notificationType' ] = $notification->notification_type;
-				$current['entry']['entry_id'] = @$notification->notification_entry_id;
-				$user = DB::table('messages')
-							->where('message_thread_id','=',$notification->notification_entry_id)
-							->orderBy( 'message_created_date', 'desc' )
-							->first();
-				$userid = $user->message_creator_id;
-				$displayname = getusernamebyid($userid);
-				$current['entry']['entry_name'] = $displayname;
-
-				$countThread = DB::table('join_message_recipients')
-							->where('join_message_recipient_thread_id','=',$notification->notification_entry_id)
-							->count();
-				if($countThread > 2)
+				if( isset( $subjects ) )
 				{
-					$message_group = 1;
+					array_push( $name_ids, array_pop( $subjects ) );
+				}
+
+				$names = User::whereIn( 'user_id', $name_ids )->get();
+
+				$nameArray = [ ];
+				foreach( $names as $name )
+				{
+					//$nameArray[ ] = $name->user_display_name;
+					$nameArray[ ] = getusernamebyid($name->user_id);
+				}
+
+				if( $subject_count > 2 )
+				{
+					$names = implode( ', ', $nameArray );
 				}
 				else
 				{
-					$message_group = 0;
+					$names = implode( ' and ', $nameArray );
 				}
-				$current[ 'messageGroup' ] = $message_group;
-				
+
+				$line = $names. ' ' .$line;
+				$icon = ( !empty( $notification->notification_icon ) ) ? 'http://' . $_ENV[ 'URL' ] . '/images/' . $notification->notification_icon : '';
+				$current[ 'notificationId' ] = $notification->notification_id;
+				$current[ 'notificationContent' ] = $line;
+				$current[ 'notificationIcon' ] = $icon;
+				//$current[ 'notificationDate' ] = $notification->notification_updated_date;
+				if($notification->notification_type == 'Message')
+				{
+					$current[ 'notificationDate' ] = $notification->notification_created_date;
+				}
+				else
+				{
+					$current[ 'notificationDate' ] = $notification->notification_updated_date;	
+				}
+				$current[ 'notificationRead' ] = ($notification->notification_read == 1);
+				if($notification->notification_type == 'Message')
+				{
+					$current[ 'notificationType' ] = $notification->notification_type;
+					$current['entry']['entry_id'] = @$notification->notification_entry_id;
+					$user = DB::table('messages')
+								->where('message_thread_id','=',$notification->notification_entry_id)
+								->orderBy( 'message_created_date', 'desc' )
+								->first();
+					$userid = $user->message_creator_id;
+					$displayname = getusernamebyid($userid);
+					$current['entry']['entry_name'] = $displayname;
+
+					$countThread = DB::table('join_message_recipients')
+								->where('join_message_recipient_thread_id','=',$notification->notification_entry_id)
+								->count();
+					if($countThread > 2)
+					{
+						$message_group = 1;
+					}
+					else
+					{
+						$message_group = 0;
+					}
+					$current[ 'messageGroup' ] = $message_group;
+					
+				}
+				else
+				{
+					$current[ 'notificationType' ] = $notification->notification_type;
+					$current['entry']['entry_id'] = @$notification->entry->entry_id;
+					$current['entry']['entry_name'] = @$notification->entry->entry_name;
+				}
+				/*$current[ 'notificationType' ] = $notification->notification_type;
+				//$current['entry']['entry_id'] = @$notification->entry->entry_id;
+				$current['entry']['entry_id'] = @$notification->entry_id;
+				//$current['entry']['entry_name'] = @$notification->entry->entry_name;
+				$current['entry']['entry_name'] = @$notification->entry_name;*/
+
+				$return[ 'notifications' ][] = $current;
 			}
 			else
 			{
-				$current[ 'notificationType' ] = $notification->notification_type;
-				$current['entry']['entry_id'] = @$notification->entry_id;
-				$current['entry']['entry_name'] = @$notification->entry_name;
+				continue;
 			}
-			/*$current[ 'notificationType' ] = $notification->notification_type;
-			//$current['entry']['entry_id'] = @$notification->entry->entry_id;
-			$current['entry']['entry_id'] = @$notification->entry_id;
-			//$current['entry']['entry_name'] = @$notification->entry->entry_name;
-			$current['entry']['entry_name'] = @$notification->entry_name;*/
-
-			$return[ 'notifications' ][] = $current;
 		}
 
 		$status_code = 200;
