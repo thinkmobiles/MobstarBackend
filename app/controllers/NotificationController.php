@@ -130,8 +130,8 @@ class NotificationController extends BaseController
 
 		foreach( $notifications as $notification )
 		{
-			/*if(!empty(@$notification->entry->entry_id))
-			{*/
+			if(!empty(@$notification->entry->entry_id))
+			{
 				$current = [ ];
 
 				$subjects = json_decode( $notification->notification_subject_ids, true );
@@ -247,11 +247,11 @@ class NotificationController extends BaseController
 				$current['entry']['entry_name'] = @$notification->entry_name;*/
 
 				$return[ 'notifications' ][] = $current;
-			/*}
+			}
 			else
 			{
 				continue;
-			}*/
+			}
 		}
 
 		$status_code = 200;
