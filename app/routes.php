@@ -377,6 +377,12 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "message/read",
 			"uses" => "Message2Controller@read"
 		] );
+		
+		Route::post( "message/showParticipants", [
+			"as"   => "message/showParticipants",
+			"uses" => "Message2Controller@showParticipants"
+		] );
+		
 //		Route::delete( "message/", [
 //			"as"   => "message/destroy",
 //			"uses" => "MessageController@destroy"

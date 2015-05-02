@@ -431,13 +431,49 @@ public function store()
 			$message_group = 0;
 		$recipArray = [ ];
 		$particArray = [ ];
-
-		$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ) ] );
+		
+		$newThread = '';
+		if($message_group == 0)
+		{
+			$thread_id = DB::table('join_message_participants')
+						->whereIn('join_message_participant_user_id', array($session->token_user_id, $recipients[0]))
+						->pluck('join_message_participant_message_thread_id');
+			if(empty($thread_id))
+			{
+				$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ),'message_thread_created_by' => $session->token_user_id ] );
+				$newThread = $messageThread->message_thread_thread_id;
+			}
+			else
+			{
+				$totalCount = DB::table('join_message_participants')
+							->where('join_message_participant_message_thread_id','=',$thread_id,'and')
+							->whereNotIn('join_message_participant_user_id',array($session->token_user_id, $recipients[0]))
+							->count('join_message_participant_id');
+				
+				if($totalCount == 0)
+				{
+					$newThread = $thread_id;
+				}
+				elseif($totalCount > 0)
+				{
+					$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ),'message_thread_created_by' => $session->token_user_id ] );
+					$newThread = $messageThread->message_thread_thread_id;
+				}
+			}
+		}
+		else
+		{
+			$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ),'message_thread_created_by' => $session->token_user_id ] );
+			$newThread = $messageThread->message_thread_thread_id;
+		}
+		
+		//$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ) ] );
 		
 		$messageOb = Message2::create(
 							 [
 								 'message_creator_id'   => $session->token_user_id,
-								 'message_thread_id'    => $messageThread->message_thread_thread_id,
+								 //'message_thread_id'    => $messageThread->message_thread_thread_id,
+								 'message_thread_id'    => $newThread,
 								 'message_body'         => $message,
 								 'message_created_date' => date( 'Y-m-d H:i:s' ),
 								 'message_group'        => $message_group
@@ -446,25 +482,29 @@ public function store()
 		$userid = $session->token_user_id;
 		$name = getusernamebyid($userid);
 		$msg = $name.' messaged you.';
-		$threadid = $messageThread->message_thread_thread_id;
+		//$threadid = $messageThread->message_thread_thread_id;
+		$threadid = $newThread;
 		$icon = '';
 		foreach( $recipients as $recipient )
 		{
 
 			$particArray [ ] = [
-				'join_message_participant_message_thread_id' => $messageThread->message_thread_thread_id,
+				//'join_message_participant_message_thread_id' => $messageThread->message_thread_thread_id,
+				'join_message_participant_message_thread_id' => $newThread,
 				'join_message_participant_user_id'           => $recipient,
 			];
 
 			$recipArray [ ] = [
-				'join_message_recipient_thread_id'  => $messageThread->message_thread_thread_id,
+				//'join_message_recipient_thread_id'  => $messageThread->message_thread_thread_id,
+				'join_message_recipient_thread_id'  => $newThread,
 				'join_message_recipient_user_id'    => $recipient,
 				'join_message_recipient_message_id' => (int)$messageOb->message_id,
 				'join_message_recipient_created'    => 0,
 				'join_message_recipient_read'       => 0,
 			];
 			$prev_not = Notification::where( 'notification_user_id', '=', $recipient, 'and' )
-									->where( 'notification_entry_id', '=', $messageThread->message_thread_thread_id, 'and' )
+									//->where( 'notification_entry_id', '=', $messageThread->message_thread_thread_id, 'and' )
+									->where( 'notification_entry_id', '=', $newThread, 'and' )
 									->where( 'notification_details', '=', ' message you.', 'and' )
 									->orderBy( 'notification_updated_date', 'desc' )
 									->first();
@@ -476,13 +516,26 @@ public function store()
 										'notification_details'      => ' messaged you.',
 										'notification_icon'			=> $icon,
 										'notification_read'         => 0,
-										'notification_entry_id'     => $messageThread->message_thread_thread_id,
+										//'notification_entry_id'     => $messageThread->message_thread_thread_id,
+										'notification_entry_id'     => $newThread,
 										'notification_type'         => 'Message',
 										'notification_created_date' => date( 'Y-m-d H:i:s' ),
 										'notification_updated_date' => '0000-00-00 00:00:00' ] );
 			}
 			else
 			{
+				/*$subjects = json_decode( $prev_not->notification_subject_ids );
+
+				if( !in_array( $session->token_user_id, $subjects ) )
+				{
+					array_push( $subjects, $session->token_user_id );
+
+					$prev_not->notification_subject_ids = json_encode( $subjects );
+					$prev_not->notification_read = 0;
+					$prev_not->notification_updated_date = date( 'Y-m-d H:i:s' );
+
+					$prev_not->save();
+				}*/
 				$subjects = json_decode( $prev_not->notification_subject_ids );
 
 				if( !in_array( $session->token_user_id, $subjects ) )
@@ -493,6 +546,13 @@ public function store()
 					$prev_not->notification_read = 0;
 					$prev_not->notification_updated_date = date( 'Y-m-d H:i:s' );
 
+					$prev_not->save();
+				}
+				else
+				{
+					$prev_not->notification_read = 0;
+					$prev_not->notification_updated_date = date( 'Y-m-d H:i:s' );
+					
 					$prev_not->save();
 				}
 			}
@@ -519,45 +579,21 @@ public function store()
 		}
 
 		array_push( $particArray, [
-			'join_message_participant_message_thread_id' => $messageThread->message_thread_thread_id,
+			//'join_message_participant_message_thread_id' => $messageThread->message_thread_thread_id,
+			'join_message_participant_message_thread_id' => $newThread,
 			'join_message_participant_user_id'           => $session->token_user_id,
 		] );
 
 		array_push( $recipArray, [
-			'join_message_recipient_thread_id'  => $messageThread->message_thread_thread_id,
+			//'join_message_recipient_thread_id'  => $messageThread->message_thread_thread_id,
+			'join_message_recipient_thread_id'  => $newThread,
 			'join_message_recipient_user_id'    => $session->token_user_id,
 			'join_message_recipient_message_id' => $messageOb->message_id,
 			'join_message_recipient_created'    => 1,
 			'join_message_recipient_read'       => 1
 		] );
 		MessageParticipants::insert( $particArray );
-
 		MessageRecipients::insert( $recipArray );
-		/*if(!empty($recipArray))
-		{
-			for($i=0; $i<count($recipArray);$i++)
-			{	
-				$u = $recipArray[$i]['join_message_recipient_user_id'];
-				if($u != $session->token_user_id)
-				{
-					$usersData = DB::select( DB::raw("SELECT t1.* FROM 
-								(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
-								from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar' AND device_registration_device_type = 'apple'
-								order by device_registration_date_created desc
-								) t1 left join users u on t1.device_registration_user_id = u.user_id 
-								where u.user_deleted = 0 
-								AND u.user_id = $u
-								group by u.user_id 
-								order by t1.device_registration_date_created desc"));
-
-					if(!empty($usersData))
-					{	
-							$this->registerSNSEndpoint($usersData[0]);
-					}
-				}
-			}
-		}*/
-
 	}
 }
 
@@ -674,17 +710,38 @@ public function reply()
 				'join_message_recipient_created'    => 0,
 				'join_message_recipient_read'       => 0,
 			];
+			$prev_not = Notification::where( 'notification_user_id', '=', $recipient->join_message_participant_user_id, 'and' )
+									->where( 'notification_subject_ids', '=', json_encode( [ $session->token_user_id ] ), 'and' )
+									->where( 'notification_entry_id', '=', $thread, 'and' )
+									->where( 'notification_type', '=', 'Message', 'and' )
+									->orderBy( 'notification_updated_date', 'desc' )
+									->first();
 			$icon = 'message.png';
-			Notification::create( [ 'notification_user_id'      => $recipient->join_message_participant_user_id,
-										'notification_subject_ids'  => json_encode( [ $session->token_user_id ] ),
-										'notification_details'      => ' messaged you.',
-										'notification_icon'			=> $icon,
-										'notification_read'         => 0,
-										'notification_entry_id'     => $thread,
-										'notification_type'         => 'Message',
-										'notification_created_date' => date( 'Y-m-d H:i:s' ),
-										'notification_updated_date' => '0000-00-00 00:00:00' ] );
-
+			if( !count( $prev_not ) )
+			{
+				Notification::create( [ 'notification_user_id'      => $recipient->join_message_participant_user_id,
+											'notification_subject_ids'  => json_encode( [ $session->token_user_id ] ),
+											'notification_details'      => ' messaged you.',
+											'notification_icon'			=> $icon,
+											'notification_read'         => 0,
+											'notification_entry_id'     => $thread,
+											'notification_type'         => 'Message',
+											'notification_created_date' => date( 'Y-m-d H:i:s' ),
+											'notification_updated_date' => '0000-00-00 00:00:00' ] );
+			}
+			else
+			{	
+				$subjects = json_decode( $prev_not->notification_subject_ids );
+				
+				if( !in_array( $session->token_user_id, $subjects ) )
+				{
+					array_push( $subjects, $session->token_user_id );
+					$prev_not->notification_subject_ids = json_encode( $subjects );
+				}
+				$prev_not->notification_read = 0;
+				$prev_not->notification_updated_date = date( 'Y-m-d H:i:s' );				
+				$prev_not->save();				
+			}
 		}
 
 		array_push( $particArray, [
@@ -1191,8 +1248,46 @@ public function reply()
 		 catch (Exception $e)
 		 {
 			//print($endpointDetails['EndpointArn'] . " - Failed: " . $e->getMessage() . "!\n");
-		 } 
-
-
+		 }
 	}
+	public function showParticipants()
+	{
+		//Validate Input
+		$rules = array(
+			'thread'  => 'required|numeric|exists:message_threads,message_thread_thread_id',
+		);
+
+		$validator = Validator::make( Input::get(), $rules );
+		$return = array();
+
+		if( $validator->fails() )
+		{
+			$return[ 'errors' ] = $validator->messages()->all();
+			$status_code = 400;
+		}
+		else
+		{
+			$threadId = Input::get( 'thread' );
+
+			//Get current user
+			$token = Request::header( "X-API-TOKEN" );
+			$session = $this->token->get_session( $token );		
+			
+			$participants = MessageParticipants::where( 'join_message_participant_message_thread_id', '=', $threadId,'and')
+										->where( 'join_message_participant_user_id','!=', $session->token_user_id,'and')
+										->where( 'join_message_participant_deleted_thread', '=', 0)->get();
+										// ->orderBy( 'join_message_participant_id', 'desc' )					
+							
+			$current[ 'participants' ] = [ ];
+			foreach ($participants as $participant) 
+			{
+				$current[ 'participants' ] = particUser( $participant->user, $session, false );
+			}
+			$response['message'] = "Display thread participants successfully.";
+			$return[ 'thread' ] = $current;
+			$status_code = 200;
+		}		
+		$response = Response::make( $return, $status_code );
+		return $response;
+	}	
 }

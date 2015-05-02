@@ -99,13 +99,13 @@ class NotificationController extends BaseController
 
 		//Find total number to put in header
 		//$count = Notification::where( 'notification_user_id', '=', $session->token_user_id )->where('notification_deleted', '=', 0)->count();
-		$count = DB::table( 'notifications' )
+		/*$count = DB::table( 'notifications' )
 					->select( 'notifications.*', 'entries.entry_id', 'entries.entry_name' )
 					->leftJoin('entries', 'entries.entry_id', '=', 'notifications.notification_entry_id')
 					->where( 'notifications.notification_user_id', '=', $session->token_user_id )
 					->where( 'notifications.notification_deleted', '=', 0 )
 					->where( 'entries.entry_deleted', '=', '0' )
-					->count();
+					->count();*/
 
 		//If the count is greater than the highest number of items displayed show a next link
 		if( $count > ( $limit * $page ) )
@@ -198,7 +198,6 @@ class NotificationController extends BaseController
 				$current[ 'notificationId' ] = $notification->notification_id;
 				$current[ 'notificationContent' ] = $line;
 				$current[ 'notificationIcon' ] = $icon;
-				//$current[ 'notificationDate' ] = $notification->notification_updated_date;
 				if($notification->notification_type == 'Message')
 				{
 					$current[ 'notificationDate' ] = $notification->notification_created_date;

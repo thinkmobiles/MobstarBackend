@@ -1,7 +1,7 @@
 <?php
 
 class MessageThread extends \Eloquent {
-	protected $fillable = ["message_thread_thread_id", "message_thread_created_date"];
+	protected $fillable = ["message_thread_thread_id", "message_thread_created_date", "message_thread_created_by"];
     protected $primaryKey = 'message_thread_thread_id';
 
     protected $table = 'message_threads';

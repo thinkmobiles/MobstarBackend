@@ -463,3 +463,33 @@ function getusernamebyid($userid)
 		return 'Guest';
 	}
 }
+function particUser( $user, $session, $includeStars = false )
+{
+	$client = getS3Client();
+
+	$return = [ 'userId'           => $user->user_id,
+				'profileImage' => ( isset( $user->user_profile_image ) )
+					? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+60 minutes' ) : '',
+	];
+
+	if( ( $user->user_display_name == '' ) || ( is_null( $user->user_name ) ) || ( is_null( $user->user_email ) ) )
+	{
+		if( $user->user_facebook_id != 0 )
+		{
+			$return[ 'displayName' ] = $user->FacebookUser->facebook_user_display_name;
+		}
+		elseif( $user->user_twitter_id != 0 )
+		{
+			$return[ 'displayName' ] = $user->TwitterUser->twitter_user_display_name;
+		}
+		elseif( $user->user_google_id != 0 )
+		{
+			$return[ 'displayName' ] = $user->GoogleUser->google_user_display_name;
+		}
+	}
+	else
+	{
+		$return[ 'displayName' ] = $user->user_display_name;
+	}
+	return $return;
+}
