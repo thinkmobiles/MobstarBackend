@@ -130,7 +130,19 @@ class NotificationController extends BaseController
 
 		foreach( $notifications as $notification )
 		{
-			if(!empty(@$notification->entry->entry_id))
+			///////
+			$type = $notification->notification_type;
+			$condition = '';
+			if($type == 'Message')
+			{
+				$condition = @$notification->notification_entry_id;				
+			}
+			else
+			{
+				$condition = @$notification->entry->entry_id;
+			}
+			
+			if(!empty(@$condition))
 			{
 				$current = [ ];
 
