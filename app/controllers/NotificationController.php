@@ -135,22 +135,18 @@ class NotificationController extends BaseController
 			$type = $notification->notification_type;
 			$condition = '';
 			$entryIdsArray = array();
-			if($type == 'Message')
-			{
-				if(!in_array(@$notification->notification_entry_id,$entryIdsArray))
-				$entryIdsArray[] = @$notification->notification_entry_id;				
-			}
+			
 			if($type == 'Message')
 			{
 				$condition = @$notification->notification_entry_id;
-				if(!in_array(@$notification->notification_entry_id,$entryIdsArray))
+				/*if(!in_array(@$notification->notification_entry_id,$entryIdsArray))
 				{	
 					$entryIdsArray[] = @$notification->notification_entry_id;
 				}
 				else
 				{
 					continue;
-				}
+				}*/
 			}
 			else
 			{
