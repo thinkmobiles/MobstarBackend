@@ -667,9 +667,21 @@ public function reply()
 		//$recipients = MessageParticipants::where( 'join_message_participant_message_thread_id', $thread );
    	    //$recipients = MessageParticipants::where('join_message_participant_message_thread_id','=',$thread)->groupBy('join_message_participant_user_id')->get();
 		$message_group = 0;
-		$message_group = DB::table('messages')
+		$messagegroup = DB::table('messages')
 					->where('message_thread_id','=',$thread)
 					->pluck( 'message_group' );
+		if(!empty($messagegroup))
+		{
+			$message_group = $messagegroup;
+		}
+		else
+		{
+			$recipients = MessageParticipants::where('join_message_participant_message_thread_id','=',$thread)->groupBy('join_message_participant_user_id')->get();
+			if(count($recipients) > 1) 
+				$message_group = 1;
+			else
+				$message_group = 0;
+		}
 		$recipArray = [ ];
 		$particArray = [ ];
 		/*if(count($recipients) > 1) 
