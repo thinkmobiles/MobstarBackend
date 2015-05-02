@@ -1536,7 +1536,7 @@ class UserController extends BaseController
 
 					if(!empty($usersDeviceData))
 					{	
-						$this->registerSNSEndpoint($usersDeviceData[0],$message,$to,$name);
+						//$this->registerSNSEndpoint($usersDeviceData[0],$message,$to,$name);
 					}
 				}
 			}
