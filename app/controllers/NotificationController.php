@@ -133,6 +133,7 @@ class NotificationController extends BaseController
 		$checkIdArray = array();
 		foreach( $notifications as $notification )
 		{
+			$type = $notification->notification_type;
 			if($type == 'Message')
 			{
 				if( in_array( @$notification->notification_entry_id, $checkIdArray ) )
