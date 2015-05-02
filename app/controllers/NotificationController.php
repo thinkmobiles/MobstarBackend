@@ -234,7 +234,7 @@ class NotificationController extends BaseController
 					$countThread = DB::table('join_message_recipients')
 								->where('join_message_recipient_thread_id','=',$notification->notification_entry_id)
 								->count();
-					if($countThread > 2)
+					if($countThread >= 2 )
 					{
 						$message_group = 1;
 					}
