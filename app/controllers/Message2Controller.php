@@ -665,13 +665,17 @@ public function reply()
 		$session = $this->token->get_session( $token );
 
 		//$recipients = MessageParticipants::where( 'join_message_participant_message_thread_id', $thread );
-   	    $recipients = MessageParticipants::where('join_message_participant_message_thread_id','=',$thread)->groupBy('join_message_participant_user_id')->get();
+   	    //$recipients = MessageParticipants::where('join_message_participant_message_thread_id','=',$thread)->groupBy('join_message_participant_user_id')->get();
+		$message_group = 0;
+		$message_group = DB::table('messages')
+					->where('message_thread_id','=',$thread)
+					->pluck( 'message_group' );
 		$recipArray = [ ];
 		$particArray = [ ];
-		if(count($recipients) > 1) 
+		/*if(count($recipients) > 1) 
 			$message_group = 1;
 		else
-			$message_group = 0;
+			$message_group = 0;*/
 		$messageOb = Message2::create(
 							 [
 								 'message_creator_id'   => $session->token_user_id,
