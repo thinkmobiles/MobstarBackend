@@ -231,17 +231,22 @@ class NotificationController extends BaseController
 					$displayname = getusernamebyid($userid);
 					$current['entry']['entry_name'] = $displayname;
 
-					$countThread = DB::table('join_message_recipients')
+					/*$countThread = DB::table('join_message_recipients')
 								->where('join_message_recipient_thread_id','=',$notification->notification_entry_id)
-								->count();
-					if($countThread >= 2 )
+								->count();*/					
+					$message_group = 0;
+					$message_group = DB::table('messages')
+								->where('message_thread_id','=',$notification->notification_entry_id)
+								->pluck( 'message_group' );
+								
+					/*if($countThread >= 2 )
 					{
 						$message_group = 1;
 					}
 					else
 					{
 						$message_group = 0;
-					}
+					}*/
 					$current[ 'messageGroup' ] = $message_group;
 					
 				}
