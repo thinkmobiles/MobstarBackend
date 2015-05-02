@@ -1281,7 +1281,7 @@ public function reply()
 			$current[ 'participants' ] = [ ];
 			foreach ($participants as $participant) 
 			{
-				$current[ 'participants' ] = particUser( $participant->user, $session, false );
+				$current[ 'participants' ][] = particUser( $participant->user, $session, false );
 			}
 			$response['message'] = "Display thread participants successfully.";
 			$return[ 'thread' ] = $current;
