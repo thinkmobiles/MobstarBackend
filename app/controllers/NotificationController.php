@@ -98,7 +98,7 @@ class NotificationController extends BaseController
 		}
 
 		//Find total number to put in header
-		$count = Notification::where( 'notification_user_id', '=', $session->token_user_id )->where('notification_deleted', '=', 0)->count();
+		$count = Notification::where( 'notification_user_id', '=', $session->token_user_id )->where('notification_deleted', '=', 0)->groupBy('notification_entry_id')->count();
 		/*$count = DB::table( 'notifications' )
 					->select( 'notifications.*', 'entries.entry_id', 'entries.entry_name' )
 					->leftJoin('entries', 'entries.entry_id', '=', 'notifications.notification_entry_id')
