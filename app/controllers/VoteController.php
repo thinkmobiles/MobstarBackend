@@ -925,7 +925,7 @@ class VoteController extends BaseController
 								"userId"=>$to,
 								"diaplayname"=>$name,
 								"Type"=>$notif_Type,
-								"entry_id"=>$entry_id,
+								"entry_id"=>$entryId,
 								"notificationIcon"=>$icon,
 							)
 						)),
