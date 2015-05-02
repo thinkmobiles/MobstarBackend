@@ -678,7 +678,7 @@ public function reply()
 		}
 		else
 		{
-			if(count($recipients) > 1) 
+			if(count($recipients) > 3) 
 				$message_group = 1;
 			else
 				$message_group = 0;
