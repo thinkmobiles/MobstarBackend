@@ -1275,8 +1275,9 @@ public function reply()
 			
 			$participants = MessageParticipants::where( 'join_message_participant_message_thread_id', '=', $threadId,'and')
 										->where( 'join_message_participant_user_id','!=', $session->token_user_id,'and')
-										->where( 'join_message_participant_deleted_thread', '=', 0)->get();
-										->groupBy( 'join_message_participant_user_id')					
+										->where( 'join_message_participant_deleted_thread', '=', 0)
+										->groupBy( 'join_message_participant_user_id')
+										->get();		
 										// ->orderBy( 'join_message_participant_id', 'desc' )					
 							
 			$current[ 'participants' ] = [ ];
