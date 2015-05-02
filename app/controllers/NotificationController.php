@@ -98,7 +98,7 @@ class NotificationController extends BaseController
 		}
 
 		//Find total number to put in header
-		$count = Notification::where( 'notification_user_id', '=', $session->token_user_id )->where('notification_deleted', '=', 0)->groupBy('notification_entry_id')->count();
+		$count = Notification::where( 'notification_user_id', '=', $session->token_user_id )->where('notification_deleted', '=', 0)->groupBy('notification_type')->count();
 		/*$count = DB::table( 'notifications' )
 					->select( 'notifications.*', 'entries.entry_id', 'entries.entry_name' )
 					->leftJoin('entries', 'entries.entry_id', '=', 'notifications.notification_entry_id')
@@ -117,7 +117,7 @@ class NotificationController extends BaseController
 			$next = false;
 		}
 
-		$notifications = Notification::where( 'notification_user_id', '=', $session->token_user_id )->where('notification_deleted', '=', 0)->latest('notification_updated_date')->take( $limit )->skip( $offset )->groupBy('notification_entry_id')->get();
+		$notifications = Notification::where( 'notification_user_id', '=', $session->token_user_id )->where('notification_deleted', '=', 0)->latest('notification_updated_date')->take( $limit )->skip( $offset )->groupBy('notification_type')->get();
 		//$notifications = Notification::where( 'notification_user_id', '=', $session->token_user_id )->where('notification_deleted', '=', 0)->latest('notification_updated_date')->take( $limit )->skip( $offset )->get();
 		/*$notifications = DB::table( 'notifications' )
 					->select( 'notifications.*', 'entries.entry_id', 'entries.entry_name' )
