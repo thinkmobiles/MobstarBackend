@@ -227,7 +227,8 @@ class NotificationController extends BaseController
 				$current[ 'notificationIcon' ] = $icon;
 				if($notification->notification_type == 'Message')
 				{
-					$current[ 'notificationDate' ] = $notification->notification_created_date;
+					//$current[ 'notificationDate' ] = $notification->notification_created_date;
+					$current[ 'notificationDate' ] = $notification->notification_updated_date;
 				}
 				else
 				{
