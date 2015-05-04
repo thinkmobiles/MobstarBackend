@@ -469,7 +469,9 @@ function particUser( $user, $session, $includeStars = false )
 
 	$return = [ 'userId'           => $user->user_id,
 				'profileImage' => ( isset( $user->user_profile_image ) )
-					? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+60 minutes' ) : '',
+					? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+720 minutes' ) : '',
+				'profileCover' => ( isset( $user->user_cover_image ) )
+								  ? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+720 minutes' ) : '',	  	
 	];
 
 	if( ( $user->user_display_name == '' ) || ( is_null( $user->user_name ) ) || ( is_null( $user->user_email ) ) )
