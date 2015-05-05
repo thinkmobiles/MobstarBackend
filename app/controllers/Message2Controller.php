@@ -152,6 +152,7 @@ class Message2Controller extends BaseController
 				}*/
 			}
 			$user = User::find( $newlastMessage->join_message_recipient_user_id);			
+			$participants=$this->getParticipants($message->message_thread_thread_id,$session);
 			$current[ 'lastMessage' ][ 'messageContent' ] = $lastMessage->message->message_body;
 			$current[ 'lastMessage' ][ 'messageSender' ] = oneUser( $user, $session );
 			$current[ 'lastMessage' ][ 'messageReceived' ] = $lastMessage->message->message_created_date;
@@ -167,7 +168,7 @@ class Message2Controller extends BaseController
 			$msgread = 0;
 			$current[ 'read' ] = $msgread;
 			
-			$current[ 'participants' ] = [ ];
+			$current[ 'participants' ] = $participants;
 
 			/*foreach( $message->messageParticipants as $participant )
 			{
@@ -1308,5 +1309,28 @@ public function reply()
 		}		
 		$response = Response::make( $return, $status_code );
 		return $response;
-	}	
+	}
+	public function getParticipants($threadId=NULL, $session=NULL)
+	{
+		$return = array();
+		if(!empty($threadId) && !empty($session))
+		{
+			//Get current user			
+			$participants = MessageParticipants::where( 'join_message_participant_message_thread_id', '=', $threadId,'and')
+										->where( 'join_message_participant_user_id','!=', $session->token_user_id,'and')
+										->where( 'join_message_participant_deleted_thread', '=', 0)
+										->groupBy( 'join_message_participant_user_id')
+										->get();		
+										// ->orderBy( 'join_message_participant_id', 'desc' )					
+							
+			$current[ 'participants' ] = [ ];
+			foreach ($participants as $participant) 
+			{
+				$current[ 'participants' ][] = particUser( $participant->user, $session, false );
+			}
+			$response['message'] = "Display thread participants successfully.";
+			$return[ 'thread' ] = $current;
+		}			
+		return $return;
+	}
 }
