@@ -1600,7 +1600,10 @@ class UserController extends BaseController
 				{
 					$starNames = [];
 					$starNames = userDetails($starred->User);
-
+					if(!empty($starred->User->user_id) && $starred->User->user_id == $session->token_user_id)
+					{
+						continue;
+					}
 					$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
 									  'starName'     => @$starNames['displayName'],
 									  'starredDate'  => $starred->user_star_created_date,
