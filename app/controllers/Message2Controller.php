@@ -168,7 +168,7 @@ class Message2Controller extends BaseController
 			$msgread = 0;
 			$current[ 'read' ] = $msgread;
 			
-			$current[ 'participants' ][] = $participants;
+			$current[ 'participants' ] = $participants;
 
 			/*foreach( $message->messageParticipants as $participant )
 			{
@@ -1323,13 +1323,12 @@ public function reply()
 										->get();		
 										// ->orderBy( 'join_message_participant_id', 'desc' )					
 							
-			$current[ 'participants' ] = [ ];
+			$current = [ ];
 			foreach ($participants as $participant) 
 			{
-				$current[ 'participants' ][] = particUser( $participant->user, $session, false );
+				$current[] = particUser( $participant->user, $session, false );
 			}
-			$response['message'] = "Display thread participants successfully.";
-			$return[ 'thread' ] = $current;
+			$return = $current;
 		}			
 		return $return;
 	}
