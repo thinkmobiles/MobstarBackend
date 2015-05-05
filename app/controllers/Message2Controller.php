@@ -124,6 +124,7 @@ class Message2Controller extends BaseController
 			$current = array();
 
 			$current[ 'threadId' ] = $message->message_thread_thread_id;
+			$participants=$this->getParticipants($message->message_thread_thread_id,$session);
 
 			$last = -1;
 			$msgread = '0';
@@ -152,7 +153,6 @@ class Message2Controller extends BaseController
 				}*/
 			}
 			$user = User::find( $newlastMessage->join_message_recipient_user_id);			
-			$participants=$this->getParticipants($message->message_thread_thread_id,$session);
 			$current[ 'lastMessage' ][ 'messageContent' ] = $lastMessage->message->message_body;
 			$current[ 'lastMessage' ][ 'messageSender' ] = oneUser( $user, $session );
 			$current[ 'lastMessage' ][ 'messageReceived' ] = $lastMessage->message->message_created_date;
@@ -168,7 +168,7 @@ class Message2Controller extends BaseController
 			$msgread = 0;
 			$current[ 'read' ] = $msgread;
 			
-			$current[ 'participants' ] = $participants;
+			$current[ 'participants' ][] = $participants;
 
 			/*foreach( $message->messageParticipants as $participant )
 			{
