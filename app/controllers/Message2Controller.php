@@ -441,13 +441,6 @@ public function store()
 						->groupBy('join_message_participant_message_thread_id')
 						->havingRaw("max(join_message_participant_user_id =$session->token_user_id ) > 0 and max(join_message_participant_user_id =$recipients[0] ) > 0 ")
 						->pluck('join_message_participant_message_thread_id');
-			dd(DB::getQueryLog());
-			die;	
-			/*SELECT join_message_participant_message_thread_id FROM `join_message_participants`  
-group by join_message_participant_message_thread_id
-having max(join_message_participant_user_id = '302') > 0 and
-       max(join_message_participant_user_id ='1549') > 0*/
-			
 			if(empty($thread_id))
 			{
 				$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ),'message_thread_created_by' => $session->token_user_id ] );
