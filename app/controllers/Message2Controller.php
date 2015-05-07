@@ -936,7 +936,7 @@ public function reply()
 						break;
 				}
 
-				foreach ($users as $user)
+				/*foreach ($users as $user)
 				{
 					$recipients = [$user];
 					$message = $input['message'];
@@ -1015,7 +1015,7 @@ public function reply()
 							}
 						}
 					}*/
-				}
+				//}
 
 				$response['info'] = "Message sent successfully to " . count($users) . " users";
 				$status_code = 201;
