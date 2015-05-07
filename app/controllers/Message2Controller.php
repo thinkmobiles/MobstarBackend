@@ -427,21 +427,27 @@ public function store()
 
 		$recipients = array_values( explode( ',', $recipients ) );
 		if(count($recipients) > 1) 
-			$message_group = '1';
+			$message_group = 1;
 		else
-			$message_group = '0';
+			$message_group = 0;
 		$recipArray = [ ];
 		$particArray = [ ];
 		
 		$newThread = '';
-		if($message_group == '0')
+		if($message_group == 0)
 		{
 			$thread_id = DB::table('join_message_participants')
-						->whereIn('join_message_participant_user_id', array($session->token_user_id, $recipients[0]))
+						//->whereIn('join_message_participant_user_id', array($session->token_user_id, $recipients[0]))
+						->groupBy('join_message_participant_message_thread_id')
+						->havingRaw("max(join_message_participant_user_id =$session->token_user_id ) > 0 and max(join_message_participant_user_id =$recipients[0] ) > 0 ")
 						->pluck('join_message_participant_message_thread_id');
 			dd(DB::getQueryLog());
-			echo "if";
-			die($thread_id);
+			die;	
+			/*SELECT join_message_participant_message_thread_id FROM `join_message_participants`  
+group by join_message_participant_message_thread_id
+having max(join_message_participant_user_id = '302') > 0 and
+       max(join_message_participant_user_id ='1549') > 0*/
+			
 			if(empty($thread_id))
 			{
 				$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ),'message_thread_created_by' => $session->token_user_id ] );
@@ -467,8 +473,6 @@ public function store()
 		}
 		else
 		{
-			echo "else";
-			die();
 			$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ),'message_thread_created_by' => $session->token_user_id ] );
 			$newThread = $messageThread->message_thread_thread_id;
 		}
