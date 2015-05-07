@@ -466,7 +466,7 @@ public function store()
 		else
 		{
 			echo "else";
-			die($message_group);
+			die();
 			$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ),'message_thread_created_by' => $session->token_user_id ] );
 			$newThread = $messageThread->message_thread_thread_id;
 		}
