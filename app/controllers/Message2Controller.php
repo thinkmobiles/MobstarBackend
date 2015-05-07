@@ -427,18 +427,19 @@ public function store()
 
 		$recipients = array_values( explode( ',', $recipients ) );
 		if(count($recipients) > 1) 
-			$message_group = 1;
+			$message_group = '1';
 		else
-			$message_group = 0;
+			$message_group = '0';
 		$recipArray = [ ];
 		$particArray = [ ];
 		
 		$newThread = '';
-		if($message_group == 0)
+		if($message_group == '0')
 		{
 			$thread_id = DB::table('join_message_participants')
 						->whereIn('join_message_participant_user_id', array($session->token_user_id, $recipients[0]))
 						->pluck('join_message_participant_message_thread_id');
+			die($thread_id)
 			if(empty($thread_id))
 			{
 				$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ),'message_thread_created_by' => $session->token_user_id ] );
@@ -464,6 +465,7 @@ public function store()
 		}
 		else
 		{
+			die($message_group);
 			$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ),'message_thread_created_by' => $session->token_user_id ] );
 			$newThread = $messageThread->message_thread_thread_id;
 		}
