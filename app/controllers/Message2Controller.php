@@ -439,7 +439,7 @@ public function store()
 			$thread_id = DB::table('join_message_participants')
 						->whereIn('join_message_participant_user_id', array($session->token_user_id, $recipients[0]))
 						->pluck('join_message_participant_message_thread_id');
-			die($thread_id)
+			die($thread_id);
 			if(empty($thread_id))
 			{
 				$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ),'message_thread_created_by' => $session->token_user_id ] );
