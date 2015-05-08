@@ -1249,7 +1249,13 @@ public function reply()
 					'default' => $message,
 					'GCM'=>json_encode(array(
 						'data'=>array(
-							'message'=> $message
+							'message'=> $message,
+							"badge"=> intval(0),
+							"messageGroup"=>$message_group,
+       						"diaplayname"=>$name,
+							"notificationIcon"=>$icon,
+       						"entry_id"=>$threadid,
+							"Type"=>'Message',
 						)
 					))
 				))
