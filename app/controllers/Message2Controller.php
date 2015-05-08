@@ -1161,7 +1161,7 @@ public function reply()
 	}
 	public function registerSNSEndpoint( $device , $message, $message_group, $name, $icon, $threadid)
 	{
-		
+		mail("anil@spaceotechnologies.com",time(),print_r($device,true));
 		if( $device->device_registration_device_type == "apple" )
 		{
 			$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushdemo";
