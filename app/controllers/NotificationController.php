@@ -234,7 +234,7 @@ class NotificationController extends BaseController
 				{
 					$current[ 'notificationDate' ] = $notification->notification_updated_date;	
 				}
-				$current[ 'notificationRead' ] = ($notification->notification_read == 1);
+				$current[ 'notificationRead' ] = ($notification->notification_read == 1) ? 1 : 0;
 				if($notification->notification_type == 'Message')
 				{
 					$current[ 'notificationType' ] = $notification->notification_type;
