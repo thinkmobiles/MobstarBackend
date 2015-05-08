@@ -1526,7 +1526,7 @@ class UserController extends BaseController
 					// die();
 					$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
 						(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
-						from device_registrations where device_registration_device_token  != '' 
+						from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
 						order by device_registration_date_created desc
 						) t1 left join users u on t1.device_registration_user_id = u.user_id 
 						where u.user_deleted = 0 
@@ -1536,7 +1536,7 @@ class UserController extends BaseController
 
 					if(!empty($usersDeviceData))
 					{	
-						//$this->registerSNSEndpoint($usersDeviceData[0],$message,$to,$name);
+						$this->registerSNSEndpoint($usersDeviceData[0],$message,$to,$name);
 					}
 				}
 			}
@@ -1700,19 +1700,19 @@ class UserController extends BaseController
 								$STR == $userID." ,Rank = ".$newrank ;
 								//mail("anil@spaceotechnologies.com",time(),$message);
 
-								// $usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
-								// 	(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
-								// 	from device_registrations where device_registration_device_token  != '' 
-								// 	order by device_registration_date_created desc
-								// 	) t1 left join users u on t1.device_registration_user_id = u.user_id 
-								// 	where u.user_deleted = 0 
-								// 	AND u.user_id = $userID
-								// 	group by u.user_id 
-								// 	order by t1.device_registration_date_created desc"));
-								// if(!empty($usersDeviceData))
-								// {	
-								// 	$this->registerSNSEndpoint($usersDeviceData[0],$message);
-								// }
+								$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
+								 	(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
+								 	from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
+								 	order by device_registration_date_created desc
+								 	) t1 left join users u on t1.device_registration_user_id = u.user_id 
+								 	where u.user_deleted = 0 
+								 	AND u.user_id = $userID
+								 	group by u.user_id 
+								 	order by t1.device_registration_date_created desc"));
+								if(!empty($usersDeviceData))
+								{	
+								 	$this->registerSNSEndpoint($usersDeviceData[0],$message);
+								}
 							}
 							elseif ($oldrank < 11) 
 							{
@@ -1729,19 +1729,19 @@ class UserController extends BaseController
 									//mail("anil@spaceotechnologies.com",time(),$STR);
 
 								}
-								// $usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
-								// 	(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
-								// 	from device_registrations where device_registration_device_token  != '' 
-								// 	order by device_registration_date_created desc
-								// 	) t1 left join users u on t1.device_registration_user_id = u.user_id 
-								// 	where u.user_deleted = 0 
-								// 	AND u.user_id = $userID
-								// 	group by u.user_id 
-								// 	order by t1.device_registration_date_created desc"));
-								// if(!empty($usersDeviceData))
-								// {	
-								// 	$this->registerSNSEndpoint($usersDeviceData[0],$message);
-								// }
+								$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
+								 	(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
+								 	from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
+								 	order by device_registration_date_created desc
+								 	) t1 left join users u on t1.device_registration_user_id = u.user_id 
+								 	where u.user_deleted = 0 
+								 	AND u.user_id = $userID
+								 	group by u.user_id 
+								 	order by t1.device_registration_date_created desc"));
+								if(!empty($usersDeviceData))
+								{	
+								 	$this->registerSNSEndpoint($usersDeviceData[0],$message);
+								}
 							}
 						}
 						//
@@ -1764,7 +1764,7 @@ class UserController extends BaseController
 		}	    		
 		return Response::make( $return , 200 );
 	}
-	public function registerSNSEndpoint( $device , $message, $to, $name)
+	public function registerSNSEndpoint( $device , $message, $to=NULL, $name=NULL)
 	{
 		if( $device->device_registration_device_type == "apple" )
 		{
@@ -1822,40 +1822,84 @@ class UserController extends BaseController
 		 //die;
 		 if($device->device_registration_device_type == "apple")
 		 {	
-			 $publisharray = array(
-			 	'TargetArn' => $endpointDetails['EndpointArn'],
-			 	'MessageStructure' => 'json',
-			 	 'Message' => json_encode(array(
-					'default' => $message,
-					//'APNS_SANDBOX' => json_encode(array(
-					'APNS' => json_encode(array(
-						'aps' => array(
-							"sound" => "default",
-							"alert" => $message,
-							"badge"=> intval(0),
-							"userId"=>$to,
-							"diaplayname"=>$name,
-							"Type"=>"Follow",
+			if(!empty($to) && !empty($name))
+			{	
+				$publisharray = array(
+					'TargetArn' => $endpointDetails['EndpointArn'],
+					'MessageStructure' => 'json',
+					 'Message' => json_encode(array(
+						'default' => $message,
+						//'APNS_SANDBOX' => json_encode(array(
+						'APNS' => json_encode(array(
+							'aps' => array(
+								"sound" => "default",
+								"alert" => $message,
+								"badge"=> intval(1),
+								"userId"=>$to,
+								"diaplayname"=>$name,
+								"Type"=>"Follow",
 
-						)
-					)),
-				))
-			 );
+							)
+						)),
+					))
+				 );
+			}
+			else
+			{
+				$publisharray = array(
+					'TargetArn' => $endpointDetails['EndpointArn'],
+					'MessageStructure' => 'json',
+					 'Message' => json_encode(array(
+						'default' => $message,
+						//'APNS_SANDBOX' => json_encode(array(
+						'APNS' => json_encode(array(
+							'aps' => array(
+								"sound" => "default",
+								"alert" => $message,
+								"badge"=> intval(1),
+							)
+						)),
+					))
+				 );
+			}
 		 }
 		 else
 		 {
-			 $publisharray = array(
-			 	'TargetArn' => $endpointDetails['EndpointArn'],
-			 	'MessageStructure' => 'json',
-			 	'Message' => json_encode(array(
-					'default' => $message,
-					'GCM'=>json_encode(array(
-						'data'=>array(
-							'message'=> $message
-						)
+			if(!empty($to) && !empty($name))
+			{
+				$publisharray = array(
+					'TargetArn' => $endpointDetails['EndpointArn'],
+					'MessageStructure' => 'json',
+					'Message' => json_encode(array(
+						'default' => $message,
+						'GCM'=>json_encode(array(
+							'data'=>array(
+								'message'=> $message,
+								"badge"=> intval(1),
+								"userId"=>$to,
+								"diaplayname"=>$name,
+								"Type"=>"Follow"
+							)
+						))
 					))
-				))
-			 );
+				);
+			}
+			else
+			{
+				$publisharray = array(
+					'TargetArn' => $endpointDetails['EndpointArn'],
+					'MessageStructure' => 'json',
+					'Message' => json_encode(array(
+						'default' => $message,
+						'GCM'=>json_encode(array(
+							'data'=>array(
+								'message'=> $message,
+								"badge"=> intval(1)
+							)
+						))
+					))
+				);
+			}
 		 }
 		 try
 		 {
