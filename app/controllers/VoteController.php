@@ -469,8 +469,7 @@ class VoteController extends BaseController
 						) t1 left join users u on t1.device_registration_user_id = u.user_id 
 						where u.user_deleted = 0 
 						AND u.user_id = $to
-						group by u.user_id 
-						order by t1.device_registration_date_created desc"));
+						order by t1.device_registration_date_created desc LIMIT 1"));
 
 					if(!empty($usersDeviceData))
 					{	
@@ -563,8 +562,7 @@ class VoteController extends BaseController
 					) t1 left join users u on t1.device_registration_user_id = u.user_id 
 					where u.user_deleted = 0 
 					AND u.user_id = $userid
-					group by u.user_id 
-					order by t1.device_registration_date_created desc"));
+					order by t1.device_registration_date_created desc LIMIT 1"));
 
 				if(!empty($usersDeviceData))
 				{	

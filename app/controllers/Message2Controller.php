@@ -563,6 +563,7 @@ public function store()
 			{
 				$message = $msg;
 				$icon = 'http://' . $_ENV[ 'URL' ] . '/images/message.png';
+				//group by u.user_id 
 				$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
 					(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
 					from device_registrations where device_registration_device_token  != '' 
@@ -570,8 +571,7 @@ public function store()
 					) t1 left join users u on t1.device_registration_user_id = u.user_id 
 					where u.user_deleted = 0 
 					AND u.user_id = $recipient
-					group by u.user_id 
-					order by t1.device_registration_date_created desc"));
+					order by t1.device_registration_date_created desc LIMIT 1"));
 
 				if(!empty($usersDeviceData))
 				{	
@@ -796,8 +796,7 @@ public function reply()
 								) t1 left join users u on t1.device_registration_user_id = u.user_id 
 								where u.user_deleted = 0 
 								AND u.user_id = $u
-								group by u.user_id 
-								order by t1.device_registration_date_created desc"));
+								order by t1.device_registration_date_created desc LIMIT 1"));
 					
 					if(!empty($usersData))
 					{	
