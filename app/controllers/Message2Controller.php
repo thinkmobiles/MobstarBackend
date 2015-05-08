@@ -737,7 +737,7 @@ public function reply()
 									->orderBy( 'notification_updated_date', 'desc' )
 									->first();
 			$icon = 'message.png';
-			if( !count( $prev_not ) )
+			if( count( $prev_not ) < 0 )
 			{
 				Notification::create( [ 'notification_user_id'      => $recipient->join_message_participant_user_id,
 											'notification_subject_ids'  => json_encode( [ $session->token_user_id ] ),
