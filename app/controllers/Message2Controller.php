@@ -523,7 +523,7 @@ public function store()
 										'notification_entry_id'     => $newThread,
 										'notification_type'         => 'Message',
 										'notification_created_date' => date( 'Y-m-d H:i:s' ),
-										'notification_updated_date' => '0000-00-00 00:00:00' ] );
+										'notification_updated_date' => date( 'Y-m-d H:i:s' ) ] );
 			}
 			else
 			{
@@ -747,7 +747,7 @@ public function reply()
 											'notification_entry_id'     => $thread,
 											'notification_type'         => 'Message',
 											'notification_created_date' => date( 'Y-m-d H:i:s' ),
-											'notification_updated_date' => '0000-00-00 00:00:00' ] );
+											'notification_updated_date' => date( 'Y-m-d H:i:s' ) ] );
 			}
 			else
 			{	
