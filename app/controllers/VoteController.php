@@ -1003,7 +1003,6 @@ class VoteController extends BaseController
 		 }   
 		 catch (Exception $e)
 		 {
-			//die('else');
 			//print($endpointDetails['EndpointArn'] . " - Failed: " . $e->getMessage() . "!\n");
 		 } 
 
