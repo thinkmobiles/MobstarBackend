@@ -330,7 +330,7 @@ class CommentController extends BaseController
 				// die();
 				$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
 					(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
-					from device_registrations where device_registration_device_token  != '' 
+					from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
 					order by device_registration_date_created desc
 					) t1 left join users u on t1.device_registration_user_id = u.user_id 
 					where u.user_deleted = 0 
@@ -340,7 +340,7 @@ class CommentController extends BaseController
 
 				if(!empty($usersDeviceData))
 				{	
-					//$this->registerSNSEndpoint($usersDeviceData[0],$message,$name,$entryid,$icon);
+					$this->registerSNSEndpoint($usersDeviceData[0],$message,$name,$entryid,$icon);
 				}
 			}
 
@@ -477,7 +477,7 @@ class CommentController extends BaseController
 						'aps' => array(
 							"sound" => "default",
 							"alert" => $message,
-							"badge"=> intval(0),
+							"badge"=> intval(1),
 							"displayname"=>$name,
 							"Type"=>'Entry Comment',
 							"EntryId"=>$entryid,
@@ -496,7 +496,12 @@ class CommentController extends BaseController
 					'default' => $message,
 					'GCM'=>json_encode(array(
 						'data'=>array(
-							'message'=> $message
+							'message'=> $message,
+							"badge"=> intval(1),
+							"displayname"=>$name,
+							"Type"=>'Entry Comment',
+							"EntryId"=>$entryid,
+							"notificationIcon"=>$icon
 						)
 					))
 				))
