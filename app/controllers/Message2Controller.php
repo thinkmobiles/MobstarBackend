@@ -1255,7 +1255,7 @@ public function reply()
        						"diaplayname"=>$name,
 							"notificationIcon"=>$icon,
        						"entry_id"=>$threadid,
-							"Type"=>'Message',
+							"Type"=>'Message'
 						)
 					))
 				))
