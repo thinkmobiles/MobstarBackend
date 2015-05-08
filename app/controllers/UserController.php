@@ -1536,7 +1536,7 @@ class UserController extends BaseController
 
 					if(!empty($usersDeviceData))
 					{	
-						//$this->registerSNSEndpoint($usersDeviceData[0],$message,$to,$name);
+						$this->registerSNSEndpoint($usersDeviceData[0],$message,$to,$name);
 					}
 				}
 			}
@@ -1700,19 +1700,19 @@ class UserController extends BaseController
 								$STR == $userID." ,Rank = ".$newrank ;
 								//mail("anil@spaceotechnologies.com",time(),$message);
 
-								// $usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
-								// 	(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
-								// 	from device_registrations where device_registration_device_token  != '' 
-								// 	order by device_registration_date_created desc
-								// 	) t1 left join users u on t1.device_registration_user_id = u.user_id 
-								// 	where u.user_deleted = 0 
-								// 	AND u.user_id = $userID
-								// 	group by u.user_id 
-								// 	order by t1.device_registration_date_created desc"));
-								// if(!empty($usersDeviceData))
-								// {	
-								// 	$this->registerSNSEndpoint($usersDeviceData[0],$message);
-								// }
+								 $usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
+								 	(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
+								 	from device_registrations where device_registration_device_token  != '' 
+								 	order by device_registration_date_created desc
+								 	) t1 left join users u on t1.device_registration_user_id = u.user_id 
+								 	where u.user_deleted = 0 
+								 	AND u.user_id = $userID
+								 	group by u.user_id 
+								 	order by t1.device_registration_date_created desc"));
+								 if(!empty($usersDeviceData))
+								 {	
+								 	$this->registerSNSEndpoint($usersDeviceData[0],$message);
+								 }
 							}
 							elseif ($oldrank < 11) 
 							{
@@ -1729,19 +1729,19 @@ class UserController extends BaseController
 									//mail("anil@spaceotechnologies.com",time(),$STR);
 
 								}
-								// $usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
-								// 	(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
-								// 	from device_registrations where device_registration_device_token  != '' 
-								// 	order by device_registration_date_created desc
-								// 	) t1 left join users u on t1.device_registration_user_id = u.user_id 
-								// 	where u.user_deleted = 0 
-								// 	AND u.user_id = $userID
-								// 	group by u.user_id 
-								// 	order by t1.device_registration_date_created desc"));
-								// if(!empty($usersDeviceData))
-								// {	
-								// 	$this->registerSNSEndpoint($usersDeviceData[0],$message);
-								// }
+								$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
+								 	(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
+								 	from device_registrations where device_registration_device_token  != '' 
+								 	order by device_registration_date_created desc
+								 	) t1 left join users u on t1.device_registration_user_id = u.user_id 
+								 	where u.user_deleted = 0 
+								 	AND u.user_id = $userID
+								 	group by u.user_id 
+								 	order by t1.device_registration_date_created desc"));
+								if(!empty($usersDeviceData))
+								{	
+								 	$this->registerSNSEndpoint($usersDeviceData[0],$message);
+								}
 							}
 						}
 						//

@@ -575,7 +575,7 @@ public function store()
 
 				if(!empty($usersDeviceData))
 				{	
-					//$this->registerSNSEndpoint($usersDeviceData[0], $message, $message_group, $name, $icon, $threadid);
+					$this->registerSNSEndpoint($usersDeviceData[0], $message, $message_group, $name, $icon, $threadid);
 				}
 			}
 
@@ -801,7 +801,7 @@ public function reply()
 
 					if(!empty($usersData))
 					{	
-							//$this->registerSNSEndpoint($usersData[0], $message, $message_group, $name, $icon, $threadid);
+							$this->registerSNSEndpoint($usersData[0], $message, $message_group, $name, $icon, $threadid);
 					}
 				}
 			}

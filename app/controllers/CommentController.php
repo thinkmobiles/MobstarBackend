@@ -340,7 +340,7 @@ class CommentController extends BaseController
 
 				if(!empty($usersDeviceData))
 				{	
-					//$this->registerSNSEndpoint($usersDeviceData[0],$message,$name,$entryid,$icon);
+					$this->registerSNSEndpoint($usersDeviceData[0],$message,$name,$entryid,$icon);
 				}
 			}
 
