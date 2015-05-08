@@ -791,14 +791,14 @@ public function reply()
 				{
 					$usersData = DB::select( DB::raw("SELECT t1.* FROM 
 								(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
-								from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar' AND device_registration_device_type = 'apple'
+								from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
 								order by device_registration_date_created desc
 								) t1 left join users u on t1.device_registration_user_id = u.user_id 
 								where u.user_deleted = 0 
 								AND u.user_id = $u
 								group by u.user_id 
 								order by t1.device_registration_date_created desc"));
-
+					
 					if(!empty($usersData))
 					{	
 							$this->registerSNSEndpoint($usersData[0], $message, $message_group, $name, $icon, $threadid);
@@ -1249,7 +1249,13 @@ public function reply()
 					'default' => $message,
 					'GCM'=>json_encode(array(
 						'data'=>array(
-							'message'=> $message							
+							'message'=> $message,
+							"badge"=> intval(0),
+							"messageGroup"=>$message_group,
+       						"diaplayname"=>$name,
+							"notificationIcon"=>$icon,
+       						"entry_id"=>$threadid,
+							"Type"=>'Message'							
 						)
 					))
 				))
