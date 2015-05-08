@@ -799,6 +799,19 @@ public function reply()
 								group by u.user_id 
 								order by t1.device_registration_date_created desc"));
 
+					echo "<pre>";
+					echo $usersData[0];
+					echo "<pre>";
+					echo $message;
+					echo "<pre>";
+					echo $message_group;
+					echo "<pre>";
+					echo $name;
+					echo "<pre>";
+					echo $icon;
+					echo "<pre>";
+					echo $threadid;
+					die;
 					if(!empty($usersData))
 					{	
 							$this->registerSNSEndpoint($usersData[0], $message, $message_group, $name, $icon, $threadid);
