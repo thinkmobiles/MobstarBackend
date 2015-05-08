@@ -1164,8 +1164,8 @@ public function reply()
 		
 		if( $device->device_registration_device_type == "apple" )
 		{
-			//$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushdemo";
-			$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS_SANDBOX/adminsandbox";
+			$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushdemo";
+			//$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS_SANDBOX/adminsandbox";
 		}
 		else
 		{
@@ -1223,8 +1223,8 @@ public function reply()
 			 	'MessageStructure' => 'json',
 			 	 'Message' => json_encode(array(
 					'default' => $message,
-					'APNS_SANDBOX' => json_encode(array(
-					//'APNS' => json_encode(array(
+					//'APNS_SANDBOX' => json_encode(array(
+					'APNS' => json_encode(array(
 						'aps' => array(
 							"sound" => "default",
 							"alert" => $message,
