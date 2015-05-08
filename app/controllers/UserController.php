@@ -1521,7 +1521,7 @@ class UserController extends BaseController
 				$to = $star->user_star_star_id;
 				if(!empty($name))
 				{
-					$message = "You have followed by ".$name;
+					$message = $name." is now following you.";
 					// echo $message;
 					// die();
 					$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 

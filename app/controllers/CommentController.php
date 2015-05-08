@@ -323,7 +323,7 @@ class CommentController extends BaseController
 			$icon = 'http://' . $_ENV[ 'URL' ] . '/images/comment.png';
 			if(!empty($name))
 			{
-				$message = $name." commented on your entry";
+				$message = $name." commented on your entry.";
 				$entryid = $record->entry_id;
 
 				// echo $message;

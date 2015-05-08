@@ -96,7 +96,7 @@ class StarController extends BaseController
 						$to = $starCheck->user_star_star_id;
 						if(!empty($name))
 						{
-							$message = "You have followed by ".$name;
+							$message = $name." is now following you.";
 							$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
 								(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
 								from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
@@ -138,7 +138,7 @@ class StarController extends BaseController
 				$to = $starCheck->user_star_star_id;
 				if(!empty($name))
 				{
-					$message = "You have followed by ".$name;
+					$message = $name." is now following you.";
 					$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
 						(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
 						from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'

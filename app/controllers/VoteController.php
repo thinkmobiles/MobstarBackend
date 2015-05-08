@@ -455,11 +455,11 @@ class VoteController extends BaseController
 				{
 					if($notif_Type == 'Like')
 					{
-						$message = $name.' Liked your '.$entryType;
+						$message = $name.' just liked your  '.$entryType;
 					}
 					else
 					{
-						$message = $name.' Voted Up your '.$entryType;
+						$message = $name.' just voted for your entry.'; //.$entryType;
 					}
 					$icon = 'http://' . $_ENV[ 'URL' ] . '/images/' . $icon;
 					$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 

@@ -484,7 +484,7 @@ public function store()
 		);
 		$userid = $session->token_user_id;
 		$name = getusernamebyid($userid);
-		$msg = $name.' messaged you.';
+		$msg = $name.' has messaged you.';
 		//$threadid = $messageThread->message_thread_thread_id;
 		$threadid = $newThread;
 		$icon = '';
@@ -516,7 +516,7 @@ public function store()
 			{
 				Notification::create( [ 'notification_user_id'      => $recipient,
 										'notification_subject_ids'  => json_encode( [ $session->token_user_id ] ),
-										'notification_details'      => ' messaged you.',
+										'notification_details'      => ' has messaged you.',
 										'notification_icon'			=> $icon,
 										'notification_read'         => 0,
 										//'notification_entry_id'     => $messageThread->message_thread_thread_id,
@@ -708,7 +708,7 @@ public function reply()
 			
 		$userid = $session->token_user_id;
 		$name = getusernamebyid($userid);
-		$msg = $name.' messaged you.';	
+		$msg = $name.' has messaged you.';	
 		$threadid = $thread;
 		$icon = '';	
 		foreach( $recipients as $recipient )
@@ -741,7 +741,7 @@ public function reply()
 			{
 				Notification::create( [ 'notification_user_id'      => $recipient->join_message_participant_user_id,
 											'notification_subject_ids'  => json_encode( [ $session->token_user_id ] ),
-											'notification_details'      => ' messaged you.',
+											'notification_details'      => ' has messaged you.',
 											'notification_icon'			=> $icon,
 											'notification_read'         => 0,
 											'notification_entry_id'     => $thread,
