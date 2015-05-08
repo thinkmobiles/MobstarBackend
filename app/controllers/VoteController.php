@@ -464,7 +464,7 @@ class VoteController extends BaseController
 					$icon = 'http://' . $_ENV[ 'URL' ] . '/images/' . $icon;
 					$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
 						(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
-						from device_registrations where device_registration_device_token  != '' 
+						from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar' 
 						order by device_registration_date_created desc
 						) t1 left join users u on t1.device_registration_user_id = u.user_id 
 						where u.user_deleted = 0 
@@ -474,7 +474,7 @@ class VoteController extends BaseController
 
 					if(!empty($usersDeviceData))
 					{	
-						//$this->registerSNSEndpoint($usersDeviceData[0],$message,$to,$notif_Type,$name,$icon,$entryId);
+						$this->registerSNSEndpoint($usersDeviceData[0],$message,$to,$notif_Type,$name,$icon,$entryId);
 					}
 				}
 				/* Change Yes vote to follow */
@@ -558,7 +558,7 @@ class VoteController extends BaseController
 				$message = "You have 10 votes";
 				$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
 					(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
-					from device_registrations where device_registration_device_token  != '' 
+					from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
 					order by device_registration_date_created desc
 					) t1 left join users u on t1.device_registration_user_id = u.user_id 
 					where u.user_deleted = 0 
@@ -568,7 +568,7 @@ class VoteController extends BaseController
 
 				if(!empty($usersDeviceData))
 				{	
-					//$this->registerSNSEndpoint($usersDeviceData[0],$message);
+					$this->registerSNSEndpoint($usersDeviceData[0],$message);
 				}
 			}
 			$this->vote->create( $input );
@@ -921,7 +921,7 @@ class VoteController extends BaseController
 							'aps' => array(
 								"sound" => "default",
 								"alert" => $message,
-								"badge"=> intval(0),
+								"badge"=> intval(1),
 								"userId"=>$to,
 								"diaplayname"=>$name,
 								"Type"=>$notif_Type,
@@ -944,7 +944,7 @@ class VoteController extends BaseController
 							'aps' => array(
 								"sound" => "default",
 								"alert" => $message,
-								"badge"=> intval(0),								
+								"badge"=> intval(1),								
 							)
 						)),
 					))
@@ -953,18 +953,43 @@ class VoteController extends BaseController
 		 }
 		 else
 		 {
-			 $publisharray = array(
-			 	'TargetArn' => $endpointDetails['EndpointArn'],
-			 	'MessageStructure' => 'json',
-			 	'Message' => json_encode(array(
-					'default' => $message,
-					'GCM'=>json_encode(array(
-						'data'=>array(
-							'message'=> $message
-						)
+			if(!empty($to) && !empty($name) && !empty($notif_Type))
+			{
+				$publisharray = array(
+					'TargetArn' => $endpointDetails['EndpointArn'],
+					'MessageStructure' => 'json',
+					'Message' => json_encode(array(
+						'default' => $message,
+						'GCM'=>json_encode(array(
+							'data'=>array(
+								'message'=> $message,
+								"badge"=> intval(1),
+								"userId"=>$to,
+								"diaplayname"=>$name,
+								"Type"=>$notif_Type,
+								"entry_id"=>$entryId,
+								"notificationIcon"=>$icon
+							)
+						))
 					))
-				))
-			 );
+				);
+			}
+			else
+			{
+				$publisharray = array(
+					'TargetArn' => $endpointDetails['EndpointArn'],
+					'MessageStructure' => 'json',
+					'Message' => json_encode(array(
+						'default' => $message,
+						'GCM'=>json_encode(array(
+							'data'=>array(
+								'message'=> $message,
+								"badge"=> intval(1)
+							)
+						))
+					))
+				);
+			}
 		 }
 		 try
 		 {
