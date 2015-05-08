@@ -479,8 +479,9 @@ class NotificationController extends BaseController
 		}
 		else
 		{
+			$notification = Notification::where('notification_user_id', '=', $session->token_user_id)->update(['notification_read' => 1]);
 			// get ids
-			$id_commas = Input::get( 'notificationIds' );
+			/*$id_commas = Input::get( 'notificationIds' );
 			$id =  explode( ',', $id_commas );
 			for( $i=0; $i<count($id); $i++ )
 			{
@@ -494,11 +495,10 @@ class NotificationController extends BaseController
 				{
 					continue;
 				}			
-			}
+			}*/
 			$response[ 'message' ] = "Notification read successfully";
 			$status_code = 201;
 		}
-
 		return Response::make( $response, $status_code );	
 	}
 }
