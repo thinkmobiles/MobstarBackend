@@ -474,7 +474,7 @@ class VoteController extends BaseController
 
 					if(!empty($usersDeviceData))
 					{	
-						$this->registerSNSEndpoint($usersDeviceData[0],$message,$to,$notif_Type,$name,$icon,$entryId);
+						//$this->registerSNSEndpoint($usersDeviceData[0],$message,$to,$notif_Type,$name,$icon,$entryId);
 					}
 				}
 				/* Change Yes vote to follow */
@@ -568,7 +568,7 @@ class VoteController extends BaseController
 
 				if(!empty($usersDeviceData))
 				{	
-					$this->registerSNSEndpoint($usersDeviceData[0],$message);
+					//$this->registerSNSEndpoint($usersDeviceData[0],$message);
 				}
 			}
 			$this->vote->create( $input );
