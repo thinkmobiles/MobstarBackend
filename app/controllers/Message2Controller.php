@@ -737,7 +737,7 @@ public function reply()
 									->orderBy( 'notification_updated_date', 'desc' )
 									->first();
 			$icon = 'message.png';
-			if( count( $prev_not ) < 0 )
+			if( count( $prev_not ) == 0 )
 			{
 				Notification::create( [ 'notification_user_id'      => $recipient->join_message_participant_user_id,
 											'notification_subject_ids'  => json_encode( [ $session->token_user_id ] ),
@@ -1228,7 +1228,7 @@ public function reply()
 						'aps' => array(
 							"sound" => "default",
 							"alert" => $message,
-							"badge"=> intval(1),
+							"badge"=> intval(0),
 							"messageGroup"=>$message_group,
        						"diaplayname"=>$name,
 							"notificationIcon"=>$icon,
@@ -1250,7 +1250,7 @@ public function reply()
 					'GCM'=>json_encode(array(
 						'data'=>array(
 							'message'=> $message,
-							"badge"=> intval(1),
+							"badge"=> intval(0),
 							"messageGroup"=>$message_group,
        						"diaplayname"=>$name,
 							"notificationIcon"=>$icon,

@@ -1834,7 +1834,7 @@ class UserController extends BaseController
 							'aps' => array(
 								"sound" => "default",
 								"alert" => $message,
-								"badge"=> intval(1),
+								"badge"=> intval(0),
 								"userId"=>$to,
 								"diaplayname"=>$name,
 								"Type"=>"Follow",
@@ -1856,7 +1856,7 @@ class UserController extends BaseController
 							'aps' => array(
 								"sound" => "default",
 								"alert" => $message,
-								"badge"=> intval(1),
+								"badge"=> intval(0),
 							)
 						)),
 					))
@@ -1875,7 +1875,7 @@ class UserController extends BaseController
 						'GCM'=>json_encode(array(
 							'data'=>array(
 								'message'=> $message,
-								"badge"=> intval(1),
+								"badge"=> intval(0),
 								"userId"=>$to,
 								"diaplayname"=>$name,
 								"Type"=>"Follow"
@@ -1894,7 +1894,7 @@ class UserController extends BaseController
 						'GCM'=>json_encode(array(
 							'data'=>array(
 								'message'=> $message,
-								"badge"=> intval(1)
+								"badge"=> intval(0)
 							)
 						))
 					))
