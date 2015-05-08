@@ -91,6 +91,27 @@ class StarController extends BaseController
 					{
 						$starCheck->user_star_deleted = 0;
 						$starCheck->save();
+						$userid = $session->token_user_id;
+						$name = getusernamebyid($userid);
+						$to = $starCheck->user_star_star_id;
+						if(!empty($name))
+						{
+							$message = "You have followed by ".$name;
+							$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
+								(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
+								from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
+								order by device_registration_date_created desc
+								) t1 left join users u on t1.device_registration_user_id = u.user_id 
+								where u.user_deleted = 0 
+								AND u.user_id = $to
+								group by u.user_id 
+								order by t1.device_registration_date_created desc"));
+
+							if(!empty($usersDeviceData))
+							{	
+								$this->registerSNSEndpoint($usersDeviceData[0],$message,$to,$name);
+							}
+						}
 					}
 					else
 					{
@@ -113,7 +134,28 @@ class StarController extends BaseController
 				}
 				$star->user_star_created_date = date( 'Y-m-d H:i:s' );
 				$star->save();
-			}
+				$userid = $session->token_user_id;
+				$name = getusernamebyid($userid);
+				$to = $starCheck->user_star_star_id;
+				if(!empty($name))
+				{
+					$message = "You have followed by ".$name;
+					$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
+						(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
+						from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
+						order by device_registration_date_created desc
+						) t1 left join users u on t1.device_registration_user_id = u.user_id 
+						where u.user_deleted = 0 
+						AND u.user_id = $to
+						group by u.user_id 
+						order by t1.device_registration_date_created desc"));
+
+					if(!empty($usersDeviceData))
+					{	
+						$this->registerSNSEndpoint($usersDeviceData[0],$message,$to,$name);
+					}
+				}
+			}			
 			$response[ 'message' ] = "star added";
 			$status_code = 201;
 		}
@@ -174,5 +216,142 @@ class StarController extends BaseController
 
 		return Response::make( $response, $status_code );
 	}
+	public function registerSNSEndpoint( $device , $message, $to=NULL, $name=NULL)
+	{
+		if( $device->device_registration_device_type == "apple" )
+		{
+			$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushdemo";
+			//$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS_SANDBOX/adminsandbox";
+		}
+		else
+		{
+			$arn = "arn:aws:sns:eu-west-1:830026328040:app/GCM/admin-android-notification";
+		}
 
+		$sns = getSNSClient();
+
+		$Model1 = $sns->listPlatformApplications();  
+		
+		$result1 = $sns->listEndpointsByPlatformApplication(array(
+			// PlatformApplicationArn is required
+			'PlatformApplicationArn' => $arn,
+		));
+		foreach($result1['Endpoints'] as $Endpoint){
+			$EndpointArn = $Endpoint['EndpointArn']; 
+			$EndpointToken = $Endpoint['Attributes'];
+			foreach($EndpointToken as $key=>$newVals){
+				if($key=="Token"){
+					if($device->device_registration_device_token==$newVals){
+					//Delete ARN
+						$result = $sns->deleteEndpoint(array(
+							// EndpointArn is required
+							'EndpointArn' => $EndpointArn,
+						));
+					}
+				}
+			}
+		}
+
+		$result = $sns->createPlatformEndpoint(array(
+			 // PlatformApplicationArn is required
+			 'PlatformApplicationArn' => $arn,
+			 // Token is required
+			 'Token' => $device->device_registration_device_token,
+
+		));
+
+		$endpointDetails = $result->toArray();		 
+		if($device->device_registration_device_type == "apple")
+		{	
+			if(!empty($to) && !empty($name))
+			{	
+				$publisharray = array(
+					'TargetArn' => $endpointDetails['EndpointArn'],
+					'MessageStructure' => 'json',
+					 'Message' => json_encode(array(
+						'default' => $message,
+						//'APNS_SANDBOX' => json_encode(array(
+						'APNS' => json_encode(array(
+							'aps' => array(
+								"sound" => "default",
+								"alert" => $message,
+								"badge"=> intval(1),
+								"userId"=>$to,
+								"diaplayname"=>$name,
+								"Type"=>"Follow",
+
+							)
+						)),
+					))
+				 );
+			}
+			else
+			{
+				$publisharray = array(
+					'TargetArn' => $endpointDetails['EndpointArn'],
+					'MessageStructure' => 'json',
+					 'Message' => json_encode(array(
+						'default' => $message,
+						//'APNS_SANDBOX' => json_encode(array(
+						'APNS' => json_encode(array(
+							'aps' => array(
+								"sound" => "default",
+								"alert" => $message,
+								"badge"=> intval(1),
+							)
+						)),
+					))
+				 );
+			}
+		}
+		else
+		{
+			if(!empty($to) && !empty($name))
+			{
+				$publisharray = array(
+					'TargetArn' => $endpointDetails['EndpointArn'],
+					'MessageStructure' => 'json',
+					'Message' => json_encode(array(
+						'default' => $message,
+						'GCM'=>json_encode(array(
+							'data'=>array(
+								'message'=> $message,
+								"badge"=> intval(1),
+								"userId"=>$to,
+								"diaplayname"=>$name,
+								"Type"=>"Follow"
+							)
+						))
+					))
+				);
+			}
+			else
+			{
+				$publisharray = array(
+					'TargetArn' => $endpointDetails['EndpointArn'],
+					'MessageStructure' => 'json',
+					'Message' => json_encode(array(
+						'default' => $message,
+						'GCM'=>json_encode(array(
+							'data'=>array(
+								'message'=> $message,
+								"badge"=> intval(1)
+							)
+						))
+					))
+				);
+			}
+		}
+		try
+		{
+			$sns->publish($publisharray);
+			$myfile = 'sns-log.txt';
+			file_put_contents($myfile, date('d-m-Y H:i:s') . ' debug log:', FILE_APPEND);
+			file_put_contents($myfile, print_r($endpointDetails, true), FILE_APPEND);
+		}   
+		catch (Exception $e)
+		{
+			//print($endpointDetails['EndpointArn'] . " - Failed: " . $e->getMessage() . "!\n");
+		}
+	}
 }
