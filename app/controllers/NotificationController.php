@@ -120,6 +120,8 @@ class NotificationController extends BaseController
 
 		//$notifications = Notification::where( 'notification_user_id', '=', $session->token_user_id )->where('notification_deleted', '=', 0)->latest('notification_updated_date')->take( $limit )->skip( $offset )->groupBy('notification_entry_id')->get();
 		$notifications = Notification::where( 'notification_user_id', '=', $session->token_user_id )->where('notification_deleted', '=', 0)->latest('notification_updated_date')->take( $limit )->skip( $offset )->get();
+		print_r($notifications);
+		dd(DB::getQueryLog());
 		//$notifications = Notification::where( 'notification_user_id', '=', $session->token_user_id )->where('notification_deleted', '=', 0)->latest('notification_updated_date')->take( $limit )->skip( $offset )->get();
 		/*$notifications = DB::table( 'notifications' )
 					->select( 'notifications.*', 'entries.entry_id', 'entries.entry_name' )
