@@ -296,7 +296,11 @@ class LoginController extends BaseController
 			$user = User::firstOrNew( array( 'user_facebook_id' => $facebook_user->facebook_user_id ) );
 
 			$user->save();
-
+			if($user->user_deleted == '1')
+			{
+				$return = array( "error" => "You have provided wrong credentials" );
+				$status_code = 401;				
+			}
 			$deviceToken = Input::get( 'deviceToken' );
 			$deviceType = Input::get( 'device' );
 
