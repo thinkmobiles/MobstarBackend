@@ -102,7 +102,8 @@ class LoginController extends BaseController
 			// create our user data for the authentication
 			$userdata = array(
 				'user_email' => Input::get( 'email' ),
-				'password'   => Input::get( 'password' )
+				'password'   => Input::get( 'password' ),
+				'user_deleted'   => '0'
 			);
 
 			// attempt to do the login
