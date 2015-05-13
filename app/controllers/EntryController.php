@@ -3358,7 +3358,8 @@ class EntryController extends BaseController
 					 ->leftJoin('google_users', 'users.user_google_id', '=', 'google_users.google_user_id')
 					// ->whereNotIn( 'entries.entry_category_id', $excludeCategory )
 					 ->where( 'entries.entry_deleted', '=', '0' )
-					 ->where( function ( $query ) use ( $term )
+					->where( 'users.user_deleted', '=', '0' )	
+					->where( function ( $query ) use ( $term )
 					 {
 						 $query->orWhere( 'entries.entry_name', 'LIKE', '%' . $term . '%' )
 							   ->orWhere( 'entries.entry_description', 'LIKE', '%' . $term . '%' )
