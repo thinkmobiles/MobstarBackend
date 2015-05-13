@@ -296,10 +296,15 @@ class LoginController extends BaseController
 			$user = User::firstOrNew( array( 'user_facebook_id' => $facebook_user->facebook_user_id ) );
 
 			$user->save();
+			if($facebook_user->facebook_user_id == '1')
+				mail('anil@spaceotechnologies.com',time(),print_r($user,true));
 			if($user->user_deleted == '1')
 			{
 				$return = array( "error" => "You have provided wrong credentials" );
-				$status_code = 401;				
+				$status_code = 401;
+				$response = Response::make( $return, $status_code );
+
+				return $response;	
 			}
 			$deviceToken = Input::get( 'deviceToken' );
 			$deviceType = Input::get( 'device' );
