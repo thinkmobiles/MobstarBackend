@@ -669,8 +669,15 @@ public function reply()
 
 		//$recipients = MessageParticipants::where( 'join_message_participant_message_thread_id', $thread );
    	    //$recipients = MessageParticipants::where('join_message_participant_message_thread_id','=',$thread)->groupBy('join_message_participant_user_id')->get();
-		$recipients = MessageParticipants::where('join_message_participant_message_thread_id','=',$thread)->groupBy('join_message_participant_user_id')->get();
-
+		// Commented on 15-May-2015 
+		//$recipients = MessageParticipants::where('join_message_participant_message_thread_id','=',$thread)->groupBy('join_message_participant_user_id')->get();
+		$recipients_count = MessageParticipants::where('join_message_participant_message_thread_id','=',$thread)->where('join_message_participant_user_id','<>','3101')->where('join_message_participant_user_id','<>',$session->token_user_id)->groupBy('join_message_participant_user_id')->count();
+   	    $recipients = MessageParticipants::where('join_message_participant_message_thread_id','=',$thread)->where('join_message_participant_user_id','<>','3101')->where('join_message_participant_user_id','<>',$session->token_user_id)->groupBy('join_message_participant_user_id')->get();
+		if($recipients_count == 0)
+		{
+			$status_code = 200;
+			return;
+		}
 		$message_group = 0;
 		$messagegroup = DB::table('messages')
 					->where('message_thread_id','=',$thread)
