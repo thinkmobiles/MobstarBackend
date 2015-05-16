@@ -65,7 +65,7 @@ class FanController extends BaseController
 
 		$session = $this->token->get_session( $token );
 
-		$entries = Entry::where( 'entry_user_id', '=', $session->token_user_id )->has( 'comments' )->with( 'comments' )->get();
+		$entries = Entry::where( 'entry_user_id', '=', $session->token_user_id )->has( 'comments' )->with( 'comments' )->orderBy('comments.comment_added_date', 'desc')->get();
 
 		$returning = [ ];
 
