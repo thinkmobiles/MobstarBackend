@@ -38,12 +38,12 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 
 	public function Stars()
 	{
-		return $this->hasMany( 'Star', 'user_star_user_id', 'user_id' );
+		return $this->hasMany( 'Star', 'user_star_user_id', 'user_id' )->orderBy('user_star_created_date', 'ASC');
 	}
 
 	public function StarredBy()
 	{
-		return $this->hasMany( 'Star', 'user_star_star_id', 'user_id' );
+		return $this->hasMany( 'Star', 'user_star_star_id', 'user_id' )->orderBy('user_star_created_date', 'ASC');
 	}
 
 	public function getAuthIdentifier()
