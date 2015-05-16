@@ -117,7 +117,7 @@ class CommentController extends BaseController
 
 		//$comments = Comment::with( 'User', 'Entry' );
 		$comments = Comment::join('users as u', 'u.user_id', '=', 'comments.comment_user_id')
-		   ->orderBy('comments.comment_added_date', 'desc')
+		   //->orderBy('comments.comment_added_date', 'desc')
 		   ->orderBy('u.user_user_group', 'desc')
 		   ->select('comments.*')       // just to avoid fetching anything from joined table
 		   ->with('User', 'Entry');
