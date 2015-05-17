@@ -735,7 +735,7 @@ class VoteController extends BaseController
 
 				$current[ 'id' ] = $vote->vote_id;
 
-				$current[ 'user' ] = oneUser( $vote->user, $session, true );
+				$current[ 'user' ] = oneUser( $vote->user, $session, false );
 				$current[ 'entry' ] = oneEntry( $vote->entry, $session, true );
 
 				if( $vote[ 'vote_up' ] == 1 && $vote[ 'vote_down' ] == 0 )
@@ -750,7 +750,7 @@ class VoteController extends BaseController
 				{
 					$current[ 'type' ] = "Error";
 				}
-
+				$current[ 'vote_created_date' ] = $vote['vote_created_date'];
 				$return[ 'votes' ][ ][ 'vote' ] = $current;
 
 		}
