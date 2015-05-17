@@ -737,7 +737,7 @@ class VoteController extends BaseController
 
 				$current[ 'user' ] = oneUser( $vote->user, $session, false );
 				$current[ 'entry' ] = oneEntry( $vote->entry, $session, true );
-
+				$current[ 'entry' ]['created'] = $vote['vote_created_date'];
 				if( $vote[ 'vote_up' ] == 1 && $vote[ 'vote_down' ] == 0 )
 				{
 					$current[ 'type' ] = "Upvote";
