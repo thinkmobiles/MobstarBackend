@@ -135,7 +135,8 @@ class StarController extends BaseController
 				$star->save();
 				$userid = $session->token_user_id;
 				$name = getusernamebyid($userid);
-				$to = $starCheck->user_star_star_id;
+				$to = $star->user_star_star_id;
+				//$to = $starCheck->user_star_star_id;
 				if(!empty($name))
 				{
 					$message = $name." is now following you.";
