@@ -750,7 +750,6 @@ class VoteController extends BaseController
 				{
 					$current[ 'type' ] = "Error";
 				}
-				$current[ 'vote_created_date' ] = $vote['vote_created_date'];
 				$return[ 'votes' ][ ][ 'vote' ] = $current;
 
 		}
