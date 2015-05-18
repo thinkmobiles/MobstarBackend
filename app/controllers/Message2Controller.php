@@ -1234,7 +1234,7 @@ public function reply()
 						'aps' => array(
 							"sound" => "default",
 							"alert" => $message,
-							"badge"=> intval(0),
+							"badge"=> intval(1),
 							"messageGroup"=>$message_group,
        						"diaplayname"=>$name,
 							"notificationIcon"=>$icon,
@@ -1256,7 +1256,7 @@ public function reply()
 					'GCM'=>json_encode(array(
 						'data'=>array(
 							'message'=> $message,
-							"badge"=> intval(0),
+							"badge"=> intval(1),
 							"messageGroup"=>$message_group,
        						"diaplayname"=>$name,
 							"notificationIcon"=>$icon,

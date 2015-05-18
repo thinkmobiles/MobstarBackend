@@ -274,7 +274,7 @@ class StarController extends BaseController
 							'aps' => array(
 								"sound" => "default",
 								"alert" => $message,
-								"badge"=> intval(0),
+								"badge"=> intval(1),
 								"userId"=>$to,
 								"diaplayname"=>$name,
 								"Type"=>"Follow",
@@ -296,7 +296,7 @@ class StarController extends BaseController
 							'aps' => array(
 								"sound" => "default",
 								"alert" => $message,
-								"badge"=> intval(0),
+								"badge"=> intval(1),
 							)
 						)),
 					))
@@ -315,7 +315,7 @@ class StarController extends BaseController
 						'GCM'=>json_encode(array(
 							'data'=>array(
 								'message'=> $message,
-								"badge"=> intval(0),
+								"badge"=> intval(1),
 								"userId"=>$to,
 								"diaplayname"=>$name,
 								"Type"=>"Follow"
@@ -334,7 +334,7 @@ class StarController extends BaseController
 						'GCM'=>json_encode(array(
 							'data'=>array(
 								'message'=> $message,
-								"badge"=> intval(0)
+								"badge"=> intval(1)
 							)
 						))
 					))

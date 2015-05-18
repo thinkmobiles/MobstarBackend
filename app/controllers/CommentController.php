@@ -486,7 +486,7 @@ class CommentController extends BaseController
 						'aps' => array(
 							"sound" => "default",
 							"alert" => $message,
-							"badge"=> intval(0),
+							"badge"=> intval(1),
 							"displayname"=>$name,
 							"Type"=>'Entry Comment',
 							"EntryId"=>$entryid,
@@ -506,7 +506,7 @@ class CommentController extends BaseController
 					'GCM'=>json_encode(array(
 						'data'=>array(
 							'message'=> $message,
-							"badge"=> intval(0),
+							"badge"=> intval(1),
 							"displayname"=>$name,
 							"Type"=>'Entry Comment',
 							"EntryId"=>$entryid,
