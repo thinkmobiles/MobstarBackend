@@ -1830,7 +1830,7 @@ class UserController extends BaseController
 	{
 		$badge_count = 0;
 		$badge_count = DB::table('notification_counts')
-					->where('user_id','=',$record->entry_user_id)
+					->where('user_id','=',$device->device_registration_user_id)
 					->pluck( 'notification_count' );
 		if( $device->device_registration_device_type == "apple" )
 		{
