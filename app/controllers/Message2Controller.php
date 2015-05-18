@@ -514,7 +514,7 @@ public function store()
 			$notificationcount = NotificationCount::firstOrNew( $input );
 			if( isset( $notificationcount->id ) )
 			{
-				$notification_count = DB::table('notification_count')
+				$notification_count = DB::table('notification_counts')
 					->where('user_id','=',$recipient)
 					->pluck( 'notification_count' );					
 				$notification_count = $notification_count + 1;
@@ -768,7 +768,7 @@ public function reply()
 			$notificationcount = NotificationCount::firstOrNew( $input );
 			if( isset( $notificationcount->id ) )
 			{
-				$notification_count = DB::table('notification_count')
+				$notification_count = DB::table('notification_counts')
 					->where('user_id','=',$recipient->join_message_participant_user_id)
 					->pluck( 'notification_count' );					
 				$notification_count = $notification_count + 1;
@@ -1212,7 +1212,7 @@ public function reply()
 	public function registerSNSEndpoint( $device , $message, $message_group, $name, $icon, $threadid)
 	{
 		$badge_count = 0;
-		$badge_count = DB::table('notification_count')
+		$badge_count = DB::table('notification_counts')
 					->where('user_id','=',$record->entry_user_id)
 					->pluck( 'notification_count' );
 		//mail("anil@spaceotechnologies.com",time(),print_r($device,true));
@@ -1400,7 +1400,7 @@ public function reply()
 		$token = Request::header( "X-API-TOKEN" );
 		$session = $this->token->get_session( $token );
 
-		$affectedRows = DB::table('notification_count')->where('user_id', '=', $session->token_user_id)->update(array('notification_count' => 0));
+		$affectedRows = DB::table('notification_counts')->where('user_id', '=', $session->token_user_id)->update(array('notification_count' => 0));
 		$response['message'] = "Badge count read successfully.";
 		$status_code = 200;			
 		$response = Response::make( $response, $status_code );

@@ -1528,7 +1528,7 @@ class UserController extends BaseController
 				$notificationcount = NotificationCount::firstOrNew( $inputbadge );
 				if( isset( $notificationcount->id ) )
 				{
-					$notification_count = DB::table('notification_count')
+					$notification_count = DB::table('notification_counts')
 						->where('user_id','=',$star->user_star_star_id)
 						->pluck( 'notification_count' );					
 					$notification_count = $notification_count + 1;
@@ -1729,7 +1729,7 @@ class UserController extends BaseController
 								$notificationcount = NotificationCount::firstOrNew( $inputbadge );
 								if( isset( $notificationcount->id ) )
 								{
-									$notification_count = DB::table('notification_count')
+									$notification_count = DB::table('notification_counts')
 										->where('user_id','=',$userID)
 										->pluck( 'notification_count' );					
 									$notification_count = $notification_count + 1;
@@ -1779,7 +1779,7 @@ class UserController extends BaseController
 								$notificationcount = NotificationCount::firstOrNew( $inputbadge );
 								if( isset( $notificationcount->id ) )
 								{
-									$notification_count = DB::table('notification_count')
+									$notification_count = DB::table('notification_counts')
 										->where('user_id','=',$userID)
 										->pluck( 'notification_count' );					
 									$notification_count = $notification_count + 1;
@@ -1829,7 +1829,7 @@ class UserController extends BaseController
 	public function registerSNSEndpoint( $device , $message, $to=NULL, $name=NULL)
 	{
 		$badge_count = 0;
-		$badge_count = DB::table('notification_count')
+		$badge_count = DB::table('notification_counts')
 					->where('user_id','=',$record->entry_user_id)
 					->pluck( 'notification_count' );
 		if( $device->device_registration_device_type == "apple" )

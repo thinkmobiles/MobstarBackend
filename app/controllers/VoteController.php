@@ -459,7 +459,7 @@ class VoteController extends BaseController
 				$notificationcount = NotificationCount::firstOrNew( $inputbadge );
 				if( isset( $notificationcount->id ) )
 				{
-					$notification_count = DB::table('notification_count')
+					$notification_count = DB::table('notification_counts')
 						->where('user_id','=',$to)
 						->pluck( 'notification_count' );					
 					$notification_count = $notification_count + 1;
@@ -584,7 +584,7 @@ class VoteController extends BaseController
 				$notificationcount = NotificationCount::firstOrNew( $inputbadge );
 				if( isset( $notificationcount->id ) )
 				{
-					$notification_count = DB::table('notification_count')
+					$notification_count = DB::table('notification_counts')
 						->where('user_id','=',$userid)
 						->pluck( 'notification_count' );					
 					$notification_count = $notification_count + 1;
@@ -894,7 +894,7 @@ class VoteController extends BaseController
 	public function registerSNSEndpoint( $device, $message, $to=NULL, $notif_Type=NULL , $name=NULL,$icon = NULL,$entryId= NULL)
 	{
 		$badge_count = 0;
-		$badge_count = DB::table('notification_count')
+		$badge_count = DB::table('notification_counts')
 					->where('user_id','=',$record->entry_user_id)
 					->pluck( 'notification_count' );
 		if( $device->device_registration_device_type == "apple" )

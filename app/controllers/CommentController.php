@@ -289,7 +289,7 @@ class CommentController extends BaseController
 			$notificationcount = NotificationCount::firstOrNew( $input );
 			if( isset( $notificationcount->id ) )
 			{
-				$notification_count = DB::table('notification_count')
+				$notification_count = DB::table('notification_counts')
 					->where('user_id','=',$record->entry_user_id)
 					->pluck( 'notification_count' );					
 				$notification_count = $notification_count + 1;
@@ -442,7 +442,7 @@ class CommentController extends BaseController
 	public function registerSNSEndpoint( $device , $message, $name, $entryid,$icon = NULL)
 	{
 		$badge_count = 0;
-		$badge_count = DB::table('notification_count')
+		$badge_count = DB::table('notification_counts')
 					->where('user_id','=',$record->entry_user_id)
 					->pluck( 'notification_count' );
 					
