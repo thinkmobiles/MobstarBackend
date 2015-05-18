@@ -152,6 +152,10 @@ class NotificationController extends BaseController
 			{
 				$condition = @$notification->notification_entry_id;				
 			}
+			elseif($type == 'Follow')
+			{
+				$condition = @$notification->notification_entry_id;				
+			}
 			else
 			{
 				$condition = @$notification->entry->entry_id;
@@ -183,6 +187,10 @@ class NotificationController extends BaseController
 					{
 						//$line = "has " .trim($notification->notification_details);
 						if($notification->notification_type == 'Message')
+						{
+							$line = trim($notification->notification_details);
+						}
+						elseif($notification->notification_type == 'Follow')
 						{
 							$line = trim($notification->notification_details);
 						}
@@ -265,6 +273,14 @@ class NotificationController extends BaseController
 					}*/
 					$current[ 'messageGroup' ] = $message_group;
 					
+				}
+				elseif($notification->notification_type == 'Follow')
+				{
+					$current[ 'notificationType' ] = $notification->notification_type;
+					$current['entry']['entry_id'] = @$notification->notification_entry_id;
+					$userid = @$notification->notification_entry_id;
+					$displayname = getusernamebyid($userid);
+					$current['entry']['entry_name'] = $displayname;
 				}
 				else
 				{

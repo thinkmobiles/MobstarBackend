@@ -94,6 +94,44 @@ class StarController extends BaseController
 						$userid = $session->token_user_id;
 						$name = getusernamebyid($userid);
 						$to = $starCheck->user_star_star_id;
+						// For Notification Table entry
+						$prev_not = Notification::where( 'notification_user_id', '=', Input::get( 'star' ), 'and' )
+										->where( 'notification_entry_id', '=', $session->token_user_id, 'and' )
+										->where( 'notification_details', '=', ' is now following you.', 'and' )
+										->orderBy( 'notification_updated_date', 'desc' )
+										->first();
+
+						if( !count( $prev_not ) )
+						{
+							Notification::create( [ 'notification_user_id'      => Input::get( 'star' ),
+													'notification_subject_ids'  => json_encode( [ $session->token_user_id ] ),
+													'notification_details'      => ' is now following you.',
+													'notification_icon'			=> 'follow.png',
+													'notification_read'         => 0,
+													'notification_entry_id'     => $session->token_user_id,
+													'notification_type'         => 'Follow',
+													'notification_created_date' => date( 'Y-m-d H:i:s' ),
+													'notification_updated_date' => date( 'Y-m-d H:i:s' )
+												  ] );
+						}
+						else
+						{
+
+							$subjects = json_decode( $prev_not->notification_subject_ids );
+
+							if( !in_array( $session->token_user_id, $subjects ) )
+							{
+								array_push( $subjects, $session->token_user_id );
+
+								$prev_not->notification_subject_ids = json_encode( $subjects );
+								$prev_not->notification_read = 0;
+								$prev_not->notification_updated_date = date( 'Y-m-d H:i:s' );
+
+								$prev_not->save();
+							}
+
+						}
+						// End For Notification Table entry
 						// Added for make entry for push badge count
 						$notification_count = 0;						
 						$input = array(
@@ -127,10 +165,11 @@ class StarController extends BaseController
 								where u.user_deleted = 0 
 								AND u.user_id = $to
 								order by t1.device_registration_date_created desc LIMIT 1"));
-
+							$icon = 'follow.png';
+							$icon = 'http://' . $_ENV[ 'URL' ] . '/images/' . $icon;
 							if(!empty($usersDeviceData))
 							{	
-								$this->registerSNSEndpoint($usersDeviceData[0],$message,$to,$name);
+								$this->registerSNSEndpoint($usersDeviceData[0],$message,$to,$name,$icon);
 							}
 						}
 					}
@@ -159,6 +198,44 @@ class StarController extends BaseController
 				$name = getusernamebyid($userid);
 				$to = $star->user_star_star_id;
 				//$to = $starCheck->user_star_star_id;
+				// For Notification Table entry
+				$prev_not = Notification::where( 'notification_user_id', '=', Input::get( 'star' ), 'and' )
+								->where( 'notification_entry_id', '=', $session->token_user_id, 'and' )
+								->where( 'notification_details', '=', ' is now following you.', 'and' )
+								->orderBy( 'notification_updated_date', 'desc' )
+								->first();
+
+				if( !count( $prev_not ) )
+				{
+					Notification::create( [ 'notification_user_id'      => Input::get( 'star' ),
+											'notification_subject_ids'  => json_encode( [ $session->token_user_id ] ),
+											'notification_details'      => ' is now following you.',
+											'notification_icon'			=> 'follow.png',
+											'notification_read'         => 0,
+											'notification_entry_id'     => $session->token_user_id,
+											'notification_type'         => 'Follow',
+											'notification_created_date' => date( 'Y-m-d H:i:s' ),
+											'notification_updated_date' => date( 'Y-m-d H:i:s' )
+										  ] );
+				}
+				else
+				{
+
+					$subjects = json_decode( $prev_not->notification_subject_ids );
+
+					if( !in_array( $session->token_user_id, $subjects ) )
+					{
+						array_push( $subjects, $session->token_user_id );
+
+						$prev_not->notification_subject_ids = json_encode( $subjects );
+						$prev_not->notification_read = 0;
+						$prev_not->notification_updated_date = date( 'Y-m-d H:i:s' );
+
+						$prev_not->save();
+					}
+
+				}
+				// End For Notification Table entry
 				// Added for make entry for push badge count
 				$notification_count = 0;						
 				$inputbadge = array(
@@ -184,6 +261,8 @@ class StarController extends BaseController
 				if(!empty($name))
 				{
 					$message = $name." is now following you.";
+					$icon = 'follow.png';
+					$icon = 'http://' . $_ENV[ 'URL' ] . '/images/' . $icon;
 					$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
 						(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
 						from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
@@ -195,7 +274,7 @@ class StarController extends BaseController
 
 					if(!empty($usersDeviceData))
 					{	
-						$this->registerSNSEndpoint($usersDeviceData[0],$message,$to,$name);
+						$this->registerSNSEndpoint($usersDeviceData[0],$message,$to,$name,$icon = NULL);
 					}
 				}
 			}			
@@ -259,7 +338,7 @@ class StarController extends BaseController
 
 		return Response::make( $response, $status_code );
 	}
-	public function registerSNSEndpoint( $device , $message, $to=NULL, $name=NULL)
+	public function registerSNSEndpoint( $device , $message, $to=NULL, $name=NULL,$icon = NULL)
 	{
 		$badge_count = 0;
 		$badge_count = DB::table('notification_counts')
@@ -326,7 +405,7 @@ class StarController extends BaseController
 								"userId"=>$to,
 								"diaplayname"=>$name,
 								"Type"=>"Follow",
-
+								"notificationIcon"=>$icon,
 							)
 						)),
 					))
@@ -366,7 +445,8 @@ class StarController extends BaseController
 								"badge"=> intval($badge_count),
 								"userId"=>$to,
 								"diaplayname"=>$name,
-								"Type"=>"Follow"
+								"Type"=>"Follow",
+								"notificationIcon"=>$icon
 							)
 						))
 					))
