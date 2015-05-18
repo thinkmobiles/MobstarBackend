@@ -2,7 +2,7 @@
 
 use Swagger\Annotations as SWG;
 use MobStar\Storage\Token\TokenRepository as Token;
-
+use Aws\S3\S3Client;
 /**
  * @package
  * @category
@@ -276,6 +276,7 @@ class NotificationController extends BaseController
 				}
 				elseif($notification->notification_type == 'Follow')
 				{
+					$client = getS3Client();
 					$current[ 'notificationType' ] = $notification->notification_type;
 					$current['entry']['entry_id'] = @$notification->notification_entry_id;
 					$userid = @$notification->notification_entry_id;
