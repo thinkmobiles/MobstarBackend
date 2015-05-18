@@ -217,6 +217,12 @@ class StarController extends BaseController
 	}
 	public function registerSNSEndpoint( $device , $message, $to=NULL, $name=NULL)
 	{
+		$badge_count =  0;
+		$badge_count = DB::table( 'notifications' )
+					->select( 'notification_id' )
+					->where( 'notification_user_id', '=', $device->device_registration_user_id )
+					->where( 'notification_read', '=', '0' )
+					->count();
 		if( $device->device_registration_device_type == "apple" )
 		{
 			$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushdemo";
@@ -274,7 +280,7 @@ class StarController extends BaseController
 							'aps' => array(
 								"sound" => "default",
 								"alert" => $message,
-								"badge"=> intval(1),
+								"badge"=> intval($badge_count),
 								"userId"=>$to,
 								"diaplayname"=>$name,
 								"Type"=>"Follow",
@@ -296,7 +302,7 @@ class StarController extends BaseController
 							'aps' => array(
 								"sound" => "default",
 								"alert" => $message,
-								"badge"=> intval(1),
+								"badge"=> intval($badge_count),
 							)
 						)),
 					))
@@ -315,7 +321,7 @@ class StarController extends BaseController
 						'GCM'=>json_encode(array(
 							'data'=>array(
 								'message'=> $message,
-								"badge"=> intval(1),
+								"badge"=> intval($badge_count),
 								"userId"=>$to,
 								"diaplayname"=>$name,
 								"Type"=>"Follow"
@@ -334,7 +340,7 @@ class StarController extends BaseController
 						'GCM'=>json_encode(array(
 							'data'=>array(
 								'message'=> $message,
-								"badge"=> intval(1)
+								"badge"=> intval($badge_count)
 							)
 						))
 					))

@@ -1167,6 +1167,7 @@ public function reply()
 	}
 	public function registerSNSEndpoint( $device , $message, $message_group, $name, $icon, $threadid)
 	{
+		$badge_count =  0;
 		$badge_count = DB::table( 'notifications' )
 					->select( 'notification_id' )
 					->where( 'notification_user_id', '=', $device->device_registration_user_id )
