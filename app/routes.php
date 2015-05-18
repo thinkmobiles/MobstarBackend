@@ -383,6 +383,11 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "Message2Controller@showParticipants"
 		] );
 		
+		Route::post( "message/badgeread", [
+			"as"   => "message/badgeread",
+			"uses" => "Message2Controller@badgeread"
+		] );
+		
 //		Route::delete( "message/", [
 //			"as"   => "message/destroy",
 //			"uses" => "MessageController@destroy"

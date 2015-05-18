@@ -280,7 +280,28 @@ class CommentController extends BaseController
 		{
 
 			$record = Entry::find( $entry );
+			// Added for make entry for push badge count
+			$notification_count = 0;						
+			$input = array(
+						'user_id' => $record->entry_user_id,
+					);
 
+			$notificationcount = NotificationCount::firstOrNew( $input );
+			if( isset( $notificationcount->id ) )
+			{
+				$notification_count = DB::table('notification_count')
+					->where('user_id','=',$record->entry_user_id)
+					->pluck( 'notification_count' );					
+				$notification_count = $notification_count + 1;
+				$notificationcount->notification_count = $notification_count;
+				$notificationcount->save();
+			}
+			else
+			{
+				$notificationcount->notification_count = 1;
+				$notificationcount->save();
+			}
+			// End
 			$prev_not = Notification::where( 'notification_user_id', '=', $record->entry_user_id, 'and' )
 									->where( 'notification_entry_id', '=', $record->entry_id, 'and' )
 									->where( 'notification_details', '=', 'commented on your entry', 'and' )
@@ -420,12 +441,11 @@ class CommentController extends BaseController
 	}
 	public function registerSNSEndpoint( $device , $message, $name, $entryid,$icon = NULL)
 	{
-		$badge_count =  0;
-		$badge_count = DB::table( 'notifications' )
-					->select( 'notification_id' )
-					->where( 'notification_user_id', '=', $device->device_registration_user_id )
-					->where( 'notification_read', '=', '0' )
-					->count();
+		$badge_count = 0;
+		$badge_count = DB::table('notification_count')
+					->where('user_id','=',$record->entry_user_id)
+					->pluck( 'notification_count' );
+					
 		if( $device->device_registration_device_type == "apple" )
 		{
 			$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushdemo";

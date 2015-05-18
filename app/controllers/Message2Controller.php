@@ -505,6 +505,28 @@ public function store()
 				'join_message_recipient_created'    => 0,
 				'join_message_recipient_read'       => 0,
 			];
+			// Added for make entry for push badge count
+			$notification_count = 0;						
+			$input = array(
+						'user_id' => $recipient,
+					);
+
+			$notificationcount = NotificationCount::firstOrNew( $input );
+			if( isset( $notificationcount->id ) )
+			{
+				$notification_count = DB::table('notification_count')
+					->where('user_id','=',$recipient)
+					->pluck( 'notification_count' );					
+				$notification_count = $notification_count + 1;
+				$notificationcount->notification_count = $notification_count;
+				$notificationcount->save();
+			}
+			else
+			{
+				$notificationcount->notification_count = 1;
+				$notificationcount->save();
+			}
+			// End
 			$prev_not = Notification::where( 'notification_user_id', '=', $recipient, 'and' )
 									//->where( 'notification_entry_id', '=', $messageThread->message_thread_thread_id, 'and' )
 									->where( 'notification_entry_id', '=', $newThread, 'and' )
@@ -737,6 +759,28 @@ public function reply()
 				'join_message_recipient_created'    => 0,
 				'join_message_recipient_read'       => 0,
 			];
+			// Added for make entry for push badge count
+			$notification_count = 0;						
+			$input = array(
+						'user_id' => $recipient->join_message_participant_user_id,
+					);
+
+			$notificationcount = NotificationCount::firstOrNew( $input );
+			if( isset( $notificationcount->id ) )
+			{
+				$notification_count = DB::table('notification_count')
+					->where('user_id','=',$recipient->join_message_participant_user_id)
+					->pluck( 'notification_count' );					
+				$notification_count = $notification_count + 1;
+				$notificationcount->notification_count = $notification_count;
+				$notificationcount->save();
+			}
+			else
+			{
+				$notificationcount->notification_count = 1;
+				$notificationcount->save();
+			}
+			// End
 			$prev_not = Notification::where( 'notification_user_id', '=', $recipient->join_message_participant_user_id, 'and' )
 									->where( 'notification_subject_ids', '=', json_encode( [ $session->token_user_id ] ), 'and' )
 									->where( 'notification_entry_id', '=', $thread, 'and' )
@@ -1167,12 +1211,10 @@ public function reply()
 	}
 	public function registerSNSEndpoint( $device , $message, $message_group, $name, $icon, $threadid)
 	{
-		$badge_count =  0;
-		$badge_count = DB::table( 'notifications' )
-					->select( 'notification_id' )
-					->where( 'notification_user_id', '=', $device->device_registration_user_id )
-					->where( 'notification_read', '=', '0' )
-					->count();
+		$badge_count = 0;
+		$badge_count = DB::table('notification_count')
+					->where('user_id','=',$record->entry_user_id)
+					->pluck( 'notification_count' );
 		//mail("anil@spaceotechnologies.com",time(),print_r($device,true));
 		if( $device->device_registration_device_type == "apple" )
 		{
@@ -1351,5 +1393,17 @@ public function reply()
 			$return = $current;
 		}			
 		return $return;
+	}
+	public function badgeread()
+	{
+		//Get current user
+		$token = Request::header( "X-API-TOKEN" );
+		$session = $this->token->get_session( $token );
+
+		$affectedRows = DB::table('notification_count')->where('user_id', '=', $session->token_user_id)->update(array('notification_count' => 0));
+		$response['message'] = "Badge count read successfully.";
+		$status_code = 200;			
+		$response = Response::make( $response, $status_code );
+		return $response;
 	}
 }

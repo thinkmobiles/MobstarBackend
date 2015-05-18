@@ -450,7 +450,28 @@ class VoteController extends BaseController
 				$userid = $session->token_user_id;
 				$name = getusernamebyid($userid);
 				$to = $entry->entry_user_id;
+				// Added for make entry for push badge count
+				$notification_count = 0;						
+				$inputbadge = array(
+							'user_id' => $to,
+						);
 
+				$notificationcount = NotificationCount::firstOrNew( $inputbadge );
+				if( isset( $notificationcount->id ) )
+				{
+					$notification_count = DB::table('notification_count')
+						->where('user_id','=',$to)
+						->pluck( 'notification_count' );					
+					$notification_count = $notification_count + 1;
+					$notificationcount->notification_count = $notification_count;
+					$notificationcount->save();
+				}
+				else
+				{
+					$notificationcount->notification_count = 1;
+					$notificationcount->save();
+				}
+				// End
 				if(!empty($name))
 				{
 					if($notif_Type == 'Like')
@@ -554,6 +575,28 @@ class VoteController extends BaseController
 
 			if($userData == 10)
 			{
+				// Added for make entry for push badge count
+				$notification_count = 0;						
+				$inputbadge = array(
+							'user_id' => $userid,
+						);
+
+				$notificationcount = NotificationCount::firstOrNew( $inputbadge );
+				if( isset( $notificationcount->id ) )
+				{
+					$notification_count = DB::table('notification_count')
+						->where('user_id','=',$userid)
+						->pluck( 'notification_count' );					
+					$notification_count = $notification_count + 1;
+					$notificationcount->notification_count = $notification_count;
+					$notificationcount->save();
+				}
+				else
+				{
+					$notificationcount->notification_count = 1;
+					$notificationcount->save();
+				}
+				// End
 				$message = "You have 10 votes";
 				$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
 					(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
@@ -850,12 +893,10 @@ class VoteController extends BaseController
 	}
 	public function registerSNSEndpoint( $device, $message, $to=NULL, $notif_Type=NULL , $name=NULL,$icon = NULL,$entryId= NULL)
 	{
-		$badge_count =  0;
-		$badge_count = DB::table( 'notifications' )
-					->select( 'notification_id' )
-					->where( 'notification_user_id', '=', $device->device_registration_user_id )
-					->where( 'notification_read', '=', '0' )
-					->count();
+		$badge_count = 0;
+		$badge_count = DB::table('notification_count')
+					->where('user_id','=',$record->entry_user_id)
+					->pluck( 'notification_count' );
 		if( $device->device_registration_device_type == "apple" )
 		{
 			$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushdemo";

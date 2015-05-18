@@ -94,6 +94,28 @@ class StarController extends BaseController
 						$userid = $session->token_user_id;
 						$name = getusernamebyid($userid);
 						$to = $starCheck->user_star_star_id;
+						// Added for make entry for push badge count
+						$notification_count = 0;						
+						$input = array(
+									'user_id' => $starCheck->user_star_star_id,
+								);
+
+						$notificationcount = NotificationCount::firstOrNew( $input );
+						if( isset( $notificationcount->id ) )
+						{
+							$notification_count = DB::table('notification_count')
+								->where('user_id','=',$starCheck->user_star_star_id)
+								->pluck( 'notification_count' );					
+							$notification_count = $notification_count + 1;
+							$notificationcount->notification_count = $notification_count;
+							$notificationcount->save();
+						}
+						else
+						{
+							$notificationcount->notification_count = 1;
+							$notificationcount->save();
+						}
+						// End
 						if(!empty($name))
 						{
 							$message = $name." is now following you.";
@@ -137,6 +159,28 @@ class StarController extends BaseController
 				$name = getusernamebyid($userid);
 				$to = $star->user_star_star_id;
 				//$to = $starCheck->user_star_star_id;
+				// Added for make entry for push badge count
+				$notification_count = 0;						
+				$inputbadge = array(
+							'user_id' => $star->user_star_star_id,
+						);
+
+				$notificationcount = NotificationCount::firstOrNew( $inputbadge );
+				if( isset( $notificationcount->id ) )
+				{
+					$notification_count = DB::table('notification_count')
+						->where('user_id','=',$star->user_star_star_id)
+						->pluck( 'notification_count' );					
+					$notification_count = $notification_count + 1;
+					$notificationcount->notification_count = $notification_count;
+					$notificationcount->save();
+				}
+				else
+				{
+					$notificationcount->notification_count = 1;
+					$notificationcount->save();
+				}
+				// End
 				if(!empty($name))
 				{
 					$message = $name." is now following you.";
@@ -217,12 +261,10 @@ class StarController extends BaseController
 	}
 	public function registerSNSEndpoint( $device , $message, $to=NULL, $name=NULL)
 	{
-		$badge_count =  0;
-		$badge_count = DB::table( 'notifications' )
-					->select( 'notification_id' )
-					->where( 'notification_user_id', '=', $device->device_registration_user_id )
-					->where( 'notification_read', '=', '0' )
-					->count();
+		$badge_count = 0;
+		$badge_count = DB::table('notification_count')
+					->where('user_id','=',$record->entry_user_id)
+					->pluck( 'notification_count' );
 		if( $device->device_registration_device_type == "apple" )
 		{
 			$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushdemo";
