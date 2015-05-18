@@ -281,6 +281,13 @@ class NotificationController extends BaseController
 					$userid = @$notification->notification_entry_id;
 					$displayname = getusernamebyid($userid);
 					$current['entry']['entry_name'] = $displayname;
+					
+					$user = User::find( @$notification->notification_entry_id );
+					$profileImage = ( isset( $user->user_profile_image ) ) ? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+720 minutes' ) : '';
+					$profileCover = ( isset( $user->user_cover_image ) )   ? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+720 minutes' ) : '';
+					
+					$current['entry']['profileImage'] = $profileImage;
+					$current['entry']['profileCover'] = $profileCover;
 				}
 				else
 				{
