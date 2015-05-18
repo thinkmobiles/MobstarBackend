@@ -1170,6 +1170,7 @@ public function reply()
 		$badge_count = DB::table( 'notifications' )
 					->select( 'notification_id' )
 					->where( 'notification_user_id', '=', $device->device_registration_user_id )
+					->where( 'notification_read', '=', '0' )
 					->count();
 		//mail("anil@spaceotechnologies.com",time(),print_r($device,true));
 		if( $device->device_registration_device_type == "apple" )
