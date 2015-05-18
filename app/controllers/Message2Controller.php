@@ -1167,6 +1167,10 @@ public function reply()
 	}
 	public function registerSNSEndpoint( $device , $message, $message_group, $name, $icon, $threadid)
 	{
+		$badge_count = DB::table( 'notifications' )
+					->select( 'notification_id' )
+					->where( 'notification_user_id', '=', $device->device_registration_user_id )
+					->count();
 		//mail("anil@spaceotechnologies.com",time(),print_r($device,true));
 		if( $device->device_registration_device_type == "apple" )
 		{
@@ -1234,7 +1238,7 @@ public function reply()
 						'aps' => array(
 							"sound" => "default",
 							"alert" => $message,
-							"badge"=> intval(1),
+							"badge"=> intval($badge_count),
 							"messageGroup"=>$message_group,
        						"diaplayname"=>$name,
 							"notificationIcon"=>$icon,
@@ -1256,7 +1260,7 @@ public function reply()
 					'GCM'=>json_encode(array(
 						'data'=>array(
 							'message'=> $message,
-							"badge"=> intval(1),
+							"badge"=> intval($badge_count),
 							"messageGroup"=>$message_group,
        						"diaplayname"=>$name,
 							"notificationIcon"=>$icon,
