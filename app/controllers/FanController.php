@@ -67,11 +67,13 @@ class FanController extends BaseController
 
 		//$entries = Entry::where( 'entry_user_id', '=', $session->token_user_id )->has( 'comments' )->with( 'comments' )->get();
 		$entries = DB::table( 'entries' )
-					 ->select( 'entries.*', 'comments.*' )
+					 ->select( 'entries.*', 'entry_files.*', 'comments.*' )
+					 ->join( 'entry_files', 'entries.entry_id', '=', 'entry_files.entry_file_entry_id' )
 					 ->join( 'comments', 'entries.entry_id', '=', 'comments.comment_entry_id' )
 					 ->where( 'entries.entry_user_id', '=', $session->token_user_id )
 					 ->where( 'entries.entry_deleted', '=', '0' )
 					 ->where( 'comments.comment_deleted', '=', '0' )
+					 ->where( 'entry_files.entry_file_deleted', '=', '0' )
 					 ->orderBy( 'comments.comment_added_date', 'desc' )
 					 ->get();
 		$returning = [ ];
@@ -86,7 +88,7 @@ class FanController extends BaseController
 				$current[ 'id' ] = $entry->entry_id;
 				$current[ 'entryName' ] = $entry->entry_name;
 
-				foreach( $entry->file as $file )
+				/*foreach( $entry->file as $file )
 				{
 
 					if( $entry->entry_type == 'audio' || $entry->entry_type == 'image' )
@@ -102,7 +104,23 @@ class FanController extends BaseController
 							$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
 							: "";
 					}
-				}
+				}*/
+				
+
+					if( $entry->entry_type == 'audio' || $entry->entry_type == 'image' )
+					{
+						if( strtolower( $entry->entry_file_type ) == 'png' || strtolower( $entry->entry_file_type ) == 'jpg' )
+						{
+							$current[ 'thumbnail' ] = $client->getObjectUrl( 'mobstar-1', $entry->entry_file_name . "." . $entry->entry_file_type, '+10 minutes' );
+						}
+					}
+					else
+					{
+						$current[ 'thumbnail' ] = ( $entry->entry_file_type == "mp4" ) ?
+							$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $entry->entry_file_name . '-thumb.jpg', '+10 minutes' )
+							: "";
+					}
+			
 
 				/*foreach( $entry->comments as $comment )
 				{
