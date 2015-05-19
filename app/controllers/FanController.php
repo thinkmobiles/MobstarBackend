@@ -65,8 +65,15 @@ class FanController extends BaseController
 
 		$session = $this->token->get_session( $token );
 
-		$entries = Entry::where( 'entry_user_id', '=', $session->token_user_id )->has( 'comments' )->with( 'comments' )->get();
-
+		//$entries = Entry::where( 'entry_user_id', '=', $session->token_user_id )->has( 'comments' )->with( 'comments' )->get();
+		$entries = DB::table( 'entries' )
+					 ->select( 'entries.*, comments.comment_added_date,comments.comment_deleted' )
+					 ->join( 'comments', 'entries.entry_id', '=', 'comments.comment_entry_id' )
+					 ->where( 'entries.entry_user_id', '=', $session->token_user_id )
+					 ->where( 'entries.entry_deleted', '=', '0' )
+					 ->where( 'comments.comment_deleted', '=', '0' )
+					 ->orderBy( 'comments.comment_added_date', 'desc' )
+					 ->get();
 		$returning = [ ];
 
 		$client = getS3Client();
@@ -96,7 +103,7 @@ class FanController extends BaseController
 					}
 				}
 
-				foreach( $entry->comments as $comment )
+				/*foreach( $entry->comments as $comment )
 				{
 					if( !isset( $current[ 'lastComment' ] ) )
 					{
@@ -107,8 +114,10 @@ class FanController extends BaseController
 						$current[ 'lastComment' ] = $comment->comment_added_date;
 					}
 
-				}
-
+				}*/
+				
+				$current[ 'lastComment' ] = $comment->comment_added_date;
+				
 				$return[ 'entries' ] [ ] = $current;
 
 				$returning[$entry->entry_id] = 0;
