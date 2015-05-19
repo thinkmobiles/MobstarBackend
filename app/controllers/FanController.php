@@ -70,7 +70,7 @@ class FanController extends BaseController
 		$returning = [ ];
 
 		$client = getS3Client();
-		$sortArray = array();
+
 		foreach( $entries as $entry )
 		{
 			if( !isset( $returning[ $entry->entry_id ] ) && ( count( $entry->comments ) > 0 ) )
@@ -95,7 +95,7 @@ class FanController extends BaseController
 							: "";
 					}
 				}
-				
+
 				foreach( $entry->comments as $comment )
 				{
 					if( !isset( $current[ 'lastComment' ] ) )
@@ -108,24 +108,14 @@ class FanController extends BaseController
 					}
 
 				}
-				foreach( $entry->comments as $key => $value )
-				{
-					if( !isset( $sortArray[ $key ] ) )
-					{
-						$sortArray[ $key ] = array();
-					}
-					$sortArray[ $key ][ ] = $value;
-				}
+
 				$return[ 'entries' ] [ ] = $current;
 
 				$returning[$entry->entry_id] = 0;
 			}
 
 		}
-		$orderby = "lastComment"; //change this to whatever key you want from the array
 
-		array_multisort( $sortArray[ $orderby ], SORT_DESC, $return[ 'entries' ] );
-		
 		$response = Response::make( $return, 200 );
 
 		return $response;
