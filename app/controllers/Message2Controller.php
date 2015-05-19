@@ -1156,6 +1156,7 @@ public function reply()
 					->select( 'join_message_recipients.*' )
 					->where( 'join_message_recipients.join_message_recipient_user_id', '=', $session->token_user_id )
 					->where('join_message_recipients.join_message_recipient_read', '=', 0)
+					->groupBy('join_message_recipients.join_message_recipient_thread_id')
 					->count();	
 		$return[ 'notifications' ]= $count;
 
