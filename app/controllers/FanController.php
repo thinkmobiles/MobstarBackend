@@ -64,8 +64,6 @@ class FanController extends BaseController
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
-
-		//$entries = Entry::where( 'entry_user_id', '=', $session->token_user_id )->has( 'comments' )->with( 'comments' )->get();
 		$entries = DB::table( 'entries' )
 					 ->select( 'entries.*', 'entry_files.*', 'comments.*' )
 					 ->join( 'entry_files', 'entries.entry_id', '=', 'entry_files.entry_file_entry_id' )
@@ -82,71 +80,30 @@ class FanController extends BaseController
 
 		foreach( $entries as $entry )
 		{
-			//if( !isset( $returning[ $entry->entry_id ] ) && ( count( $entry->comments ) > 0 ) )
 			if( !isset( $returning[ $entry->entry_id ] ) )
 			{
 				$current[ 'id' ] = $entry->entry_id;
 				$current[ 'entryName' ] = $entry->entry_name;
-				$current[ 'entryDescription' ] = $entry->entry_description;
-
-				/*foreach( $entry->file as $file )
+				$current[ 'entryDescription' ] = $entry->entry_description;				
+				if( $entry->entry_type == 'audio' || $entry->entry_type == 'image' )
 				{
-
-					if( $entry->entry_type == 'audio' || $entry->entry_type == 'image' )
+					if( strtolower( $entry->entry_file_type ) == 'png' || strtolower( $entry->entry_file_type ) == 'jpg' )
 					{
-						if( strtolower( $file->entry_file_type ) == 'png' || strtolower( $file->entry_file_type ) == 'jpg' )
-						{
-							$current[ 'thumbnail' ] = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+10 minutes' );
-						}
+						$current[ 'thumbnail' ] = $client->getObjectUrl( 'mobstar-1', $entry->entry_file_name . "." . $entry->entry_file_type, '+10 minutes' );
 					}
-					else
-					{
-						$current[ 'thumbnail' ] = ( $file->entry_file_type == "mp4" ) ?
-							$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+10 minutes' )
-							: "";
-					}
-				}*/
-				
-
-					if( $entry->entry_type == 'audio' || $entry->entry_type == 'image' )
-					{
-						if( strtolower( $entry->entry_file_type ) == 'png' || strtolower( $entry->entry_file_type ) == 'jpg' )
-						{
-							$current[ 'thumbnail' ] = $client->getObjectUrl( 'mobstar-1', $entry->entry_file_name . "." . $entry->entry_file_type, '+10 minutes' );
-						}
-					}
-					else
-					{
-						$current[ 'thumbnail' ] = ( $entry->entry_file_type == "mp4" ) ?
-							$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $entry->entry_file_name . '-thumb.jpg', '+10 minutes' )
-							: "";
-					}
-			
-
-				/*foreach( $entry->comments as $comment )
+				}
+				else
 				{
-					if( !isset( $current[ 'lastComment' ] ) )
-					{
-						$current[ 'lastComment' ] = $comment->comment_added_date;
-					}
-					elseif( $comment->comment_added_date > $current[ 'lastComment' ] )
-					{
-						$current[ 'lastComment' ] = $comment->comment_added_date;
-					}
-
-				}*/
-				
-				$current[ 'lastComment' ] = $entry->comment_added_date;
-				
+					$current[ 'thumbnail' ] = ( $entry->entry_file_type == "mp4" ) ?
+						$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $entry->entry_file_name . '-thumb.jpg', '+10 minutes' )
+						: "";
+				}
+				$current[ 'lastComment' ] = $entry->comment_added_date;				
 				$return[ 'entries' ] [ ] = $current;
-
 				$returning[$entry->entry_id] = 0;
 			}
-
 		}
-
 		$response = Response::make( $return, 200 );
-
 		return $response;
 	}
 
