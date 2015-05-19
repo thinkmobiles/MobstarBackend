@@ -135,7 +135,7 @@ class FanController extends BaseController
 
 				}*/
 				
-				$current[ 'lastComment' ] = $comment->comment_added_date;
+				$current[ 'lastComment' ] = $entry->comment_added_date;
 				
 				$return[ 'entries' ] [ ] = $current;
 
