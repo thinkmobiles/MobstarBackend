@@ -72,6 +72,7 @@ class FanController extends BaseController
 					 ->where( 'entries.entry_deleted', '=', '0' )
 					 ->where( 'comments.comment_deleted', '=', '0' )
 					 ->where( 'entry_files.entry_file_deleted', '=', '0' )
+					 ->groupBy('entries.entry_id')
 					 ->orderBy( 'comments.comment_added_date', 'desc' )
 					 ->get();
 		$returning = [ ];
