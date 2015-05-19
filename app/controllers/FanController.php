@@ -109,14 +109,7 @@ class FanController extends BaseController
 
 				}
 
-				$price = array();
-				foreach ($current as $key => $row)
-				{
-					$price[$key] = $row['lastComment'];
-				}
-				array_multisort($price, SORT_DESC, $current);
-				
-				$return[ 'entries' ] [ ] = $price;
+				$return[ 'entries' ] [ ] = $current;
 
 				$returning[$entry->entry_id] = 0;
 			}
