@@ -730,6 +730,10 @@ Route::post( "entry/deleteentryfiles", [
 			"as"	=> "entry/deleteentryfiles",	
 			"uses"	=> "EntryController@deleteEntryFiles"
 		] );
+Route::post( "user/uploadimage", [
+			"as"	=> "user/uploadimage",	
+			"uses"	=> "UserController@uploadimage"
+		] );
 App::missing( function ( $exception )
 {
 

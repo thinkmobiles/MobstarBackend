@@ -2023,5 +2023,59 @@ class UserController extends BaseController
 		 } 
 
 
+	}
+	public function uploadimage()
+	{		
+		/*code for upload user profile and cover image*/
+		$user = User::find($_POST['user_id']);
+
+		$userprofile = Input::file( 'user_profile_image' );
+		
+		if( !empty( $userprofile ) )
+		{			
+			$file_in = $userprofile->getRealPath();
+
+			$file_out = 'profile/' . $_POST['user_id'] . "-" . str_random( 12 ) . ".jpg";
+
+			$img = Image::make( $file_in );
+
+			$img->resize( 200, 200 );
+
+			$img->save( $_ENV[ 'PATH' ] . '/public/' . $file_out, 80 );
+
+			$handle = fopen( $_ENV[ 'PATH' ] . '/public/' . $file_out, "r" );
+
+			Flysystem::connection( 'awss3' )->put( $file_out,
+												   fread( $handle,
+														  filesize( $_ENV[ 'PATH' ] . '/public/' . $file_out ) ) );		
+
+			$user->user_profile_image = $file_out;			
+		}
+
+		$usercoverprofile = Input::file( 'user_cover_image' );
+
+		if( !empty( $usercoverprofile ) )
+		{
+			$file_in = $usercoverprofile->getRealPath();
+			$file_out = 'profile/' . $_POST['user_id'] . "-" . str_random( 12 ) . ".jpg";
+
+			$img = Image::make( $file_in );
+
+			$img->resize( 200, 200 );
+
+			$img->save( $_ENV[ 'PATH' ] . '/public/' . $file_out, 80 );
+
+			$handle = fopen( $_ENV[ 'PATH' ] . '/public/' . $file_out, "r" );
+
+			Flysystem::connection( 'awss3' )->put( $file_out,
+												   fread( $handle,
+														  filesize( $_ENV[ 'PATH' ] . '/public/' . $file_out ) ) );
+
+			$user->user_cover_image = $file_out;			
+		}
+		$user->save();
+		header("Location:http://admin.mobstar.com/user/".$_POST['user_id']);
+		exit();
+		/*end of code for upload user profile and cover image*/
 	}	
 }
