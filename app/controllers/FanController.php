@@ -80,7 +80,8 @@ class FanController extends BaseController
 
 		foreach( $entries as $entry )
 		{
-			if( !isset( $returning[ $entry->entry_id ] ) && ( count( $entry->comments ) > 0 ) )
+			//if( !isset( $returning[ $entry->entry_id ] ) && ( count( $entry->comments ) > 0 ) )
+			if( !isset( $returning[ $entry->entry_id ] ) )
 			{
 				$current[ 'id' ] = $entry->entry_id;
 				$current[ 'entryName' ] = $entry->entry_name;
