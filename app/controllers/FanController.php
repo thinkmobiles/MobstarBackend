@@ -87,6 +87,7 @@ class FanController extends BaseController
 			{
 				$current[ 'id' ] = $entry->entry_id;
 				$current[ 'entryName' ] = $entry->entry_name;
+				$current[ 'entryDescription' ] = $entry->entry_description;
 
 				/*foreach( $entry->file as $file )
 				{
