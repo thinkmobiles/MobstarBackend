@@ -67,7 +67,7 @@ class FanController extends BaseController
 
 		//$entries = Entry::where( 'entry_user_id', '=', $session->token_user_id )->has( 'comments' )->with( 'comments' )->get();
 		$entries = DB::table( 'entries' )
-					 ->select( 'entries.*, comments.*' )
+					 ->select( 'entries.*', 'comments.*' )
 					 ->join( 'comments', 'entries.entry_id', '=', 'comments.comment_entry_id' )
 					 ->where( 'entries.entry_user_id', '=', $session->token_user_id )
 					 ->where( 'entries.entry_deleted', '=', '0' )
