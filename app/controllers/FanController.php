@@ -124,7 +124,7 @@ class FanController extends BaseController
 		}
 		$orderby = "lastComment"; //change this to whatever key you want from the array
 
-		array_multisort( $sortArray[ $orderby ], SORT_DESC, $entries );
+		array_multisort( $sortArray[ $orderby ], SORT_DESC, $return[ 'entries' ] );
 		
 		$response = Response::make( $return, 200 );
 
