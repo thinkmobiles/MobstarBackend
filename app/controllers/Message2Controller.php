@@ -1152,12 +1152,20 @@ public function reply()
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );		
-		$count = DB::table( 'join_message_recipients' )
+		/*$count = DB::table( 'join_message_recipients' )
 					->select( 'join_message_recipients.*' )
 					->where( 'join_message_recipients.join_message_recipient_user_id', '=', $session->token_user_id )
 					->where('join_message_recipients.join_message_recipient_read', '=', 0)
 					->groupBy('join_message_recipients.join_message_recipient_thread_id')
-					->count();	
+					->count();	*/
+		$count = DB::table( 'notifications' )
+			->select( 'notifications.*' )
+			->where( 'notifications.notification_user_id', '=', $session->token_user_id )
+			->where('notifications.notification_read', '=', 0)
+			->where('notifications.notification_deleted', '=', 0)
+			->where('notifications.notification_type', '=', 'Message')
+			->count();
+		
 		$return[ 'notifications' ]= $count;
 
 		$status_code = 200;
