@@ -272,12 +272,13 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 	$excludeCategory = [7,8];
 	$entries = Entry::with('vote')->where('entry_user_id', '=', $user->user_id)->whereNotIn( 'entry_category_id', $excludeCategory )->where('entry_deleted', '=', '0')->get();
 	
-	$rank = 100000;
+	$rank = 0;
+	//$rank = 100000;
 	$votes = 0;
 	foreach($entries as $entry)
 	{
-			if($entry->entry_rank < $rank && $entry->entry_rank != 0)
-				$rank = $entry->entry_rank;
+			/*if($entry->entry_rank < $rank && $entry->entry_rank != 0)
+				$rank = $entry->entry_rank;*/
 			foreach($entry->vote as $vote)
 			{
 				$tmp[]  = $vote->vote_entry_id;
@@ -286,11 +287,11 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 			}
 	}
 
-	if ($rank == 100000)
+	/*if ($rank == 100000)
 		$rank = 0;
-
-
 	$return['rank'] = $rank;
+	*/
+	$return['rank'] = $user->user_rank;
 	$return['fans'] = count($starredBy);
 	$return['votes'] = $votes;
 
