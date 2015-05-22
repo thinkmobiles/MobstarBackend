@@ -369,7 +369,7 @@ class VoteController extends BaseController
 		);
 
 		$validator = Validator::make( Input::get(), $rules );
-
+		$userid = $session->token_user_id;
 		if( $validator->fails() )
 		{
 			//var_dump($validator->messages());
