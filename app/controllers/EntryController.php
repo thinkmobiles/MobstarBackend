@@ -3298,7 +3298,7 @@ class EntryController extends BaseController
 		{
 			$aj = User::find( $user );
 			$starredBy = [ ];
-			foreach( $aj->StarredBy as $starred )
+			/*foreach( $aj->StarredBy as $starred )
 			{
 				if( $starred->user_star_deleted == 0 )
 				{
@@ -3318,6 +3318,9 @@ class EntryController extends BaseController
 			}
 			$return[ 'starredBy' ] = $starredBy;
 			$return['fans'] = count($starredBy);
+			*/
+			$return[ 'starredBy' ] = $starredBy;
+			$return['fans'] = count($aj->StarredBy);
 		}
 		/* End */
 		$status_code = 200;
