@@ -3511,6 +3511,30 @@ class EntryController extends BaseController
 		$session = $this->token->get_session( $token );
 
 		$term = Input::get( "term" );		
+		
+		//Get limit to calculate pagination 
+		$limit = ( Input::get( 'limit', '50' ) );
+
+		//If not numeric set it to the default limit
+		$limit = ( !is_numeric( $limit ) || $limit < 1 ) ? 50 : $limit;
+
+		//Get page
+		$page = ( Input::get( 'page', '1' ) );
+		$page = ( !is_numeric( $page ) ) ? 1 : $page;
+		
+		//Calculate offset
+		$offset = ( $page * $limit ) - $limit;
+
+		//If page is greter than one show a previous link
+		if( $page > 1 )
+		{
+			$previous = true;
+		}
+		else
+		{
+			$previous = false;
+		}
+		
 		$return = [ ];
 		//$excludeCategory = [7,8];
 		$results = DB::table( 'entries' )
@@ -3535,7 +3559,8 @@ class EntryController extends BaseController
 							   ->orWhere( 'comments.comment_content', 'LIKE','%' . $term . '%' );
 					 } )
 					 ->groupBy('entry_id')
-					 ->get();
+					 //->get();
+					 ->take( $limit )->skip( $offset )->get();
 		$status_code = 200;
 		
 		$results_user = DB::table( 'users' )
@@ -3552,7 +3577,8 @@ class EntryController extends BaseController
 						   ->orWhere( 'google_users.google_user_display_name', 'LIKE', '%' . $term . '%' )
 						   ->orWhere( 'google_users.google_user_user_name', 'LIKE', '%' . $term . '%' );
 				 } )
-				 ->get();
+				 //->get();
+				 ->take( $limit )->skip( $offset )->get();
 		if(count($results_user) > 0)
 		{
 			for( $i = 0; $i < count( $results_user ); $i++ )
