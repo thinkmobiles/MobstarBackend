@@ -990,7 +990,8 @@ class UserController extends BaseController
 			{
 				$user->user_full_name = Input::get( "fullName" );
 			}
-			if( isset( $input[ 'userName' ] ) &&  !empty( $input[ 'userName' ] ))
+			//if( isset( $input[ 'userName' ] ) &&  !empty( $input[ 'userName' ] ))
+			if( isset( $input[ 'userName' ] ) )
 			{
 				$user->user_name = Input::get( "userName" );
 			}
