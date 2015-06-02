@@ -525,4 +525,56 @@ class NotificationController extends BaseController
 		}
 		return Response::make( $response, $status_code );	
 	}
+	///////
+	public function markreadnew( )
+	{
+
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		//Validate Input
+		$rules = array(
+			'notificationIds'    => 'required',			
+		);
+		$messages = array(			
+		);
+
+		$validator = Validator::make( Input::all(), $rules, $messages );
+
+		// process the login
+		if( $validator->fails() )
+		{
+
+			$return = $validator->messages();
+
+			$response = Response::make( $return, 400 );
+
+			return $response;
+		}
+		else
+		{
+			//$notification = Notification::where('notification_user_id', '=', $session->token_user_id)->update(['notification_read' => 1]);
+			// get ids
+			$id_commas = Input::get( 'notificationIds' );
+			$id =  explode( ',', $id_commas );
+			for( $i=0; $i<count($id); $i++ )
+			{
+				$notification = Notification::where('notification_id', '=', $id[$i])->where('notification_user_id', '=', $session->token_user_id)->first();
+				if(!is_null($notification))
+				{
+					$notification->notification_read = 1;
+					$notification->save();
+				}
+				else
+				{
+					continue;
+				}			
+			}
+			$response[ 'message' ] = "Notification read successfully";
+			$status_code = 201;
+		}
+		return Response::make( $response, $status_code );	
+	}
+	///////
 }

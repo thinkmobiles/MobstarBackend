@@ -436,6 +436,11 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "notification/markread",
 			"uses" => "NotificationController@markread"
 		] );
+		
+		Route::post( "notification/markreadnew", [
+			"as"   => "notification/markreadnew",
+			"uses" => "NotificationController@markreadnew"
+		] );
 
 		// -------------------------------------------------------
 		// FAQ(s)
