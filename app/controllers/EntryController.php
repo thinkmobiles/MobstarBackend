@@ -3293,6 +3293,7 @@ class EntryController extends BaseController
 				$return[ 'entries' ][ ][ 'entry' ] = $current;
 			}			
 		}
+		mail('anil@spaceotechnologies.com',time(),print_r($return[ 'entries' ][ ][ 'entry' ],true));
 		/* Added By AJ for getting followrs */
 		if( $user != 0 )
 		{
