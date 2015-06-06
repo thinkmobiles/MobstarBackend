@@ -1761,7 +1761,7 @@ class UserController extends BaseController
 						//end
 						
 						// ckeck for position of user
-						if( $oldrank != $newrank)
+						/*if( $oldrank != $newrank)
 						{
 							$STR = "";
 							$userID = $User->user_id;
@@ -1856,7 +1856,7 @@ class UserController extends BaseController
 								 	$this->registerSNSEndpoint($usersDeviceData[0],$message);
 								}
 							}
-						}
+						}*/
 						//
 					   $user1[ 'rank' ] = $rank;
 				       $user1[ 'id' ] = $User->user_id;
