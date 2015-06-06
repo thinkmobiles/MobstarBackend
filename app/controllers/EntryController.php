@@ -2192,12 +2192,7 @@ class EntryController extends BaseController
 
 		foreach( $entries as $entry )
 		{
-			if(count($entry[ 'file' ]) <= 0)
-				continue;
-			if( ( count($entry[ 'file' ]) < 2 ) &&  $entry['entry_type'] === 'audio' )
-				continue;
-			if( ( count($entry[ 'file' ])  < 1 ) &&  $entry['entry_type'] === 'video' )
-				continue;
+
 			$up_votes = 0;
 			$down_votes = 0;
 
@@ -2230,11 +2225,7 @@ class EntryController extends BaseController
 		}
 
 		$orderby = "entry_up_votes"; //change this to whatever key you want from the array
-		//echo "<pre>";
-		//print_r($entries);
-		//echo "<pre>";
-		//print_r($sortArray);
-		//die();
+
 		array_multisort( $sortArray[ $orderby ], SORT_DESC, $entries );
 
 		$r = 1;
@@ -2258,7 +2249,7 @@ class EntryController extends BaseController
 			foreach( $entries2 as $entry )
 			{
 				$entry->entry_rank = $rank[ $entry->entry_id ];
-				//$entry->save();
+				$entry->save();
 			}
 		}
 	}
@@ -3012,7 +3003,7 @@ class EntryController extends BaseController
 		$entries = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false, true );
 		//dd(DB::getQueryLog());
 		$count = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, true );
-		//mail('anil@spaceotechnologies.com',time(),print_r($entries,true));	
+
 		if( $count == 0 )
 		{
 			if( $user != 0 )
@@ -3112,7 +3103,7 @@ class EntryController extends BaseController
 			//check to see if fields were specified and at least one is valid
 			if( ( !empty( $fields ) ) && $valid )
 			{
-				//mail('anil@spaceotechnologies.com',time(),print_r('if',true));
+
 				if( in_array( "id", $fields ) )
 				{
 					$current[ 'id' ] = $entry->entry_id;
@@ -3228,7 +3219,7 @@ class EntryController extends BaseController
 
 			else
 			{
-				//mail('anil@spaceotechnologies.com',time(),print_r('else',true));
+
 				$current[ 'id' ] = $entry->entry_id;
 				$current[ 'user' ] = oneUser( $entry->User, $session );
 				if( isset( $entry->entry_category_id )  && $entry->entry_category_id == 3 )
@@ -3302,7 +3293,6 @@ class EntryController extends BaseController
 				$return[ 'entries' ][ ][ 'entry' ] = $current;
 			}			
 		}
-		
 		/* Added By AJ for getting followrs */
 		if( $user != 0 )
 		{
@@ -3347,7 +3337,7 @@ class EntryController extends BaseController
 		{
 			$return[ 'previous' ] = url( "index.php/entry/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] ) );
 		}
-		//mail('anil@spaceotechnologies.com',time(),print_r($return,true));
+
 		$response = Response::make( $return, $status_code );
 
 		$response->header( 'X-Total-Count', $count );
