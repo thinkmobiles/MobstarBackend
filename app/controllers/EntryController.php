@@ -2186,6 +2186,8 @@ class EntryController extends BaseController
 		}
 		//$entries = $this->entry->all( $user, $category, 0, 0, 'entry_rank', 'asc', 10000, 0, false, true )->toArray();
 		$entries = $this->entry->rerankall( $user, $category, 0, $exclude, 'entry_rank', 'asc', 10000, 0, false, true )->toArray();
+		dd(DB::getQueryLog());
+		die;
 		$myfile = $_ENV['PATH'] . 'public/reranklog.txt';
 		file_put_contents($myfile, date('d-m-Y H:i:s') . ' debug log:', FILE_APPEND);
 		file_put_contents($myfile, print_r($entries, true), FILE_APPEND);
