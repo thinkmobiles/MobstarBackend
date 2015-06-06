@@ -3003,7 +3003,7 @@ class EntryController extends BaseController
 		$entries = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false, true );
 		//dd(DB::getQueryLog());
 		$count = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, true );
-		mail('anil@spaceotechnologies.com',time(),print_r($count,true));	
+		mail('anil@spaceotechnologies.com',time(),print_r($entries,true));	
 		if( $count == 0 )
 		{
 			if( $user != 0 )
