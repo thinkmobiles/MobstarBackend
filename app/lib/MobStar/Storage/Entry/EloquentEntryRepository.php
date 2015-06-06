@@ -58,7 +58,56 @@ class EloquentEntryRepository implements EntryRepository
 
 		return $query->take( $limit )->skip( $offset )->get();
 	}
+	public function rerankall( $user = 0, $category = 0, $tag = 0, $exclude = 0, $order_by = 0, $order = 'desc', $limit = 50, $offset = 0, $count = false, $withAll = true)
+	{
+		if($withAll)
+		{
+			$query = Entry::with( 'category', 'vote', 'user', 'file', 'entryTag.tag', 'comments' )->join( 'entry_files', 'entry_id', '=', 'entry_file_entry_id' )->where( 'entry_id', '>', '0' );
+		}
+		else
+		{
+			$query = Entry::where( 'entry_id', '>', '0' );
+		}
 
+		$query = $query->where( 'entry_deleted', '=', '0' );
+
+
+		if( $user )
+		{
+			$query = $query->where( 'entry_user_id', '=', $user );
+		}
+
+		if( $category )
+		{
+			$query = $query->where( 'entry_category_id', '=', $category );
+		}
+
+		if( $count )
+		{
+			return $query->count();
+		}
+
+		if( $tag )
+		{
+			$query = $query->whereHas( 'entryTag', function ( $q ) use ( $tag )
+			{
+				$q->where( 'entry_tag_tag_id', '=', $tag );
+			} );
+		}
+
+		if( $exclude )
+		{
+			$query = $query->whereNotIn( 'entry_id', $exclude );
+		}
+
+		//echo $order_by;
+		if( $order_by )
+		{
+			$query = $query->orderBy( $order_by, $order );
+		}
+
+		return $query->take( $limit )->skip( $offset )->get();
+	}
 	public function all_include_deleted( $user = 0, $category = 0, $tag = 0, $exclude = 0, $order_by = 0, $order = 'desc', $limit = 50, $offset = 0, $count = false )
 	{
 		$query = Entry::with( 'category', 'vote', 'user', 'file', 'entryTag.tag', 'comments' )->where( 'entry_id', '>', '0' );
