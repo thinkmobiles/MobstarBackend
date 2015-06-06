@@ -2232,8 +2232,8 @@ class EntryController extends BaseController
 		$orderby = "entry_up_votes"; //change this to whatever key you want from the array
 		echo "<pre>";
 		print_r($entries);
-		echo "<pre>";
-		print_r($sortArray);
+		//echo "<pre>";
+		//print_r($sortArray);
 		die();
 		array_multisort( $sortArray[ $orderby ], SORT_DESC, $entries );
 
