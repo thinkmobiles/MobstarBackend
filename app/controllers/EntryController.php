@@ -2192,12 +2192,12 @@ class EntryController extends BaseController
 
 		foreach( $entries as $entry )
 		{
-			/*if(count($entry[ 'file' ]) <= 0)
+			if(count($entry[ 'file' ]) <= 0)
 				continue;
 			if( ( count($entry[ 'file' ]) < 2 ) &&  $entry['entry_type'] === 'audio' )
 				continue;
 			if( ( count($entry[ 'file' ])  < 1 ) &&  $entry['entry_type'] === 'video' )
-				continue;*/
+				continue;
 			$up_votes = 0;
 			$down_votes = 0;
 
@@ -2254,7 +2254,7 @@ class EntryController extends BaseController
 			foreach( $entries2 as $entry )
 			{
 				$entry->entry_rank = $rank[ $entry->entry_id ];
-				$entry->save();
+				//$entry->save();
 			}
 		}
 	}
