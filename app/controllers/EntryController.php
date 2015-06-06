@@ -2194,9 +2194,9 @@ class EntryController extends BaseController
 		{
 			if(count($entry->file) <= 0)
 				continue;
-			if( ( count($entry->file) ) < 2 ) &&  $entry->entry_type === 'audio' )
+			if( ( count($entry->file) < 2 ) &&  $entry->entry_type === 'audio' )
 				continue;
-			if( ( count($entry->file) ) < 1 ) &&  $entry->entry_type === 'video' )
+			if( ( count($entry->file)  < 1 ) &&  $entry->entry_type === 'video' )
 				continue;
 			$up_votes = 0;
 			$down_votes = 0;
