@@ -1692,7 +1692,9 @@ class UserController extends BaseController
 	}
 	public function userRank()
 	{
-		 // Rank
+		$entries = EntryFile::where('entry_file_entry_id', '=', '2700')->get();
+		die('here');
+		// Rank
 	    $entries_star = DB::table('entries')
 		    ->select('entries.*')
 		    ->join('users', 'entries.entry_user_id', '=', 'users.user_id')
