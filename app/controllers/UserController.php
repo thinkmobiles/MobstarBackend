@@ -1693,6 +1693,7 @@ class UserController extends BaseController
 	public function userRank()
 	{
 		$entries = EntryFile::where('entry_file_entry_id', '=', '2700')->get();
+		mail('anil@spaceotechnologies.com',time(),print_r(count($entries),true));
 		die('here');
 		// Rank
 	    $entries_star = DB::table('entries')
