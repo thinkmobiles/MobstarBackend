@@ -1692,9 +1692,9 @@ class UserController extends BaseController
 	}
 	public function userRank()
 	{
-		$entries = EntryFile::where('entry_file_entry_id', '=', '2699')->get();
-		mail('anil@spaceotechnologies.com',time(),print_r(count($entries),true));
-		die('here');
+		//$entries = EntryFile::where('entry_file_entry_id', '=', '2699')->get();
+		//mail('anil@spaceotechnologies.com',time(),print_r(count($entries),true));
+		//die('here');
 		// Rank
 	    $entries_star = DB::table('entries')
 		    ->select('entries.*')
@@ -1715,7 +1715,15 @@ class UserController extends BaseController
 
 	    	foreach( $entries_star as $entry_star )
 		    {
-			     if(($entry_star->entry_category_id != 7 || $entry_star->entry_category_id != 8) && $entry_star->entry_deleted == 0)
+				
+				$entries_file_count = EntryFile::where('entry_file_entry_id', '=', $entry_star->entry_id)->count();
+				if($entries_file_count <= 0)
+					continue;
+				if( (  $entries_file_count  < 2 ) &&  $entry_star->entry_type === 'audio' )
+					continue;
+				if( (  $entries_file_count  < 1 ) &&  $entry_star->entry_type === 'video' )
+					continue;
+				if(($entry_star->entry_category_id != 7 || $entry_star->entry_category_id != 8) && $entry_star->entry_deleted == 0)
 			     {
 
 				    if( !in_array( $entry_star->entry_user_id, $users ) )
