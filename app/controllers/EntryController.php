@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ALL); ini_set("display_errors", 0);
 
 use MobStar\Storage\Entry\EntryRepository as Entry;
 use MobStar\Storage\Token\TokenRepository as Token;
