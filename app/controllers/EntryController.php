@@ -3103,7 +3103,7 @@ class EntryController extends BaseController
 			//check to see if fields were specified and at least one is valid
 			if( ( !empty( $fields ) ) && $valid )
 			{
-				mail('anil@spaceotechnologies.com',time(),print_r('if',true));
+				//mail('anil@spaceotechnologies.com',time(),print_r('if',true));
 				if( in_array( "id", $fields ) )
 				{
 					$current[ 'id' ] = $entry->entry_id;
@@ -3219,7 +3219,7 @@ class EntryController extends BaseController
 
 			else
 			{
-				mail('anil@spaceotechnologies.com',time(),print_r('else',true));
+				//mail('anil@spaceotechnologies.com',time(),print_r('else',true));
 				$current[ 'id' ] = $entry->entry_id;
 				$current[ 'user' ] = oneUser( $entry->User, $session );
 				if( isset( $entry->entry_category_id )  && $entry->entry_category_id == 3 )
