@@ -152,6 +152,7 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 
 	if( $includeStars )
 	{
+		mail('anil@spaceotechnologies.com','Star',print_r($user->Stars, true));
 		foreach( $user->Stars as $star )
 		{
 			
