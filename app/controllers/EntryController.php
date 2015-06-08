@@ -2185,7 +2185,7 @@ class EntryController extends BaseController
 			$exclude[ ] = $c->entry_id;
 		}
 		//$entries = $this->entry->all( $user, $category, 0, 0, 'entry_rank', 'asc', 10000, 0, false, true )->toArray();
-		$entries = $this->entry->all( $user, $category, 0, $exclude, 'entry_rank', 'asc', 10000, 0, false, true )->toArray();
+		$entries = $this->entry->all( $user, $category, 0, $exclude, 'entry_rank', 'asc', 50, 0, false, true )->toArray();
 		print_r($entries);
 		die('here');
 		
