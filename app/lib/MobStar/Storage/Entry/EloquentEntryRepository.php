@@ -62,7 +62,7 @@ class EloquentEntryRepository implements EntryRepository
 	{
 		if($withAll)
 		{
-			$query = Entry::with( 'category', 'vote', 'user', 'file', 'entryTag.tag', 'comments' )->where( 'entry_id', '>', '0' );
+			$query = Entry::with( 'category', 'user', 'file', 'entryTag.tag' )->where( 'entry_id', '>', '0' );
 		}
 		else
 		{
