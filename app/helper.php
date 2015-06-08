@@ -226,7 +226,8 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 						$lookup_array[ ]= $star->Stars->user_id;
 						
 						$stars[ ] = [ 'starId'       => $star->Stars->user_id,
-									  'starName'     => $starNames['displayName'],
+									  //'starName'     => $starNames['displayName'],
+									  'starName'     => ( isset( $starNames['displayName'] ) ) ? $starNames['displayName'] : '',
 									  'starredDate'  => $star->user_star_created_date,
 									  'profileImage' => ( isset( $star->Stars->user_profile_image ) )
 										  ? $client->getObjectUrl( 'mobstar-1', $star->Stars->user_profile_image, '+720 minutes' )
