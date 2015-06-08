@@ -172,7 +172,7 @@ class EntryController extends BaseController
 		$limit = ( Input::get( 'limit', '50' ) );
 
 		//If not numeric set it to the default limit
-		$limit = ( !is_numeric( $limit ) || $limit < 1 ) ? 50 : $limit;
+		$limit = ( !is_numeric( $limit ) || $limit < 1 ) ? 20 : $limit;
 
 		//Get page
 		$page = ( Input::get( 'page', '1' ) );
