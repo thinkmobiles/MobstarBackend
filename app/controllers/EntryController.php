@@ -169,7 +169,7 @@ class EntryController extends BaseController
 		}
 
 		//Get limit to calculate pagination 
-		$limit = ( Input::get( 'limit', '50' ) );
+		$limit = ( Input::get( 'limit', '20' ) );
 
 		//If not numeric set it to the default limit
 		$limit = ( !is_numeric( $limit ) || $limit < 1 ) ? 20 : $limit;
