@@ -788,10 +788,10 @@ public function reply()
 									->orderBy( 'notification_updated_date', 'desc' )
 									->first();
 			$icon = 'message.png';
-			mail('anil@spaceotechnologies.com',time().'prev_not',print_r($prev_not,true));
+			//mail('anil@spaceotechnologies.com',time().'prev_not',print_r($prev_not,true));
 			if( count( $prev_not ) == 0 )
 			{
-				mail('anil@spaceotechnologies.com',time().'if',print_r($thread,true));
+				//mail('anil@spaceotechnologies.com',time().'if',print_r($thread,true));
 				Notification::create( [ 'notification_user_id'      => $recipient->join_message_participant_user_id,
 											'notification_subject_ids'  => json_encode( [ $session->token_user_id ] ),
 											'notification_details'      => ' has messaged you.',
@@ -804,7 +804,7 @@ public function reply()
 			}
 			else
 			{	
-				mail('anil@spaceotechnologies.com',time().'else',print_r($thread,true));
+				//mail('anil@spaceotechnologies.com',time().'else',print_r($thread,true));
 				$subjects = json_decode( $prev_not->notification_subject_ids );
 				
 				if( !in_array( $session->token_user_id, $subjects ) )
