@@ -1152,19 +1152,20 @@ public function reply()
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );		
-		/*$count = DB::table( 'join_message_recipients' )
+		$count = DB::table( 'join_message_recipients' )
 					->select( 'join_message_recipients.*' )
 					->where( 'join_message_recipients.join_message_recipient_user_id', '=', $session->token_user_id )
 					->where('join_message_recipients.join_message_recipient_read', '=', 0)
 					->groupBy('join_message_recipients.join_message_recipient_thread_id')
-					->count();	*/
-		$count = DB::table( 'notifications' )
+					->count();	
+		/* Commented on 17-June-2015 for notificaion changes */
+		/*$count = DB::table( 'notifications' )
 			->select( 'notifications.*' )
 			->where( 'notifications.notification_user_id', '=', $session->token_user_id )
 			->where('notifications.notification_read', '=', 0)
 			->where('notifications.notification_deleted', '=', 0)
 			->where('notifications.notification_type', '=', 'Message')
-			->count();
+			->count();*/
 		
 		$return[ 'notifications' ]= $count;
 
@@ -1211,7 +1212,8 @@ public function reply()
 					$msg->join_message_recipient_read = 1;
 					$msg->save();
 				}
-			}					
+			}
+			$notification = Notification::where('notification_user_id', '=', $session->token_user_id)->where('notification_entry_id','=',$threadId)->update(['notification_read' => 1]);					
 			$response['message'] = "Thread read successfully.";
 			$status_code = 200;			
 		}
