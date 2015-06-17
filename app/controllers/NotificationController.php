@@ -250,6 +250,7 @@ class NotificationController extends BaseController
 						->select( 'join_message_recipients.*' )
 						->where( 'join_message_recipients.join_message_recipient_user_id', '=', $session->token_user_id )
 						->where('join_message_recipients.join_message_recipient_read', '=', 0)
+						->where('join_message_recipients.join_message_recipient_thread_id', '=', @$notification->notification_entry_id)
 						->groupBy('join_message_recipients.join_message_recipient_thread_id')
 						->count();
 					$current[ 'notificationRead' ] = ($count_notification > 0) ? 0 : 1;
