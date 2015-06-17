@@ -246,13 +246,13 @@ class NotificationController extends BaseController
 				/* Added for notification count issue on 17-June-2015 */
 				if($notification->notification_type == 'Message')
 			    {
-					$count = DB::table( 'join_message_recipients' )
+					$count_notification = DB::table( 'join_message_recipients' )
 						->select( 'join_message_recipients.*' )
 						->where( 'join_message_recipients.join_message_recipient_user_id', '=', $session->token_user_id )
 						->where('join_message_recipients.join_message_recipient_read', '=', 0)
 						->groupBy('join_message_recipients.join_message_recipient_thread_id')
 						->count();
-					$current[ 'notificationRead' ] = ($count >= 1) ? 0 : 1;
+					$current[ 'notificationRead' ] = ($count_notification > 0) ? 0 : 1;
 			    }
 			    else
 			    {
