@@ -788,6 +788,7 @@ public function reply()
 									->orderBy( 'notification_updated_date', 'desc' )
 									->first();
 			$icon = 'message.png';
+			mail('anil@spaceotechnologies.com',time().'prev_not',print_r($prev_not,true));
 			if( count( $prev_not ) == 0 )
 			{
 				mail('anil@spaceotechnologies.com',time().'if',print_r($thread,true));
