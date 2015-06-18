@@ -285,6 +285,15 @@ class EntryController extends BaseController
 				$current[ 'id' ] = null;
 				$current[ 'user' ] = oneUser( $user, $session );
 				$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $user->user_id )->count();
+				$iAmStarFlag = Star::where( 'user_star_user_id', '=', $user->user_id )->where( 'user_star_star_id', '=', $session->user_id )->count();
+				if($iAmStarFlag > 0)
+				{
+					$current[ 'user' ][ 'iAmStar' ] = 1;	
+				}
+				else
+				{
+					$current[ 'user' ][ 'iAmStar' ] = 0;
+				}
 				$current[ 'category' ] = null;
 				$current[ 'type' ] = null;
 				$current[ 'name' ] = null;
@@ -823,7 +832,15 @@ class EntryController extends BaseController
 					$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
 						? "http://" . $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
 					$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $entry->entry_user_id )->count();
-
+					$iAmStarFlag = Star::where( 'user_star_user_id', '=', $entry->entry_user_id )->where( 'user_star_star_id', '=', $session->user_id )->count();
+					if($iAmStarFlag > 0)
+					{
+						$current[ 'user' ][ 'iAmStar' ] = 1;	
+					}
+					else
+					{
+						$current[ 'user' ][ 'iAmStar' ] = 0;
+					}
 				}
 
 				if( in_array( "type", $fields ) )
@@ -3012,6 +3029,15 @@ class EntryController extends BaseController
 				$current[ 'id' ] = null;
 				$current[ 'user' ] = oneUser( $user, $session );
 				$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $user->user_id )->count();
+				$iAmStarFlag = Star::where( 'user_star_user_id', '=', $user->user_id )->where( 'user_star_star_id', '=', $session->user_id )->count();
+				if($iAmStarFlag > 0)
+				{
+					$current[ 'user' ][ 'iAmStar' ] = 1;	
+				}
+				else
+				{
+					$current[ 'user' ][ 'iAmStar' ] = 0;
+				}
 				$current[ 'category' ] = null;
 				$current[ 'type' ] = null;
 				$current[ 'name' ] = null;

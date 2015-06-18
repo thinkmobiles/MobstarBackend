@@ -144,6 +144,15 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 	if( $session->token_user_id != $user->user_id )
 	{
 		$return[ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $user->user_id )->where( 'user_star_deleted', '!=', '1' )->count();
+		$iAmStarFlag = Star::where( 'user_star_user_id', '=', $user->user_id )->where( 'user_star_star_id', '=', $session->token_user_id )->where( 'user_star_deleted', '!=', '1' )->count();
+		if($iAmStarFlag > 0)
+		{
+			$return[ 'iAmStar' ] = 1;	
+		}
+		else
+		{
+			$return[ 'iAmStar' ] = 0;
+		}
 	}
 
 	$stars = [ ];
