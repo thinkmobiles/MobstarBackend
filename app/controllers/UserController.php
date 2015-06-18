@@ -2088,5 +2088,69 @@ class UserController extends BaseController
 		header("Location:http://admin.mobstar.com/user/".$_POST['user_id']);
 		exit();
 		/*end of code for upload user profile and cover image*/
+	}
+	// Function for user analytics data capture
+	public function analytic( )
+	{
+		
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		//Validate Input
+		$rules = array(
+			'platform'    => 'required',			
+			'osversion'    => 'required',			
+			'appversion'    => 'required',			
+		);
+		$messages = array(			
+		);
+
+		$validator = Validator::make( Input::all(), $rules, $messages );
+
+		// process the login
+		if( $validator->fails() )
+		{
+
+			$return = $validator->messages();
+
+			$response = Response::make( $return, 400 );
+
+			return $response;
+		}
+		else
+		{
+			$user_analytic_user_id = $session->token_user_id;
+			$user_analytic_platform = Input::get( 'platform' );
+			$user_analytic_os_version = Input::get( 'osversion' );
+			$user_analytic_device_name = Input::get( 'devicename' );
+			$user_analytic_app_version = Input::get( 'appversion' );			
+			
+			$useranalytic = UserAnalytic::where( 'user_analytic_user_id', '=', $session->token_user_id )->first();			
+			if( $useranalytic )
+			{
+				$useranalytic->user_analytic_user_id = $user_analytic_user_id;
+				$useranalytic->user_analytic_platform = $user_analytic_platform;
+				$useranalytic->user_analytic_os_version = $user_analytic_os_version;
+				$useranalytic->user_analytic_device_name = $user_analytic_device_name;
+				$useranalytic->user_analytic_app_version = $user_analytic_app_version;
+				$useranalytic->user_analytic_created_at = date( 'Y-m-d H:i:s' );
+				$useranalytic->save();
+			}
+			else
+			{
+				UserAnalytic::create( [ 'user_analytic_user_id'     => $user_analytic_user_id,
+										'user_analytic_platform'    => $user_analytic_platform,
+										'user_analytic_os_version'  => $user_analytic_os_version,
+										'user_analytic_device_name'	=> $user_analytic_device_name,
+										'user_analytic_app_version' => $user_analytic_app_version,
+										'user_analytic_created_at'  => date( 'Y-m-d H:i:s' )] );
+			}
+			$response[ 'message' ] = "Analytics data stored successfully";
+			$status_code = 201;
+		}
+
+		return Response::make( $response, $status_code );	
 	}	
+	// End	
 }
