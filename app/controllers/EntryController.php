@@ -1187,9 +1187,9 @@ class EntryController extends BaseController
 						//'entry_name'         => preg_replace('/\\\\/', '', Input::get( 'name' )),
 						//'entry_language'     => preg_replace('/\\\\/', '', Input::get( 'language' )),
 						//'entry_description'  => preg_replace('/\\\\/', '', Input::get( 'description' )),
-						'entry_name'         => trim(Input::get( 'name' ), '"'),
-						'entry_language'     => trim(Input::get( 'language' ), '"'),
-						'entry_description'  => trim(Input::get( 'description' ), '"'),
+						'entry_name'         => str_replace('"', '', Input::get( 'name' )),
+						'entry_language'     => str_replace('"', '', Input::get( 'language' )),
+						'entry_description'  => str_replace('"', '', Input::get( 'description' )),
 						'entry_created_date' => date( 'Y-m-d H:i:s' ),
 						'entry_deleted'      => $entry_deleted,
 						'entry_subcategory'  => Input::get( 'subCategory' ),
@@ -1203,9 +1203,9 @@ class EntryController extends BaseController
 						'entry_user_id'      => $session->token_user_id,
 						'entry_category_id'  => (Input::get( 'category' ) > 0) ? Input::get( 'category' ) : 1,
 						'entry_type'         => Input::get( 'type' ),
-						'entry_name'         => trim(Input::get( 'name' ), '"'),
-						'entry_language'     => trim(Input::get( 'language' ), '"'),
-						'entry_description'  => trim(Input::get( 'description' ), '"'),
+						'entry_name'         => str_replace('"', '', Input::get( 'name' )),
+						'entry_language'     => str_replace('"', '', Input::get( 'language' )),
+						'entry_description'  => str_replace('"', '', Input::get( 'description' )),
 						'entry_created_date' => date( 'Y-m-d H:i:s' ),
 						'entry_deleted'      => $entry_deleted,
 						'entry_subcategory'  => '',
@@ -1226,7 +1226,7 @@ class EntryController extends BaseController
 
 					foreach( $tags as $tag )
 					{
-						$this->entry->addTag( trim($tag, '"'), $response[ 'entry_id' ], $session->token_user_id );
+						$this->entry->addTag( str_replace('"', '', $tag), $response[ 'entry_id' ], $session->token_user_id );
 						//$this->entry->addTag( trim(preg_replace('/\\\\/', '', $tag)), $response[ 'entry_id' ], $session->token_user_id );
 						//$this->entry->addTag( trim( $tag ), $response[ 'entry_id' ], $session->token_user_id );
 					}
