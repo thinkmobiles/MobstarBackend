@@ -102,8 +102,8 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 	}
 	$return = [ 'id'           => $user->user_id,
 				'email'        => $user->user_email,
-				'tagLine'      => (!empty($user->user_tagline)) ? preg_replace('/\\\\/', '',$user->user_tagline) : '',
-				'bio'      	   => (!empty($user->user_bio)) ? preg_replace('/\\\\/', '',$user->user_bio) :'',
+				'tagLine'      => (!empty($user->user_tagline)) ? $user->user_tagline : '',
+				'bio'      	   => (!empty($user->user_bio)) ? $user->user_bio :'',
 				'usergroup'      	   => (!empty($user->user_user_group)) ? $user->user_user_group :'',
 				/*'profileImage' => ( isset( $user->user_profile_image ) )
 					? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+60 minutes' ) : '',
@@ -347,8 +347,8 @@ function oneEntry( $entry, $session, $includeUser = false )
 		$current[ 'user' ] = oneUser( $entry->User, $session );
 	}
 
-	$current[ 'name' ] = preg_replace('/\\\\/', '', $entry->entry_name);
-	$current[ 'description' ] = preg_replace('/\\\\/', '', $entry->entry_description);
+	$current[ 'name' ] = $entry->entry_name;
+	$current[ 'description' ] = $entry->entry_description;
 	$current[ 'totalComments' ] = $entry->comments->count();
 	$current[ 'totalviews' ] = $entry->entryViews->count();
 	$current[ 'created' ] = $entry->entry_created_date;
@@ -357,7 +357,7 @@ function oneEntry( $entry, $session, $includeUser = false )
 	$current[ 'tags' ] = array();
 	foreach( $entry->entryTag as $tag )
 	{
-		$current[ 'tags' ][ ] = preg_replace('/\\\\/', '', Tag::find( $tag->entry_tag_tag_id )->tag_name);
+		$current[ 'tags' ][ ] = Tag::find( $tag->entry_tag_tag_id )->tag_name;
 	}
 
 	//break;
@@ -378,7 +378,7 @@ function oneEntry( $entry, $session, $includeUser = false )
 	$current[ 'upVotes' ] = $up_votes;
 	$current[ 'downVotes' ] = $down_votes;
 	$current[ 'rank' ] = $entry->entry_rank;
-	$current[ 'language' ] = preg_replace('/\\\\/', '', $entry->entry_language);
+	$current[ 'language' ] = $entry->entry_language;
 	// /print_r($entry);
 
 	if( $entry->entry_deleted )

@@ -400,12 +400,12 @@ class EntryController extends BaseController
 
 				if( in_array( "name", $fields ) )
 				{
-					$current[ 'name' ] = preg_replace('/\\\\/', '', $entry->entry_name);
+					$current[ 'name' ] = $entry->entry_name;
 				}
 
 				if( in_array( "description", $fields ) )
 				{
-					$current[ 'description' ] = preg_replace('/\\\\/', '', $entry->entry_description);
+					$current[ 'description' ] = $entry->entry_description;
 				}
 
 				if( in_array( "created", $fields ) )
@@ -423,7 +423,7 @@ class EntryController extends BaseController
 					$current[ 'tags' ] = array();
 					foreach( $entry->entryTag as $tag )
 					{
-						$current[ 'tags' ][ ] = preg_replace('/\\\\/', '', Tag::find( $tag->entry_tag_tag_id )->tag_name);
+						$current[ 'tags' ][ ] = Tag::find( $tag->entry_tag_tag_id )->tag_name;
 					}
 				}
 
@@ -467,7 +467,7 @@ class EntryController extends BaseController
 
 				if( in_array( "language", $fields ) )
 				{
-					$current[ 'language' ] = preg_replace('/\\\\/', '', $entry->entry_language);
+					$current[ 'language' ] = $entry->entry_language;
 				}
 
 				if( $entry->entry_deleted )
@@ -505,8 +505,8 @@ class EntryController extends BaseController
 				}
 				$current[ 'category' ] = $entry->category->category_name;
 				$current[ 'type' ] = $entry->entry_type;
-				$current[ 'name' ] = preg_replace('/\\\\/', '', $entry->entry_name);
-				$current[ 'description' ] = preg_replace('/\\\\/', '', $entry->entry_description);
+				$current[ 'name' ] = $entry->entry_name;
+				$current[ 'description' ] = $entry->entry_description;
 				$current[ 'totalComments' ] = $entry->comments->count();
 				$current[ 'totalviews' ] = $entry->entryViews->count();
 				$current[ 'created' ] = $entry->entry_created_date;
@@ -516,7 +516,7 @@ class EntryController extends BaseController
 				foreach( $entry->entryTag as $entry_tag )
 				{
 					//TODO: Fix tags so that we do not need to find this
-					$current[ 'tags' ][ ] = preg_replace('/\\\\/', '', $entry_tag->tag->tag_name);
+					$current[ 'tags' ][ ] = $entry_tag->tag->tag_name;
 				}
 				if(count($entry->file) <= 0)
 				continue;
@@ -545,7 +545,7 @@ class EntryController extends BaseController
 				$current[ 'upVotes' ] = $up_votes;
 				$current[ 'downVotes' ] = $down_votes;
 				$current[ 'rank' ] = $entry->entry_rank;
-				$current[ 'language' ] = preg_replace('/\\\\/', '', $entry->entry_language);
+				$current[ 'language' ] = $entry->entry_language;
 
 				if( $showFeedback == 1 )
 				{
@@ -554,7 +554,7 @@ class EntryController extends BaseController
 					foreach( $entry->comments as $comment )
 					{
 						$currentFeedback[ ] = [
-							'comment'        => preg_replace('/\\\\/', '', $comment->comment_content),
+							'comment'        => $comment->comment_content,
 							'commentDate'    => $comment->comment_added_date,
 							'commentDeleted' => (bool)$comment->comment_deleted ];
 					}
@@ -850,12 +850,12 @@ class EntryController extends BaseController
 
 				if( in_array( "name", $fields ) )
 				{
-					$current[ 'name' ] = preg_replace('/\\\\/', '', $entry->entry_name);
+					$current[ 'name' ] = $entry->entry_name;
 				}
 
 				if( in_array( "description", $fields ) )
 				{
-					$current[ 'description' ] = preg_replace('/\\\\/', '', $entry->entry_description);
+					$current[ 'description' ] = $entry->entry_description;
 				}
 
 				if( in_array( "created", $fields ) )
@@ -873,7 +873,7 @@ class EntryController extends BaseController
 					$current[ 'tags' ] = array();
 					foreach( $entry->entryTag as $tag )
 					{
-						$current[ 'tags' ][ ] = preg_replace('/\\\\/', '', Tag::find( $tag->entry_tag_tag_id )->tag_name);
+						$current[ 'tags' ][ ] = Tag::find( $tag->entry_tag_tag_id )->tag_name;
 					}
 				}
 
@@ -916,7 +916,7 @@ class EntryController extends BaseController
 
 				if( in_array( "language", $fields ) )
 				{
-					$current[ 'language' ] = preg_replace('/\\\\/', '', $entry->entry_language);
+					$current[ 'language' ] = $entry->entry_language;
 				}
 
 				if( $entry->entry_deleted )
@@ -955,15 +955,15 @@ class EntryController extends BaseController
 //					? "http://" . $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
 //				$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $entry->entry_user_id )->count();
 
-				$current[ 'name' ] = preg_replace('/\\\\/', '', $entry->entry_name);
-				$current[ 'description' ] = preg_replace('/\\\\/', '', $entry->entry_description);
+				$current[ 'name' ] = $entry->entry_name;
+				$current[ 'description' ] = $entry->entry_description;
 				$current[ 'created' ] = $entry->entry_created_date;
 				$current[ 'modified' ] = $entry->entry_modified_date;
 
 				$current[ 'tags' ] = array();
 				foreach( $entry->entryTag as $tag )
 				{
-					$current[ 'tags' ][ ] = preg_replace('/\\\\/', '',Tag::find( $tag->entry_tag_tag_id )->tag_name);
+					$current[ 'tags' ][ ] = Tag::find( $tag->entry_tag_tag_id )->tag_name;
 				}
 
 				//break;
@@ -993,7 +993,7 @@ class EntryController extends BaseController
 					foreach( $entry->comments as $comment )
 					{
 						$currentFeedback[ ] = [
-							'comment'        => preg_replace('/\\\\/', '',$comment->comment_content),
+							'comment'        => $comment->comment_content,
 							'commentDate'    => $comment->comment_added_date,
 							'commentDeleted' => (bool)$comment->comment_deleted ];
 					}
@@ -1003,7 +1003,7 @@ class EntryController extends BaseController
 				$current[ 'upVotes' ] = $up_votes;
 				$current[ 'downVotes' ] = $down_votes;
 				$current[ 'rank' ] = $entry->entry_rank;
-				$current[ 'language' ] = preg_replace('/\\\\/', '',$entry->entry_language);
+				$current[ 'language' ] = $entry->entry_language;
 
 				$current[ 'totalComments' ] = $entry->comments->count();
 				$current[ 'totalviews' ] = $entry->entryViews->count();
@@ -1828,7 +1828,7 @@ class EntryController extends BaseController
 
 			$feedback = [
 				'entry_feedback_entry_id'     => $id,
-				'entry_feedback_content'      => preg_replace('/\\\\/', '', Input::get( 'feedback' )),
+				'entry_feedback_content'      => Input::get( 'feedback' ),
 				'entry_feedback_user_id'      => $session->token_user_id,
 				'entry_feedback_created_date' => date( 'Y-m-d H:i:s' ),
 			];
@@ -1997,7 +1997,7 @@ class EntryController extends BaseController
 						'feedback' => [
 							[
 								'feedbackUser' => oneUser( $feedback->user, $session, false ),
-								'feedback'     => preg_replace('/\\\\/', '', $feedback->entry_feedback_content)
+								'feedback'     => $feedback->entry_feedback_content
 							]
 						]
 					];
@@ -2006,7 +2006,7 @@ class EntryController extends BaseController
 				{
 					array_push( $current[ $feedback->entry_feedback_entry_id ][ 'feedback' ],
 								[ 'feedbackUser' => oneUser( $feedback->user, $session, false ),
-								  'feedback'     => preg_replace('/\\\\/', '', $feedback->entry_feedback_content) ] );
+								  'feedback'     => $feedback->entry_feedback_content ] );
 				}
 			}
 
@@ -2319,15 +2319,15 @@ class EntryController extends BaseController
 //			$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $entry->entry_user_id )->count();
 		}
 
-		$current[ 'name' ] = preg_replace('/\\\\/', '',$entry->entry_name);
-		$current[ 'description' ] = preg_replace('/\\\\/', '',$entry->entry_description);
+		$current[ 'name' ] = $entry->entry_name;
+		$current[ 'description' ] = $entry->entry_description;
 		$current[ 'created' ] = $entry->entry_created_date;
 		$current[ 'modified' ] = $entry->entry_modified_date;
 
 		$current[ 'tags' ] = array();
 		foreach( $entry->entryTag as $tag )
 		{
-			$current[ 'tags' ][ ] = preg_replace('/\\\\/', '',Tag::find( $tag->entry_tag_tag_id )->tag_name);
+			$current[ 'tags' ][ ] = Tag::find( $tag->entry_tag_tag_id )->tag_name;
 		}
 
 		//break;
@@ -2348,7 +2348,7 @@ class EntryController extends BaseController
 		$current[ 'upVotes' ] = $up_votes;
 		$current[ 'downVotes' ] = $down_votes;
 		$current[ 'rank' ] = $entry->entry_rank;
-		$current[ 'language' ] = preg_replace('/\\\\/', '',$entry->entry_language);
+		$current[ 'language' ] = $entry->entry_language;
 
 		if( $entry->entry_deleted )
 		{
@@ -2485,8 +2485,8 @@ class EntryController extends BaseController
 			$current[ 'user' ] = oneUser( $User, $session );
 		}
 
-		$current[ 'name' ] = preg_replace('/\\\\/', '', $entry->entry_name);
-		$current[ 'description' ] = preg_replace('/\\\\/', '',$entry->entry_description);
+		$current[ 'name' ] = $entry->entry_name;
+		$current[ 'description' ] = $entry->entry_description;
 		$totalComments = Comment::where( 'comment_entry_id', '=', $entry->entry_id )->where( 'comment_deleted', '=', '0' )->count();
 		$totalviews = EntryView::where( 'entry_view_entry_id', '=', $entry->entry_id )->count();
 		$current[ 'totalComments' ] = $totalComments;
@@ -2498,7 +2498,7 @@ class EntryController extends BaseController
 		$entryTag = EntryTag::where( 'entry_tag_entry_id', '=', $entry->entry_id )->get();
 		foreach( $entryTag as $tag )
 		{
-			$current[ 'tags' ][ ] = preg_replace('/\\\\/', '',Tag::find( $tag->entry_tag_tag_id )->tag_name);
+			$current[ 'tags' ][ ] = Tag::find( $tag->entry_tag_tag_id )->tag_name;
 		}
 
 		$current[ 'entryFiles' ] = array();
@@ -2539,7 +2539,7 @@ class EntryController extends BaseController
 		$current[ 'upVotes' ] = $up_votes;
 		$current[ 'downVotes' ] = $down_votes;
 		$current[ 'rank' ] = $entry->entry_rank;
-		$current[ 'language' ] = preg_replace('/\\\\/', '', $entry->entry_language);
+		$current[ 'language' ] = $entry->entry_language;
 
 		if( $entry->entry_deleted )
 		{
@@ -3160,12 +3160,12 @@ class EntryController extends BaseController
 
 				if( in_array( "name", $fields ) )
 				{
-					$current[ 'name' ] = preg_replace('/\\\\/', '', $entry->entry_name);
+					$current[ 'name' ] = $entry->entry_name;
 				}
 
 				if( in_array( "description", $fields ) )
 				{
-					$current[ 'description' ] = preg_replace('/\\\\/', '', $entry->entry_description);
+					$current[ 'description' ] = $entry->entry_description;
 				}
 
 				if( in_array( "created", $fields ) )
@@ -3183,7 +3183,7 @@ class EntryController extends BaseController
 					$current[ 'tags' ] = array();
 					foreach( $entry->entryTag as $tag )
 					{
-						$current[ 'tags' ][ ] = preg_replace('/\\\\/', '', Tag::find( $tag->entry_tag_tag_id )->tag_name);
+						$current[ 'tags' ][ ] = Tag::find( $tag->entry_tag_tag_id )->tag_name;
 					}
 				}
 
@@ -3227,7 +3227,7 @@ class EntryController extends BaseController
 
 				if( in_array( "language", $fields ) )
 				{
-					$current[ 'language' ] = preg_replace('/\\\\/', '', $entry->entry_language);
+					$current[ 'language' ] = $entry->entry_language;
 				}
 
 				if( $entry->entry_deleted )
@@ -3256,8 +3256,8 @@ class EntryController extends BaseController
 				}
 				$current[ 'category' ] = $entry->category->category_name;
 				$current[ 'type' ] = $entry->entry_type;
-				$current[ 'name' ] = preg_replace('/\\\\/', '', $entry->entry_name);
-				$current[ 'description' ] = preg_replace('/\\\\/', '', $entry->entry_description);
+				$current[ 'name' ] = $entry->entry_name;
+				$current[ 'description' ] = $entry->entry_description;
 				$current[ 'totalComments' ] = $entry->comments->count();
 				$current[ 'totalviews' ] = $entry->entryViews->count();
 				$current[ 'created' ] = $entry->entry_created_date;
@@ -3267,7 +3267,7 @@ class EntryController extends BaseController
 				foreach( $entry->entryTag as $entry_tag )
 				{
 					//TODO: Fix tags so that we do not need to find this
-					$current[ 'tags' ][ ] = preg_replace('/\\\\/', '', $entry_tag->tag->tag_name);
+					$current[ 'tags' ][ ] = $entry_tag->tag->tag_name;
 				}
 				if(count($entry->file) <= 0)
 					continue;
@@ -3291,7 +3291,7 @@ class EntryController extends BaseController
 				$current[ 'upVotes' ] = $up_votes;
 				$current[ 'downVotes' ] = $down_votes;
 				$current[ 'rank' ] = $entry->entry_rank;
-				$current[ 'language' ] = preg_replace('/\\\\/', '', $entry->entry_language);
+				$current[ 'language' ] = $entry->entry_language;
 
 				if( $showFeedback == 1 )
 				{
