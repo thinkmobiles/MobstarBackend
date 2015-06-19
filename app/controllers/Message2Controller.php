@@ -477,7 +477,7 @@ public function store()
 								 'message_creator_id'   => $session->token_user_id,
 								 //'message_thread_id'    => $messageThread->message_thread_thread_id,
 								 'message_thread_id'    => $newThread,
-								 'message_body'         => $message,
+								 'message_body'         => str_replace('"', '', $message),
 								 'message_created_date' => date( 'Y-m-d H:i:s' ),
 								 'message_group'        => $message_group
 							 ]
@@ -725,7 +725,7 @@ public function reply()
 							 [
 								 'message_creator_id'   => $session->token_user_id,
 								 'message_thread_id'    => $thread,
-								 'message_body'         => $message,
+								 'message_body'         => str_replace('"', '', $message),
 								 'message_created_date' => date( 'Y-m-d H:i:s' ),
 								 'message_group'		=> $message_group
 							 ]
@@ -1003,7 +1003,7 @@ public function reply()
 						[
 							'message_creator_id'   => $session->token_user_id,
 							'message_thread_id'    => $messageThread->message_thread_thread_id,
-							'message_body'         => $message,
+							'message_body'         => str_replace('"', '', $message),
 							'message_created_date' => date( 'Y-m-d H:i:s' ),
 							'message_group'		   => 0
 						]

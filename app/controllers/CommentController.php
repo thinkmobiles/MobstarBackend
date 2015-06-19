@@ -344,7 +344,7 @@ class CommentController extends BaseController
 				'comment_user_id'    => $session->token_user_id,
 				'comment_entry_id'   => $entry,
 				'comment_added_date' => date( 'Y-m-d H:i:s' ),
-				'comment_content'    => Input::get( 'comment' )
+				'comment_content'    => str_replace('"', '', Input::get( 'comment' ))
 			);
 
 			$comment = Comment::create( $input );
