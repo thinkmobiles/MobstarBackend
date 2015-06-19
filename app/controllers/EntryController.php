@@ -1226,7 +1226,7 @@ class EntryController extends BaseController
 
 					foreach( $tags as $tag )
 					{
-						$this->entry->addTag( trim($tag), '"'), $response[ 'entry_id' ], $session->token_user_id );
+						$this->entry->addTag( trim($tag, '"'), $response[ 'entry_id' ], $session->token_user_id );
 						//$this->entry->addTag( trim(preg_replace('/\\\\/', '', $tag)), $response[ 'entry_id' ], $session->token_user_id );
 						//$this->entry->addTag( trim( $tag ), $response[ 'entry_id' ], $session->token_user_id );
 					}
