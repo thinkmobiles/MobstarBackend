@@ -135,7 +135,10 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "user/follower",
 			"uses" => "UserController@follower"
 		] );
-		
+		Route::post( "user/following/", [
+			"as"   => "user/following",
+			"uses" => "UserController@following"
+		] );
 		Route::post( "user/analytic", [
 			"as"   => "user/analytic",
 			"uses" => "UserController@analytic"

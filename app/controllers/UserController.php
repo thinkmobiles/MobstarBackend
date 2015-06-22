@@ -1650,32 +1650,114 @@ class UserController extends BaseController
 		//Get user
 		$user = ( Input::get( 'user', '0' ) );
 		$user = ( !is_numeric( $user ) ) ? 0 : $user;
+		//Get limit to calculate pagination 
+		$limit = ( Input::get( 'limit', '50' ) );
+
+		//If not numeric set it to the default limit
+		$limit = ( !is_numeric( $limit ) || $limit < 1 ) ? 50 : $limit;
+
+		//Get page
+		$page = ( Input::get( 'page', '1' ) );
+		$page = ( !is_numeric( $page ) ) ? 1 : $page;
+		
+		//Calculate offset
+		$offset = ( $page * $limit ) - $limit;
+
+		//If page is greter than one show a previous link
+		if( $page > 1 )
+		{
+			$previous = true;
+		}
+		else
+		{
+			$previous = false;
+		}
+		$count = 0;
 		/* Added By AJ */
 		if( $user != 0 )
 		{
-			$user = User::find( $user );
-			$starredBy = [ ];
-			foreach( $user->StarredBy as $starred )
+			$starredBy = [ ];			
+			$count = DB::table( 'users' )
+				->select( 'users.*','user_stars.user_star_created_date' )
+				->leftJoin( 'user_stars', 'user_stars.user_star_user_id', '=', 'users.user_id' )
+				->where( 'user_stars.user_star_deleted', '=', '0' )
+				->where( 'users.user_deleted', '=', '0' )
+				->where( 'user_stars.user_star_star_id', '=', $user )				
+				->groupBy('users.user_id')
+				->orderBy('user_stars.user_star_created_date', 'DESC')
+				->get();
+			$results = DB::table( 'users' )
+				->select( 'users.*','user_stars.user_star_created_date' )
+				->leftJoin( 'user_stars', 'user_stars.user_star_user_id', '=', 'users.user_id' )
+				->where( 'user_stars.user_star_deleted', '=', '0' )
+				->where( 'users.user_deleted', '=', '0' )
+				->where( 'user_stars.user_star_star_id', '=', $user )				
+				->groupBy('users.user_id')
+				->orderBy('user_stars.user_star_created_date', 'DESC')
+				->take( $limit )->skip( $offset )->get();
+				
+			//If the count is greater than the highest number of items displayed show a next link
+			if(count($count)==0)
 			{
-				if( $starred->user_star_deleted == 0 )
+				$return = [ 'error' => 'No Entries Found' ];
+				$status_code = 404;
+				return Response::make( $return, $status_code );
+			}
+			elseif( count($count) > ( $limit * $page ) )
+			{
+				$next = true;
+			}
+			else
+			{
+				$next = false;
+			}			
+			foreach( $results as $starred )
+			{
+				$starNames = [];
+				if(!empty($starred->user_id) && $starred->user_id == $session->token_user_id)
 				{
-					$starNames = [];
-					$starNames = userDetails($starred->User);
-					if(!empty($starred->User->user_id) && $starred->User->user_id == $session->token_user_id)
-					{
-						continue;
-					}
-					$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
-									  'starName'     => @$starNames['displayName'],
-									  'starredDate'  => $starred->user_star_created_date,
-									  'profileImage' => ( isset( $starred->User->user_profile_image ) )
-										  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+60 minutes' )
-										  : '',
-									  'profileCover' => ( isset( $starred->User->user_cover_image ) )
-									  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_cover_image, '+60 minutes' ) : '',
-				  					  'isMyStar'  => Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $starred->User->user_id )->where( 'user_star_deleted', '!=', '1' )->count(),		
-					];
+					continue;
 				}
+				if( ( $starred->user_display_name == '' ) || ( is_null( $starred->user_name ) ) || ( is_null( $starred->user_email ) ) )
+				{
+					if( $starred->user_facebook_id != 0 )
+					{
+						$displayName = DB::table( 'facebook_users' )->where( 'facebook_user_id', '=', $starred->user_facebook_id )->pluck( 'facebook_user_display_name' );							
+					}
+					elseif( $starred->user_twitter_id != 0 )
+					{
+						$displayName = DB::table( 'twitter_users' )->where( 'twitter_user_id', '=', $starred->user_twitter_id )->pluck( 'twitter_user_display_name' );
+					}
+					elseif( $starred->user_google_id != 0 )
+					{
+						$displayName = DB::table( 'google_users' )->where( 'google_user_id', '=', $starred->user_google_id )->pluck( 'google_user_display_name' );
+					}
+				}
+				else
+				{
+					$displayName = $starred->user_display_name;
+				}
+				
+				$starredBy[ ] = [ 'starId'       => $starred->user_id,
+								  'starName'     => @$displayName,
+								  'starredDate'  => $starred->user_star_created_date,
+								  'profileImage' => ( isset( $starred->user_profile_image ) )
+									  ? $client->getObjectUrl( 'mobstar-1', $starred->user_profile_image, '+60 minutes' )
+									  : '',
+								  'profileCover' => ( isset( $starred->user_cover_image ) )
+								  ? $client->getObjectUrl( 'mobstar-1', $starred->user_cover_image, '+60 minutes' ) : '',
+								  'isMyStar'  => Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $starred->user_id )->where( 'user_star_deleted', '!=', '1' )->count(),		
+				];
+			}
+			//If next is true create next page link
+			if( $next )
+			{
+				$return[ 'next' ] = url( "user/follower?user=".$user ."&". http_build_query( [ "limit" => $limit, "page" => $page + 1 ] ) );
+			}
+
+			if( $previous )
+			{
+				$return[ 'previous' ] = url( "user/follower?user=".$user ."&". http_build_query( [ "limit" => $limit, "page" => $page - 1 ] ) );
 			}
 			$return[ 'starredBy' ] = $starredBy;
 			$return['fans'] = count($starredBy);
@@ -1687,8 +1769,10 @@ class UserController extends BaseController
 			$return = [ 'error' => 'No Entries Found' ];
 			$status_code = 404;
 		}
+		$response = Response::make( $return, $status_code );
+		$response->header( 'X-Total-Count', count($count) );
 		/* End */
-		return Response::make( $return , 200 );
+		return $response;
 	}
 	public function userRank()
 	{
@@ -2152,5 +2236,169 @@ class UserController extends BaseController
 
 		return Response::make( $response, $status_code );	
 	}	
-	// End	
+	// End
+	/**
+	 *
+	 * @SWG\Api(
+	 *   path="/user/following",
+	 *   description="Operation about Users",
+	 *   @SWG\Operations(
+	 *     @SWG\Operation(
+	 *       method="POST",
+	 *       summary="Get user following",
+	 *       notes="Details about following for passed user id",
+	 *       nickname="followings",
+	 *       @SWG\Parameters(
+	 *         @SWG\Parameter(
+	 *           name="user",
+	 *           description="ID of required users.",
+	 *           paramType="query",
+	 *           required=true,
+	 *           type="integer"
+	 *         )
+	 *       ),
+	 *       @SWG\ResponseMessages(
+	 *          @SWG\ResponseMessage(
+	 *            code=401,
+	 *            message="Authorization failed"
+	 *          ),
+	 *          @SWG\ResponseMessage(
+	 *            code=400,
+	 *            message="Input validation failed"
+	 *          )
+	 *       )
+	 *     )
+	 *   )
+	 * )
+	 */
+	public function following()
+	{
+		$client = getS3Client();
+		$token = Request::header( "X-API-TOKEN" );
+		$session = $this->token->get_session( $token );
+		
+		//Get user
+		$user = ( Input::get( 'user', '0' ) );
+		$user = ( !is_numeric( $user ) ) ? 0 : $user;
+		//Get limit to calculate pagination 
+		$limit = ( Input::get( 'limit', '50' ) );
+
+		//If not numeric set it to the default limit
+		$limit = ( !is_numeric( $limit ) || $limit < 1 ) ? 50 : $limit;
+
+		//Get page
+		$page = ( Input::get( 'page', '1' ) );
+		$page = ( !is_numeric( $page ) ) ? 1 : $page;
+		
+		//Calculate offset
+		$offset = ( $page * $limit ) - $limit;
+
+		//If page is greter than one show a previous link
+		if( $page > 1 )
+		{
+			$previous = true;
+		}
+		else
+		{
+			$previous = false;
+		}
+		$count = 0;
+		/* Added By AJ */
+		if( $user != 0 )
+		{
+			$stars = [ ];			
+			$count = DB::table( 'users' )
+				->select( 'users.*','user_stars.user_star_created_date' )
+				->leftJoin( 'user_stars', 'user_stars.user_star_star_id', '=', 'users.user_id' )
+				->where( 'user_stars.user_star_deleted', '=', '0' )
+				->where( 'users.user_deleted', '=', '0' )
+				->where( 'user_stars.user_star_user_id', '=', $user )				
+				->groupBy('users.user_id')
+				->orderBy('user_stars.user_star_created_date', 'DESC')
+				->get();
+			$results = DB::table( 'users' )
+				->select( 'users.*','user_stars.user_star_created_date' )
+				->leftJoin( 'user_stars', 'user_stars.user_star_star_id', '=', 'users.user_id' )
+				->where( 'user_stars.user_star_deleted', '=', '0' )
+				->where( 'users.user_deleted', '=', '0' )
+				->where( 'user_stars.user_star_user_id', '=', $user )				
+				->groupBy('users.user_id')
+				->orderBy('user_stars.user_star_created_date', 'DESC')
+				->take( $limit )->skip( $offset )->get();
+			//If the count is greater than the highest number of items displayed show a next link
+			if(count($count)==0)
+			{
+				$return = [ 'error' => 'No Entries Found' ];
+				$status_code = 404;
+				return Response::make( $return, $status_code );
+			}
+			elseif( count($count) > ( $limit * $page ) )
+			{
+				$next = true;
+			}
+			else
+			{
+				$next = false;
+			}			
+			foreach( $results as $starred )
+			{
+				if(!empty($starred->user_id) && $starred->user_id == $session->token_user_id)
+				{
+					continue;
+				}
+				if( ( $starred->user_display_name == '' ) || ( is_null( $starred->user_name ) ) || ( is_null( $starred->user_email ) ) )
+				{
+					if( $starred->user_facebook_id != 0 )
+					{
+						$displayName = DB::table( 'facebook_users' )->where( 'facebook_user_id', '=', $starred->user_facebook_id )->pluck( 'facebook_user_display_name' );							
+					}
+					elseif( $starred->user_twitter_id != 0 )
+					{
+						$displayName = DB::table( 'twitter_users' )->where( 'twitter_user_id', '=', $starred->user_twitter_id )->pluck( 'twitter_user_display_name' );
+					}
+					elseif( $starred->user_google_id != 0 )
+					{
+						$displayName = DB::table( 'google_users' )->where( 'google_user_id', '=', $starred->user_google_id )->pluck( 'google_user_display_name' );
+					}
+				}
+				else
+				{
+					$displayName = $starred->user_display_name;
+				}
+				
+				$stars[ ] = [ 'starId'       => $starred->user_id,
+								  'starName'     => @$displayName,
+								  'starredDate'  => $starred->user_star_created_date,
+								  'profileImage' => ( isset( $starred->user_profile_image ) )
+									  ? $client->getObjectUrl( 'mobstar-1', $starred->user_profile_image, '+60 minutes' )
+									  : '',
+								  'profileCover' => ( isset( $starred->user_cover_image ) )
+								  ? $client->getObjectUrl( 'mobstar-1', $starred->user_cover_image, '+60 minutes' ) : '',
+								  'rank'     => DB::table('users')->where( 'user_id', '=', $starred->user_id )->pluck('user_rank'),
+								  'stat'     => DB::table('users')->where( 'user_id', '=', $starred->user_id )->pluck('user_entry_rank'),
+				];
+			}
+			//If next is true create next page link
+			if( $next )
+			{
+				$return[ 'next' ] = url( "user/following?user=".$user ."&". http_build_query( [ "limit" => $limit, "page" => $page + 1 ] ) );
+			}
+
+			if( $previous )
+			{
+				$return[ 'previous' ] = url( "user/following?user=".$user ."&". http_build_query( [ "limit" => $limit, "page" => $page - 1 ] ) );
+			}
+			$return[ 'stars' ] = $stars;
+			$status_code = 200;
+
+		}
+		else
+		{
+			$return = [ 'error' => 'No Entries Found' ];
+			$status_code = 404;
+		}
+		$response = Response::make( $return, $status_code );
+		$response->header( 'X-Total-Count', count($count) );
+		return $response;
+	}
 }
