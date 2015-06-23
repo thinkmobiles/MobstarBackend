@@ -3326,6 +3326,7 @@ class EntryController extends BaseController
 		}
 		else
 		{
+			mail('anil@spaceotechnologies.com',time(),print_r($count,true));
 			$return[ 'entries' ] = [];	
 		}	
 		/* Added By AJ for getting followrs */
