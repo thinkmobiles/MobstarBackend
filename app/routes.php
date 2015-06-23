@@ -542,6 +542,11 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "talent/top",
 			"uses" => "TalentController@top"
 		] );
+		
+		Route::get( "talent/topnew", [
+			"as"   => "talent/topnew",
+			"uses" => "TalentController@topnew"
+		] );
 
 
 		// -------------------------------------------------------
