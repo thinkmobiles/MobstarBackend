@@ -3326,7 +3326,7 @@ class EntryController extends BaseController
 		}
 		else
 		{
-			$return[ 'entries' ] = array();	
+			$return[ 'entries' ] = [];	
 		}	
 		/* Added By AJ for getting followrs */
 		if( $user != 0 )
