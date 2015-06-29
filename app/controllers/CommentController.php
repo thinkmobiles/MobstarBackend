@@ -2,7 +2,6 @@
 
 use MobStar\Storage\Token\TokenRepository as Token;
 use Swagger\Annotations as SWG;
-use Aws\S3\S3Client;
 
 /**
  * @package
@@ -175,7 +174,7 @@ class CommentController extends BaseController
 		$session = $this->token->get_session( $token );
 
 
-		/*foreach( $comments as $comment )
+		foreach( $comments as $comment )
 		{
 			$current = array();
 
@@ -192,29 +191,6 @@ class CommentController extends BaseController
 
 			$current['entry'] = oneEntry($comment->Entry, $session, true);
 
-			$return[ 'comments' ][ ][ 'comment' ] = $current;
-		}*/
-		$client = getS3Client();
-		foreach( $comments as $comment )
-		{
-			$current = array();			
-			$current[ 'id' ] = $comment->Entry->entry_id;
-			$current[ 'name' ] = $comment->Entry->entry_name;
-			$current[ 'description' ] = $comment->Entry->entry_description;
-			$current[ 'totalComments' ] = $comment->Entry->comments->count();
-			$current[ 'created' ] = $comment->Entry->entry_created_date;
-			$current[ 'entryFiles' ] = array();
-			foreach( $comment->Entry->file as $file )
-			{
-				$signedUrl = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
-				$current[ 'entryFiles' ][ ] = [
-					'fileType' => $file->entry_file_type,
-					'filePath' => $signedUrl ];
-
-				$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-					$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
-					: "";
-			}
 			$return[ 'comments' ][ ][ 'comment' ] = $current;
 		}
 
