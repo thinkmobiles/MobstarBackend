@@ -667,6 +667,7 @@ class CommentController extends BaseController
 			$current['entry'][ 'id' ] = $comment->Entry->entry_id;
 			$current['entry'][ 'name' ] = $comment->Entry->entry_name;
 			$current['entry'][ 'description' ] = $comment->Entry->entry_description;
+			$current['entry'][ 'type' ] = $comment->Entry->entry_type;
 			$current['entry'][ 'totalComments' ] = $comment->Entry->comments->count();
 			$current['entry'][ 'created' ] = $comment->Entry->entry_created_date;
 			$current['entry'][ 'entryFiles' ] = array();
