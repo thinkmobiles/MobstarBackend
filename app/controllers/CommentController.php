@@ -559,4 +559,147 @@ class CommentController extends BaseController
 
 
 	}
+	// New API for comments with pagination created on 30-June-2015
+	public function index2()
+	{
+		$return = [ ];
+
+		//Get limit to calculate pagination
+		$limit = ( Input::get( 'limit', '20' ) );
+
+		//If not numeric set it to the default limit
+		$limit = ( !is_numeric( $limit ) || $limit < 1 ) ? 20 : $limit;
+
+		//Get page
+		$page = ( Input::get( 'page', '1' ) );
+		$page = ( !is_numeric( $page ) ) ? 1 : $page;
+
+		//Calculate offset
+		$offset = ( $page * $limit ) - $limit;
+
+		//If page is greter than one show a previous link
+		if( $page > 1 )
+		{
+			$previous = true;
+		}
+		else
+		{
+			$previous = false;
+		}
+
+		//Get user
+		$user = ( Input::get( 'user', '0' ) );
+		$user = ( !is_numeric( $user ) ) ? 0 : $user;
+
+		//Get entry
+		$entry = ( Input::get( 'entry', '0' ) );
+		$entry = ( !is_numeric( $entry ) ) ? 0 : $entry;
+
+		$deleted = ( Input::get( 'delted', '0' ) );
+
+		//$comments = Comment::with( 'User', 'Entry' );
+		if($user > 0 && $entry == 0)
+		{
+		$comments = Comment::join('users as u', 'u.user_id', '=', 'comments.comment_user_id')
+		   ->groupBy('comments.comment_entry_id')
+		   ->orderBy('comments.comment_added_date', 'desc')
+		   ->orderBy('u.user_user_group', 'desc')
+		   ->select('comments.*')       // just to avoid fetching anything from joined table
+		   ->with('User', 'Entry');
+		   
+		}
+		else
+		{			
+			$comments = Comment::join('users as u', 'u.user_id', '=', 'comments.comment_user_id')		   
+			   ->groupBy('comments.comment_entry_id')
+			   ->orderBy('u.user_user_group', 'desc')
+			   ->select('comments.*')       // just to avoid fetching anything from joined table
+			   ->with('User', 'Entry');
+		}
+		if( $user )
+		{
+			$comments = $comments->where( 'comment_user_id', '=', $user );
+		}
+
+		if( $entry )
+		{
+			$comments = $comments->where( 'comment_entry_id', '=', $entry );
+		}
+
+		if( !$deleted )
+		{
+			$comments = $comments->where( 'comment_deleted', '=', '0' );
+		}
+		//$count = $comments->count();
+		$count = $comments->get();
+		$count = count($count);
+		$comments =$comments->take( $limit )->skip( $offset )->get();
+		//dd(DB::getQueryLog());
+		
+
+		if( $count == 0 )
+		{
+			$return = [ 'error' => 'No comments Found' ];
+			$status_code = 404;
+
+			return Response::make( $return, $status_code );
+		}
+
+		//If the count is greater than the highest number of items displayed show a next link
+		elseif( $count > ( $limit * $page ) )
+		{
+			$next = true;
+		}
+		else
+		{
+			$next = false;
+		}
+
+
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		$client = getS3Client();
+		foreach( $comments as $comment )
+		{
+			$current = array();			
+			$current['entry'][ 'id' ] = $comment->Entry->entry_id;
+			$current['entry'][ 'name' ] = $comment->Entry->entry_name;
+			$current['entry'][ 'description' ] = $comment->Entry->entry_description;
+			$current['entry'][ 'totalComments' ] = $comment->Entry->comments->count();
+			$current['entry'][ 'created' ] = $comment->Entry->entry_created_date;
+			$current['entry'][ 'entryFiles' ] = array();
+			foreach( $comment->Entry->file as $file )
+			{
+				$signedUrl = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
+				$current['entry'][ 'entryFiles' ][ ] = [
+					'fileType' => $file->entry_file_type,
+					'filePath' => $signedUrl ];
+
+				$current['entry'][ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
+					$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
+					: "";
+			}
+			
+			$return[ 'comments' ][ ][ 'comment' ] = $current;
+		}
+		$status_code = 200;
+		//If next is true create next page link
+		if( $next )
+		{
+			$return[ 'next' ] = "http://api.mobstar.com/comment/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
+		}
+
+		if( $previous )
+		{
+			$return[ 'previous' ] = "http://api.mobstar.com/comment/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
+		}
+
+		$response = Response::make( $return, $status_code );
+
+		$response->header( 'X-Total-Count', $count );
+
+		return $response;
+	}
 }

@@ -503,7 +503,12 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "comment/index",
 			"uses" => "CommentController@index"
 		] );
-
+		
+		Route::get( "comment/index2", [
+			"as"   => "comment/index2",
+			"uses" => "CommentController@index2"
+		] );
+		
 		Route::delete( "comment/{id}", [
 			"as"   => "comment/destroy",
 			"uses" => "CommentController@destroy"
