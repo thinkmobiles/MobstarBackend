@@ -601,7 +601,7 @@ class CommentController extends BaseController
 		if($user > 0 && $entry == 0)
 		{
 		$comments = Comment::join('users as u', 'u.user_id', '=', 'comments.comment_user_id')
-		   ->groupBy('comments.comment_entry_id')
+		   //->groupBy('comments.comment_entry_id')
 		   ->orderBy('comments.comment_added_date', 'desc')
 		   ->orderBy('u.user_user_group', 'desc')
 		   ->select('comments.*')       // just to avoid fetching anything from joined table
@@ -611,7 +611,7 @@ class CommentController extends BaseController
 		else
 		{			
 			$comments = Comment::join('users as u', 'u.user_id', '=', 'comments.comment_user_id')		   
-			   ->groupBy('comments.comment_entry_id')
+			   //->groupBy('comments.comment_entry_id')
 			   ->orderBy('u.user_user_group', 'desc')
 			   ->select('comments.*')       // just to avoid fetching anything from joined table
 			   ->with('User', 'Entry');
