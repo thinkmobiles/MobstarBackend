@@ -4001,8 +4001,15 @@ class EntryController extends BaseController
 		  	try
 		  	{
 			    $videoPath = $serviceDetails["pathfile"];
-			   
-			    $snippet = new Google_Service_YouTube_VideoSnippet();
+				if(isset($serviceDetails["rotation_angel"]) && $serviceDetails["rotation_angel"] != '')
+				{
+					if($serviceDetails["rotation_angel"] == '90')
+					{
+						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/outputvideo.mp4';
+						shell_exec( '/usr/bin/ffmpeg -i '.$videoPath.' -vf "movie=mob_img.png [watermark]; [in][watermark] overlay=10:10 [out]" '.$file_out.');
+					}
+				}
+				$snippet = new Google_Service_YouTube_VideoSnippet();
 			    $snippet->setTitle($serviceDetails["name"]);
 			    $snippet->setDescription($serviceDetails["description"]);
 			    //$snippet->setTags(array("Yes", "No"));
@@ -4057,6 +4064,7 @@ class EntryController extends BaseController
 		    // If you want to make other calls after the file upload, set setDefer back to false
 		    	$client->setDefer(false);			  
 				mail('anil@spaceotechnologies.com', 'Success_'.time(),print_r($status['id'],true));
+				unlink($file_out);
 			// REPLACE this value with the video ID of the video being updated.
 		    	$videoId = $status['id'];
 
