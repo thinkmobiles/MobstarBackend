@@ -4000,13 +4000,16 @@ class EntryController extends BaseController
 		  
 		  	try
 		  	{
-			    $videoPath = $serviceDetails["pathfile"];
+			    $videoPath_original = $serviceDetails["pathfile"];
 				if(isset($serviceDetails["rotation_angel"]) && $serviceDetails["rotation_angel"] != '')
 				{
 					if($serviceDetails["rotation_angel"] == '90')
 					{
 						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/outputvideo.mp4';
-						shell_exec( '/usr/bin/ffmpeg -i '.$videoPath.' -vf "movie=mob_img.png [watermark]; [in][watermark] overlay=10:10 [out]" '.$file_out);
+						$img_path = $_ENV[ 'PATH' ] . 'public/images/mob_img.png';
+						//$tmp = '/usr/bin/ffmpeg -i '.$videoPath_original.' -vf "movie=mob_img.png [watermark]; [in][watermark] overlay=10:10 [out]" '.$file_out;
+						//mail('anil@spaceotechnologies.com','ffmpeg_path',print_r($tmp));
+						shell_exec( '/usr/bin/ffmpeg -i '.$videoPath_original.' -vf "movie="'.$img_path.'" [watermark]; [in][watermark] overlay=10:10 [out]" '.$file_out);
 						sleep(20);
 						$videoPath = $file_out;
 					}
