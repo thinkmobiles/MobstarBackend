@@ -3930,7 +3930,6 @@ class EntryController extends BaseController
 	// youtube upload
 	public function youtubeUpload()
  	{
-		die('here');
 		$serviceDetails = json_decode($_REQUEST['jsonData'], true);
 		require_once '/var/www/api/vendor/google-api-php-client-master/src/Google/autoload.php';
 		// session_start();
