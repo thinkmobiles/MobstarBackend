@@ -3724,14 +3724,14 @@ class EntryController extends BaseController
 						'entry_height'       => '',
 					];
 				}
-				Eloquent::unguard();
-				$response[ 'entry_id' ] = $this->entry->create( $input )->entry_id;
+				//Eloquent::unguard();
+				//$response[ 'entry_id' ] = $this->entry->create( $input )->entry_id;
 				$status_code = 201;
-				Eloquent::reguard();
+				//Eloquent::reguard();
 
 				$tags = Input::get( 'tags' );
 
-				if( isset( $tags ) )
+				/*if( isset( $tags ) )
 				{
 					$tags = array_values( explode( ',', $tags ) );
 
@@ -3741,7 +3741,7 @@ class EntryController extends BaseController
 						//$this->entry->addTag( trim(preg_replace('/\\\\/', '', $tag)), $response[ 'entry_id' ], $session->token_user_id );
 						//$this->entry->addTag( trim( $tag ), $response[ 'entry_id' ], $session->token_user_id );
 					}
-				}
+				}*/
 
 				$dest = 'uploads';
 
@@ -3863,7 +3863,7 @@ class EntryController extends BaseController
 					}
 				}
 
-				Eloquent::unguard();
+				/*Eloquent::unguard();
 
 				EntryFile::create( [
 									   'entry_file_name'         => $filename,
@@ -3874,7 +3874,7 @@ class EntryController extends BaseController
 									   'entry_file_updated_date' => date( 'Y-m-d H:i:s' ),
 								   ] );
 
-				Eloquent::reguard();
+				Eloquent::reguard();*/
 
 				$file = Input::file( 'file2' );
 
@@ -3902,7 +3902,7 @@ class EntryController extends BaseController
 
 					unlink( $file_out );
 
-					Eloquent::unguard();
+					/*Eloquent::unguard();
 
 					EntryFile::create( [
 										   'entry_file_name'         => $filename,
@@ -3913,7 +3913,7 @@ class EntryController extends BaseController
 										   'entry_file_updated_date' => date( 'Y-m-d H:i:s' ),
 									   ] );
 
-					Eloquent::reguard();
+					Eloquent::reguard();*/
 				}
 			}
 			else
