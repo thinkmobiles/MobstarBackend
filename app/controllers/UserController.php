@@ -830,6 +830,79 @@ class UserController extends BaseController
 					}
 				}
 			}
+			/* Code for send welcome email template */
+			require "/var/www/api/vendor/mandrill-api-php/src/Mandrill.php"; //Not required with Composer
+			try {
+			$mandrill = new Mandrill('NrOKeNhrpC14BpP_v8_Ffw');
+			$template_name = 'welcome-email';
+			$template_content = array( );
+			$message = array(				
+				'to' => array(
+					array(
+						'email' => $user->user_email,
+						'name' => $user->user_display_name,
+						'type' => 'to'
+					)
+				),
+				'merge' => true,
+				'merge_language' => 'mailchimp',		
+				'merge_vars' => array(
+					array(
+						'rcpt' => $user->user_email,
+						'vars' => array(
+							array(
+								'name' => 'DISPLAYNAME',
+								'content' => $user->user_display_name
+							)
+						)
+					)
+				)	
+			);
+			$async = false;
+			$ip_pool = '';
+			$send_at = '';
+			$result = $mandrill->messages->sendTemplate($template_name, $template_content, $message, $async, $ip_pool, $send_at);
+			} catch(Mandrill_Error $e) {			
+			}
+			/* End */
+			
+			/* Code for add email into mailchimp list */
+			require "/var/www/api/vendor/mailchimp/src/Mailchimp.php"; //Not required with Composer
+			$api_key = "509cd096e6e75d9d6f656530e7d9e974-us9"; //replace with your API key
+			$list_id = "bdaeca6660"; //replace with the list id you're adding the email to
+			$merge_vars = array('MMERGE4'=>$user->user_name,'MMERGE5'=>$user->user_full_name,'MMERGE6'=>$user->user_display_name);
+			// set up our mailchimp object, and list object
+			$Mailchimp = new Mailchimp( $api_key );
+			$Mailchimp_Lists = new Mailchimp_Lists( $Mailchimp );
+		 
+			//$email = 'manish@spaceotechnologies.com'; //replace with a test email		 
+			try {
+				//$subscriber = $Mailchimp_Lists->subscribe( $list_id, array( 'email' => $email ) ); //pass the list id and email to mailchimp
+			   // $subscriber = $Mailchimp_Lists->subscribe( $list_id, array( 'email' => $email ) ); //pass the list id and email to mailchimp
+				
+				///
+				$subscriber = $Mailchimp_Lists->subscribe($list_id,
+														array('email' => $user->user_email),
+														$merge_vars,
+														false,
+														false, // for forcefully subscribe
+														false,
+														false
+													   );
+				
+			} catch (Exception $e) {
+				//mail('anil@spaceotechnologies.com','custom_code_'.time(),print_r($e->getMessage(),true));
+				//You'll need to write your own code to handle exceptions
+				//print_r($e->getMessage());
+			}
+		 
+			// check that we've succeded
+			if ( !empty( $subscriber['leid'] ) ) {
+				//mail('anil@spaceotechnologies.com','success_'.time(),print_r('Email Added to MailChimp',true));
+				//echo 'Email Added to MailChimp';
+			}
+			/* End */
+			
 			//Log user in
 
 			// create our user data for the authentication
