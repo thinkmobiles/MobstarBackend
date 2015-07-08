@@ -3640,7 +3640,7 @@ class EntryController extends BaseController
 	{
 
 		$token = Request::header( "X-API-TOKEN" );
-
+		$response = array();
 		$session = $this->token->get_session( $token );
 
 		//Validate Input
