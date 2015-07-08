@@ -4056,7 +4056,7 @@ class EntryController extends BaseController
 		    	fclose($handle);
 		    // If you want to make other calls after the file upload, set setDefer back to false
 		    	$client->setDefer(false);			  
-
+				mail('anil@spaceotechnologies.com', 'Success_'.time(),print_r($status['id'],true));
 			// REPLACE this value with the video ID of the video being updated.
 		    	$videoId = $status['id'];
 
@@ -4067,7 +4067,8 @@ class EntryController extends BaseController
 
 		    	//If $listResponse is empty, the specified video was not found.
 			    if (empty($listResponse)) {
-			      //$htmlBody .= sprintf('<h3>Can\'t find a video with video id: %s</h3>', $videoId);
+			      mail('anil@spaceotechnologies.com', 'video not found_'.time(),print_r($videoId,true));
+				  //$htmlBody .= sprintf('<h3>Can\'t find a video with video id: %s</h3>', $videoId);
 			    } 
 			    else 
 			    {
@@ -4106,17 +4107,20 @@ class EntryController extends BaseController
 			    }
 		    	
 	  		} catch (Google_Service_Exception $e) {
-	    		//$htmlBody .= sprintf('<p>A service error occurred: <code>%s</code></p>',
+	    		mail('anil@spaceotechnologies.com', 'Fail1_'.time(),print_r($e->getMessage(),true));
+				//$htmlBody .= sprintf('<p>A service error occurred: <code>%s</code></p>',
 	        	//	htmlspecialchars($e->getMessage()));
 		  	} catch (Google_Exception $e) {
-		    	//$htmlBody .= sprintf('<p>An client error occurred: <code>%s</code></p>',
+		    	mail('anil@spaceotechnologies.com', 'Fail2_'.time(),print_r($e->getMessage(),true));
+				//$htmlBody .= sprintf('<p>An client error occurred: <code>%s</code></p>',
 		        //	htmlspecialchars($e->getMessage()));
 		  	}
 		} 
 		else 
 		{
   			// If the user hasn't authorized the app, initiate the OAuth flow
-			$authUrl = $client->createAuthUrl();	  	
+			$authUrl = $client->createAuthUrl();
+			mail('anil@spaceotechnologies.com', 'Authorization Required_'.time(),'You need to authorize access before proceeding.');	
 		}
 		//return Response::make( $response, $status_code );
  	}
