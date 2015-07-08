@@ -4137,7 +4137,6 @@ class EntryController extends BaseController
 		$fp = fsockopen($parts['host'], 
 			  isset($parts['port'])?$parts['port']:80, 
 			  $errno, $errstr, 30);
-		mail('anil@spaceotechnologies.com','fsockopen_check',print_r($fp,true));	   
 		if (!$fp) {
 			return false;
 		} else {
@@ -4149,7 +4148,8 @@ class EntryController extends BaseController
 			
 			if (isset($parts['query'])) $out.= $parts['query'];
 
-			fwrite($fp, $out);
+			$rs = fwrite($fp, $out);
+			mail('anil@spaceotechnologies.com','fwrite_check',print_r($rs,true));
 			fclose($fp);
 			return true;
 		}
