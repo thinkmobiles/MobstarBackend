@@ -4006,7 +4006,8 @@ class EntryController extends BaseController
 					if($serviceDetails["rotation_angel"] == '90')
 					{
 						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/outputvideo.mp4';
-						shell_exec( '/usr/bin/ffmpeg -i '.$videoPath.' -vf "movie=mob_img.png [watermark]; [in][watermark] overlay=10:10 [out]" '.$file_out.');
+						shell_exec( '/usr/bin/ffmpeg -i '.$videoPath.' -vf "movie=mob_img.png [watermark]; [in][watermark] overlay=10:10 [out]" '.$file_out);
+						$videoPath = $file_out;
 					}
 				}
 				$snippet = new Google_Service_YouTube_VideoSnippet();
