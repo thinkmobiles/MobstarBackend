@@ -4001,9 +4001,9 @@ class EntryController extends BaseController
 		  	try
 		  	{
 			    $videoPath_original = $serviceDetails["pathfile"];
+				$file_out = $_ENV[ 'PATH' ] . 'public/uploads/'.time().'.mp4';
 				if(isset($serviceDetails["rotation_angel"]) && $serviceDetails["rotation_angel"] != '')
 				{
-					$file_out = $_ENV[ 'PATH' ] . 'public/uploads/'.time().'.mp4';
 					if($serviceDetails["rotation_angel"] == '90')
 					{
 						$img_path = $_ENV[ 'PATH' ] . 'public/images/mob_img.png';	
