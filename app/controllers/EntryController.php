@@ -3635,5 +3635,521 @@ class EntryController extends BaseController
 		return Response::make( $return, $status_code );
 	}
 
-	
+	/* Added by Anil for testing youtube upload and watermark symbol add in video */
+	public function store2()
+	{
+
+		$token = Request::header( "X-API-TOKEN" );
+
+		$session = $this->token->get_session( $token );
+
+		//Validate Input
+		$rules = array(
+			'category'    => 'required|numeric',
+			'type'        => 'required',
+			'name'        => 'required',
+			'description' => 'required',
+		);
+
+		$validator = Validator::make( Input::get(), $rules );
+
+		if( $validator->fails() )
+		{
+			$response[ 'errors' ] = $validator->messages();
+			$status_code = 400;
+		}
+		else
+		{
+
+			$file = Input::file( 'file1' );
+
+			if( !empty( $file ) )
+			{
+
+				//Will need to do some work here to upload file to CDN
+
+				//Get input
+				$entry_by_default_enable = DB::table( 'settings' )->where( 'vUniqueName', '=', 'ENTRY_DEFAULT' )->pluck( 'vSettingValue' );
+				$categoryId = DB::table( 'categories' )->where( 'category_id', '=', Input::get( 'category' ) )->pluck( 'category_id' );
+				if(empty($categoryId))
+				{
+					$response[ 'error' ] = "No category selected";
+					$status_code = 400;
+				}
+				
+				/* Commented for one Demo as on request 07 March 2015 // Removed Comment on 13 March 2015 as on request */
+				if( Input::get( 'category' ) == 7 || Input::get( 'category' ) == 8 )
+				{
+					$entry_deleted = 0;
+				}
+				else
+				{
+					if($entry_by_default_enable && $entry_by_default_enable === 'TRUE')
+					$entry_deleted = 0;
+					else
+					$entry_deleted = 1;	
+				}
+				if( Input::get( 'category' ) == 3 )
+				{
+					$input = [
+						'entry_user_id'      => $session->token_user_id,
+						'entry_category_id'  => Input::get( 'category' ),
+						'entry_type'         => Input::get( 'type' ),
+						//'entry_name'         => preg_replace('/\\\\/', '', Input::get( 'name' )),
+						//'entry_language'     => preg_replace('/\\\\/', '', Input::get( 'language' )),
+						//'entry_description'  => preg_replace('/\\\\/', '', Input::get( 'description' )),
+						'entry_name'         => str_replace('"', '', Input::get( 'name' )),
+						'entry_language'     => str_replace('"', '', Input::get( 'language' )),
+						'entry_description'  => str_replace('"', '', Input::get( 'description' )),
+						'entry_created_date' => date( 'Y-m-d H:i:s' ),
+						'entry_deleted'      => $entry_deleted,
+						'entry_subcategory'  => Input::get( 'subCategory' ),
+						'entry_age'          => Input::get( 'age' ),
+						'entry_height'       => Input::get( 'height' ),
+					];	
+				}
+				else
+				{
+					$input = [
+						'entry_user_id'      => $session->token_user_id,
+						'entry_category_id'  => (Input::get( 'category' ) > 0) ? Input::get( 'category' ) : 1,
+						'entry_type'         => Input::get( 'type' ),
+						'entry_name'         => str_replace('"', '', Input::get( 'name' )),
+						'entry_language'     => str_replace('"', '', Input::get( 'language' )),
+						'entry_description'  => str_replace('"', '', Input::get( 'description' )),
+						'entry_created_date' => date( 'Y-m-d H:i:s' ),
+						'entry_deleted'      => $entry_deleted,
+						'entry_subcategory'  => '',
+						'entry_age'      	 => '',
+						'entry_height'       => '',
+					];
+				}
+				Eloquent::unguard();
+				$response[ 'entry_id' ] = $this->entry->create( $input )->entry_id;
+				$status_code = 201;
+				Eloquent::reguard();
+
+				$tags = Input::get( 'tags' );
+
+				if( isset( $tags ) )
+				{
+					$tags = array_values( explode( ',', $tags ) );
+
+					foreach( $tags as $tag )
+					{
+						$this->entry->addTag( str_replace('"', '', $tag), $response[ 'entry_id' ], $session->token_user_id );
+						//$this->entry->addTag( trim(preg_replace('/\\\\/', '', $tag)), $response[ 'entry_id' ], $session->token_user_id );
+						//$this->entry->addTag( trim( $tag ), $response[ 'entry_id' ], $session->token_user_id );
+					}
+				}
+
+				$dest = 'uploads';
+
+				$filename = str_random( 12 );
+
+				$extension = $file->getClientOriginalExtension();
+
+//old method was just to move the file, and not encode it
+//				$file->move($dest, $filename . '.' . $extension);
+
+				if( $input[ 'entry_type' ] == 'audio' )
+				{
+					$file_in = $file->getRealPath();
+					$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp3';
+
+					// Transcode Audio
+					shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
+
+					$extension = 'mp3';
+
+					$handle = fopen( $file_out, "r" );
+
+					Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, fread( $handle, filesize( $file_out ) ) );
+
+					unlink( $file_out );
+
+				}
+				else
+				{
+					if( $input[ 'entry_type' ] == 'video' )
+					{
+
+						$file_in = $file->getRealPath();
+
+						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
+
+						// Transcode Video
+						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
+						//shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vsync 2 -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
+
+						$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', $filename . '-uploaded.' . $extension );
+
+						$extension = 'mp4';
+
+						$handle = fopen( $file_out, "r" );
+
+						Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, fread( $handle, filesize( $file_out ) ) );
+
+						$thumb = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-thumb.jpg';
+
+						exec( '/usr/bin/ffprobe 2>&1 ' . $file_out . ' | grep "rotate          :"', $rotation );
+
+						if( isset( $rotation[ 0 ] ) )
+						{
+							$rotation = substr( $rotation[ 0 ], 17 );
+						}
+
+						$contents = file_get_contents( $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
+						preg_match( "#rotate.*?([0-9]{1,3})#im", $contents, $rotationMatches );
+
+						$transpose = '';
+
+						if( count( $rotationMatches ) > 0 )
+						{
+							switch( $rotationMatches[ 1 ] )
+							{
+								case '90':
+									$transpose = ' -vf transpose=1';
+									$rotation_angel = '90';
+									break;
+								case '180':
+									$transpose = ' -vf vflip,hflip';
+									$rotation_angel = '180';
+									break;
+								case '270':
+									$transpose = ' -vf transpose=2';
+									$rotation_angel = '270';
+									break;
+							}
+						}
+				
+						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . $transpose . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
+
+						$handle = fopen( $thumb, "r" );
+
+						Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", fread( $handle, filesize( $thumb ) ) );
+						
+						$pathfile = '/var/www/api/public/uploads/'. $filename . '-uploaded.' . $extension;
+						$serviceDetails = array();
+						$serviceDetails["pathfile"] = $pathfile;
+						$serviceDetails["rotation_angel"] = $rotation_angel;
+						$serviceDetails["name"] = Input::get( 'name' );
+						$serviceDetails["description"] = Input::get( 'description' );
+						$serviceDetails["category"] = Input::get( 'category' );
+						
+						$this->backgroundPost('http://api.mobstar.com:80/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
+//						unlink($file_out);
+//						unlink($thumb);
+					}
+					else
+					{
+						//File is an image
+
+						$file_in = $file->getRealPath();
+
+						$file_out = $_ENV[ 'PATH' ] . "public/uploads/" . $filename . '.' . $extension;
+
+						$image = Image::make( $file_in );
+
+						$image->widen( 350 );
+
+						$image->save( $file_out );
+
+						$handle = fopen( $file_out, "r" );
+
+						Flysystem::connection( 'awss3' )->put( $filename . "." . $extension,
+															   fread( $handle,
+																	  filesize( $file_out ) ) );
+					}
+				}
+
+				Eloquent::unguard();
+
+				EntryFile::create( [
+									   'entry_file_name'         => $filename,
+									   'entry_file_entry_id'     => $response[ 'entry_id' ],
+									   'entry_file_location'     => $dest,
+									   'entry_file_type'         => $extension,
+									   'entry_file_created_date' => date( 'Y-m-d H:i:s' ),
+									   'entry_file_updated_date' => date( 'Y-m-d H:i:s' ),
+								   ] );
+
+				Eloquent::reguard();
+
+				$file = Input::file( 'file2' );
+
+				if( !empty( $file ) && $file->isValid() )
+				{
+					$dest = 'uploads';
+
+					$file_in = $file->getRealPath();
+
+					$extension = ".jpg";
+
+					$file_out = $_ENV[ 'PATH' ] . "public/uploads/" . $filename . '.' . $extension;
+
+					$image = Image::make( $file_in );
+
+					$image->widen( 350 );
+
+					$image->save( $file_out, 80 );
+
+					$handle = fopen( $file_out, "r" );
+
+					Flysystem::connection( 'awss3' )->put( $filename . "." . $extension,
+														   fread( $handle,
+																  filesize( $file_out ) ) );
+
+					unlink( $file_out );
+
+					Eloquent::unguard();
+
+					EntryFile::create( [
+										   'entry_file_name'         => $filename,
+										   'entry_file_entry_id'     => $response[ 'entry_id' ],
+										   'entry_file_location'     => $dest,
+										   'entry_file_type'         => $extension,
+										   'entry_file_created_date' => date( 'Y-m-d H:i:s' ),
+										   'entry_file_updated_date' => date( 'Y-m-d H:i:s' ),
+									   ] );
+
+					Eloquent::reguard();
+				}
+			}
+			else
+			{
+
+				$response[ 'error' ] = "No file included";
+				$status_code = 400;
+			}
+
+		}
+
+		return Response::make( $response, $status_code );
+	}	
+	// youtube upload
+	public function youtubeUpload()
+ 	{
+		die('here');
+		$serviceDetails = json_decode($_REQUEST['jsonData'], true);
+		require_once '/var/www/api/vendor/google-api-php-client-master/src/Google/autoload.php';
+		// session_start();
+		
+		$OAUTH2_CLIENT_ID = '750620540831-68mufugc9vnh04qnm1f74qv98h696ljb.apps.googleusercontent.com';
+		$OAUTH2_CLIENT_SECRET = 'jXOGIdgad98FzkZ6pIhgxJmy';
+
+		$client = new Google_Client();
+		$client->setClientId($OAUTH2_CLIENT_ID);
+		$client->setClientSecret($OAUTH2_CLIENT_SECRET);
+		$client->setAccessType('offline');
+		$client->setApprovalPrompt('force');
+		$scope = array('https://www.googleapis.com/auth/youtube.upload', 'https://www.googleapis.com/auth/youtube', 'https://www.googleapis.com/auth/youtubepartner');
+		$client->setScopes($scope);
+		$redirect = filter_var('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'],
+		    FILTER_SANITIZE_URL);
+		$client->setRedirectUri($redirect);
+
+		$youtube = new Google_Service_YouTube($client);
+
+		$filename = 'youtubeToken.txt';
+		$readData = '';
+
+		if (isset($_GET['code'])) 
+		{
+		    $client->authenticate($_GET['code']);
+		    $tokenData = $client->getAccessToken();
+		    if(file_exists($filename))
+		    {
+		        $handler = fopen($filename, 'w+');
+		        fwrite($handler, $tokenData);
+		        fclose($handler);
+		    }
+		    else
+		    {
+		        touch($filename);
+		        chmod($filename, 0777);
+		        $newfile = fopen($filename, 'w+');
+		        fwrite($newfile, $tokenData);
+		        fclose($newfile);
+		    }
+		  
+		  header('Location: ' . $redirect);
+		  
+		}
+		if(file_exists($filename) && filesize($filename) > 0)
+		{
+		    $fp = fopen($filename, 'r');
+		    $ftokenRead = json_decode(fread($fp,filesize($filename)),true);
+		    fclose($fp);
+		}
+
+		if (!empty($ftokenRead) && is_array($ftokenRead)) {
+		  $client->setAccessToken(json_encode($ftokenRead));
+		}
+		// Check to ensure that the access token was successfully acquired.
+		if (!empty($ftokenRead)) 
+		{
+		  	if($client->isAccessTokenExpired())
+		  	{
+			    $newRefreshTokenData = $client->refreshToken($ftokenRead['refresh_token']);
+			    $newTokenData = $client->getAccessToken();
+			    $fpnew = fopen($filename, 'w+');
+			    fwrite($fpnew, $newTokenData);
+			    fclose($fpnew);
+			    $client->setAccessToken($newTokenData);
+		  	}
+		  
+		  	try
+		  	{
+			    $videoPath = $serviceDetails["pathfile"];
+			   
+			    $snippet = new Google_Service_YouTube_VideoSnippet();
+			    $snippet->setTitle($serviceDetails["name"]);
+			    $snippet->setDescription($serviceDetails["description"]);
+			    //$snippet->setTags(array("Yes", "No"));
+
+			   	$snippet->setCategoryId("10");
+
+			    $status = new Google_Service_YouTube_VideoStatus();
+			    $status->privacyStatus = "private";
+
+			    $video = new Google_Service_YouTube_Video();
+			    $video->setSnippet($snippet);
+			    $video->setStatus($status);    
+
+			    // Specify the size of each chunk of data, in bytes. Set a higher value for
+			    // reliable connection as fewer chunks lead to faster uploads. Set a lower
+			    // value for better recovery on less reliable connections.
+			    $chunkSizeBytes = 1 * 1024 * 1024;
+			    //$chunkSizeBytes = -1;
+
+			    // Setting the defer flag to true tells the client to return a request which can be called
+			    // with ->execute(); instead of making the API call immediately.
+			    $client->setDefer(true);
+
+		    	// Create a request for the API's videos.insert method to create and upload the video.
+		    
+			    $insertRequest = $youtube->videos->insert("status,snippet",$video,
+			      array("data"=>file_get_contents($videoPath),
+			       "uploadType"=>"media",  // This was needed in my case
+			       "mimeType" => "application/octet-stream",
+			   ));
+
+		    	// Create a MediaFileUpload object for resumable uploads.
+			    $media = new Google_Http_MediaFileUpload(
+			        $client,
+			        $insertRequest,
+			        'application/octet-stream',
+			        null,
+			        true,
+			        $chunkSizeBytes
+			    );
+		    	$media->setFileSize(filesize($videoPath));
+		    // Read the media file and upload it chunk by chunk.
+			    $status = false;
+			    $handle = fopen($videoPath, "rb");
+
+			    while (!$status && !feof($handle)) {
+			      $chunk = fread($handle, $chunkSizeBytes);
+			      $status = $media->nextChunk($chunk);
+			  	}
+
+		    	fclose($handle);
+		    // If you want to make other calls after the file upload, set setDefer back to false
+		    	$client->setDefer(false);			  
+
+			// REPLACE this value with the video ID of the video being updated.
+		    	$videoId = $status['id'];
+
+		    // Call the API's videos.list method to retrieve the video resource.
+		   		$listResponse = $youtube->videos->listVideos("snippet,status",
+		        array('id' => $videoId));
+		    
+
+		    	//If $listResponse is empty, the specified video was not found.
+			    if (empty($listResponse)) {
+			      //$htmlBody .= sprintf('<h3>Can\'t find a video with video id: %s</h3>', $videoId);
+			    } 
+			    else 
+			    {
+			      // Since the request specified a video ID, the response only
+			      // contains one video resource.
+			      $video = $listResponse[0];
+			      $videoSnippet = $video['snippet'];
+			      $videoStatus = $video['status'];
+
+			      $tags = $videoSnippet['tags'];
+			      $title = $videoSnippet['title'];
+			      $description = $videoSnippet['description'];
+			      $status = $videoStatus['privacyStatus'];
+			      
+			      if (is_null($title) || $title == "unknown") 
+			      {
+			        $title = $serviceDetails["name"];
+			      } 
+			      if(is_null($description) || empty($description))
+			      {
+			        $description = $serviceDetails["description"];
+			      }
+			      if($status == 'public')
+			      {
+			        $status = "private";
+			      }
+			      
+			      // Set the tags array for the video snippet
+			      $videoSnippet['tags'] = $tags;
+			      $videoSnippet['title'] = $title;
+			      $videoSnippet['description'] = $description;
+			      $videoStatus['privacyStatus'] = $status;
+
+			      // Update the video resource by calling the videos.update() method.
+			      $updateResponse = $youtube->videos->update("snippet,status", $video);
+			    }
+		    	
+	  		} catch (Google_Service_Exception $e) {
+	    		//$htmlBody .= sprintf('<p>A service error occurred: <code>%s</code></p>',
+	        	//	htmlspecialchars($e->getMessage()));
+		  	} catch (Google_Exception $e) {
+		    	//$htmlBody .= sprintf('<p>An client error occurred: <code>%s</code></p>',
+		        //	htmlspecialchars($e->getMessage()));
+		  	}
+		} 
+		else 
+		{
+  			// If the user hasn't authorized the app, initiate the OAuth flow
+			$authUrl = $client->createAuthUrl();	  	
+		}
+		//return Response::make( $response, $status_code );
+ 	}
+
+	/**
+	 * This function useful to create background process call
+	 */
+	public function backgroundPost($url){
+
+		$parts = parse_url($url);
+		//echo "<pre>"; print_r($parts); //exit;
+
+		$fp = fsockopen($parts['host'], 
+			  isset($parts['port'])?$parts['port']:80, 
+			  $errno, $errstr, 30);
+			   
+		if (!$fp) {
+			return false;
+		} else {
+			$out = "POST ".$parts['path']." HTTP/1.1\r\n";
+			$out.= "Host: ".$parts['host']."\r\n";
+			$out.= "Content-Type: application/x-www-form-urlencoded\r\n";
+			$out.= "Content-Length: ".strlen($parts['query'])."\r\n";
+			$out.= "Connection: Close\r\n\r\n";
+			
+			if (isset($parts['query'])) $out.= $parts['query'];
+
+			fwrite($fp, $out);
+			fclose($fp);
+			return true;
+		}
+		
+	}
+	/* End */
 }

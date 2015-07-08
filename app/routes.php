@@ -262,6 +262,16 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "EntryController@store"
 		] );
 		
+		Route::post( "entry/store2", [
+			"as"   => "entry/store2",
+			"uses" => "EntryController@store2"
+		] );
+		
+		Route::post( "entry/youtubeUpload", [
+			"as"   => "entry/youtubeUpload",
+			"uses" => "EntryController@youtubeUpload"
+		] );
+		
 		Route::post( "entry/videoupload", [
 			"as"   => "entry/videoupload",
 			"uses" => "EntryController@videoupload"
