@@ -267,11 +267,6 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "EntryController@store2"
 		] );
 		
-		Route::post( "entry/youtubeUpload", [
-			"as"   => "entry/youtubeUpload",
-			"uses" => "EntryController@youtubeUpload"
-		] );
-		
 		Route::post( "entry/videoupload", [
 			"as"   => "entry/videoupload",
 			"uses" => "EntryController@videoupload"
@@ -752,6 +747,12 @@ Route::post( "login/forgotpassword", [
 	"as"   => "login/forgotpassword",
 	"uses" => "LoginController@password"
 ] );
+
+Route::post( "entry/youtubeUpload", [
+			"as"   => "entry/youtubeUpload",
+			"uses" => "EntryController@youtubeUpload"
+		] );
+
 Route::post( "user/team/", [
 			"as"   => "user/team",
 			"uses" => "UserController@team"
