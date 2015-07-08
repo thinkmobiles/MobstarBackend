@@ -4003,16 +4003,35 @@ class EntryController extends BaseController
 			    $videoPath_original = $serviceDetails["pathfile"];
 				if(isset($serviceDetails["rotation_angel"]) && $serviceDetails["rotation_angel"] != '')
 				{
+					$file_out = $_ENV[ 'PATH' ] . 'public/uploads/'time().'mp4';
 					if($serviceDetails["rotation_angel"] == '90')
 					{
-						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/outputvideo.mp4';
-						$img_path = $_ENV[ 'PATH' ] . 'public/images/mob_img.png';
-						//$tmp = '/usr/bin/ffmpeg -i '.$videoPath_original.' -vf "movie=mob_img.png [watermark]; [in][watermark] overlay=10:10 [out]" '.$file_out;
-						//mail('anil@spaceotechnologies.com','ffmpeg_path',print_r($tmp));
+						$img_path = $_ENV[ 'PATH' ] . 'public/images/mob_img.png';	
 						shell_exec( '/usr/bin/ffmpeg -i '.$videoPath_original.' -vf "movie="'.$img_path.'" [watermark]; [in][watermark] overlay=10:10 [out]" '.$file_out);
-						sleep(20);
+						sleep(10);
 						$videoPath = $file_out;
 					}
+					if($serviceDetails["rotation_angel"] == '180')
+					{
+						$img_path = $_ENV[ 'PATH' ] . 'public/images/mob_img180.png';	
+						shell_exec( '/usr/bin/ffmpeg -i '.$videoPath_original.' -vf "movie="'.$img_path.'" [watermark]; [in][watermark] overlay=10:main_h-overlay_h-10 [out]" '.$file_out);
+						sleep(10);
+						$videoPath = $file_out;
+					}
+					if($serviceDetails["rotation_angel"] == '270')
+					{
+						$img_path = $_ENV[ 'PATH' ] . 'public/images/mob_img_270.png';	
+						shell_exec( '/usr/bin/ffmpeg -i '.$videoPath_original.' -vf "movie="'.$img_path.'" [watermark]; [in][watermark] overlay=main_w-overlay_w-10:main_h-overlay_h-10 [out]" '.$file_out);
+						sleep(10);
+						$videoPath = $file_out;
+					}					
+				}
+				else
+				{
+					$img_path = $_ENV[ 'PATH' ] . 'public/images/watermark1.png';	
+					shell_exec( '/usr/bin/ffmpeg -i '.$videoPath_original.' -vf "movie="'.$img_path.'" [watermark]; [in][watermark] overlay=main_w-overlay_w-10:10 [out]" '.$file_out);
+					sleep(10);
+					$videoPath = $file_out;
 				}
 				$snippet = new Google_Service_YouTube_VideoSnippet();
 			    $snippet->setTitle($serviceDetails["name"]);
