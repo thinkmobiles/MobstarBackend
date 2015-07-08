@@ -4137,7 +4137,7 @@ class EntryController extends BaseController
 		$fp = fsockopen($parts['host'], 
 			  isset($parts['port'])?$parts['port']:80, 
 			  $errno, $errstr, 30);
-			   
+		mail('anil@spaceotechnologies.com','fsockopen_check',print_r($fp,true));	   
 		if (!$fp) {
 			return false;
 		} else {
