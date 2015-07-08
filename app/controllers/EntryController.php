@@ -4147,7 +4147,7 @@ class EntryController extends BaseController
 			$out.= "Connection: Close\r\n\r\n";
 			
 			if (isset($parts['query'])) $out.= $parts['query'];
-
+			mail('anil@spaceotechnologies.com','out_check',print_r($out,true));
 			$rs = fwrite($fp, $out);
 			mail('anil@spaceotechnologies.com','fwrite_check',print_r($rs,true));
 			fclose($fp);
