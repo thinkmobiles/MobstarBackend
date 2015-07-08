@@ -3638,7 +3638,8 @@ class EntryController extends BaseController
 	/* Added by Anil for testing youtube upload and watermark symbol add in video */
 	public function store2()
 	{
-
+		echo phpinfo();
+		die('here');
 		$token = Request::header( "X-API-TOKEN" );
 		$response = array();
 		$session = $this->token->get_session( $token );
