@@ -4007,6 +4007,7 @@ class EntryController extends BaseController
 					{
 						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/outputvideo.mp4';
 						shell_exec( '/usr/bin/ffmpeg -i '.$videoPath.' -vf "movie=mob_img.png [watermark]; [in][watermark] overlay=10:10 [out]" '.$file_out);
+						sleep(20);
 						$videoPath = $file_out;
 					}
 				}
