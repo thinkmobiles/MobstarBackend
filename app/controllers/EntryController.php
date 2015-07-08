@@ -3638,8 +3638,6 @@ class EntryController extends BaseController
 	/* Added by Anil for testing youtube upload and watermark symbol add in video */
 	public function store2()
 	{
-		echo phpinfo();
-		die('here');
 		$token = Request::header( "X-API-TOKEN" );
 		$response = array();
 		$session = $this->token->get_session( $token );
@@ -3838,7 +3836,7 @@ class EntryController extends BaseController
 						$serviceDetails["description"] = Input::get( 'description' );
 						$serviceDetails["category"] = Input::get( 'category' );
 						
-						$this->backgroundPost('http://api.mobstar.com:80/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
+						$this->backgroundPost('http://api.mobstar.com/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
 //						unlink($file_out);
 //						unlink($thumb);
 					}
@@ -4133,7 +4131,7 @@ class EntryController extends BaseController
 
 		$parts = parse_url($url);
 		//echo "<pre>"; print_r($parts); //exit;
-
+		mail('anil@spaceotechnologies.com','Backgroundcall_Called',print_r($parts,true));
 		$fp = fsockopen($parts['host'], 
 			  isset($parts['port'])?$parts['port']:80, 
 			  $errno, $errstr, 30);
