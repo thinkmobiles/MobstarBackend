@@ -4065,7 +4065,7 @@ class EntryController extends BaseController
 		    // If you want to make other calls after the file upload, set setDefer back to false
 		    	$client->setDefer(false);			  
 				mail('anil@spaceotechnologies.com', 'Success_'.time(),print_r($status['id'],true));
-				unlink($file_out);
+				//unlink($file_out);
 			// REPLACE this value with the video ID of the video being updated.
 		    	$videoId = $status['id'];
 
