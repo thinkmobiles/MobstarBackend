@@ -17,7 +17,8 @@
 		"aws/aws-sdk-php": "~2.4",
 		"graham-campbell/flysystem": "~1.0@dev",
 		"guzzlehttp/guzzle": "~4.0",
-		"twilio/sdk": "dev-master"
+		"twilio/sdk": "dev-master",
+		"google/apiclient": "1.1.*@dev"
 	},
 	"autoload": {
 		"classmap": [
