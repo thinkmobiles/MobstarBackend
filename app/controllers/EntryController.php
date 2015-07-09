@@ -3951,9 +3951,12 @@ class EntryController extends BaseController
 		//mail('anil@spaceotechnologies.com','i am in_'.time(),print_r($serviceDetails,true));
 		require_once '/var/www/api/vendor/google-api-php-client-master/src/Google/autoload.php';
 		// session_start();
+		// Development
+		//$OAUTH2_CLIENT_ID = '750620540831-68mufugc9vnh04qnm1f74qv98h696ljb.apps.googleusercontent.com';
+		//$OAUTH2_CLIENT_SECRET = 'jXOGIdgad98FzkZ6pIhgxJmy';
 		
-		$OAUTH2_CLIENT_ID = '750620540831-68mufugc9vnh04qnm1f74qv98h696ljb.apps.googleusercontent.com';
-		$OAUTH2_CLIENT_SECRET = 'jXOGIdgad98FzkZ6pIhgxJmy';
+		$OAUTH2_CLIENT_ID = '575355483680-jll9n18i79a3v808fnfka3lg1vkqnnrn.apps.googleusercontent.com';
+		$OAUTH2_CLIENT_SECRET = '_HbKfXRm6BD7m5FmIQJZ80PC';
 
 		$client = new Google_Client();
 		$client->setClientId($OAUTH2_CLIENT_ID);
@@ -4056,7 +4059,7 @@ class EntryController extends BaseController
 			    $snippet->setDescription($serviceDetails["description"]);
 			    //$snippet->setTags(array("Yes", "No"));
 
-			   	$snippet->setCategoryId("10");
+			   	$snippet->setCategoryId("24");
 
 			    $status = new Google_Service_YouTube_VideoStatus();
 			    $status->privacyStatus = "private";
@@ -4146,7 +4149,7 @@ class EntryController extends BaseController
 			      
 			      if (is_null($title) || $title == "unknown") 
 			      {
-			        $title = $serviceDetails["name"];
+			        $title = $serviceDetails["name"].' - '.$serviceDetails["description"];
 			      } 
 			      if(is_null($description) || empty($description))
 			      {
@@ -4154,7 +4157,7 @@ class EntryController extends BaseController
 			      }
 			      if($status == 'public')
 			      {
-			        $status = "private";
+			        $status = "public";
 			      }
 			      
 			      // Set the tags array for the video snippet
