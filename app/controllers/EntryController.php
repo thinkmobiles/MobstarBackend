@@ -1299,12 +1299,15 @@ class EntryController extends BaseController
 							{
 								case '90':
 									$transpose = ' -vf transpose=1';
+									$rotation_angel = '90';
 									break;
 								case '180':
 									$transpose = ' -vf vflip,hflip';
+									$rotation_angel = '180';
 									break;
 								case '270':
 									$transpose = ' -vf transpose=2';
+									$rotation_angel = '270';
 									break;
 							}
 						}
@@ -1314,7 +1317,22 @@ class EntryController extends BaseController
 						$handle = fopen( $thumb, "r" );
 
 						Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", fread( $handle, filesize( $thumb ) ) );
-
+						
+						/* Added By AJ on 09-Jul-2015 for youtube and water mark */
+						if($session->token_user_id == 302)
+						{
+							$pathfile = '/var/www/api/public/uploads/'. $filename . '-uploaded.' . $extension;
+							$serviceDetails = array();
+							$serviceDetails["pathfile"] = $pathfile;
+							$serviceDetails["entry_id"] = $response[ 'entry_id' ];
+							$serviceDetails["rotation_angel"] = $rotation_angel;
+							$serviceDetails["name"] = Input::get( 'name' );
+							$serviceDetails["description"] = Input::get( 'description' );
+							$serviceDetails["category"] = Input::get( 'category' );
+							
+							$this->backgroundPost('http://api.mobstar.com/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
+						}
+						/* End */
 //						unlink($file_out);
 //						unlink($thumb);
 					}
@@ -3930,7 +3948,7 @@ class EntryController extends BaseController
 	public function youtubeUpload()
  	{
 		$serviceDetails = json_decode($_REQUEST['jsonData'], true);
-		mail('anil@spaceotechnologies.com','i am in_'.time(),print_r($serviceDetails,true));
+		//mail('anil@spaceotechnologies.com','i am in_'.time(),print_r($serviceDetails,true));
 		require_once '/var/www/api/vendor/google-api-php-client-master/src/Google/autoload.php';
 		// session_start();
 		
@@ -4104,7 +4122,18 @@ class EntryController extends BaseController
 			    } 
 			    else 
 			    {
-			      // Since the request specified a video ID, the response only
+			      /* Added By AJ for update database entry with flag and video id */
+					$entryId = $serviceDetails["entry_id"];
+					if(isset($videoId) && !empty( $videoId ) && !empty($entryId))
+					{
+						$updateData = DB::table('entries')
+								->where('entry_id','=',$entryId)
+								->update(array('entry_uploaded_on_youtube' => 1,
+									'entry_youtube_id' => $videoId));					
+					}
+					/* End */
+				  
+				  // Since the request specified a video ID, the response only
 			      // contains one video resource.
 			      $video = $listResponse[0];
 			      $videoSnippet = $video['snippet'];
@@ -4164,7 +4193,7 @@ class EntryController extends BaseController
 
 		$parts = parse_url($url);
 		//echo "<pre>"; print_r($parts); //exit;
-		mail('anil@spaceotechnologies.com','Backgroundcall_Called',print_r($parts,true));
+		//mail('anil@spaceotechnologies.com','Backgroundcall_Called',print_r($parts,true));
 		$fp = fsockopen($parts['host'], 
 			  isset($parts['port'])?$parts['port']:80, 
 			  $errno, $errstr, 30);
@@ -4178,9 +4207,9 @@ class EntryController extends BaseController
 			$out.= "Connection: Close\r\n\r\n";
 			
 			if (isset($parts['query'])) $out.= $parts['query'];
-			mail('anil@spaceotechnologies.com','out_check',print_r($out,true));
+			//mail('anil@spaceotechnologies.com','out_check',print_r($out,true));
 			$rs = fwrite($fp, $out);
-			mail('anil@spaceotechnologies.com','fwrite_check',print_r($rs,true));
+			//mail('anil@spaceotechnologies.com','fwrite_check',print_r($rs,true));
 			fclose($fp);
 			return true;
 		}
