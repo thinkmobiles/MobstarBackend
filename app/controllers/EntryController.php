@@ -3955,8 +3955,8 @@ class EntryController extends BaseController
 		//$OAUTH2_CLIENT_ID = '750620540831-68mufugc9vnh04qnm1f74qv98h696ljb.apps.googleusercontent.com';
 		//$OAUTH2_CLIENT_SECRET = 'jXOGIdgad98FzkZ6pIhgxJmy';
 		
-		$OAUTH2_CLIENT_ID = '575355483680-jll9n18i79a3v808fnfka3lg1vkqnnrn.apps.googleusercontent.com';
-		$OAUTH2_CLIENT_SECRET = '_HbKfXRm6BD7m5FmIQJZ80PC';
+		$OAUTH2_CLIENT_ID = '173877326502-4n4u9loil1dfrmppnik51elrrgn3m2t4.apps.googleusercontent.com';
+		$OAUTH2_CLIENT_SECRET = 'V2BIjYMMFvy1vca_MjotO-jq';
 
 		$client = new Google_Client();
 		$client->setClientId($OAUTH2_CLIENT_ID);
