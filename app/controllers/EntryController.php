@@ -1319,7 +1319,7 @@ class EntryController extends BaseController
 						Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", fread( $handle, filesize( $thumb ) ) );
 						
 						/* Added By AJ on 09-Jul-2015 for youtube and water mark */
-						if( $session->token_user_id == 302 && Input::get( 'category' ) != 7 && Input::get( 'category' ) != 8 )
+						if( Input::get( 'category' ) != 7 && Input::get( 'category' ) != 8 )
 						{
 							$pathfile = '/var/www/api/public/uploads/'. $filename . '-uploaded.' . $extension;
 							$serviceDetails = array();
@@ -4058,9 +4058,19 @@ class EntryController extends BaseController
 			    $snippet->setTitle($serviceDetails["name"]);
 			    $snippet->setDescription($serviceDetails["description"]);
 			    //$snippet->setTags(array("Yes", "No"));
-
-			   	$snippet->setCategoryId("24");
-
+				$snippet->setCategoryId("24");
+				if($serviceDetails["category"] == 1)
+				{
+					$snippet->setCategoryId("10");
+				}
+				if($serviceDetails["category"] == 5)
+				{
+					$snippet->setCategoryId("17");
+				}
+				if($serviceDetails["category"] == 9)
+				{
+					$snippet->setCategoryId("23");
+				}
 			    $status = new Google_Service_YouTube_VideoStatus();
 			    $status->privacyStatus = "private";
 
