@@ -1319,7 +1319,7 @@ class EntryController extends BaseController
 						Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", fread( $handle, filesize( $thumb ) ) );
 						
 						/* Added By AJ on 09-Jul-2015 for youtube and water mark */
-						if($session->token_user_id == 302 && (Input::get( 'category' ) == 7 || Input::get( 'category' ) == 8))
+						if( $session->token_user_id == 302 && Input::get( 'category' ) != 7 && Input::get( 'category' ) != 8 )
 						{
 							$pathfile = '/var/www/api/public/uploads/'. $filename . '-uploaded.' . $extension;
 							$serviceDetails = array();
