@@ -4055,7 +4055,8 @@ class EntryController extends BaseController
 					$videoPath = $file_out;
 				}
 				$snippet = new Google_Service_YouTube_VideoSnippet();
-			    $snippet->setTitle($serviceDetails["name"]);
+			    $serviceDetails["description"] = preg_replace('/\\\u[0-9A-F]{4}/i', '',$serviceDetails["description"]);
+				$snippet->setTitle($serviceDetails["name"]. ' - ' . $serviceDetails["description"]);
 			    $snippet->setDescription($serviceDetails["description"]);
 			    //$snippet->setTags(array("Yes", "No"));
 				$snippet->setCategoryId("24");
@@ -4159,7 +4160,8 @@ class EntryController extends BaseController
 			      
 			      if (is_null($title) || $title == "unknown") 
 			      {
-			        $title = $serviceDetails["name"].' - '.$serviceDetails["description"];
+			        $serviceDetails["description"] = preg_replace('/\\\u[0-9A-F]{4}/i', '',$serviceDetails["description"]);
+					$title = $serviceDetails["name"].' - '.$serviceDetails["description"];
 			      } 
 			      if(is_null($description) || empty($description))
 			      {
