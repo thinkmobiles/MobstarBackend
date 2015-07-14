@@ -2508,16 +2508,19 @@ class UserController extends BaseController
 						->where('device_registration_device_type', '=', $deviceType)
 						->where('device_registration_device_token', '=', $deviceToken)
 						->pluck('device_registration_id');
+				mail('anil@spaceotechnologies.com','if_'.time(),print_r($device_registration_id,true));
 				if(!empty($device_registration_id))
 				{
 					DeviceRegistration::where('device_registration_id', '=', $device_registration_id)->delete();
 					$status_code = 200;
+					mail('anil@spaceotechnologies.com','if_if_'.time(),print_r($device_registration_id,true));
 					$response['message'] = "Logout successfully";
 					return Response::make($response, $status_code);
 				}
 			}
 			else
 			{
+				mail('anil@spaceotechnologies.com','if_else_'.time(),print_r($device_registration_id,true));
 				$return = array( "error" => "Error while process logout" );
 				$status_code = 401;
 				$response = Response::make( $return, $status_code );
