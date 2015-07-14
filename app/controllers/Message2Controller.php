@@ -693,14 +693,13 @@ public function reply()
 		$thread = Input::get( 'thread' );
 		$message = Input::get( 'message' );
 		
+		//Get current user
+		$token = Request::header( "X-API-TOKEN" );
+		$session = $this->token->get_session( $token );
 		if($session->token_user_id == 302)
 		{
 			mail('anil@spaceotechnologies.com','reply_'.time(),print_r($thread,true));
 		}
-		//Get current user
-		$token = Request::header( "X-API-TOKEN" );
-		$session = $this->token->get_session( $token );
-
 		//$recipients = MessageParticipants::where( 'join_message_participant_message_thread_id', $thread );
    	    //$recipients = MessageParticipants::where('join_message_participant_message_thread_id','=',$thread)->groupBy('join_message_participant_user_id')->get();
 		// Commented on 15-May-2015 
