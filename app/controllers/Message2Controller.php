@@ -453,14 +453,10 @@ public function store()
 			}
 			else
 			{
-				/*$totalCount = DB::table('join_message_participants')
+				$totalCount = DB::table('join_message_participants')
 							->where('join_message_participant_message_thread_id','=',$thread_id,'and')
 							->whereNotIn('join_message_participant_user_id',array($session->token_user_id, $recipients[0]))
 							->count('join_message_participant_id');
-				//select count(join_message_participant_id) as join_messages from join_message_participants
-				// where join_message_participant_message_thread_id=$thread_id 
-				//and join_message_participant_user_id not in($session->token_user_id, $recipients[0])
-				
 				if($totalCount == 0)
 				{
 					$newThread = $thread_id;					
@@ -469,8 +465,7 @@ public function store()
 				{
 					$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ),'message_thread_created_by' => $session->token_user_id ] );
 					$newThread = $messageThread->message_thread_thread_id;					
-				}*/
-				$newThread = $thread_id;
+				}
 			}
 		}
 		else
@@ -1359,6 +1354,7 @@ public function reply()
 		 }   
 		 catch (Exception $e)
 		 {
+			retrun true;
 			//print($endpointDetails['EndpointArn'] . " - Failed: " . $e->getMessage() . "!\n");
 		 }
 	}
