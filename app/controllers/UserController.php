@@ -2477,4 +2477,53 @@ class UserController extends BaseController
 		$response->header( 'X-Total-Count', count($count) );
 		return $response;
 	}
+	// Logout API created on 14-Jul-2015
+	public function logout()
+	{
+		$token = Request::header( "X-API-TOKEN" );
+		$session = $this->token->get_session( $token );
+		$rules = array(
+			'device'   => 'in:apple,google', // device type, must be google or apple
+			'deviceToken'    => 'required' // token is required
+		);
+		// run the validation rules on the inputs
+		$validator = Validator::make( Input::all(), $rules );
+
+		// if the validator fails, return errors
+		if( $validator->fails() )
+		{
+			$return = $validator->messages();
+			$status_code = 401;
+			$response = Response::make( $return, $status_code );
+			return $response;
+		}
+		else
+		{
+			$deviceToken = Input::get( 'deviceToken' );
+			$deviceType = Input::get( 'device' );
+			if( isset( $deviceType ) && isset( $deviceToken ) )
+			{
+				$device_registration_id = DB::table('device_registrations')
+						->where('device_registration_user_id', '=', $session->token_user_id)
+						->where('device_registration_device_type', '=', $deviceType)
+						->where('device_registration_device_token', '=', $deviceToken)
+						->pluck('device_registration_id');
+				if(!empty($device_registration_id))
+				{
+					DeviceRegistration::where('device_registration_id', '=', $device_registration_id)->delete();
+					$status_code = 200;
+					$response['message'] = "Logout successfully";
+					return Response::make($response, $status_code);
+				}
+			}
+			else
+			{
+				$return = array( "error" => "Error while process logout" );
+				$status_code = 401;
+				$response = Response::make( $return, $status_code );
+				return $response;
+			}
+		}
+	}
+	// End
 }

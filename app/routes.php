@@ -144,6 +144,11 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "UserController@analytic"
 		] );
 		
+		Route::post( "user/logout", [
+			"as"   => "user/logout",
+			"uses" => "UserController@logout"
+		] );
+		
 		Route::post( "vote/likes/", [
 			"as"   => "vote/likes",
 			"uses" => "VoteController@likes"
