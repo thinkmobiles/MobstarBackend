@@ -366,11 +366,14 @@ class CommentController extends BaseController
 					) t1 left join users u on t1.device_registration_user_id = u.user_id 
 					where u.user_deleted = 0 
 					AND u.user_id = $to
-					order by t1.device_registration_date_created desc LIMIT 1"));
+					order by t1.device_registration_date_created desc"));
 
 				if(!empty($usersDeviceData))
 				{	
-					$this->registerSNSEndpoint($usersDeviceData[0],$message,$name,$entryid,$icon);
+					for($i=0;$i<count($usersDeviceData);$i++)
+					{
+						$this->registerSNSEndpoint($usersDeviceData[$i],$message,$name,$entryid,$icon);
+					}
 				}
 			}
 

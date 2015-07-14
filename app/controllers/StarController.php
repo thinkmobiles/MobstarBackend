@@ -164,12 +164,15 @@ class StarController extends BaseController
 								) t1 left join users u on t1.device_registration_user_id = u.user_id 
 								where u.user_deleted = 0 
 								AND u.user_id = $to
-								order by t1.device_registration_date_created desc LIMIT 1"));
+								order by t1.device_registration_date_created desc"));
 							$icon = 'follow.png';
 							$icon = 'http://' . $_ENV[ 'URL' ] . '/images/' . $icon;
 							if(!empty($usersDeviceData))
 							{	
-								$this->registerSNSEndpoint($usersDeviceData[0],$message,$to,$name,$icon);
+								for($j=0;$j<count($usersDeviceData);$j++)
+								{
+									$this->registerSNSEndpoint($usersDeviceData[$j],$message,$to,$name,$icon);
+								}
 							}
 						}
 					}
@@ -270,11 +273,14 @@ class StarController extends BaseController
 						) t1 left join users u on t1.device_registration_user_id = u.user_id 
 						where u.user_deleted = 0 
 						AND u.user_id = $to
-						order by t1.device_registration_date_created desc LIMIT 1"));
+						order by t1.device_registration_date_created desc"));
 
 					if(!empty($usersDeviceData))
 					{	
-						$this->registerSNSEndpoint($usersDeviceData[0],$message,$to,$name,$icon = NULL);
+						for($k=0;$k<count($usersDeviceData);$k++)
+						{
+							$this->registerSNSEndpoint($usersDeviceData[$k],$message,$to,$name,$icon = NULL);
+						}
 					}
 				}
 			}			
