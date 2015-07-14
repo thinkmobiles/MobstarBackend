@@ -437,9 +437,11 @@ public function store()
 		{
 			$thread_id = DB::table('join_message_participants')
 						//->whereIn('join_message_participant_user_id', array($session->token_user_id, $recipients[0]))
+						->join('messages', 'join_message_participants.join_message_participant_message_thread_id', '=' , 'messages.message_thread_id')
+						->where( 'messages.message_group', '=' , '0' )
 						->groupBy('join_message_participant_message_thread_id')
-						->havingRaw("max(join_message_participant_user_id =$session->token_user_id ) > 0 and max(join_message_participant_user_id =$recipients[0] ) > 0 ")
-						->pluck('join_message_participant_message_thread_id');
+						->havingRaw("max(join_message_participants.join_message_participant_user_id =$session->token_user_id ) > 0 and max(join_message_participants.join_message_participant_user_id =$recipients[0] ) > 0 ")
+						->pluck('join_message_participants.join_message_participant_message_thread_id');
 			if($session->token_user_id == 302)
 			{
 				mail('anil@spaceotechnologies.com','store_'.time(),print_r($thread_id,true));
