@@ -460,24 +460,19 @@ public function store()
 				
 				if($session->token_user_id == 302)
 				{
-					dd(DB::getQueryLog());
+					//dd(DB::getQueryLog());
 				}
 				if($totalCount == 0)
 				{
-					$newThread = $thread_id;
-					if($session->token_user_id == 302)
-					{
-						mail('anil@spaceotechnologies.com','store1_'.time(),print_r($newThread,true));
-					}
+					//$newThread = $thread_id;
+					$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ),'message_thread_created_by' => $session->token_user_id ] );
+					$newThread = $messageThread->message_thread_thread_id;					
 				}
 				elseif($totalCount > 0)
 				{
-					$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ),'message_thread_created_by' => $session->token_user_id ] );
-					$newThread = $messageThread->message_thread_thread_id;
-					if($session->token_user_id == 302)
-					{
-						mail('anil@spaceotechnologies.com','store2_'.time(),print_r($newThread,true));
-					}
+					//$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ),'message_thread_created_by' => $session->token_user_id ] );
+					//$newThread = $messageThread->message_thread_thread_id;
+					$newThread = $thread_id;					
 				}
 			}
 		}
