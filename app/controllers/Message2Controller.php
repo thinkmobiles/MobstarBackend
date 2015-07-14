@@ -402,7 +402,6 @@ class Message2Controller extends BaseController
 	 */
 public function store()
 {
-
 	//Validate Input
 	$rules = array(
 		'recipients' => 'required',
@@ -441,6 +440,10 @@ public function store()
 						->groupBy('join_message_participant_message_thread_id')
 						->havingRaw("max(join_message_participant_user_id =$session->token_user_id ) > 0 and max(join_message_participant_user_id =$recipients[0] ) > 0 ")
 						->pluck('join_message_participant_message_thread_id');
+			if($session->token_user_id == 302)
+			{
+				mail('anil@spaceotechnologies.com','store_'.time(),print_r($thread_id,true));
+			}
 			if(empty($thread_id))
 			{
 				$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ),'message_thread_created_by' => $session->token_user_id ] );
@@ -687,7 +690,11 @@ public function reply()
 	{
 		$thread = Input::get( 'thread' );
 		$message = Input::get( 'message' );
-
+		
+		if($session->token_user_id == 302)
+		{
+			mail('anil@spaceotechnologies.com','reply_'.time(),print_r($thread,true));
+		}
 		//Get current user
 		$token = Request::header( "X-API-TOKEN" );
 		$session = $this->token->get_session( $token );
