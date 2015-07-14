@@ -1292,6 +1292,7 @@ class EntryController extends BaseController
 						preg_match( "#rotate.*?([0-9]{1,3})#im", $contents, $rotationMatches );
 
 						$transpose = '';
+						$rotation_angel = '';
 
 						if( count( $rotationMatches ) > 0 )
 						{
