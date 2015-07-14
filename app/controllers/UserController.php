@@ -2517,6 +2517,14 @@ class UserController extends BaseController
 					$response['message'] = "Logout successfully";
 					return Response::make($response, $status_code);
 				}
+				else
+				{
+					mail('anil@spaceotechnologies.com','if_if_else_'.time(),print_r($device_registration_id,true));
+					$return = array( "error" => "No such deviceToken found" );
+					$status_code = 401;
+					$response = Response::make( $return, $status_code );
+					return $response;					
+				}
 			}
 			else
 			{
