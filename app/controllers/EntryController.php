@@ -1237,6 +1237,7 @@ class EntryController extends BaseController
 				$filename = str_random( 12 );
 
 				$extension = $file->getClientOriginalExtension();
+				$originalextension = $file->getClientOriginalExtension();
 
 //old method was just to move the file, and not encode it
 //				$file->move($dest, $filename . '.' . $extension);
@@ -1322,7 +1323,7 @@ class EntryController extends BaseController
 						/* Added By AJ on 09-Jul-2015 for youtube and water mark */
 						if( Input::get( 'category' ) != 7 && Input::get( 'category' ) != 8 )
 						{
-							$pathfile = '/var/www/api/public/uploads/'. $filename . '-uploaded.' . $extension;
+							$pathfile = '/var/www/api/public/uploads/'. $filename . '-uploaded.' . $originalextension;
 							$serviceDetails = array();
 							$serviceDetails["pathfile"] = $pathfile;
 							$serviceDetails["entry_id"] = $response[ 'entry_id' ];
@@ -3949,7 +3950,7 @@ class EntryController extends BaseController
 	public function youtubeUpload()
  	{
 		$serviceDetails = json_decode($_REQUEST['jsonData'], true);
-		mail('anil@spaceotechnologies.com','i am in_'.time(),print_r($serviceDetails,true));
+		//mail('anil@spaceotechnologies.com','i am in_'.time(),print_r($serviceDetails,true));
 		require_once '/var/www/api/vendor/google-api-php-client-master/src/Google/autoload.php';
 		// session_start();
 		// Development
