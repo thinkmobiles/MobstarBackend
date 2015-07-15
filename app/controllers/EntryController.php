@@ -3949,7 +3949,7 @@ class EntryController extends BaseController
 	public function youtubeUpload()
  	{
 		$serviceDetails = json_decode($_REQUEST['jsonData'], true);
-		//mail('anil@spaceotechnologies.com','i am in_'.time(),print_r($serviceDetails,true));
+		mail('anil@spaceotechnologies.com','i am in_'.time(),print_r($serviceDetails,true));
 		require_once '/var/www/api/vendor/google-api-php-client-master/src/Google/autoload.php';
 		// session_start();
 		// Development
@@ -4237,7 +4237,7 @@ class EntryController extends BaseController
 	public function youtubeDelete()
  	{
 		$serviceDetails = json_decode($_REQUEST['jsonData'], true);
-		mail('anil@spaceotechnologies.com','i am in_'.time(),print_r($serviceDetails,true));
+		//mail('anil@spaceotechnologies.com','i am in_'.time(),print_r($serviceDetails,true));
 		require_once '/var/www/api/vendor/google-api-php-client-master/src/Google/autoload.php';
 		// session_start();
 		// Development
