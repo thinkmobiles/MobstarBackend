@@ -4313,7 +4313,7 @@ class EntryController extends BaseController
 				$entryId = $serviceDetails["entry_id"];
 				$youtube->videos->delete($videoid);
 				/* Added By AJ for update database entry with flag and video id */
-				if(isset($videoId) && !empty( $videoId ) && !empty($entryId))
+				if(isset($videoid) && !empty( $videoid ) && !empty($entryId))
 				{
 					$updateData = DB::table('entries')
 							->where('entry_id','=',$entryId)
