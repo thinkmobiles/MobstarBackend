@@ -4232,4 +4232,115 @@ class EntryController extends BaseController
 		
 	}
 	/* End */
+	
+	/* Youtube delete */
+	public function youtubeDelete()
+ 	{
+		$serviceDetails = json_decode($_REQUEST['jsonData'], true);
+		//mail('anil@spaceotechnologies.com','i am in_'.time(),print_r($serviceDetails,true));
+		require_once '/var/www/api/vendor/google-api-php-client-master/src/Google/autoload.php';
+		// session_start();
+		// Development
+		//$OAUTH2_CLIENT_ID = '750620540831-68mufugc9vnh04qnm1f74qv98h696ljb.apps.googleusercontent.com';
+		//$OAUTH2_CLIENT_SECRET = 'jXOGIdgad98FzkZ6pIhgxJmy';
+		
+		$OAUTH2_CLIENT_ID = '173877326502-4n4u9loil1dfrmppnik51elrrgn3m2t4.apps.googleusercontent.com';
+		$OAUTH2_CLIENT_SECRET = 'V2BIjYMMFvy1vca_MjotO-jq';
+
+		$client = new Google_Client();
+		$client->setClientId($OAUTH2_CLIENT_ID);
+		$client->setClientSecret($OAUTH2_CLIENT_SECRET);
+		$client->setAccessType('offline');
+		$client->setApprovalPrompt('force');
+		$scope = array('https://www.googleapis.com/auth/youtube.upload', 'https://www.googleapis.com/auth/youtube', 'https://www.googleapis.com/auth/youtubepartner');
+		$client->setScopes($scope);
+		$redirect = filter_var('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'],
+		    FILTER_SANITIZE_URL);
+		$client->setRedirectUri($redirect);
+
+		$youtube = new Google_Service_YouTube($client);
+
+		$filename = 'youtubeToken.txt';
+		$readData = '';
+
+		if (isset($_GET['code'])) 
+		{
+		    $client->authenticate($_GET['code']);
+		    $tokenData = $client->getAccessToken();
+		    if(file_exists($filename))
+		    {
+		        $handler = fopen($filename, 'w+');
+		        fwrite($handler, $tokenData);
+		        fclose($handler);
+		    }
+		    else
+		    {
+		        touch($filename);
+		        chmod($filename, 0777);
+		        $newfile = fopen($filename, 'w+');
+		        fwrite($newfile, $tokenData);
+		        fclose($newfile);
+		    }
+		  
+		  header('Location: ' . $redirect);
+		  
+		}
+		if(file_exists($filename) && filesize($filename) > 0)
+		{
+		    $fp = fopen($filename, 'r');
+		    $ftokenRead = json_decode(fread($fp,filesize($filename)),true);
+		    fclose($fp);
+		}
+
+		if (!empty($ftokenRead) && is_array($ftokenRead)) {
+		  $client->setAccessToken(json_encode($ftokenRead));
+		}
+		// Check to ensure that the access token was successfully acquired.
+		if (!empty($ftokenRead)) 
+		{
+		  	if($client->isAccessTokenExpired())
+		  	{
+			    $newRefreshTokenData = $client->refreshToken($ftokenRead['refresh_token']);
+			    $newTokenData = $client->getAccessToken();
+			    $fpnew = fopen($filename, 'w+');
+			    fwrite($fpnew, $newTokenData);
+			    fclose($fpnew);
+			    $client->setAccessToken($newTokenData);
+		  	}		  
+		  	try
+		  	{
+				$videoid = $serviceDetails["videoid"];
+				$entryId = $serviceDetails["entry_id"];
+				$youtube->videos->delete($videoid);
+				/* Added By AJ for update database entry with flag and video id */
+				if(isset($videoId) && !empty( $videoId ) && !empty($entryId))
+				{
+					$updateData = DB::table('entries')
+							->where('entry_id','=',$entryId)
+							->update(array('entry_uploaded_on_youtube' => 0,
+								'entry_youtube_id' => NULL));					
+				}
+				mail('anil@spaceotechnologies.com', 'Delete Successfully_'.time(),print_r($status['id'],true));
+				/* End */	
+	  		} catch (Google_Service_Exception $e) {
+	    		mail('anil@spaceotechnologies.com', 'Fail1_'.time(),print_r($e->getMessage(),true));
+				//$htmlBody .= sprintf('<p>A service error occurred: <code>%s</code></p>',
+	        	//	htmlspecialchars($e->getMessage()));
+		  	} catch (Google_Exception $e) {
+		    	mail('anil@spaceotechnologies.com', 'Fail2_'.time(),print_r($e->getMessage(),true));
+				//$htmlBody .= sprintf('<p>An client error occurred: <code>%s</code></p>',
+		        //	htmlspecialchars($e->getMessage()));
+		  	}
+		} 
+		else 
+		{
+  			// If the user hasn't authorized the app, initiate the OAuth flow
+			$authUrl = $client->createAuthUrl();
+			mail('anil@spaceotechnologies.com', 'Authorization Required_'.time(),'You need to authorize access before proceeding.');	
+		}
+		//return Response::make( $response, $status_code );
+ 	}
+
+	
+	/* End */
 }

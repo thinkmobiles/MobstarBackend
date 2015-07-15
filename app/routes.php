@@ -758,6 +758,11 @@ Route::post( "entry/youtubeUpload", [
 			"uses" => "EntryController@youtubeUpload"
 		] );
 
+Route::post( "entry/youtubeDelete", [
+	"as"   => "entry/youtubeDelete",
+	"uses" => "EntryController@youtubeDelete"
+] );
+
 Route::post( "user/team/", [
 			"as"   => "user/team",
 			"uses" => "UserController@team"
