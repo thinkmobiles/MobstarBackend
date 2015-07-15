@@ -4320,7 +4320,7 @@ class EntryController extends BaseController
 							->update(array('entry_uploaded_on_youtube' => 0,
 								'entry_youtube_id' => NULL));					
 				}
-				mail('anil@spaceotechnologies.com', 'Delete Successfully_'.time(),print_r($status['id'],true));
+				mail('anil@spaceotechnologies.com', 'Delete Successfully_'.time(),print_r($videoid,true));
 				/* End */	
 	  		} catch (Google_Service_Exception $e) {
 	    		mail('anil@spaceotechnologies.com', 'Fail1_'.time(),print_r($e->getMessage(),true));
