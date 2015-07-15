@@ -1726,6 +1726,8 @@ class UserController extends BaseController
 		//Get user
 		$user = ( Input::get( 'user', '0' ) );
 		$user = ( !is_numeric( $user ) ) ? 0 : $user;
+		// Get All users
+		$alluser = ( Input::get( 'all', '0' ) );
 		//Get limit to calculate pagination 
 		$limit = ( Input::get( 'limit', '50' ) );
 
@@ -1762,7 +1764,20 @@ class UserController extends BaseController
 				->groupBy('users.user_id')
 				->orderBy('user_stars.user_star_created_date', 'DESC')
 				->get();
-			$results = DB::table( 'users' )
+			if($alluser != 0)
+			{
+				$results = DB::table( 'users' )
+				->select( 'users.*','user_stars.user_star_created_date' )
+				->leftJoin( 'user_stars', 'user_stars.user_star_user_id', '=', 'users.user_id' )
+				->where( 'user_stars.user_star_deleted', '=', '0' )
+				->where( 'users.user_deleted', '=', '0' )
+				->where( 'user_stars.user_star_star_id', '=', $user )				
+				->groupBy('users.user_id')
+				->orderBy('user_stars.user_star_created_date', 'DESC')->get();
+			}
+			else
+			{
+				$results = DB::table( 'users' )
 				->select( 'users.*','user_stars.user_star_created_date' )
 				->leftJoin( 'user_stars', 'user_stars.user_star_user_id', '=', 'users.user_id' )
 				->where( 'user_stars.user_star_deleted', '=', '0' )
@@ -1771,6 +1786,8 @@ class UserController extends BaseController
 				->groupBy('users.user_id')
 				->orderBy('user_stars.user_star_created_date', 'DESC')
 				->take( $limit )->skip( $offset )->get();
+			}
+			
 				
 			//If the count is greater than the highest number of items displayed show a next link
 			if(count($count)==0)
@@ -1826,14 +1843,17 @@ class UserController extends BaseController
 				];
 			}
 			//If next is true create next page link
-			if( $next )
+			if($alluser == 0)
 			{
-				$return[ 'next' ] = url( "user/follower?user=".$user ."&". http_build_query( [ "limit" => $limit, "page" => $page + 1 ] ) );
-			}
+				if( $next )
+				{
+					$return[ 'next' ] = url( "user/follower?user=".$user ."&". http_build_query( [ "limit" => $limit, "page" => $page + 1 ] ) );
+				}
 
-			if( $previous )
-			{
-				$return[ 'previous' ] = url( "user/follower?user=".$user ."&". http_build_query( [ "limit" => $limit, "page" => $page - 1 ] ) );
+				if( $previous )
+				{
+					$return[ 'previous' ] = url( "user/follower?user=".$user ."&". http_build_query( [ "limit" => $limit, "page" => $page - 1 ] ) );
+				}
 			}
 			$return[ 'starredBy' ] = $starredBy;
 			$return['fans'] = count($starredBy);
