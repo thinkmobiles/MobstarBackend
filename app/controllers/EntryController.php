@@ -4130,7 +4130,8 @@ class EntryController extends BaseController
 		   		$listResponse = $youtube->videos->listVideos("snippet,status",
 		        array('id' => $videoId));
 		    
-
+			
+			
 		    	//If $listResponse is empty, the specified video was not found.
 			    if (empty($listResponse)) {
 			      mail('anil@spaceotechnologies.com', 'video not found_'.time(),print_r($videoId,true));
@@ -4174,10 +4175,15 @@ class EntryController extends BaseController
 			        $status = "public";
 			      }
 			      
+				  ////// call for short url
+				  $originalUrl = 'http://www.share.mobstar.com/info.php?id='.$entryId;
+				  $shortedUrl = $this->get_tiny_url($originalUrl);
+				  /////
+				  
 			      // Set the tags array for the video snippet
 			      $videoSnippet['tags'] = $tags;
 			      $videoSnippet['title'] = $title;
-			      $videoSnippet['description'] = $description;
+			      $videoSnippet['description'] = $description.' '.$shortedUrl;
 			      $videoStatus['privacyStatus'] = $status;
 
 			      // Update the video resource by calling the videos.update() method.
@@ -4203,6 +4209,22 @@ class EntryController extends BaseController
 		//return Response::make( $response, $status_code );
  	}
 
+	/////// for Short URL
+			
+	public function get_tiny_url($url) 
+	{  
+	  $ch = curl_init();  
+	  $timeout = 5;  
+	  curl_setopt($ch,CURLOPT_URL,'http://tinyurl.com/api-create.php?url='.$url);  
+	  curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);  
+	  curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,$timeout);  
+	  $data = curl_exec($ch);  
+	  curl_close($ch);
+	  return $data;  
+	}
+		
+	///////	
+	
 	/**
 	 * This function useful to create background process call
 	 */
