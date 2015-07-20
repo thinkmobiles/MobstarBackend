@@ -304,6 +304,7 @@ class CommentController extends BaseController
 			// End
 			$prev_not = Notification::where( 'notification_user_id', '=', $record->entry_user_id, 'and' )
 									->where( 'notification_entry_id', '=', $record->entry_id, 'and' )
+									->where( 'notification_type', '=', 'Entry Comment', 'and' )
 									->where( 'notification_details', '=', 'commented on your entry', 'and' )
 									->orderBy( 'notification_updated_date', 'desc' )
 									->first();
@@ -336,7 +337,13 @@ class CommentController extends BaseController
 
 					$prev_not->save();
 				}
+				if( in_array( $session->token_user_id, $subjects ) )
+				{
+					$prev_not->notification_read = 0;
+					$prev_not->notification_updated_date = date( 'Y-m-d H:i:s' );
 
+					$prev_not->save();
+				}
 			}
 
 			//Get input
