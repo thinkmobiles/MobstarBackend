@@ -1167,7 +1167,8 @@ public function reply()
 					->where( 'join_message_recipients.join_message_recipient_user_id', '=', $session->token_user_id )
 					->where('join_message_recipients.join_message_recipient_read', '=', 0)
 					->groupBy('join_message_recipients.join_message_recipient_thread_id')
-					->count();	
+					->get();	
+					//->count();	
 		/* Commented on 17-June-2015 for notificaion changes */
 		/*$count = DB::table( 'notifications' )
 			->select( 'notifications.*' )
@@ -1177,13 +1178,15 @@ public function reply()
 			->where('notifications.notification_type', '=', 'Message')
 			->count();*/
 		
-		$return[ 'notifications' ]= $count;
+		//$return[ 'notifications' ]= $count;
+		$return[ 'notifications' ]= count($count);
 
 		$status_code = 200;
 
 		$response = Response::make( $return, $status_code );
 
-		$response->header( 'X-Total-Count', $count );
+		//$response->header( 'X-Total-Count', $count );
+		$response->header( 'X-Total-Count', count($count) );
 
 		return $response;
 	}
@@ -1223,7 +1226,8 @@ public function reply()
 					$msg->save();
 				}
 			}
-			$notification = Notification::where('notification_user_id', '=', $session->token_user_id)->where('notification_entry_id','=',$threadId)->update(['notification_read' => 1]);					
+			//$notification = Notification::where('notification_user_id', '=', $session->token_user_id)->where('notification_entry_id','=',$threadId)->update(['notification_read' => 1]);					
+			$notification = Notification::where('notification_user_id', '=', $session->token_user_id)->where('notification_entry_id','=',$threadId)->where('notification_type','=','Message')->update(['notification_read' => 1]);					
 			$response['message'] = "Thread read successfully.";
 			$status_code = 200;			
 		}
