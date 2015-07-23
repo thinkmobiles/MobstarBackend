@@ -1322,13 +1322,14 @@ class EntryController extends BaseController
 								if( isset( $displayMatches[ 0 ] ) )
 								{
 									$displayrotation = substr( $displayMatches[ 0 ], 27 );
+									$tm = $_ENV[ 'PATH' ] . 'public/uploads/output.mp4';
 									switch( $displayrotation )
 									{
 										case '-90':
-											shell_exec( '/usr/bin/ffmpeg -y -i ' . $file_out . ' -vf "rotate=-PI/2" ' . $file_out);
+											shell_exec( '/usr/bin/ffmpeg -y -i ' . $file_out . ' -vf "rotate=-PI/2" ' . $tm);
 											break;
 										case '90':
-											shell_exec( '/usr/bin/ffmpeg -y -i ' . $file_out . ' -vf "rotate=PI/2" ' . $file_out);
+											shell_exec( '/usr/bin/ffmpeg -y -i ' . $file_out . ' -vf "rotate=PI/2" ' . $tm);
 											break;									
 									}
 								}
