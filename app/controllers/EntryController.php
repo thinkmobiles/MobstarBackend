@@ -1328,7 +1328,7 @@ class EntryController extends BaseController
 									if($displayrotation == '-90')
 									{
 										mail('anil@spaceotechnologies.com','i am in_-90'.time(),print_r($displayrotation,true));
-										shell_exec( '/usr/bin/ffmpeg -i ' . $in . ' -vf "rotate=-PI/2" ' . $tm);
+										shell_exec( '/usr/bin/ffmpeg -i ' . $in . ' -vf "rotate=PI/2" ' . $tm);
 										
 									}
 									else
