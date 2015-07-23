@@ -1269,15 +1269,7 @@ class EntryController extends BaseController
 						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
 
 						// Transcode Video
-						if($session->token_user_id == 302)
-						{
-							shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf "rotate=-PI/2" ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
-							//shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf "rotate=PI/2" scale=306:306 -strict -2 ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
-						}
-						else
-						{
-							shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
-						}
+						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
 						//shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vsync 2 -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
 
 						$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', $filename . '-uploaded.' . $extension );
@@ -1299,9 +1291,11 @@ class EntryController extends BaseController
 
 						$contents = file_get_contents( $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
 						preg_match( "#rotate.*?([0-9]{1,3})#im", $contents, $rotationMatches );
+						preg_match( "#displaymatrix.*?([0-9]{1,3})#im", $contents, $displayMatches );
 
 						$transpose = '';
 						$rotation_angel = '';
+						$display_angel = '';
 
 						if( count( $rotationMatches ) > 0 )
 						{
@@ -1321,7 +1315,25 @@ class EntryController extends BaseController
 									break;
 							}
 						}
-
+						if($session->token_user_id == 302)
+						{
+							if( count( $displayMatches ) > 0 )
+							{
+								if( isset( $displayMatches[ 0 ] ) )
+								{
+									$displayrotation = substr( $displayMatches[ 0 ], 27 );
+									switch( $displayrotation )
+									{
+										case '-90':
+											shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -vf "rotate=-PI/2" ' . $file_out);
+											break;
+										case '90':
+											shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -vf "rotate=PI/2" ' . $file_out);
+											break;									
+									}
+								}
+							}
+						}
 						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . $transpose . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
 
 						$handle = fopen( $thumb, "r" );
