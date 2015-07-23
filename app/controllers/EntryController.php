@@ -1319,21 +1319,19 @@ class EntryController extends BaseController
 						{
 							if( count( $displayMatches ) > 0 )
 							{
-								mail('anil@spaceotechnologies.com','main'.time(),print_r($displayMatches,true));
 								if( isset( $displayMatches[ 0 ] ) )
 								{
 									$displayrotation = substr( $displayMatches[ 0 ], 27 );
 									$in = $_ENV[ 'PATH' ] . 'public/uploads/'. $filename . '.' . $extension;
+									$out = $_ENV[ 'PATH' ] . 'public/uploads/anil.mp4;
 									if($displayrotation == '-90')
 									{
-										mail('anil@spaceotechnologies.com','i am in_-90'.time(),print_r($displayrotation,true));
-										shell_exec( '/usr/bin/ffmpeg -y -i ' . $in . ' -vf "rotate=PI/2" ' . $in);
+										shell_exec( '/usr/bin/ffmpeg -i ' . $in . ' -vf "rotate=PI/2" ' . $out);
 										
 									}
 									else
 									{
-										mail('anil@spaceotechnologies.com','i am in_+90'.time(),print_r($displayrotation,true));
-										shell_exec( '/usr/bin/ffmpeg -y -i ' . $in . ' -vf "rotate=PI/2" ' . $in);
+										shell_exec( '/usr/bin/ffmpeg -i ' . $in . ' -vf "rotate=PI/2" ' . $out);
 									}
 								}
 							}
