@@ -1271,8 +1271,8 @@ class EntryController extends BaseController
 						// Transcode Video
 						if($session->token_user_id == 302)
 						{
-							shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf "rotate=PI/2" ' . $file_out);
-							//shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf "rotate=PI/2" scale=306:306 -strict -2 ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
+							//shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf "rotate=PI/2" ' . $file_out);
+							shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf "rotate=PI/2" scale=306:306 -strict -2 ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
 						}
 						else
 						{
