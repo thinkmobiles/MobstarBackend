@@ -1323,7 +1323,7 @@ class EntryController extends BaseController
 								if( isset( $displayMatches[ 0 ] ) )
 								{
 									$displayrotation = substr( $displayMatches[ 0 ], 27 );
-									$tm = $_ENV[ 'PATH' ] . 'public/uploads/output.mp4';
+									$tm = $_ENV[ 'PATH' ] . 'public/uploads/anil_rotation.mp4';
 									$in = $_ENV[ 'PATH' ] . 'public/uploads/'. $filename . '-uploaded.' . $extension;
 									if($displayrotation == '-90')
 									{
