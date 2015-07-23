@@ -1323,7 +1323,7 @@ class EntryController extends BaseController
 								{
 									$displayrotation = substr( $displayMatches[ 0 ], 27 );
 									$in = $_ENV[ 'PATH' ] . 'public/uploads/'. $filename . '.' . $extension;
-									$out = $_ENV[ 'PATH' ] . 'public/uploads/anil.mp4;
+									$out = $_ENV[ 'PATH' ] . 'public/uploads/anil.mp4';
 									if($displayrotation == '-90')
 									{
 										shell_exec( '/usr/bin/ffmpeg -i ' . $in . ' -vf "rotate=PI/2" ' . $out);
