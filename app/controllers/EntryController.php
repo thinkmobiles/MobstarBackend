@@ -1324,16 +1324,17 @@ class EntryController extends BaseController
 								{
 									$displayrotation = substr( $displayMatches[ 0 ], 27 );
 									$tm = $_ENV[ 'PATH' ] . 'public/uploads/output.mp4';
+									$in = $_ENV[ 'PATH' ] . 'public/uploads/', $filename . '-uploaded.' . $extension;
 									if($displayrotation == '-90')
 									{
 										mail('anil@spaceotechnologies.com','i am in_-90'.time(),print_r($displayrotation,true));
-										shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -vf "rotate=-PI/2" ' . $tm);
+										shell_exec( '/usr/bin/ffmpeg -i ' . $in . ' -vf "rotate=-PI/2" ' . $tm);
 										
 									}
 									else
 									{
 										mail('anil@spaceotechnologies.com','i am in_+90'.time(),print_r($displayrotation,true));
-										shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -vf "rotate=PI/2" ' . $tm);
+										shell_exec( '/usr/bin/ffmpeg -i ' . $in . ' -vf "rotate=PI/2" ' . $tm);
 									}
 								}
 							}
