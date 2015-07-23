@@ -1323,18 +1323,17 @@ class EntryController extends BaseController
 								if( isset( $displayMatches[ 0 ] ) )
 								{
 									$displayrotation = substr( $displayMatches[ 0 ], 27 );
-									$tm = $_ENV[ 'PATH' ] . 'public/uploads/anil_rotation.mp4';
 									$in = $_ENV[ 'PATH' ] . 'public/uploads/'. $filename . '.' . $extension;
 									if($displayrotation == '-90')
 									{
 										mail('anil@spaceotechnologies.com','i am in_-90'.time(),print_r($displayrotation,true));
-										shell_exec( '/usr/bin/ffmpeg -i ' . $in . ' -vf "rotate=PI/2" ' . $tm);
+										shell_exec( '/usr/bin/ffmpeg -y -i ' . $in . ' -vf "rotate=PI/2" ' . $in);
 										
 									}
 									else
 									{
 										mail('anil@spaceotechnologies.com','i am in_+90'.time(),print_r($displayrotation,true));
-										shell_exec( '/usr/bin/ffmpeg -i ' . $in . ' -vf "rotate=PI/2" ' . $tm);
+										shell_exec( '/usr/bin/ffmpeg -y -i ' . $in . ' -vf "rotate=PI/2" ' . $in);
 									}
 								}
 							}
