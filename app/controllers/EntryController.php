@@ -1325,10 +1325,10 @@ class EntryController extends BaseController
 									switch( $displayrotation )
 									{
 										case '-90':
-											shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -vf "rotate=-PI/2" ' . $file_out);
+											shell_exec( '/usr/bin/ffmpeg -y -i ' . $file_out . ' -vf "rotate=-PI/2" ' . $file_out);
 											break;
 										case '90':
-											shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -vf "rotate=PI/2" ' . $file_out);
+											shell_exec( '/usr/bin/ffmpeg -y -i ' . $file_out . ' -vf "rotate=PI/2" ' . $file_out);
 											break;									
 									}
 								}
