@@ -1315,7 +1315,7 @@ class EntryController extends BaseController
 									break;
 							}
 						}
-						if($session->token_user_id == 302)
+						/*if($session->token_user_id == 302)
 						{
 							if( count( $displayMatches ) > 0 )
 							{
@@ -1335,7 +1335,7 @@ class EntryController extends BaseController
 									}
 								}
 							}
-						}
+						}*/
 						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . $transpose . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
 
 						$handle = fopen( $thumb, "r" );
