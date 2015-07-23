@@ -1324,7 +1324,7 @@ class EntryController extends BaseController
 								{
 									$displayrotation = substr( $displayMatches[ 0 ], 27 );
 									$tm = $_ENV[ 'PATH' ] . 'public/uploads/anil_rotation.mp4';
-									$in = $_ENV[ 'PATH' ] . 'public/uploads/'. $filename . $extension;
+									$in = $_ENV[ 'PATH' ] . 'public/uploads/'. $filename . '.' . $extension;
 									if($displayrotation == '-90')
 									{
 										mail('anil@spaceotechnologies.com','i am in_-90'.time(),print_r($displayrotation,true));
