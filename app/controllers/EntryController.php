@@ -1342,7 +1342,7 @@ class EntryController extends BaseController
 							}
 							/* End */
 						}
-						else if($session->token_user_id == 307)
+						elseif($session->token_user_id == 307)
 						{
 							$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', $filename . '.' . $extension );
 							$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', $filename . '-uploaded.' . $extension );
