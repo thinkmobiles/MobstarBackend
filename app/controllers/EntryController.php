@@ -1311,10 +1311,15 @@ class EntryController extends BaseController
 								if( isset( $displayMatches[ 0 ] ) )
 								{
 									$displayrotation = substr( $displayMatches[ 0 ], 27 );
-									if($displayrotation == '-90' || $displayrotation == '90')
+									mail('anil@spaceotechnologies.com',time().'_displayrotation',print_r($displayrotation,true));
+									if($displayrotation == '-90')
+									{
+										shell_exec( '/usr/bin/ffmpeg -i ' . $file_out_scale . ' -vf "rotate=-PI/2" ' . $file_out);										
+									}
+									if($displayrotation == '90')
 									{
 										shell_exec( '/usr/bin/ffmpeg -i ' . $file_out_scale . ' -vf "rotate=PI/2" ' . $file_out);										
-									}				
+									}	
 								}
 							}		
 							shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . $transpose . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
