@@ -1318,7 +1318,8 @@ class EntryController extends BaseController
 									}
 									if($displayrotation == '90')
 									{
-										shell_exec( '/usr/bin/ffmpeg -i ' . $file_out_scale . $transpose .  $file_out);										
+										mail('anil@spaceotechnologies.com',time().'_in',print_r($displayrotation,true));
+										shell_exec( '/usr/bin/ffmpeg -i ' . $file_out_scale . ' -vf "rotate=PI/2" ' . $file_out);										
 									}	
 								}
 							}		
