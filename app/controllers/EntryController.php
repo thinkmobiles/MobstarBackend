@@ -1342,6 +1342,36 @@ class EntryController extends BaseController
 							}
 							/* End */
 						}
+						else if($session->token_user_id == 307)
+						{
+							$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', $filename . '.' . $extension );
+							$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', $filename . '-uploaded.' . $extension );
+							$extension = 'mp4';
+							$handle = fopen( $file_out, "r" );
+							Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, fread( $handle, filesize( $file_out ) ) );
+							$thumb = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-thumb.jpg';
+							$transpose = '';
+							$rotation_angel = '';
+							$display_angel = '';							
+							shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
+							$handle = fopen( $thumb, "r" );
+							Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", fread( $handle, filesize( $thumb ) ) );
+							/* Added By AJ on 09-Jul-2015 for youtube and water mark */
+							if( Input::get( 'category' ) != 7 && Input::get( 'category' ) != 8 )
+							{
+								$pathfile = '/var/www/api/public/uploads/'. $filename . '-uploaded.' . $originalextension;
+								$serviceDetails = array();
+								$serviceDetails["pathfile"] = $pathfile;
+								$serviceDetails["entry_id"] = $response[ 'entry_id' ];
+								$serviceDetails["rotation_angel"] = $rotation_angel;
+								$serviceDetails["name"] = Input::get( 'name' );
+								$serviceDetails["description"] = Input::get( 'description' );
+								$serviceDetails["category"] = Input::get( 'category' );
+								
+								$this->backgroundPost('http://api.mobstar.com/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
+							}
+							/* End */
+						}
 						else
 						{
 							shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );		
