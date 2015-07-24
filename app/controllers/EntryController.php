@@ -1306,7 +1306,7 @@ class EntryController extends BaseController
 										break;
 								}
 							}
-							shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . $transpose . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
+							shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . $transpose . ' -vframes 1 -an -ss 00:00:00.10 ' . $thumb );
 							$handle = fopen( $thumb, "r" );
 							Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", fread( $handle, filesize( $thumb ) ) );
 							/* Added By AJ on 09-Jul-2015 for youtube and water mark */
