@@ -1313,11 +1313,11 @@ class EntryController extends BaseController
 									$displayrotation = substr( $displayMatches[ 0 ], 27 );
 									if($displayrotation == '-90')
 									{
-										shell_exec( '/usr/bin/ffmpeg -i ' . $file_out_scale . $transpose . $file_out);										
+										shell_exec( '/usr/bin/ffmpeg -i ' . $file_out_scale . ' -vf "transpose=1" ' . $file_out);										
 									}
 									if($displayrotation == '90')
 									{
-										shell_exec( '/usr/bin/ffmpeg -i ' . $file_out_scale . $transpose . $file_out);										
+										shell_exec( '/usr/bin/ffmpeg -i ' . $file_out_scale . ' -vf "transpose=1" ' . $file_out);										
 									}	
 								}
 							}		
