@@ -1314,12 +1314,13 @@ class EntryController extends BaseController
 									mail('anil@spaceotechnologies.com',time().'_displayrotation',print_r($displayrotation,true));
 									if($displayrotation == '-90')
 									{
-										shell_exec( '/usr/bin/ffmpeg -i ' . $file_out_scale . ' -vf "rotate=-PI/2" ' . $file_out);										
+										mail('anil@spaceotechnologies.com',time().'_in1',print_r($displayrotation,true));
+										shell_exec( '/usr/bin/ffmpeg -i ' . $file_out_scale . ' -vf "rotate=PI/2" ' . $file_out);										
 									}
 									if($displayrotation == '90')
 									{
-										mail('anil@spaceotechnologies.com',time().'_in',print_r($displayrotation,true));
-										shell_exec( '/usr/bin/ffmpeg -i ' . $file_out_scale . ' -vf "rotate=PI/2" ' . $file_out);										
+										mail('anil@spaceotechnologies.com',time().'_in2',print_r($displayrotation,true));
+										shell_exec( '/usr/bin/ffmpeg -i ' . $file_out_scale . ' -vf "rotate=-PI/2" ' . $file_out);										
 									}	
 								}
 							}		
