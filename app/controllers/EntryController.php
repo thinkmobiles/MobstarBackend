@@ -1345,7 +1345,7 @@ class EntryController extends BaseController
 						elseif($session->token_user_id == 307)
 						{
 							$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', $filename . '.' . $extension );
-							$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', $filename . '-uploaded.' . $extension );
+							//$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', $filename . '-uploaded.' . $extension );
 							$extension = 'mp4';
 							$handle = fopen( $file_out, "r" );
 							Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, fread( $handle, filesize( $file_out ) ) );
