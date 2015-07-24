@@ -1310,13 +1310,10 @@ class EntryController extends BaseController
 							{
 								if( isset( $displayMatches[ 0 ] ) )
 								{
-									$displayrotation = substr( $displayMatches[ 0 ], 28 );
-									$in = $file_out_scale;
-									$out = $_ENV[ 'PATH' ] . 'public/uploads/anil.mp4';
-									if($displayrotation == '90')
+									$displayrotation = substr( $displayMatches[ 0 ], 27 );
+									if($displayrotation == '-90' || $displayrotation == '90')
 									{
-										shell_exec( '/usr/bin/ffmpeg -i ' . $file_out_scale . ' -vf "rotate=PI/2" ' . $file_out);
-										
+										shell_exec( '/usr/bin/ffmpeg -i ' . $file_out_scale . ' -vf "rotate=PI/2" ' . $file_out);										
 									}				
 								}
 							}		
