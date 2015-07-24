@@ -1265,100 +1265,135 @@ class EntryController extends BaseController
 					{
 
 						$file_in = $file->getRealPath();
-
 						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
+						$file_out_scale = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-scale.mp4';
 
 						// Transcode Video
-						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
-						//shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vsync 2 -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
-
-						$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', $filename . '-uploaded.' . $extension );
-
-						$extension = 'mp4';
-
-						$handle = fopen( $file_out, "r" );
-
-						Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, fread( $handle, filesize( $file_out ) ) );
-
-						$thumb = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-thumb.jpg';
-
-						exec( '/usr/bin/ffprobe 2>&1 ' . $file_out . ' | grep "rotate          :"', $rotation );
-
-						if( isset( $rotation[ 0 ] ) )
+						if($session->token_user_id == 302)
 						{
-							$rotation = substr( $rotation[ 0 ], 17 );
-						}
-
-						$contents = file_get_contents( $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
-						preg_match( "#rotate.*?([0-9]{1,3})#im", $contents, $rotationMatches );
-						preg_match( "#displaymatrix.*?([0-9]{1,3})#im", $contents, $displayMatches );
-
-						$transpose = '';
-						$rotation_angel = '';
-						$display_angel = '';
-
-						if( count( $rotationMatches ) > 0 )
-						{
-							switch( $rotationMatches[ 1 ] )
+							shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out_scale . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
+							$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', $filename . '-uploaded.' . $extension );
+							$extension = 'mp4';
+							$handle = fopen( $file_out_scale, "r" );
+							Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, fread( $handle, filesize( $file_out_scale ) ) );
+							$thumb = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-thumb.jpg';
+							exec( '/usr/bin/ffprobe 2>&1 ' . $file_out_scale . ' | grep "rotate          :"', $rotation );
+							if( isset( $rotation[ 0 ] ) )
 							{
-								case '90':
-									$transpose = ' -vf transpose=1';
-									$rotation_angel = '90';
-									break;
-								case '180':
-									$transpose = ' -vf vflip,hflip';
-									$rotation_angel = '180';
-									break;
-								case '270':
-									$transpose = ' -vf transpose=2';
-									$rotation_angel = '270';
-									break;
+								$rotation = substr( $rotation[ 0 ], 17 );
 							}
-						}
-						/*if($session->token_user_id == 302)
-						{
+							$contents = file_get_contents( $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
+							preg_match( "#rotate.*?([0-9]{1,3})#im", $contents, $rotationMatches );
+							preg_match( "#displaymatrix.*?([0-9]{1,3})#im", $contents, $displayMatches );
+							$transpose = '';
+							$rotation_angel = '';
+							$display_angel = '';
+							if( count( $rotationMatches ) > 0 )
+							{
+								switch( $rotationMatches[ 1 ] )
+								{
+									case '90':
+										$transpose = ' -vf transpose=1';
+										$rotation_angel = '90';
+										break;
+									case '180':
+										$transpose = ' -vf vflip,hflip';
+										$rotation_angel = '180';
+										break;
+									case '270':
+										$transpose = ' -vf transpose=2';
+										$rotation_angel = '270';
+										break;
+								}
+							}
 							if( count( $displayMatches ) > 0 )
 							{
 								if( isset( $displayMatches[ 0 ] ) )
 								{
-									$displayrotation = substr( $displayMatches[ 0 ], 27 );
-									$in = $_ENV[ 'PATH' ] . 'public/uploads/'. $filename . '.' . $extension;
+									$displayrotation = substr( $displayMatches[ 0 ], 28 );
+									$in = $file_out_scale;
 									$out = $_ENV[ 'PATH' ] . 'public/uploads/anil.mp4';
-									if($displayrotation == '-90')
+									if($displayrotation == '90')
 									{
-										shell_exec( '/usr/bin/ffmpeg -i ' . $in . ' -vf "rotate=PI/2" ' . $out);
+										shell_exec( '/usr/bin/ffmpeg -i ' . $file_out_scale . ' -vf "rotate=PI/2" ' . $file_out);
 										
-									}
-									else
-									{
-										shell_exec( '/usr/bin/ffmpeg -i ' . $in . ' -vf "rotate=PI/2" ' . $out);
-									}
+									}				
+								}
+							}		
+							shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . $transpose . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
+							$handle = fopen( $thumb, "r" );
+							Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", fread( $handle, filesize( $thumb ) ) );
+							/* Added By AJ on 09-Jul-2015 for youtube and water mark */
+							if( Input::get( 'category' ) != 7 && Input::get( 'category' ) != 8 )
+							{
+								$pathfile = '/var/www/api/public/uploads/'. $filename . '-uploaded.' . $originalextension;
+								$serviceDetails = array();
+								$serviceDetails["pathfile"] = $pathfile;
+								$serviceDetails["entry_id"] = $response[ 'entry_id' ];
+								$serviceDetails["rotation_angel"] = $rotation_angel;
+								$serviceDetails["name"] = Input::get( 'name' );
+								$serviceDetails["description"] = Input::get( 'description' );
+								$serviceDetails["category"] = Input::get( 'category' );			
+								$this->backgroundPost('http://api.mobstar.com/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
+							}
+							/* End */
+						}
+						else
+						{
+							shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );		
+							$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', $filename . '-uploaded.' . $extension );
+							$extension = 'mp4';
+							$handle = fopen( $file_out, "r" );
+							Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, fread( $handle, filesize( $file_out ) ) );
+							$thumb = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-thumb.jpg';
+							exec( '/usr/bin/ffprobe 2>&1 ' . $file_out . ' | grep "rotate          :"', $rotation );
+							if( isset( $rotation[ 0 ] ) )
+							{
+								$rotation = substr( $rotation[ 0 ], 17 );
+							}
+							$contents = file_get_contents( $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
+							preg_match( "#rotate.*?([0-9]{1,3})#im", $contents, $rotationMatches );
+							preg_match( "#displaymatrix.*?([0-9]{1,3})#im", $contents, $displayMatches );
+							$transpose = '';
+							$rotation_angel = '';
+							$display_angel = '';
+							if( count( $rotationMatches ) > 0 )
+							{
+								switch( $rotationMatches[ 1 ] )
+								{
+									case '90':
+										$transpose = ' -vf transpose=1';
+										$rotation_angel = '90';
+										break;
+									case '180':
+										$transpose = ' -vf vflip,hflip';
+										$rotation_angel = '180';
+										break;
+									case '270':
+										$transpose = ' -vf transpose=2';
+										$rotation_angel = '270';
+										break;
 								}
 							}
-						}*/
-						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . $transpose . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
-
-						$handle = fopen( $thumb, "r" );
-
-						Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", fread( $handle, filesize( $thumb ) ) );
-						
-						/* Added By AJ on 09-Jul-2015 for youtube and water mark */
-						if( Input::get( 'category' ) != 7 && Input::get( 'category' ) != 8 )
-						{
-							$pathfile = '/var/www/api/public/uploads/'. $filename . '-uploaded.' . $originalextension;
-							$serviceDetails = array();
-							$serviceDetails["pathfile"] = $pathfile;
-							$serviceDetails["entry_id"] = $response[ 'entry_id' ];
-							$serviceDetails["rotation_angel"] = $rotation_angel;
-							$serviceDetails["name"] = Input::get( 'name' );
-							$serviceDetails["description"] = Input::get( 'description' );
-							$serviceDetails["category"] = Input::get( 'category' );
-							
-							$this->backgroundPost('http://api.mobstar.com/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
+							shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . $transpose . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
+							$handle = fopen( $thumb, "r" );
+							Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", fread( $handle, filesize( $thumb ) ) );
+							/* Added By AJ on 09-Jul-2015 for youtube and water mark */
+							if( Input::get( 'category' ) != 7 && Input::get( 'category' ) != 8 )
+							{
+								$pathfile = '/var/www/api/public/uploads/'. $filename . '-uploaded.' . $originalextension;
+								$serviceDetails = array();
+								$serviceDetails["pathfile"] = $pathfile;
+								$serviceDetails["entry_id"] = $response[ 'entry_id' ];
+								$serviceDetails["rotation_angel"] = $rotation_angel;
+								$serviceDetails["name"] = Input::get( 'name' );
+								$serviceDetails["description"] = Input::get( 'description' );
+								$serviceDetails["category"] = Input::get( 'category' );
+								
+								$this->backgroundPost('http://api.mobstar.com/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
+							}
+							/* End */
 						}
-						/* End */
-//						unlink($file_out);
-//						unlink($thumb);
 					}
 					else
 					{
