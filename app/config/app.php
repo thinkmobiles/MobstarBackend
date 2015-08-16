@@ -187,4 +187,6 @@ return array(
 		'Creds'               => 'Aws\Common\Credentials\Credentials'
 	),
 
+	'bucket' => isset( $_ENV[ 'bucket' ] ) ? $_ENV[ 'bucket' ] : '',
+
 );

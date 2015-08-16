@@ -368,10 +368,10 @@ class TalentController extends BaseController
 								  'userName'     => @$displayName,
 								  'displayName'  => @$displayName,
 								  'profileImage' => ( isset( $entry->user_profile_image ) )
-									  ? $client->getObjectUrl( 'mobstar-1', $entry->user_profile_image, '+60 minutes' )
+									  ? $client->getObjectUrl( Config::get('app.bucket'), $entry->user_profile_image, '+60 minutes' )
 									  : '',
 								  'profileCover' => ( isset( $entry->user_cover_image ) )
-								  ? $client->getObjectUrl( 'mobstar-1', $entry->user_cover_image, '+60 minutes' ) : '',
+								  ? $client->getObjectUrl( Config::get('app.bucket'), $entry->user_cover_image, '+60 minutes' ) : '',
 								  'rank'     => $entry->user_rank
 				];
 			

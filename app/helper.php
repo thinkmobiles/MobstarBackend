@@ -6,7 +6,7 @@ use Aws\Sns\SnsClient;
 function getUserProfile( $user, $session, $normal = false )
 {
 	$client = getS3Client();
-	
+
 	$profileImage = '';
 	$profileCover = '';
 	if($normal)
@@ -16,10 +16,10 @@ function getUserProfile( $user, $session, $normal = false )
 	}
 	else
 	{
-		$profileImage = ( isset( $user->user_profile_image ) ) ? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+720 minutes' ) : '';
-		$profileCover = ( isset( $user->user_cover_image ) )   ? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+720 minutes' ) : '';
+		$profileImage = ( isset( $user->user_profile_image ) ) ? $client->getObjectUrl( Config::get('app.bucket'), $user->user_profile_image, '+720 minutes' ) : '';
+		$profileCover = ( isset( $user->user_cover_image ) )   ? $client->getObjectUrl( Config::get('app.bucket'), $user->user_cover_image, '+720 minutes' ) : '';
 	}
-	
+
 	$return[ 'token' ] = $session->token_value;
 	$return[ 'userId' ] = $user->user_id;
 
@@ -115,10 +115,10 @@ function getUserProfile( $user, $session, $normal = false )
 	$return[ 'userBio' ] = (!empty($user->user_bio)) ? $user->user_bio : '';
 
 	/*$return[ 'profileImage' ] = ( isset( $user->user_profile_image ) )
-		? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+60 minutes' ) : '';
+		? $client->getObjectUrl( Config::get('app.bucket'), $user->user_profile_image, '+60 minutes' ) : '';
 
 	$return[ 'profileCover' ] = ( isset( $user->user_cover_image ) )
-		? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+60 minutes' ) : '';
+		? $client->getObjectUrl( Config::get('app.bucket'), $user->user_cover_image, '+60 minutes' ) : '';
 	*/
 	$return[ 'profileImage' ] = $profileImage;
 	$return[ 'profileCover' ] = $profileCover;
@@ -138,8 +138,8 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 	}
 	else
 	{
-		$profileImage = ( isset( $user->user_profile_image ) ) ? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+720 minutes' ) : '';
-		$profileCover = ( isset( $user->user_cover_image ) )   ? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+720 minutes' ) : '';
+		$profileImage = ( isset( $user->user_profile_image ) ) ? $client->getObjectUrl( Config::get('app.bucket'), $user->user_profile_image, '+720 minutes' ) : '';
+		$profileCover = ( isset( $user->user_cover_image ) )   ? $client->getObjectUrl( Config::get('app.bucket'), $user->user_cover_image, '+720 minutes' ) : '';
 	}
 	$return = [ 'id'           => $user->user_id,
 				'email'        => $user->user_email,
@@ -147,9 +147,9 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 				'bio'      	   => (!empty($user->user_bio)) ? $user->user_bio :'',
 				'usergroup'      	   => (!empty($user->user_user_group)) ? $user->user_user_group :'',
 				/*'profileImage' => ( isset( $user->user_profile_image ) )
-					? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+60 minutes' ) : '',
+					? $client->getObjectUrl( Config::get('app.bucket'), $user->user_profile_image, '+60 minutes' ) : '',
 				'profileCover' => ( isset( $user->user_cover_image ) )
-					? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+60 minutes' ) : '',*/
+					? $client->getObjectUrl( Config::get('app.bucket'), $user->user_cover_image, '+60 minutes' ) : '',*/
 				'profileImage' => $profileImage	,
 				'profileCover' => $profileCover,
 	];
@@ -188,7 +188,7 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 		$iAmStarFlag = Star::where( 'user_star_user_id', '=', $user->user_id )->where( 'user_star_star_id', '=', $session->token_user_id )->where( 'user_star_deleted', '!=', '1' )->count();
 		if($iAmStarFlag > 0)
 		{
-			$return[ 'iAmStar' ] = 1;	
+			$return[ 'iAmStar' ] = 1;
 		}
 		else
 		{
@@ -205,14 +205,14 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 		//mail('anil@spaceotechnologies.com','Star',print_r($user->Stars, true));
 		foreach( $user->Stars as $star )
 		{
-			
+
 			if( !in_array( $star->Stars->user_id, $lookup_array ) )
 			{
 				if( $star->user_star_deleted == 0 )
 				{
 					$starNames = [];
 					$starNames = userDetails($star->Stars);
-					
+
 					/*
 					// Stats
 					$entries = Entry::where('entry_user_id', '=', $star->Stars->user_id)->get();
@@ -223,8 +223,8 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 						{
 							if( $entry->entry_rank < $stats && $entry->entry_rank != 0 )
 							{
-								$stats = $entry->entry_rank;					
-							}						
+								$stats = $entry->entry_rank;
+							}
 						}
 					}
 					if ($stats == 100000)
@@ -238,7 +238,7 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 					->where(function($query)
 						{
 							$query->where('entries.entry_rank', '!=', 0);
-						})			
+						})
 					->orderBy( 'entry_rank', 'asc' )
 					->get();
 					$users = [ ];
@@ -267,29 +267,29 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 						if($tmp_star['talents'][$i]['talent']['id'] == $star->Stars->user_id)
 						{
 							$myrank = $tmp_star['talents'][$i]['talent']['rank'];
-						}					
+						}
 					}
 					// End Rank
 					*/
-						
+
 
 						$lookup_array[ ]= $star->Stars->user_id;
-						
+
 						$stars[ ] = [ 'starId'       => $star->Stars->user_id,
 									  //'starName'     => $starNames['displayName'],
 									  'starName'     => ( isset( $starNames['displayName'] ) ) ? $starNames['displayName'] : '',
 									  'starredDate'  => $star->user_star_created_date,
 									  'profileImage' => ( isset( $star->Stars->user_profile_image ) )
-										  ? $client->getObjectUrl( 'mobstar-1', $star->Stars->user_profile_image, '+720 minutes' )
+										  ? $client->getObjectUrl( Config::get('app.bucket'), $star->Stars->user_profile_image, '+720 minutes' )
 										  : '',
 									  'profileCover' => ( isset( $star->Stars->user_cover_image ) )
-										  ? $client->getObjectUrl( 'mobstar-1', $star->Stars->user_cover_image, '+720 minutes' ) : '',
+										  ? $client->getObjectUrl( Config::get('app.bucket'), $star->Stars->user_cover_image, '+720 minutes' ) : '',
 									  //'rank'     => $myrank,
 									  'rank'     => DB::table('users')->where( 'user_id', '=', $star->Stars->user_id )->pluck('user_rank'),
-									  //'stats'     => $stats,								  
-									  'stat'     => DB::table('users')->where( 'user_id', '=', $star->Stars->user_id )->pluck('user_entry_rank'),								  
+									  //'stats'     => $stats,
+									  'stat'     => DB::table('users')->where( 'user_id', '=', $star->Stars->user_id )->pluck('user_entry_rank'),
 						];
-					
+
 				}
 			}
 		}
@@ -308,10 +308,10 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 								  'starName'     => ( isset( $starNames['displayName'] ) ) ? $starNames['displayName'] : '',
 								  'starredDate'  => $starred->user_star_created_date,
 								  'profileImage' => ( isset( $starred->User->user_profile_image ) )
-									  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+720 minutes' )
+									  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_profile_image, '+720 minutes' )
 									  : '',
 								  'profileCover' => ( isset( $starred->User->user_cover_image ) )
-								  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_cover_image, '+720 minutes' ) : '',	  
+								  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_cover_image, '+720 minutes' ) : '',
 				];
 			}
 		}
@@ -323,7 +323,7 @@ function oneUser( $user, $session, $includeStars = false, $normal = false )
 	$return[ 'starredBy' ] = $starredBy;
 	$excludeCategory = [7,8];
 	$entries = Entry::with('vote')->where('entry_user_id', '=', $user->user_id)->whereNotIn( 'entry_category_id', $excludeCategory )->where('entry_deleted', '=', '0')->get();
-	
+
 	$rank = 0;
 	//$rank = 100000;
 	$votes = 0;
@@ -406,13 +406,13 @@ function oneEntry( $entry, $session, $includeUser = false )
 	$current[ 'entryFiles' ] = array();
 	foreach( $entry->file as $file )
 	{
-		$signedUrl = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
+		$signedUrl = $client->getObjectUrl( Config::get('app.bucket'), $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
 		$current[ 'entryFiles' ][ ] = [
 			'fileType' => $file->entry_file_type,
 			'filePath' => $signedUrl ];
 
 		$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-			$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
+			$client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
 			: "";
 	}
 
@@ -522,9 +522,9 @@ function particUser( $user, $session, $includeStars = false )
 
 	$return = [ 'userId'           => $user->user_id,
 				'profileImage' => ( isset( $user->user_profile_image ) )
-					? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+720 minutes' ) : '',
+					? $client->getObjectUrl( Config::get('app.bucket'), $user->user_profile_image, '+720 minutes' ) : '',
 				'profileCover' => ( isset( $user->user_cover_image ) )
-								  ? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+720 minutes' ) : '',	  	
+								  ? $client->getObjectUrl( Config::get('app.bucket'), $user->user_cover_image, '+720 minutes' ) : '',
 	];
 
 	if( ( $user->user_display_name == '' ) || ( is_null( $user->user_name ) ) || ( is_null( $user->user_email ) ) )

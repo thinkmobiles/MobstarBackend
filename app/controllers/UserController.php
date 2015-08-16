@@ -1296,7 +1296,7 @@ class UserController extends BaseController
 //
 //		$client = S3Client::factory($config);
 //
-//		$signedUrl = $client->getObjectUrl('mobstar-1', 'hi.txt', '+10 minutes');
+//		$signedUrl = $client->getObjectUrl(Config::get('app.bucket'), 'hi.txt', '+10 minutes');
 //		return $signedUrl;
 
 		$users = User::all();
@@ -1467,7 +1467,7 @@ class UserController extends BaseController
 		{
 			$data = [ 'id'           => $user->user_id,
 			'profileImage' => ( isset( $user->user_profile_image ) )
-						? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+60 minutes' ) : ''
+						? $client->getObjectUrl( Config::get('app.bucket'), $user->user_profile_image, '+60 minutes' ) : ''
 			];
 			if( ( $user->user_display_name == '' ) )
 			{
@@ -1835,10 +1835,10 @@ class UserController extends BaseController
 								  'starName'     => @$displayName,
 								  'starredDate'  => $starred->user_star_created_date,
 								  'profileImage' => ( isset( $starred->user_profile_image ) )
-									  ? $client->getObjectUrl( 'mobstar-1', $starred->user_profile_image, '+60 minutes' )
+									  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->user_profile_image, '+60 minutes' )
 									  : '',
 								  'profileCover' => ( isset( $starred->user_cover_image ) )
-								  ? $client->getObjectUrl( 'mobstar-1', $starred->user_cover_image, '+60 minutes' ) : '',
+								  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->user_cover_image, '+60 minutes' ) : '',
 								  'isMyStar'  => Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $starred->user_id )->where( 'user_star_deleted', '!=', '1' )->count(),		
 				];
 			}
@@ -2466,10 +2466,10 @@ class UserController extends BaseController
 								  'starName'     => @$displayName,
 								  'starredDate'  => $starred->user_star_created_date,
 								  'profileImage' => ( isset( $starred->user_profile_image ) )
-									  ? $client->getObjectUrl( 'mobstar-1', $starred->user_profile_image, '+60 minutes' )
+									  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->user_profile_image, '+60 minutes' )
 									  : '',
 								  'profileCover' => ( isset( $starred->user_cover_image ) )
-								  ? $client->getObjectUrl( 'mobstar-1', $starred->user_cover_image, '+60 minutes' ) : '',
+								  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->user_cover_image, '+60 minutes' ) : '',
 								  'rank'     => DB::table('users')->where( 'user_id', '=', $starred->user_id )->pluck('user_rank'),
 								  'stat'     => DB::table('users')->where( 'user_id', '=', $starred->user_id )->pluck('user_entry_rank'),
 				];

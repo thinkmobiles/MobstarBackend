@@ -174,7 +174,7 @@ class CategoryController extends BaseController {
 					$current['categoryDescription'] = $category->category_description;
 				
 				if(in_array("categoryIcon",$fields) && !empty( $category->category_icon ))
-					$current['categoryIcon'] = $client->getObjectUrl( 'mobstar-1', $category->category_icon, '+60 minutes' );	
+					$current['categoryIcon'] = $client->getObjectUrl( Config::get('app.bucket'), $category->category_icon, '+60 minutes' );	
 				
 				/*
 				if(in_array("mentors",$fields)){
@@ -206,7 +206,7 @@ class CategoryController extends BaseController {
 				$current['categoryName'] = $category->category_name;
 				$current['categoryActive'] = ($category->category_active) ? true : false;
 				$current['categoryDescription'] = $category->category_description;
-				$current['categoryDescription'] = (!empty($category->category_icon)) ? $client->getObjectUrl( 'mobstar-1', $category->category_icon, '+60 minutes' ) : '';
+				$current['categoryDescription'] = (!empty($category->category_icon)) ? $client->getObjectUrl( Config::get('app.bucket'), $category->category_icon, '+60 minutes' ) : '';
 				/*
 				$mentors = $category->mentors()->getResults();
 				$current['mentors'] = array();

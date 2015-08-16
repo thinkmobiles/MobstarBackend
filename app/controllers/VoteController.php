@@ -869,10 +869,10 @@ class VoteController extends BaseController
 					 }
 
 					 $return[$i]['profileImage'] = ( isset( $user->user_profile_image ) )
-							? $client->getObjectUrl( 'mobstar-1', $user->user_profile_image, '+60 minutes' )
+							? $client->getObjectUrl( Config::get('app.bucket'), $user->user_profile_image, '+60 minutes' )
 							: '';
 					 $return[$i]['profileCover'] = ( isset( $user->user_cover_image ) )
-							? $client->getObjectUrl( 'mobstar-1', $user->user_cover_image, '+60 minutes' )
+							? $client->getObjectUrl( Config::get('app.bucket'), $user->user_cover_image, '+60 minutes' )
 							: '';
 					$return[ $i ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $user->user_id )->where( 'user_star_deleted', '=', '0')->count();
 				  $i++;

@@ -168,7 +168,7 @@ class EntryController extends BaseController
 
 		}
 
-		//Get limit to calculate pagination 
+		//Get limit to calculate pagination
 		$limit = ( Input::get( 'limit', '20' ) );
 
 		//If not numeric set it to the default limit
@@ -247,7 +247,7 @@ class EntryController extends BaseController
 		$excludeCategory = array();
 		if($category != 8 && $category != 7)
 		{
-			$excludeCategory = [7,8];			
+			$excludeCategory = [7,8];
 			$entry_category = DB::table('entries')->whereIn( 'entry_category_id', $excludeCategory )->get();
 			foreach( $entry_category as $c )
 			{
@@ -261,7 +261,7 @@ class EntryController extends BaseController
 			foreach( $entry_category as $c )
 			{
 				$exclude[ ] = $c->entry_id;
-			}	
+			}
 		}
 		if($category == 7)
 		{
@@ -270,7 +270,7 @@ class EntryController extends BaseController
 			foreach( $entry_category as $c )
 			{
 				$exclude[ ] = $c->entry_id;
-			}	
+			}
 		}
 		/* End */
 		$entries = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false, true );
@@ -288,7 +288,7 @@ class EntryController extends BaseController
 				$iAmStarFlag = Star::where( 'user_star_user_id', '=', $user->user_id )->where( 'user_star_star_id', '=', $session->token_user_id )->where( 'user_star_deleted', '=', '0')->count();
 				if($iAmStarFlag > 0)
 				{
-					$current[ 'user' ][ 'iAmStar' ] = 1;	
+					$current[ 'user' ][ 'iAmStar' ] = 1;
 				}
 				else
 				{
@@ -315,10 +315,10 @@ class EntryController extends BaseController
 										  'starName'     => @$starNames['displayName'],
 										  'starredDate'  => $starred->user_star_created_date,
 										  'profileImage' => ( isset( $starred->User->user_profile_image ) )
-											  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+720 minutes' )
+											  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_profile_image, '+720 minutes' )
 											  : '',
 										  'profileCover' => ( isset( $starred->User->user_cover_image ) )
-										  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_cover_image, '+720 minutes' ) : '',	  
+										  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_cover_image, '+720 minutes' ) : '',
 						];
 					}
 				}
@@ -435,19 +435,19 @@ class EntryController extends BaseController
 					foreach( $entry->file as $file )
 					{
 
-						$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
+						$url = $client->getObjectUrl( Config::get('app.bucket'), $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
 						$current[ 'entryFiles' ][ ] = [
 							'fileType' => $file->entry_file_type,
 							'filePath' => $url ];
 
 						$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-							$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
+							$client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
 							: "";
 					}
 					if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
 						continue;
 					if( ( count( $current[ 'entryFiles' ] ) < 1 ) &&  $entry->entry_type === 'video' )
-						continue;	
+						continue;
 				}
 
 				if( in_array( "upVotes", $fields ) )
@@ -479,7 +479,7 @@ class EntryController extends BaseController
 					$current[ 'deleted' ] = false;
 				}
 
-				$return[ 'entries' ][ ][ 'entry' ] = $current;				
+				$return[ 'entries' ][ ][ 'entry' ] = $current;
 			}
 
 			else
@@ -523,14 +523,14 @@ class EntryController extends BaseController
 				foreach( $entry->file as $file )
 				{
 
-					$signedUrl = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
+					$signedUrl = $client->getObjectUrl( Config::get('app.bucket'), $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
 
 					$current[ 'entryFiles' ][ ] = [
 						'fileType' => $file->entry_file_type,
 						'filePath' => $signedUrl ];
 
 					$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-						$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
+						$client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
 						: "";
 				}
 				if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
@@ -571,7 +571,7 @@ class EntryController extends BaseController
 				}
 
 				$return[ 'entries' ][ ][ 'entry' ] = $current;
-			}			
+			}
 		}
 
 		/* Added By AJ for getting followers */
@@ -590,10 +590,10 @@ class EntryController extends BaseController
 									  'starName'     => @$starNames['displayName'],
 									  'starredDate'  => $starred->user_star_created_date,
 									  'profileImage' => ( isset( $starred->User->user_profile_image ) )
-										  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+720 minutes' )
+										  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_profile_image, '+720 minutes' )
 										  : '',
 									  'profileCover' => ( isset( $starred->User->user_cover_image ) )
-									  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_cover_image, '+720 minutes' ) : '',	  
+									  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_cover_image, '+720 minutes' ) : '',
 					];
 				}
 			}
@@ -727,7 +727,7 @@ class EntryController extends BaseController
 
 		}
 
-		//Get limit to calculate pagination 
+		//Get limit to calculate pagination
 		$limit = ( Input::get( 'limit', '50' ) );
 
 		//If not numeric set it to the default limit
@@ -835,7 +835,7 @@ class EntryController extends BaseController
 					$iAmStarFlag = Star::where( 'user_star_user_id', '=', $entry->entry_user_id )->where( 'user_star_star_id', '=', $session->token_user_id )->where( 'user_star_deleted', '=', '0')->count();
 					if($iAmStarFlag > 0)
 					{
-						$current[ 'user' ][ 'iAmStar' ] = 1;	
+						$current[ 'user' ][ 'iAmStar' ] = 1;
 					}
 					else
 					{
@@ -884,13 +884,13 @@ class EntryController extends BaseController
 					continue;
 					foreach( $entry->file as $file )
 					{
-						$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
+						$url = $client->getObjectUrl( Config::get('app.bucket'), $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
 						$current[ 'entryFiles' ][ ] = [
 							'fileType' => $file->entry_file_type,
 							'filePath' => $url ];
 
 						$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-							$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
+							$client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
 							: "";
 					}
 					if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
@@ -973,13 +973,13 @@ class EntryController extends BaseController
 					continue;
 				foreach( $entry->file as $file )
 				{
-					$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
+					$url = $client->getObjectUrl( Config::get('app.bucket'), $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
 					$current[ 'entryFiles' ][ ] = [
 						'fileType' => $file->entry_file_type,
 						'filePath' => $url ];
 
 					$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-						$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
+						$client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
 						: "";
 				}
 				if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
@@ -1165,7 +1165,7 @@ class EntryController extends BaseController
 					$response[ 'error' ] = "No category selected";
 					$status_code = 400;
 				}
-				
+
 				/* Commented for one Demo as on request 07 March 2015 // Removed Comment on 13 March 2015 as on request */
 				if( Input::get( 'category' ) == 7 || Input::get( 'category' ) == 8 )
 				{
@@ -1176,7 +1176,7 @@ class EntryController extends BaseController
 					if($entry_by_default_enable && $entry_by_default_enable === 'TRUE')
 					$entry_deleted = 0;
 					else
-					$entry_deleted = 1;	
+					$entry_deleted = 1;
 				}
 				if( Input::get( 'category' ) == 3 )
 				{
@@ -1195,7 +1195,7 @@ class EntryController extends BaseController
 						'entry_subcategory'  => Input::get( 'subCategory' ),
 						'entry_age'          => Input::get( 'age' ),
 						'entry_height'       => Input::get( 'height' ),
-					];	
+					];
 				}
 				else
 				{
@@ -1271,7 +1271,7 @@ class EntryController extends BaseController
 						// Transcode Video
 						if($session->token_user_id == 307 || $session->token_user_id == 302)
 						{
-							shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );		
+							shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
 							$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', $filename . '-uploaded.' . $extension );
 							$extension = 'mp4';
 							$handle = fopen( $file_out, "r" );
@@ -1320,14 +1320,14 @@ class EntryController extends BaseController
 								$serviceDetails["name"] = Input::get( 'name' );
 								$serviceDetails["description"] = Input::get( 'description' );
 								$serviceDetails["category"] = Input::get( 'category' );
-								
+
 								$this->backgroundPost('http://api.mobstar.com/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
 							}
 							/* End */
 						}
 						else
 						{
-							shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );		
+							shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
 							$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', $filename . '-uploaded.' . $extension );
 							$extension = 'mp4';
 							$handle = fopen( $file_out, "r" );
@@ -1376,7 +1376,7 @@ class EntryController extends BaseController
 								$serviceDetails["name"] = Input::get( 'name' );
 								$serviceDetails["description"] = Input::get( 'description' );
 								$serviceDetails["category"] = Input::get( 'category' );
-								
+
 								$this->backgroundPost('http://api.mobstar.com/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
 							}
 							/* End */
@@ -2263,7 +2263,7 @@ class EntryController extends BaseController
 		$category = 0;
 		$tag = 0;
 		$excludeCategory = array();
-		$excludeCategory = [7,8];			
+		$excludeCategory = [7,8];
 		$entry_category = DB::table('entries')->whereIn( 'entry_category_id', $excludeCategory )->get();
 		foreach( $entry_category as $c )
 		{
@@ -2271,7 +2271,7 @@ class EntryController extends BaseController
 		}
 		//$entries = $this->entry->all( $user, $category, 0, 0, 'entry_rank', 'asc', 10000, 0, false, true )->toArray();
 		$entries = $this->entry->all( $user, $category, 0, $exclude, 'entry_rank', 'asc', 10000, 0, false, true )->toArray();
-		
+
 		$sortArray = array();
 		$i = 0;
 
@@ -2403,13 +2403,13 @@ class EntryController extends BaseController
 		$current[ 'entryFiles' ] = array();
 		foreach( $entry->file as $file )
 		{
-			$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
+			$url = $client->getObjectUrl( Config::get('app.bucket'), $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
 			$current[ 'entryFiles' ][ ] = [
 				'fileType' => $file->entry_file_type,
 				'filePath' => $url ];
 
 			$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-				$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
+				$client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
 				: "";
 		}
 
@@ -2573,26 +2573,26 @@ class EntryController extends BaseController
 		$EntryFile = EntryFile::where( 'entry_file_entry_id', '=', $entry->entry_id )->get();
 		/*foreach( $EntryFile as $file )
 		{
-			$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
+			$url = $client->getObjectUrl( Config::get('app.bucket'), $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
 			$current[ 'entryFiles' ][ ] = [
 				'fileType' => $file->entry_file_type,
 				'filePath' => $url ];
 
 			$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-				$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
+				$client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
 				: "";
 		}*/
 		if(count($EntryFile) <= 0)
-			return false;		
+			return false;
 		foreach( $EntryFile as $file )
 		{
-			$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
+			$url = $client->getObjectUrl( Config::get('app.bucket'), $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
 			$current[ 'entryFiles' ][ ] = [
 				'fileType' => $file->entry_file_type,
 				'filePath' => $url ];
 
 			$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-				$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
+				$client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
 				: "";
 		}
 		if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
@@ -2641,10 +2641,10 @@ class EntryController extends BaseController
 		$query = $query->where( 'entry_rank', '>', 0 );
 		$query = $query->where( 'entry_deleted', '=', 0 );
 		$query = $query->whereNotIn( 'entries.entry_id',$exclude );
-		$query = $query->orderBy( $order, $dir );		
+		$query = $query->orderBy( $order, $dir );
 		$query = $query->take( 10 );
 		$entries = $query;
-		$combined = $team->union($entries)->get();	
+		$combined = $team->union($entries)->get();
 		$ids= [];
 		foreach( $combined as $users )
 		{
@@ -2676,10 +2676,10 @@ class EntryController extends BaseController
 		$query = $query->where( 'entry_rank', '>', 0 );
 		$query = $query->where( 'entry_deleted', '=', 0 );
 		$query = $query->whereNotIn( 'entries.entry_id',$exclude );
-		$query = $query->orderBy( $order, $dir );		
+		$query = $query->orderBy( $order, $dir );
 		$query = $query->take( 10 );
 		$entries = $query;
-		$combined = $team->union($entries)->get();	
+		$combined = $team->union($entries)->get();
 		$ids= [];
 		foreach( $combined as $teamusers )
 		{
@@ -2690,8 +2690,8 @@ class EntryController extends BaseController
 		//Find total number to put in header
 		//$count = User::where( 'user_user_group', 4 )->count();
 		$count = User::whereIn( 'user_id', $ids )->orderByRaw(DB::raw("FIELD(user_id, $newOrderBy)"))->count();
-		
-		
+
+
 		//print_r($users);
 		foreach( $users as $user )
 		{
@@ -2715,8 +2715,8 @@ class EntryController extends BaseController
 		->where('entries.entry_deleted', '=', '0')
 	    ->where(function($query)
             {
-                $query->where('entries.entry_rank', '!=', 0);						
-            })			
+                $query->where('entries.entry_rank', '!=', 0);
+            })
        ->orderBy( 'entry_rank', 'asc' )->get();*/
 
 		$entries = DB::table( 'entries' )
@@ -3010,7 +3010,7 @@ class EntryController extends BaseController
 
 		}
 
-		//Get limit to calculate pagination 
+		//Get limit to calculate pagination
 		$limit = ( Input::get( 'limit', '20' ) );
 
 		//If not numeric set it to the default limit
@@ -3100,7 +3100,7 @@ class EntryController extends BaseController
 				$iAmStarFlag = Star::where( 'user_star_user_id', '=', $user->user_id )->where( 'user_star_star_id', '=', $session->token_user_id )->where( 'user_star_deleted', '=', '0')->count();
 				if($iAmStarFlag > 0)
 				{
-					$current[ 'user' ][ 'iAmStar' ] = 1;	
+					$current[ 'user' ][ 'iAmStar' ] = 1;
 				}
 				else
 				{
@@ -3127,17 +3127,17 @@ class EntryController extends BaseController
 										  'starName'     => @$starNames['displayName'],
 										  'starredDate'  => $starred->user_star_created_date,
 										  'profileImage' => ( isset( $starred->User->user_profile_image ) )
-											  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+720 minutes' )
+											  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_profile_image, '+720 minutes' )
 											  : '',
 										  'profileCover' => ( isset( $starred->User->user_cover_image ) )
-										  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_cover_image, '+720 minutes' ) : '',	  
+										  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_cover_image, '+720 minutes' ) : '',
 						];
 					}
 				}
 				$return[ 'starredBy' ] = $starredBy;
 				$return['fans'] = count($starredBy);
 				/* End */
-				$status_code = 200;	
+				$status_code = 200;
 			}
 			else
 			{
@@ -3190,9 +3190,9 @@ class EntryController extends BaseController
 					else
 					{
 						$isVotedByYou = 1;
-					}					
+					}
 				}
-				$current[ 'isVotedByYou' ] = $isVotedByYou;	
+				$current[ 'isVotedByYou' ] = $isVotedByYou;
 			}
 			//check to see if fields were specified and at least one is valid
 			if( ( !empty( $fields ) ) && $valid )
@@ -3263,13 +3263,13 @@ class EntryController extends BaseController
 					foreach( $entry->file as $file )
 					{
 
-						$url = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
+						$url = $client->getObjectUrl( Config::get('app.bucket'), $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
 						$current[ 'entryFiles' ][ ] = [
 							'fileType' => $file->entry_file_type,
 							'filePath' => $url ];
 
 						$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-							$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
+							$client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
 							: "";
 					}
 					if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
@@ -3342,14 +3342,14 @@ class EntryController extends BaseController
 				foreach( $entry->file as $file )
 				{
 
-					$signedUrl = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
+					$signedUrl = $client->getObjectUrl( Config::get('app.bucket'), $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
 
 					$current[ 'entryFiles' ][ ] = [
 						'fileType' => $file->entry_file_type,
 						'filePath' => $signedUrl ];
 
 					$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-						$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
+						$client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
 						: "";
 				}
 				if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
@@ -3385,7 +3385,7 @@ class EntryController extends BaseController
 				}
 
 				$return[ 'entries' ][ ][ 'entry' ] = $current;
-			}			
+			}
 		}
 		/* Added By AJ for getting followrs */
 		if( $user != 0 )
@@ -3403,10 +3403,10 @@ class EntryController extends BaseController
 									  'starName'     => @$starNames['displayName'],
 									  'starredDate'  => $starred->user_star_created_date,
 									  'profileImage' => ( isset( $starred->User->user_profile_image ) )
-										  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_profile_image, '+720 minutes' )
+										  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_profile_image, '+720 minutes' )
 										  : '',
 									  'profileCover' => ( isset( $starred->User->user_cover_image ) )
-									  ? $client->getObjectUrl( 'mobstar-1', $starred->User->user_cover_image, '+720 minutes' ) : '',	  
+									  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_cover_image, '+720 minutes' ) : '',
 					];
 				}
 			}
@@ -3445,7 +3445,7 @@ class EntryController extends BaseController
 
 		$session = $this->token->get_session( $token );
 
-		$term = Input::get( "term" );		
+		$term = Input::get( "term" );
 		//$excludeCategory = [7,8];
 		$results = DB::table( 'entries' )
 					 ->select( 'entries.*' )
@@ -3455,7 +3455,7 @@ class EntryController extends BaseController
 					 ->leftJoin('google_users', 'users.user_google_id', '=', 'google_users.google_user_id')
 					// ->whereNotIn( 'entries.entry_category_id', $excludeCategory )
 					 ->where( 'entries.entry_deleted', '=', '0' )
-					->where( 'users.user_deleted', '=', '0' )	
+					->where( 'users.user_deleted', '=', '0' )
 					->where( function ( $query ) use ( $term )
 					 {
 						 $query->orWhere( 'entries.entry_name', 'LIKE', '%' . $term . '%' )
@@ -3492,7 +3492,7 @@ class EntryController extends BaseController
 			{
 				$User = User::where( 'user_id', '=', $results[0]->user_id )->first();
 				$current[ 'category' ] = 'onlyprofile';
-				$current[ 'user' ] = oneUser( $User, $session );		 
+				$current[ 'user' ] = oneUser( $User, $session );
 				$return[ 'entries' ][ ][ 'entry' ] = $current;
 				$status_code = 200;
 			}
@@ -3533,9 +3533,9 @@ class EntryController extends BaseController
 			$filename = 'Spaceo_'.time();
 
 			$extension = $file->getClientOriginalExtension();
-						
+
 			$file_in = $file->getRealPath();
-			
+
 			$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
 
 			// Transcode Video
@@ -3597,16 +3597,16 @@ class EntryController extends BaseController
 		}
 		return Response::make( $response, $status_code );
 	}
-	
+
 	public function search4()
 	{
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
 
-		$term = Input::get( "term" );		
-		
-		//Get limit to calculate pagination 
+		$term = Input::get( "term" );
+
+		//Get limit to calculate pagination
 		$limit = ( Input::get( 'limit', '50' ) );
 
 		//If not numeric set it to the default limit
@@ -3615,7 +3615,7 @@ class EntryController extends BaseController
 		//Get page
 		$page = ( Input::get( 'page', '1' ) );
 		$page = ( !is_numeric( $page ) ) ? 1 : $page;
-		
+
 		//Calculate offset
 		$offset = ( $page * $limit ) - $limit;
 
@@ -3628,7 +3628,7 @@ class EntryController extends BaseController
 		{
 			$previous = false;
 		}
-		
+
 		$return = [ ];
 		//$excludeCategory = [7,8];
 		$results = DB::table( 'entries' )
@@ -3656,7 +3656,7 @@ class EntryController extends BaseController
 					 //->get();
 					 ->take( $limit )->skip( $offset )->get();
 		$status_code = 200;
-		
+
 		$results_user = DB::table( 'users' )
 				 ->select( 'users.*' )
 				 ->leftJoin('facebook_users', 'users.user_facebook_id', '=', 'facebook_users.facebook_user_id')
@@ -3679,10 +3679,10 @@ class EntryController extends BaseController
 			{
 				$User = User::where( 'user_id', '=', $results_user[$i]->user_id )->first();
 				$current[ 'category' ] = 'onlyprofile';
-				$current[ 'user' ] = oneUser( $User, $session );		 
+				$current[ 'user' ] = oneUser( $User, $session );
 				$return[ 'entries' ][ ][ 'entry' ] = $current;
-			}				
-		}			
+			}
+		}
 		for( $i = 0; $i < count( $results ); $i++ )
 		{
 			if( $results[ $i ]->entry_deleted === 1 )
@@ -3739,7 +3739,7 @@ class EntryController extends BaseController
 					$response[ 'error' ] = "No category selected";
 					$status_code = 400;
 				}
-				
+
 				/* Commented for one Demo as on request 07 March 2015 // Removed Comment on 13 March 2015 as on request */
 				if( Input::get( 'category' ) == 7 || Input::get( 'category' ) == 8 )
 				{
@@ -3750,7 +3750,7 @@ class EntryController extends BaseController
 					if($entry_by_default_enable && $entry_by_default_enable === 'TRUE')
 					$entry_deleted = 0;
 					else
-					$entry_deleted = 1;	
+					$entry_deleted = 1;
 				}
 				if( Input::get( 'category' ) == 3 )
 				{
@@ -3769,7 +3769,7 @@ class EntryController extends BaseController
 						'entry_subcategory'  => Input::get( 'subCategory' ),
 						'entry_age'          => Input::get( 'age' ),
 						'entry_height'       => Input::get( 'height' ),
-					];	
+					];
 				}
 				else
 				{
@@ -3885,13 +3885,13 @@ class EntryController extends BaseController
 									break;
 							}
 						}
-				
+
 						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . $transpose . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
 
 						$handle = fopen( $thumb, "r" );
 
 						Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", fread( $handle, filesize( $thumb ) ) );
-						
+
 						$pathfile = '/var/www/api/public/uploads/'. $filename . '-uploaded.' . $extension;
 						$serviceDetails = array();
 						$serviceDetails["pathfile"] = $pathfile;
@@ -3899,7 +3899,7 @@ class EntryController extends BaseController
 						$serviceDetails["name"] = Input::get( 'name' );
 						$serviceDetails["description"] = Input::get( 'description' );
 						$serviceDetails["category"] = Input::get( 'category' );
-						
+
 						$this->backgroundPost('http://api.mobstar.com/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
 //						unlink($file_out);
 //						unlink($thumb);
@@ -3989,7 +3989,7 @@ class EntryController extends BaseController
 		}
 
 		return Response::make( $response, $status_code );
-	}	
+	}
 	// youtube upload
 	public function youtubeUpload()
  	{
@@ -4000,7 +4000,7 @@ class EntryController extends BaseController
 		// Development
 		//$OAUTH2_CLIENT_ID = '750620540831-68mufugc9vnh04qnm1f74qv98h696ljb.apps.googleusercontent.com';
 		//$OAUTH2_CLIENT_SECRET = 'jXOGIdgad98FzkZ6pIhgxJmy';
-		
+
 		$OAUTH2_CLIENT_ID = '173877326502-4n4u9loil1dfrmppnik51elrrgn3m2t4.apps.googleusercontent.com';
 		$OAUTH2_CLIENT_SECRET = 'V2BIjYMMFvy1vca_MjotO-jq';
 
@@ -4020,7 +4020,7 @@ class EntryController extends BaseController
 		$filename = 'youtubeToken.txt';
 		$readData = '';
 
-		if (isset($_GET['code'])) 
+		if (isset($_GET['code']))
 		{
 		    $client->authenticate($_GET['code']);
 		    $tokenData = $client->getAccessToken();
@@ -4038,9 +4038,9 @@ class EntryController extends BaseController
 		        fwrite($newfile, $tokenData);
 		        fclose($newfile);
 		    }
-		  
+
 		  header('Location: ' . $redirect);
-		  
+
 		}
 		if(file_exists($filename) && filesize($filename) > 0)
 		{
@@ -4053,7 +4053,7 @@ class EntryController extends BaseController
 		  $client->setAccessToken(json_encode($ftokenRead));
 		}
 		// Check to ensure that the access token was successfully acquired.
-		if (!empty($ftokenRead)) 
+		if (!empty($ftokenRead))
 		{
 		  	if($client->isAccessTokenExpired())
 		  	{
@@ -4064,7 +4064,7 @@ class EntryController extends BaseController
 			    fclose($fpnew);
 			    $client->setAccessToken($newTokenData);
 		  	}
-		  
+
 		  	try
 		  	{
 			    $videoPath_original = $serviceDetails["pathfile"];
@@ -4073,29 +4073,29 @@ class EntryController extends BaseController
 				{
 					if($serviceDetails["rotation_angel"] == '90')
 					{
-						$img_path = $_ENV[ 'PATH' ] . 'public/images/mob_img.png';	
+						$img_path = $_ENV[ 'PATH' ] . 'public/images/mob_img.png';
 						shell_exec( '/usr/bin/ffmpeg -i '.$videoPath_original.' -vf "movie="'.$img_path.'" [watermark]; [in][watermark] overlay=10:10 [out]" '.$file_out);
 						sleep(10);
 						$videoPath = $file_out;
 					}
 					if($serviceDetails["rotation_angel"] == '180')
 					{
-						$img_path = $_ENV[ 'PATH' ] . 'public/images/mob_img180.png';	
+						$img_path = $_ENV[ 'PATH' ] . 'public/images/mob_img180.png';
 						shell_exec( '/usr/bin/ffmpeg -i '.$videoPath_original.' -vf "movie="'.$img_path.'" [watermark]; [in][watermark] overlay=10:main_h-overlay_h-10 [out]" '.$file_out);
 						sleep(10);
 						$videoPath = $file_out;
 					}
 					if($serviceDetails["rotation_angel"] == '270')
 					{
-						$img_path = $_ENV[ 'PATH' ] . 'public/images/mob_img_270.png';	
+						$img_path = $_ENV[ 'PATH' ] . 'public/images/mob_img_270.png';
 						shell_exec( '/usr/bin/ffmpeg -i '.$videoPath_original.' -vf "movie="'.$img_path.'" [watermark]; [in][watermark] overlay=main_w-overlay_w-10:main_h-overlay_h-10 [out]" '.$file_out);
 						sleep(10);
 						$videoPath = $file_out;
-					}					
+					}
 				}
 				else
 				{
-					$img_path = $_ENV[ 'PATH' ] . 'public/images/watermark1.png';	
+					$img_path = $_ENV[ 'PATH' ] . 'public/images/watermark1.png';
 					shell_exec( '/usr/bin/ffmpeg -i '.$videoPath_original.' -vf "movie="'.$img_path.'" [watermark]; [in][watermark] overlay=main_w-overlay_w-10:10 [out]" '.$file_out);
 					sleep(10);
 					$videoPath = $file_out;
@@ -4123,7 +4123,7 @@ class EntryController extends BaseController
 
 			    $video = new Google_Service_YouTube_Video();
 			    $video->setSnippet($snippet);
-			    $video->setStatus($status);    
+			    $video->setStatus($status);
 
 			    // Specify the size of each chunk of data, in bytes. Set a higher value for
 			    // reliable connection as fewer chunks lead to faster uploads. Set a lower
@@ -4136,7 +4136,7 @@ class EntryController extends BaseController
 			    $client->setDefer(true);
 
 		    	// Create a request for the API's videos.insert method to create and upload the video.
-		    
+
 			    $insertRequest = $youtube->videos->insert("status,snippet",$video,
 			      array("data"=>file_get_contents($videoPath),
 			       "uploadType"=>"media",  // This was needed in my case
@@ -4164,7 +4164,7 @@ class EntryController extends BaseController
 
 		    	fclose($handle);
 		    // If you want to make other calls after the file upload, set setDefer back to false
-		    	$client->setDefer(false);			  
+		    $client->setDefer(false);
 				mail('anil@spaceotechnologies.com', 'Success_'.time(),print_r($status['id'],true));
 				//unlink($file_out);
 			// REPLACE this value with the video ID of the video being updated.
@@ -4173,15 +4173,15 @@ class EntryController extends BaseController
 		    // Call the API's videos.list method to retrieve the video resource.
 		   		$listResponse = $youtube->videos->listVideos("snippet,status",
 		        array('id' => $videoId));
-		    
-			
-			
+
+
+
 		    	//If $listResponse is empty, the specified video was not found.
 			    if (empty($listResponse)) {
 			      mail('anil@spaceotechnologies.com', 'video not found_'.time(),print_r($videoId,true));
 				  //$htmlBody .= sprintf('<h3>Can\'t find a video with video id: %s</h3>', $videoId);
-			    } 
-			    else 
+			    }
+			    else
 			    {
 			      /* Added By AJ for update database entry with flag and video id */
 					$entryId = $serviceDetails["entry_id"];
@@ -4190,10 +4190,10 @@ class EntryController extends BaseController
 						$updateData = DB::table('entries')
 								->where('entry_id','=',$entryId)
 								->update(array('entry_uploaded_on_youtube' => 1,
-									'entry_youtube_id' => $videoId));					
+									'entry_youtube_id' => $videoId));
 					}
 					/* End */
-				  
+
 				  // Since the request specified a video ID, the response only
 			      // contains one video resource.
 			      $video = $listResponse[0];
@@ -4204,12 +4204,12 @@ class EntryController extends BaseController
 			      $title = $videoSnippet['title'];
 			      $description = $videoSnippet['description'];
 			      $status = $videoStatus['privacyStatus'];
-			      
-			      if (is_null($title) || $title == "unknown") 
+
+			      if (is_null($title) || $title == "unknown")
 			      {
 			        $serviceDetails["description"] = preg_replace('/\\\u[0-9A-F]{4}/i', '',$serviceDetails["description"]);
 					$title = $serviceDetails["name"].' - '.$serviceDetails["description"];
-			      } 
+			      }
 			      if(is_null($description) || empty($description))
 			      {
 			        $description = $serviceDetails["description"];
@@ -4218,12 +4218,12 @@ class EntryController extends BaseController
 			      {
 			        $status = "public";
 			      }
-			      
+
 				  ////// call for short url
 				  $originalUrl = 'http://www.share.mobstar.com/info.php?id='.$entryId;
 				  $shortedUrl = $this->get_tiny_url($originalUrl);
 				  /////
-				  
+
 			      // Set the tags array for the video snippet
 			      $videoSnippet['tags'] = $tags;
 			      $videoSnippet['title'] = $title;
@@ -4233,7 +4233,7 @@ class EntryController extends BaseController
 			      // Update the video resource by calling the videos.update() method.
 			      $updateResponse = $youtube->videos->update("snippet,status", $video);
 			    }
-		    	
+
 	  		} catch (Google_Service_Exception $e) {
 	    		mail('anil@spaceotechnologies.com', 'Fail1_'.time(),print_r($e->getMessage(),true));
 				//$htmlBody .= sprintf('<p>A service error occurred: <code>%s</code></p>',
@@ -4243,32 +4243,32 @@ class EntryController extends BaseController
 				//$htmlBody .= sprintf('<p>An client error occurred: <code>%s</code></p>',
 		        //	htmlspecialchars($e->getMessage()));
 		  	}
-		} 
-		else 
+		}
+		else
 		{
   			// If the user hasn't authorized the app, initiate the OAuth flow
 			$authUrl = $client->createAuthUrl();
-			mail('anil@spaceotechnologies.com', 'Authorization Required_'.time(),'You need to authorize access before proceeding.');	
+			mail('anil@spaceotechnologies.com', 'Authorization Required_'.time(),'You need to authorize access before proceeding.');
 		}
 		//return Response::make( $response, $status_code );
  	}
 
 	/////// for Short URL
-			
-	public function get_tiny_url($url) 
-	{  
-	  $ch = curl_init();  
-	  $timeout = 5;  
-	  curl_setopt($ch,CURLOPT_URL,'http://tinyurl.com/api-create.php?url='.$url);  
-	  curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);  
-	  curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,$timeout);  
-	  $data = curl_exec($ch);  
+
+	public function get_tiny_url($url)
+	{
+	  $ch = curl_init();
+	  $timeout = 5;
+	  curl_setopt($ch,CURLOPT_URL,'http://tinyurl.com/api-create.php?url='.$url);
+	  curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+	  curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,$timeout);
+	  $data = curl_exec($ch);
 	  curl_close($ch);
-	  return $data;  
+	  return $data;
 	}
-		
-	///////	
-	
+
+	///////
+
 	/**
 	 * This function useful to create background process call
 	 */
@@ -4277,8 +4277,8 @@ class EntryController extends BaseController
 		$parts = parse_url($url);
 		//echo "<pre>"; print_r($parts); //exit;
 		//mail('anil@spaceotechnologies.com','Backgroundcall_Called',print_r($parts,true));
-		$fp = fsockopen($parts['host'], 
-			  isset($parts['port'])?$parts['port']:80, 
+		$fp = fsockopen($parts['host'],
+			  isset($parts['port'])?$parts['port']:80,
 			  $errno, $errstr, 30);
 		if (!$fp) {
 			return false;
@@ -4288,7 +4288,7 @@ class EntryController extends BaseController
 			$out.= "Content-Type: application/x-www-form-urlencoded\r\n";
 			$out.= "Content-Length: ".strlen($parts['query'])."\r\n";
 			$out.= "Connection: Close\r\n\r\n";
-			
+
 			if (isset($parts['query'])) $out.= $parts['query'];
 			//mail('anil@spaceotechnologies.com','out_check',print_r($out,true));
 			$rs = fwrite($fp, $out);
@@ -4296,10 +4296,10 @@ class EntryController extends BaseController
 			fclose($fp);
 			return true;
 		}
-		
+
 	}
 	/* End */
-	
+
 	/* Youtube delete */
 	public function youtubeDelete()
  	{
@@ -4310,7 +4310,7 @@ class EntryController extends BaseController
 		// Development
 		//$OAUTH2_CLIENT_ID = '750620540831-68mufugc9vnh04qnm1f74qv98h696ljb.apps.googleusercontent.com';
 		//$OAUTH2_CLIENT_SECRET = 'jXOGIdgad98FzkZ6pIhgxJmy';
-		
+
 		$OAUTH2_CLIENT_ID = '173877326502-4n4u9loil1dfrmppnik51elrrgn3m2t4.apps.googleusercontent.com';
 		$OAUTH2_CLIENT_SECRET = 'V2BIjYMMFvy1vca_MjotO-jq';
 
@@ -4330,7 +4330,7 @@ class EntryController extends BaseController
 		$filename = 'youtubeToken.txt';
 		$readData = '';
 
-		if (isset($_GET['code'])) 
+		if (isset($_GET['code']))
 		{
 		    $client->authenticate($_GET['code']);
 		    $tokenData = $client->getAccessToken();
@@ -4348,9 +4348,9 @@ class EntryController extends BaseController
 		        fwrite($newfile, $tokenData);
 		        fclose($newfile);
 		    }
-		  
+
 		  header('Location: ' . $redirect);
-		  
+
 		}
 		if(file_exists($filename) && filesize($filename) > 0)
 		{
@@ -4363,7 +4363,7 @@ class EntryController extends BaseController
 		  $client->setAccessToken(json_encode($ftokenRead));
 		}
 		// Check to ensure that the access token was successfully acquired.
-		if (!empty($ftokenRead)) 
+		if (!empty($ftokenRead))
 		{
 		  	if($client->isAccessTokenExpired())
 		  	{
@@ -4373,7 +4373,7 @@ class EntryController extends BaseController
 			    fwrite($fpnew, $newTokenData);
 			    fclose($fpnew);
 			    $client->setAccessToken($newTokenData);
-		  	}		  
+		    }
 		  	try
 		  	{
 				$videoid = $serviceDetails["videoid"];
@@ -4385,10 +4385,10 @@ class EntryController extends BaseController
 					$updateData = DB::table('entries')
 							->where('entry_id','=',$entryId)
 							->update(array('entry_uploaded_on_youtube' => 0,
-								'entry_youtube_id' => NULL));					
+								'entry_youtube_id' => NULL));
 				}
 				mail('anil@spaceotechnologies.com', 'Delete Successfully_'.time(),print_r($videoid,true));
-				/* End */	
+				/* End */
 	  		} catch (Google_Service_Exception $e) {
 	    		mail('anil@spaceotechnologies.com', 'Fail1_'.time(),print_r($e->getMessage(),true));
 				//$htmlBody .= sprintf('<p>A service error occurred: <code>%s</code></p>',
@@ -4398,16 +4398,16 @@ class EntryController extends BaseController
 				//$htmlBody .= sprintf('<p>An client error occurred: <code>%s</code></p>',
 		        //	htmlspecialchars($e->getMessage()));
 		  	}
-		} 
-		else 
+		}
+		else
 		{
   			// If the user hasn't authorized the app, initiate the OAuth flow
 			$authUrl = $client->createAuthUrl();
-			mail('anil@spaceotechnologies.com', 'Authorization Required_'.time(),'You need to authorize access before proceeding.');	
+			mail('anil@spaceotechnologies.com', 'Authorization Required_'.time(),'You need to authorize access before proceeding.');
 		}
 		//return Response::make( $response, $status_code );
  	}
 
-	
+
 	/* End */
 }

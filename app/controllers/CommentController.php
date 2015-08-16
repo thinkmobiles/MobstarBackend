@@ -683,13 +683,13 @@ class CommentController extends BaseController
 			$current['entry'][ 'entryFiles' ] = array();
 			foreach( $comment->Entry->file as $file )
 			{
-				$signedUrl = $client->getObjectUrl( 'mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
+				$signedUrl = $client->getObjectUrl( Config::get('app.bucket'), $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
 				$current['entry'][ 'entryFiles' ][ ] = [
 					'fileType' => $file->entry_file_type,
 					'filePath' => $signedUrl ];
 
 				$current['entry'][ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-					$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
+					$client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
 					: "";
 			}
 			

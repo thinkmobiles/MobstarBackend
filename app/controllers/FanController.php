@@ -89,13 +89,13 @@ class FanController extends BaseController
 				{
 					if( strtolower( $entry->entry_file_type ) == 'png' || strtolower( $entry->entry_file_type ) == 'jpg' )
 					{
-						$current[ 'thumbnail' ] = $client->getObjectUrl( 'mobstar-1', $entry->entry_file_name . "." . $entry->entry_file_type, '+10 minutes' );
+						$current[ 'thumbnail' ] = $client->getObjectUrl( Config::get('app.bucket'), $entry->entry_file_name . "." . $entry->entry_file_type, '+10 minutes' );
 					}
 				}
 				else
 				{
 					$current[ 'thumbnail' ] = ( $entry->entry_file_type == "mp4" ) ?
-						$client->getObjectUrl( 'mobstar-1', 'thumbs/' . $entry->entry_file_name . '-thumb.jpg', '+10 minutes' )
+						$client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $entry->entry_file_name . '-thumb.jpg', '+10 minutes' )
 						: "";
 				}
 				$current[ 'lastComment' ] = $entry->comment_added_date;				

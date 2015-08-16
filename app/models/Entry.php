@@ -106,7 +106,7 @@ class Entry extends \Eloquent
 		$current[ 'entryFiles' ] = array();
 		foreach( $entry->file as $file )
 		{
-			$url = $client->getObjectUrl('mobstar-1', $file->entry_file_name . "." . $file->entry_file_type, '+60 minutes');
+			$url = $client->getObjectUrl(Config::get('app.bucket'), $file->entry_file_name . "." . $file->entry_file_type, '+60 minutes');
 			$current[ 'entryFiles' ][ ] = [
 				'fileType' => $file->entry_file_type,
 				'filePath' => $url ];

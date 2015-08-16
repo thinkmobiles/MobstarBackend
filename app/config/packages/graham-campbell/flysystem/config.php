@@ -46,7 +46,7 @@ return array(
             'driver'    => 'awss3',
             'key'       => 'AKIAIE4TLASFISDQDHPA',
             'secret'    => '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',
-            'bucket'    => 'mobstar-1',
+            'bucket'    => Config::get( 'app.bucket' ),
             // 'region'    => 'your-region',
             // 'prefix'    => 'your-prefix',
             // 'eventable' => true,

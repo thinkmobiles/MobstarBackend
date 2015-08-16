@@ -1,9 +1,11 @@
 <?php
 return array(
-	'DATABASE_HOST'		=> 'mobstar-apibeta.cyz3qf3vz9qw.eu-west-1.rds.amazonaws.com',
-	'DATABASE_PASSWORD'	=> 'd0wnund3r',
+	'DATABASE_HOST'		=> 'localhost',
+	'DATABASE_USER'		=> 'mobstar',
+	'DATABASE_PASSWORD'	=> 'mobstar',
+	'DATABASE_DATABASE'		=> 'mobstar',
     'PATH'				=> '/var/www/api-beta/',
 	'URL'				=> 'api2.mobstar.com',
 	'DEBUG'				=> true,
+	'bucket' => 'mobstar-test-local',
 );
- 
