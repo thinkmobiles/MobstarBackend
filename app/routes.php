@@ -42,33 +42,40 @@ Route::get( '/', function()
 
 Route::get( 'debug/', function ()
 {
+  ob_start();
+
+  echo '<pre>';
+
 	echo "tmp read:";
 	var_dump( is_readable( '/tmp/' ) );
-	echo "<br>";
-	echo "<br>";
-	echo "<br>";
+	echo "\n";
 	echo "home read:";
 	var_dump( is_readable( '/var/www/api-beta/public/uploads' ) );
 
-	echo "<br>";
-	echo "<br>";
-	echo "<br>";
+	echo "\n";
 	echo "tmp write:";
 	var_dump( is_writable( '/tmp/' ) );
 
-	echo "<br>";
-	echo "<br>";
-	echo "<br>";
+	echo "\n";
 	echo "tmp read:";
 	var_dump( is_writable( '/var/www/api-beta/public/uploads' ) );
-	echo "<br>";
-	echo "<br>";
-	echo "<br>";
+	echo "\n";
 
 	echo 'sonus:';
 	var_dump( Sonus::getSupportedFormats() );
 
 	var_dump($_ENV);
+
+	echo "\n";
+
+	echo 'current environment: ', print_r( App::environment(), true ), "\n\n";
+	echo 'mysql database config:', "\n";
+	print_r( Config::get( 'database.connections' )['mysql'] );
+	echo 'AWS bucket: ', Config::get( 'app.bucket' ), "\n";
+
+	echo "\n", '</pre>';
+
+	return ob_get_clean();
 //     Force the execution to fail by throwing an exception:
 //    throw new RuntimeException("Oopsie!");
 } );
@@ -125,12 +132,12 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "user/destroy",
 			"uses" => "UserController@destroy"
 		] );
-		
+
 		Route::post( "user/follow/", [
 			"as"   => "user/follow",
 			"uses" => "UserController@follow"
 		] );
-		
+
 		Route::post( "user/follower/", [
 			"as"   => "user/follower",
 			"uses" => "UserController@follower"
@@ -143,16 +150,16 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "user/analytic",
 			"uses" => "UserController@analytic"
 		] );
-		
+
 		Route::post( "user/logout", [
 			"as"   => "user/logout",
 			"uses" => "UserController@logout"
 		] );
-		
+
 		Route::post( "vote/likes/", [
 			"as"   => "vote/likes",
 			"uses" => "VoteController@likes"
-		] );	
+		] );
 		// -------------------------------------------------------
 		// Category(s)
 		//---------------------------------------------------------
@@ -189,25 +196,25 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "defaultNotification/index",
 			"uses" => "DefaultNotificationController@index"
 		] );
-		
+
 		// -------------------------------------------------------
 		// Welcome Video
 		//---------------------------------------------------------
-		
+
 		Route::get( "welcome/", [
 			"as"   => "welcome/index",
 			"uses" => "WelcomeController@index"
 		] );
-		
+
 		Route::get( "video/show", [
 		   "as"   => "video/show",
 		   "uses" => "ModelingVideoController@show"
 		] );
-		
+
 		// -------------------------------------------------------
 		// Blogs
 		//---------------------------------------------------------
-		
+
 		Route::get( "blogs/", [
 			"as"   => "blogs/index",
 			"uses" => "BlogsController@index"
@@ -221,12 +228,12 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "entry/index",
 			"uses" => "EntryController@index"
 		] );
-		
+
 		Route::get( "entry/mix", [
 			"as"   => "entry/mix",
 			"uses" => "EntryController@mix"
 		] );
-		
+
 		Route::get( "entry/search", [
 			"as"   => "entry/search",
 			"uses" => "EntryController@search"
@@ -236,27 +243,27 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "entry/search2",
 			"uses" => "EntryController@search2"
 		] );
-		
+
 		Route::get( "entry/search3", [
 			"as"   => "entry/search3",
 			"uses" => "EntryController@search3"
 		] );
-		
+
 		Route::get( "entry/search4", [
 			"as"   => "entry/search4",
 			"uses" => "EntryController@search4"
 		] );
-		
+
 		Route::get( "entry/mysearch", [
 			"as"   => "entry/mysearch",
 			"uses" => "EntryController@mysearch"
 		] );
-		
+
 		Route::post( "entry/dummytest", [
 			"as"   => "entry/dummytest",
 			"uses" => "EntryController@dummytest"
 		] );
-		
+
 		Route::get( "entry/{id}", [
 			"as"   => "entry/show",
 			"uses" => "EntryController@show"
@@ -266,12 +273,12 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "entry/store",
 			"uses" => "EntryController@store"
 		] );
-		
+
 		Route::post( "entry/store2", [
 			"as"   => "entry/store2",
 			"uses" => "EntryController@store2"
 		] );
-		
+
 		Route::post( "entry/videoupload", [
 			"as"   => "entry/videoupload",
 			"uses" => "EntryController@videoupload"
@@ -296,9 +303,9 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "entry/view",
 			"uses" => "EntryController@view"
 		] );
-		
+
 		Route::post( "entry/updateViewCount", [
-			"as"	=> "entry/updateViewCount",	
+			"as"	=> "entry/updateViewCount",
 			"uses"	=> "EntryController@updateViewCount"
 		] );
 		Route::delete( "entry/{entry}", [
@@ -376,37 +383,37 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "message/reply",
 			"uses" => "Message2Controller@reply"
 		] );
-		
+
 		Route::post( "message/deleteThread", [
 			"as"   => "message/deleteThread",
 			"uses" => "Message2Controller@deleteThread"
 		] );
-		
+
 		Route::post( "message/bulk", [
 			"as"   => "message/bulk",
 			"uses" => "Message2Controller@bulk"
 		] );
-		
+
 		Route::post( "message/msgcount", [
 			"as"   => "message/msgcount",
 			"uses" => "Message2Controller@msgcount"
 		] );
-		
+
 		Route::post( "message/read", [
 			"as"   => "message/read",
 			"uses" => "Message2Controller@read"
 		] );
-		
+
 		Route::post( "message/showParticipants", [
 			"as"   => "message/showParticipants",
 			"uses" => "Message2Controller@showParticipants"
 		] );
-		
+
 		Route::post( "message/badgeread", [
 			"as"   => "message/badgeread",
 			"uses" => "Message2Controller@badgeread"
 		] );
-		
+
 //		Route::delete( "message/", [
 //			"as"   => "message/destroy",
 //			"uses" => "MessageController@destroy"
@@ -450,12 +457,12 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "notification/delete",
 			"uses" => "NotificationController@delete"
 		] );
-		
+
 		Route::post( "notification/markread", [
 			"as"   => "notification/markread",
 			"uses" => "NotificationController@markread"
 		] );
-		
+
 		Route::post( "notification/markreadnew", [
 			"as"   => "notification/markreadnew",
 			"uses" => "NotificationController@markreadnew"
@@ -487,7 +494,7 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "feedback/store",
 			"uses" => "FeedbackController@store"
 		] );
-		
+
 		// -------------------------------------------------------
 		// Profile Content
 		//---------------------------------------------------------
@@ -513,12 +520,12 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "comment/index",
 			"uses" => "CommentController@index"
 		] );
-		
+
 		Route::get( "comment/index2", [
 			"as"   => "comment/index2",
 			"uses" => "CommentController@index2"
 		] );
-		
+
 		Route::delete( "comment/{id}", [
 			"as"   => "comment/destroy",
 			"uses" => "CommentController@destroy"
@@ -557,7 +564,7 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "talent/top",
 			"uses" => "TalentController@top"
 		] );
-		
+
 		Route::get( "talent/topnew", [
 			"as"   => "talent/topnew",
 			"uses" => "TalentController@topnew"
@@ -598,12 +605,12 @@ Route::group( [ "before" => "auth" ], function ()
 		"as"   => "login/index",
 		"uses" => "LoginController@index"
 	] );
-	
+
 	Route::post( "login/verifyCode", [
 		"as"   => "login/verifyCode",
 		"uses" => "LoginController@verifyCode"
 	] );
-	
+
 	Route::post( "login/verifyphonenumber", [
 		"as"   => "login/verifyphonenumber",
 		"uses" => "LoginController@verifyphonenumber"
@@ -770,13 +777,13 @@ Route::post( "user/team/", [
 Route::get( "login/twiml/", [
 			"as"   => "login/twiml",
 			"uses" => "LoginController@twiml"
-		] );		
+		] );
 Route::post( "entry/deleteentryfiles", [
-			"as"	=> "entry/deleteentryfiles",	
+			"as"	=> "entry/deleteentryfiles",
 			"uses"	=> "EntryController@deleteEntryFiles"
 		] );
 Route::post( "user/uploadimage", [
-			"as"	=> "user/uploadimage",	
+			"as"	=> "user/uploadimage",
 			"uses"	=> "UserController@uploadimage"
 		] );
 App::missing( function ( $exception )
