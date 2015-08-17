@@ -1321,7 +1321,7 @@ class EntryController extends BaseController
 								$serviceDetails["description"] = Input::get( 'description' );
 								$serviceDetails["category"] = Input::get( 'category' );
 
-								$this->backgroundPost('http://".$_ENV['URL']."/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
+								$this->backgroundPost('http://'.$_ENV['URL'].'/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
 							}
 							/* End */
 						}
@@ -1377,7 +1377,7 @@ class EntryController extends BaseController
 								$serviceDetails["description"] = Input::get( 'description' );
 								$serviceDetails["category"] = Input::get( 'category' );
 
-								$this->backgroundPost('http://".$_ENV['URL']."/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
+								$this->backgroundPost('http://'.$_ENV['URL'].'/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
 							}
 							/* End */
 						}
@@ -3900,7 +3900,7 @@ class EntryController extends BaseController
 						$serviceDetails["description"] = Input::get( 'description' );
 						$serviceDetails["category"] = Input::get( 'category' );
 
-						$this->backgroundPost('http://".$_ENV['URL']."/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
+						$this->backgroundPost('http://'.$_ENV['URL'].'/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
 //						unlink($file_out);
 //						unlink($thumb);
 					}
