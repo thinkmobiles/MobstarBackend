@@ -1152,13 +1152,13 @@ class UserController extends BaseController
 
 			$img->resize( 200, 200 );
 
-			$img->save( $_ENV[ 'PATH' ] . '/public/' . $file_out, 80 );
+			$img->save( Config::get('app.home') . '/public/' . $file_out, 80 );
 
-			$handle = fopen( $_ENV[ 'PATH' ] . '/public/' . $file_out, "r" );
+			$handle = fopen( Config::get('app.home') . '/public/' . $file_out, "r" );
 
 			Flysystem::connection( 'awss3' )->put( $file_out,
 												   fread( $handle,
-														  filesize( $_ENV[ 'PATH' ] . '/public/' . $file_out ) ) );
+														  filesize( Config::get('app.home') . '/public/' . $file_out ) ) );
 
 			$user->user_profile_image = $file_out;
 		}
@@ -1230,13 +1230,13 @@ class UserController extends BaseController
 
 			$img->resize( 200, 200 );
 
-			$img->save( $_ENV[ 'PATH' ] . '/public/' . $file_out, 80 );
+			$img->save( Config::get('app.home') . '/public/' . $file_out, 80 );
 
-			$handle = fopen( $_ENV[ 'PATH' ] . '/public/' . $file_out, "r" );
+			$handle = fopen( Config::get('app.home') . '/public/' . $file_out, "r" );
 
 			Flysystem::connection( 'awss3' )->put( $file_out,
 												   fread( $handle,
-														  filesize( $_ENV[ 'PATH' ] . '/public/' . $file_out ) ) );
+														  filesize( Config::get('app.home') . '/public/' . $file_out ) ) );
 
 			$user->user_cover_image = $file_out;
 		}
@@ -1303,7 +1303,7 @@ class UserController extends BaseController
 
 		foreach( $users as $user )
 		{
-			$file_in = $_ENV[ 'PATH' ] . 'public/' . $user->user_profile_image;
+			$file_in = Config::get('app.home') . 'public/' . $user->user_profile_image;
 
 			if(
 				isset( $user->user_profile_image )
@@ -1315,7 +1315,7 @@ class UserController extends BaseController
 
 			}
 
-			$file_in = '/' . $_ENV[ 'PATH' ] . $user->user_cover_image;
+			$file_in = '/' . Config::get('app.home') . $user->user_cover_image;
 			if(
 				isset( $user->user_cover_image )
 				&& file_exists( $file_in )
@@ -2232,13 +2232,13 @@ class UserController extends BaseController
 
 			$img->resize( 200, 200 );
 
-			$img->save( $_ENV[ 'PATH' ] . '/public/' . $file_out, 80 );
+			$img->save( Config::get('app.home') . '/public/' . $file_out, 80 );
 
-			$handle = fopen( $_ENV[ 'PATH' ] . '/public/' . $file_out, "r" );
+			$handle = fopen( Config::get('app.home') . '/public/' . $file_out, "r" );
 
 			Flysystem::connection( 'awss3' )->put( $file_out,
 												   fread( $handle,
-														  filesize( $_ENV[ 'PATH' ] . '/public/' . $file_out ) ) );
+														  filesize( Config::get('app.home') . '/public/' . $file_out ) ) );
 
 			$user->user_profile_image = $file_out;
 		}
@@ -2254,13 +2254,13 @@ class UserController extends BaseController
 
 			$img->resize( 200, 200 );
 
-			$img->save( $_ENV[ 'PATH' ] . '/public/' . $file_out, 80 );
+			$img->save( Config::get('app.home') . '/public/' . $file_out, 80 );
 
-			$handle = fopen( $_ENV[ 'PATH' ] . '/public/' . $file_out, "r" );
+			$handle = fopen( Config::get('app.home') . '/public/' . $file_out, "r" );
 
 			Flysystem::connection( 'awss3' )->put( $file_out,
 												   fread( $handle,
-														  filesize( $_ENV[ 'PATH' ] . '/public/' . $file_out ) ) );
+														  filesize( Config::get('app.home') . '/public/' . $file_out ) ) );
 
 			$user->user_cover_image = $file_out;
 		}

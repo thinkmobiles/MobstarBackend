@@ -57,7 +57,7 @@ class ProfileContentController extends BaseController
 				Eloquent::unguard();
 				$response[ 'content_id' ] = $this->profilecontent->create( $input )->content_id;
 				$status_code = 201;
-				Eloquent::reguard();				
+				Eloquent::reguard();
 
 				$dest = 'uploads';
 
@@ -68,7 +68,7 @@ class ProfileContentController extends BaseController
 				if( $input[ 'content_type' ] == 'audio' )
 				{
 					$file_in = $file->getRealPath();
-					$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp3';
+					$file_out = Config::get('app.home') . 'public/uploads/' . $filename . '.mp3';
 
 					// Transcode Audio
 					shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
@@ -89,11 +89,11 @@ class ProfileContentController extends BaseController
 
 						$file_in = $file->getRealPath();
 
-						$file_out = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '.mp4';
+						$file_out = Config::get('app.home') . 'public/uploads/' . $filename . '.mp4';
 
 						// Transcode Video
-						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
-						$file->move( $_ENV[ 'PATH' ] . 'public/uploads/', $filename . '-uploaded.' . $extension );
+						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt' );
+						$file->move( Config::get('app.home') . 'public/uploads/', $filename . '-uploaded.' . $extension );
 
 						$extension = 'mp4';
 
@@ -101,7 +101,7 @@ class ProfileContentController extends BaseController
 
 						Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, fread( $handle, filesize( $file_out ) ) );
 
-						$thumb = $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-thumb.jpg';
+						$thumb = Config::get('app.home') . 'public/uploads/' . $filename . '-thumb.jpg';
 
 						exec( '/usr/bin/ffprobe 2>&1 ' . $file_out . ' | grep "rotate          :"', $rotation );
 
@@ -110,7 +110,7 @@ class ProfileContentController extends BaseController
 							$rotation = substr( $rotation[ 0 ], 17 );
 						}
 
-						$contents = file_get_contents( $_ENV[ 'PATH' ] . 'public/uploads/' . $filename . '-log.txt' );
+						$contents = file_get_contents( Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt' );
 						preg_match( "#rotate.*?([0-9]{1,3})#im", $contents, $rotationMatches );
 
 						$transpose = '';
@@ -146,7 +146,7 @@ class ProfileContentController extends BaseController
 
 						$file_in = $file->getRealPath();
 
-						$file_out = $_ENV[ 'PATH' ] . "public/uploads/" . $filename . '.' . $extension;
+						$file_out = Config::get('app.home') . "public/uploads/" . $filename . '.' . $extension;
 
 						$image = Image::make( $file_in );
 
@@ -185,7 +185,7 @@ class ProfileContentController extends BaseController
 
 					$extension = ".jpg";
 
-					$file_out = $_ENV[ 'PATH' ] . "public/uploads/" . $filename . '.' . $extension;
+					$file_out = Config::get('app.home') . "public/uploads/" . $filename . '.' . $extension;
 
 					$image = Image::make( $file_in );
 
@@ -231,7 +231,7 @@ class ProfileContentController extends BaseController
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
-		
+
 		$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushdemo";
 		$client = getSNSClient();
 		$result1 = $client->listEndpointsByPlatformApplication(array(
@@ -240,7 +240,7 @@ class ProfileContentController extends BaseController
 		));
 
 		foreach($result1['Endpoints'] as $Endpoint){
-			$EndpointArn = $Endpoint['EndpointArn']; 
+			$EndpointArn = $Endpoint['EndpointArn'];
 			$EndpointToken = $Endpoint['Attributes'];
 			foreach($EndpointToken as $key=>$newVals){
 				if($key=="Token"){
@@ -278,12 +278,12 @@ class ProfileContentController extends BaseController
 									  ]
 								  ]
 							  ] );
-		print($EndpointArn . " - Succeeded!\n"); 
+		print($EndpointArn . " - Succeeded!\n");
 		}
 		catch (Exception $e)
 		{
 			print($EndpointArn . " - Failed: " . $e->getMessage() . "!\n");
-		}  
-		//log contents	
-	}	
+		}
+		//log contents
+	}
 }

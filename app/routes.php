@@ -711,7 +711,7 @@ Route::post( "admin/validate", [
 Route::get( 'api-info/', function ()
 {
 	// var_dump($_ENV);
-	$swagger = new Swagger( $_ENV[ 'PATH' ] . '/app/controllers' );
+	$swagger = new Swagger( Config::get('app.home') . '/app/controllers' );
 //header("Content-Type: application/json");
 //var_dump($swagger);
 	$return = $swagger->getRegistry();
@@ -728,7 +728,7 @@ Route::get( 'api-info/', function ()
 
 Route::get( 'api-info//{resource}', function ( $resource )
 {
-	$swagger = new Swagger( $_ENV[ 'PATH' ] . '/app/controllers' );
+	$swagger = new Swagger( Config::get('app.home') . '/app/controllers' );
 	//header("Content-Type: application/json");
 	//var_dump($swagger);
 	$return = $swagger->getRegistry();

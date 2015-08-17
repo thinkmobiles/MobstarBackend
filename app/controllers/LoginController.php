@@ -919,7 +919,7 @@ class LoginController extends BaseController
 
 		//log contents
 		try{
-			$myfile = $_ENV['PATH'] . 'public/sns-log.txt';
+			$myfile = Config::get('app.home') . 'public/sns-log.txt';
 			file_put_contents($myfile, date('d-m-Y H:i:s') . ' debug log:', FILE_APPEND);
 			file_put_contents($myfile, print_r($endpointDetails, true), FILE_APPEND);
 		}
