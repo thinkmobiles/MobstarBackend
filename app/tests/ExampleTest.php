@@ -31,4 +31,32 @@ class ExampleTest extends TestCase {
     $entries = $content->entries;
     $this->assertTrue( count( $entries ) == 20 );
   }
+
+
+  public function testPostEntry()
+  {
+    $testFilename = __DIR__.'/files/test_movie.mp4';
+    $uploadedFilename = __DIR__.'/files/test_movie_for_upload.mp4';
+
+    $this->assertTrue( copy( $testFilename, $uploadedFilename ), 'can not create temp file for uploading' );
+
+    $file = new \Symfony\Component\HttpFoundation\File\UploadedFile(
+      $uploadedFilename,
+      'test_file'
+    );
+
+    $response = $this->call( 'POST', '/entry',
+      array(
+        'category' => 7,
+        'type' => 'video',
+        'language' => 'english',
+        'name' => 'Test',
+        'description' => 'Test Video',
+      ),
+      array( 'file1' => $file ),
+      array( 'HTTP_X-API-TOKEN' => '07516258357' )
+    );
+
+    $this->assertEquals( 201, $response->getStatusCode() );
+  }
 }

@@ -1149,7 +1149,6 @@ class EntryController extends BaseController
 		}
 		else
 		{
-
 			$file = Input::file( 'file1' );
 
 			if( !empty( $file ) )
@@ -1213,6 +1212,8 @@ class EntryController extends BaseController
 						'entry_height'       => '',
 					];
 				}
+				if( empty( $input['entry_subcategory'] ) ) unset( $input['entry_subcategory'] );
+				if( empty( $input['entry_age'] ) ) unset( $input['entry_age'] );
 				Eloquent::unguard();
 				$response[ 'entry_id' ] = $this->entry->create( $input )->entry_id;
 				$status_code = 201;
@@ -1413,6 +1414,7 @@ class EntryController extends BaseController
 									   'entry_file_type'         => $extension,
 									   'entry_file_created_date' => date( 'Y-m-d H:i:s' ),
 									   'entry_file_updated_date' => date( 'Y-m-d H:i:s' ),
+									   'entry_file_size' => filesize( $file_out ),
 								   ] );
 
 				Eloquent::reguard();
@@ -1441,7 +1443,7 @@ class EntryController extends BaseController
 														   fread( $handle,
 																  filesize( $file_out ) ) );
 
-					unlink( $file_out );
+
 
 					Eloquent::unguard();
 
@@ -1452,9 +1454,12 @@ class EntryController extends BaseController
 										   'entry_file_type'         => $extension,
 										   'entry_file_created_date' => date( 'Y-m-d H:i:s' ),
 										   'entry_file_updated_date' => date( 'Y-m-d H:i:s' ),
+										   'entry_file_size' => filesize( $file_out ),
 									   ] );
 
 					Eloquent::reguard();
+
+					unlink( $file_out );
 				}
 			}
 			else
