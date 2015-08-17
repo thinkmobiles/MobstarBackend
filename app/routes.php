@@ -46,19 +46,22 @@ Route::get( 'debug/', function ()
 
   echo '<pre>';
 
+  echo 'App home path: ', Config::get( 'app.home' ), "\n";
+  echo 'App tmp path: ', Config::get( 'app.tmp' ), "\n";
+
 	echo "tmp read:";
-	var_dump( is_readable( '/tmp/' ) );
+	var_dump( is_readable( Config::get( 'app.tmp' ) ) );
 	echo "\n";
 	echo "home read:";
-	var_dump( is_readable( '/var/www/api-beta/public/uploads' ) );
+	var_dump( is_readable( Config::get( 'app.home' ).'/public/uploads' ) );
 
 	echo "\n";
 	echo "tmp write:";
-	var_dump( is_writable( '/tmp/' ) );
+	var_dump( is_writable( Config::get( 'app.tmp' ) ) );
 
 	echo "\n";
 	echo "tmp read:";
-	var_dump( is_writable( '/var/www/api-beta/public/uploads' ) );
+	var_dump( is_writable( Config::get( 'app.home' ).'/public/uploads' ) );
 	echo "\n";
 
 	echo 'sonus:';

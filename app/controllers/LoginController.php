@@ -161,7 +161,7 @@ class LoginController extends BaseController
 						? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_profile_image : '',
 					'profileCover'    => ( !empty( Auth::user()->user_cover_image ) )
 						? 'http://' . $_ENV[ 'URL' ] . '/' . Auth::user()->user_cover_image : '',
-					'userPhone'     => $isVerifiedPhone,	
+					'userPhone'     => $isVerifiedPhone,
 				);
 
 				$status_code = 200;
@@ -170,7 +170,7 @@ class LoginController extends BaseController
 			else
 			{
 
-				// validation not successful, send back to form	
+				// validation not successful, send back to form
 				$return = array( "error" => "You have provided wrong credentials" );
 
 				$status_code = 401;
@@ -295,13 +295,13 @@ class LoginController extends BaseController
 
 			$user = User::firstOrNew( array( 'user_facebook_id' => $facebook_user->facebook_user_id ) );
 
-			$user->save();			
+			$user->save();
 			if($user->user_deleted == '1')
 			{
 				$return = array( "error" => "You have provided wrong credentials" );
 				$status_code = 401;
 				$response = Response::make( $return, $status_code );
-				return $response;	
+				return $response;
 			}
 			$deviceToken = Input::get( 'deviceToken' );
 			$deviceType = Input::get( 'device' );
@@ -323,7 +323,7 @@ class LoginController extends BaseController
 				//$this->registerSNSEndpoint( $device );
 
 			}
-			//Get team users 
+			//Get team users
 			$ids = [ 4, 5 ];
 			//$team_users = User::where( 'user_user_group', 4 )->get();
 			$team_users = User::whereIn( 'user_user_group', $ids )->get();
@@ -332,7 +332,7 @@ class LoginController extends BaseController
 			$team_users_count = User::whereIn( 'user_user_group', $ids )->count();
 			if( $team_users_count > 0 )
 			{
-				
+
 				foreach( $team_users as $team )
 				{
 					$input = array(
@@ -492,7 +492,7 @@ class LoginController extends BaseController
 				$return = array( "error" => "You have provided wrong credentials" );
 				$status_code = 401;
 				$response = Response::make( $return, $status_code );
-				return $response;	
+				return $response;
 			}
 			$deviceToken = Input::get( 'deviceToken' );
 			$deviceType = Input::get( 'device' );
@@ -514,7 +514,7 @@ class LoginController extends BaseController
 				//$this->registerSNSEndpoint( $device );
 
 			}
-			//Get team users 
+			//Get team users
 			$ids = [ 4, 5 ];
 			//$team_users = User::where( 'user_user_group', 4 )->get();
 			$team_users = User::whereIn( 'user_user_group', $ids )->get();
@@ -523,7 +523,7 @@ class LoginController extends BaseController
 			$team_users_count = User::whereIn( 'user_user_group', $ids )->count();
 			if( $team_users_count > 0 )
 			{
-				
+
 				foreach( $team_users as $team )
 				{
 					$input = array(
@@ -701,7 +701,7 @@ class LoginController extends BaseController
 				$return = array( "error" => "You have provided wrong credentials" );
 				$status_code = 401;
 				$response = Response::make( $return, $status_code );
-				return $response;	
+				return $response;
 			}
 			$deviceToken = Input::get( 'deviceToken' );
 			$deviceType = Input::get( 'device' );
@@ -723,7 +723,7 @@ class LoginController extends BaseController
 				//$this->registerSNSEndpoint( $device );
 
 			}
-			//Get team users 
+			//Get team users
 			$ids = [ 4, 5 ];
 			//$team_users = User::where( 'user_user_group', 4 )->get();
 			$team_users = User::whereIn( 'user_user_group', $ids )->get();
@@ -732,7 +732,7 @@ class LoginController extends BaseController
 			$team_users_count = User::whereIn( 'user_user_group', $ids )->count();
 			if( $team_users_count > 0 )
 			{
-				
+
 				foreach( $team_users as $team )
 				{
 					$input = array(
@@ -936,7 +936,7 @@ class LoginController extends BaseController
 			'vPhoneNo' => 'required',
 			'countryCode'   => 'required'
 		);
-		
+
 		// run the validation rules on the inputs
 		$validator = Validator::make( Input::all(), $rules );
 
@@ -952,7 +952,7 @@ class LoginController extends BaseController
 			$iVerificationCode = mt_rand(1111, 9999);
 			$user_phone_user_id = Input::get( 'userId' );
 			$user_phone_number = Input::get( 'vPhoneNo' );
-			$user_phone_country = Input::get( 'countryCode' );			
+			$user_phone_country = Input::get( 'countryCode' );
 			if( isset( $user_phone_user_id ) && isset( $user_phone_number ) && isset( $user_phone_country ))
 			{
 				$phone = UserPhone::firstOrNew(
@@ -968,7 +968,7 @@ class LoginController extends BaseController
 
 				if($phone->save())
 				{
-					require "/var/www/api/vendor/twilio/Services/Twilio.php";
+					require Config::get( 'app.home' )."/vendor/twilio/Services/Twilio.php";
 					// set your AccountSid and AuthToken from www.twilio.com/user/account
 					//$AccountSid = "AC77fca1e17b7508e848be713a6994893c";
 					$AccountSid = "AC1651a9f031f9450afb7e5bac05434970";
@@ -990,7 +990,7 @@ class LoginController extends BaseController
 							'+353766805001', // Verified Outgoing Caller ID or Twilio number
 							$user_phone_country.$user_phone_number,// The phone number you wish to dial
 							'http://api.mobstar.com/login/twiml' // The URL of twiml.php on your server
-							);						
+							);
 						}
 						catch (Services_Twilio_RestException $e) {
 						mail('anil@spaceotechnologies.com',time(),'hello fail');
@@ -1000,7 +1000,7 @@ class LoginController extends BaseController
 						$status_code = 404;
 						$response = Response::make( $return, $status_code );
 						return $response;
-						}						
+						}
 					}*/
 					try {
 						$message = $client->account->messages->create(array(
@@ -1016,7 +1016,7 @@ class LoginController extends BaseController
 						$status_code = 404;
 						$response = Response::make( $return, $status_code );
 						return $response;
-					}	
+					}
 				}
 				$phonedata = DB::table('user_phones')->where('user_phone_user_id', '=', $user_phone_user_id)->first();
 				if(!empty($phonedata))
@@ -1026,7 +1026,7 @@ class LoginController extends BaseController
 					'userId'          => $phonedata->user_phone_user_id,
 					'vPhoneNo'        => $phonedata->user_phone_number,
 					'countryCode'     => $phonedata->user_phone_country,
-					'userPhone'       => $phonedata->user_phone_verified,	
+					'userPhone'       => $phonedata->user_phone_verified,
 					);*/
 					$return = [ 'notice' => 'success' ];
 					$status_code = 200;
@@ -1036,10 +1036,10 @@ class LoginController extends BaseController
 					$return = json_encode( [ 'error' => 'No Entries Found' ] );
 					$status_code = 404;
 				}
-			}			
+			}
 			else
 			{
-				// validation not successful, send back to form	
+				// validation not successful, send back to form
 				$return = array( "error" => "You have provided wrong details" );
 				$status_code = 401;
 			}
@@ -1051,11 +1051,11 @@ class LoginController extends BaseController
 	{
 		// tell the caller that they should listen to their howl
 			// and play the recording back, using the URL that Twilio posted
-			header("content-type: text/xml");			
+			header("content-type: text/xml");
 			return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 			<Response>
 			<Say>Hi - This is a call from MobStar to verify your device.Your unique code is:</Say>
-			<Pause length=\"2\"/>	
+			<Pause length=\"2\"/>
 			<Say>1 2 3 4</Say>
 		</Response>";
 		//return View::make('login/twiml');
@@ -1067,7 +1067,7 @@ class LoginController extends BaseController
 			'userId'    => 'required',
 			'verificationCode' => 'required',
 		);
-		
+
 		// run the validation rules on the inputs
 		$validator = Validator::make( Input::all(), $rules );
 
@@ -1093,9 +1093,9 @@ class LoginController extends BaseController
 						$phonedata->user_phone_verified = '1';
 						$phonedata->updated_at = date( "Y-m-d H:i:s" );
 						$phonedata->save();
-						
+
 						$return = [ 'notice' => 'Phone number verified successfully' ];
-						$status_code = 200;	
+						$status_code = 200;
 					}
 					else
 					{
@@ -1111,7 +1111,7 @@ class LoginController extends BaseController
 			}
 			else
 			{
-				// validation not successful, send back to form	
+				// validation not successful, send back to form
 				$return = array( "error" => "You have provided wrong details" );
 				$status_code = 401;
 			}

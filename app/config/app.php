@@ -189,4 +189,8 @@ return array(
 
 	'bucket' => isset( $_ENV[ 'bucket' ] ) ? $_ENV[ 'bucket' ] : '',
 
+	'home' => isset( $_ENV['PATH'] ) ? $_ENV['PATH'] : realpath( __DIR__.'/../../' ),
+
+	'tmp' => isset( $_ENV['TMP'] ) ? $_ENV['TMP'] : sys_get_temp_dir(),
+
 );

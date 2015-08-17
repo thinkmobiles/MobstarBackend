@@ -1312,7 +1312,7 @@ class EntryController extends BaseController
 							/* Added By AJ on 09-Jul-2015 for youtube and water mark */
 							if( Input::get( 'category' ) != 7 && Input::get( 'category' ) != 8 )
 							{
-								$pathfile = '/var/www/api/public/uploads/'. $filename . '-uploaded.' . $originalextension;
+								$pathfile = Config::get( 'app.home' ).'/public/uploads/'. $filename . '-uploaded.' . $originalextension;
 								$serviceDetails = array();
 								$serviceDetails["pathfile"] = $pathfile;
 								$serviceDetails["entry_id"] = $response[ 'entry_id' ];
@@ -1368,7 +1368,7 @@ class EntryController extends BaseController
 							/* Added By AJ on 09-Jul-2015 for youtube and water mark */
 							if( Input::get( 'category' ) != 7 && Input::get( 'category' ) != 8 )
 							{
-								$pathfile = '/var/www/api/public/uploads/'. $filename . '-uploaded.' . $originalextension;
+								$pathfile = Config::get( 'app.home' ).'/public/uploads/'. $filename . '-uploaded.' . $originalextension;
 								$serviceDetails = array();
 								$serviceDetails["pathfile"] = $pathfile;
 								$serviceDetails["entry_id"] = $response[ 'entry_id' ];
@@ -3892,7 +3892,7 @@ class EntryController extends BaseController
 
 						Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", fread( $handle, filesize( $thumb ) ) );
 
-						$pathfile = '/var/www/api/public/uploads/'. $filename . '-uploaded.' . $extension;
+						$pathfile = Config::get( 'app.home' ).'/public/uploads/'. $filename . '-uploaded.' . $extension;
 						$serviceDetails = array();
 						$serviceDetails["pathfile"] = $pathfile;
 						$serviceDetails["rotation_angel"] = $rotation_angel;
@@ -3995,7 +3995,7 @@ class EntryController extends BaseController
  	{
 		$serviceDetails = json_decode($_REQUEST['jsonData'], true);
 		//mail('anil@spaceotechnologies.com','i am in_'.time(),print_r($serviceDetails,true));
-		require_once '/var/www/api/vendor/google-api-php-client-master/src/Google/autoload.php';
+		require_once Config::get( 'app.home' ).'/vendor/google-api-php-client-master/src/Google/autoload.php';
 		// session_start();
 		// Development
 		//$OAUTH2_CLIENT_ID = '750620540831-68mufugc9vnh04qnm1f74qv98h696ljb.apps.googleusercontent.com';
@@ -4305,7 +4305,7 @@ class EntryController extends BaseController
  	{
 		$serviceDetails = json_decode($_REQUEST['jsonData'], true);
 		//mail('anil@spaceotechnologies.com','i am in_'.time(),print_r($serviceDetails,true));
-		require_once '/var/www/api/vendor/google-api-php-client-master/src/Google/autoload.php';
+		require_once Config::get( 'app.home' ).'/vendor/google-api-php-client-master/src/Google/autoload.php';
 		// session_start();
 		// Development
 		//$OAUTH2_CLIENT_ID = '750620540831-68mufugc9vnh04qnm1f74qv98h696ljb.apps.googleusercontent.com';

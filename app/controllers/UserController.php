@@ -388,7 +388,7 @@ class UserController extends BaseController
 			}
 		}
 
-		//Get limit and cursor and calculate pagination 
+		//Get limit and cursor and calculate pagination
 		$limit = ( Input::get( 'limit', '50' ) );
 
 		//If not numeric set it to the default limit
@@ -537,7 +537,7 @@ class UserController extends BaseController
 			//if not just return all info
 			else
 			{
-				
+
 
 				$return[ 'users' ][ ][ 'user' ] = oneUser( $user, $session, true );
 
@@ -556,7 +556,7 @@ class UserController extends BaseController
 			$return[ 'previous' ] = "http://api.mobstar.com/user/" . $id_commas . "?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
 		}
 
-		//echo $id_commas; 
+		//echo $id_commas;
 		$response = Response::make( $return, $status_code );
 
 		$response->header( 'X-Total-Count', $count );
@@ -800,7 +800,7 @@ class UserController extends BaseController
 				//$login->registerSNSEndpoint( $device );
 
 			}
-			//Get team users 
+			//Get team users
 			$ids = [ 4, 5 ];
 			//$team_users = User::where( 'user_user_group', 4 )->get();
 			$team_users = User::whereIn( 'user_user_group', $ids )->get();
@@ -809,7 +809,7 @@ class UserController extends BaseController
 			$team_users_count = User::whereIn( 'user_user_group', $ids )->count();
 			if( $team_users_count > 0 )
 			{
-				
+
 				foreach( $team_users as $team )
 				{
 					$input = array(
@@ -831,12 +831,12 @@ class UserController extends BaseController
 				}
 			}
 			/* Code for send welcome email template */
-			require "/var/www/api/vendor/mandrill-api-php/src/Mandrill.php"; //Not required with Composer
+			require Config::get( 'app.home' )."/vendor/mandrill-api-php/src/Mandrill.php"; //Not required with Composer
 			try {
 			$mandrill = new Mandrill('NrOKeNhrpC14BpP_v8_Ffw');
 			$template_name = 'welcome-email';
 			$template_content = array( );
-			$message = array(				
+			$message = array(
 				'to' => array(
 					array(
 						'email' => $user->user_email,
@@ -845,7 +845,7 @@ class UserController extends BaseController
 					)
 				),
 				'merge' => true,
-				'merge_language' => 'mailchimp',		
+				'merge_language' => 'mailchimp',
 				'merge_vars' => array(
 					array(
 						'rcpt' => $user->user_email,
@@ -856,30 +856,30 @@ class UserController extends BaseController
 							)
 						)
 					)
-				)	
+				)
 			);
 			$async = false;
 			$ip_pool = '';
 			$send_at = '';
 			$result = $mandrill->messages->sendTemplate($template_name, $template_content, $message, $async, $ip_pool, $send_at);
-			} catch(Mandrill_Error $e) {			
+			} catch(Mandrill_Error $e) {
 			}
 			/* End */
-			
+
 			/* Code for add email into mailchimp list */
-			require "/var/www/api/vendor/mailchimp/src/Mailchimp.php"; //Not required with Composer
+			require Config::get( 'app.home' )."/vendor/mailchimp/src/Mailchimp.php"; //Not required with Composer
 			$api_key = "509cd096e6e75d9d6f656530e7d9e974-us9"; //replace with your API key
 			$list_id = "bdaeca6660"; //replace with the list id you're adding the email to
 			$merge_vars = array('MMERGE4'=>$user->user_name,'MMERGE5'=>$user->user_full_name,'MMERGE6'=>$user->user_display_name);
 			// set up our mailchimp object, and list object
 			$Mailchimp = new Mailchimp( $api_key );
 			$Mailchimp_Lists = new Mailchimp_Lists( $Mailchimp );
-		 
-			//$email = 'manish@spaceotechnologies.com'; //replace with a test email		 
+
+			//$email = 'manish@spaceotechnologies.com'; //replace with a test email
 			try {
 				//$subscriber = $Mailchimp_Lists->subscribe( $list_id, array( 'email' => $email ) ); //pass the list id and email to mailchimp
 			   // $subscriber = $Mailchimp_Lists->subscribe( $list_id, array( 'email' => $email ) ); //pass the list id and email to mailchimp
-				
+
 				///
 				$subscriber = $Mailchimp_Lists->subscribe($list_id,
 														array('email' => $user->user_email),
@@ -889,20 +889,20 @@ class UserController extends BaseController
 														false,
 														false
 													   );
-				
+
 			} catch (Exception $e) {
 				//mail('anil@spaceotechnologies.com','custom_code_'.time(),print_r($e->getMessage(),true));
 				//You'll need to write your own code to handle exceptions
 				//print_r($e->getMessage());
 			}
-		 
+
 			// check that we've succeded
 			if ( !empty( $subscriber['leid'] ) ) {
 				//mail('anil@spaceotechnologies.com','success_'.time(),print_r('Email Added to MailChimp',true));
 				//echo 'Email Added to MailChimp';
 			}
 			/* End */
-			
+
 			//Log user in
 
 			// create our user data for the authentication
@@ -945,7 +945,7 @@ class UserController extends BaseController
 			else
 			{
 
-				// validation not successful, send back to form	
+				// validation not successful, send back to form
 				return json_encode( array( "error" => "login unsucessful" ) );
 
 			}
@@ -1003,7 +1003,7 @@ class UserController extends BaseController
 	 *           paramType="form",
 	 *           required=true,
 	 *           type="string"
-	 *         ),	
+	 *         ),
 	 *         @SWG\Parameter(
 	 *           name="password",
 	 *           description="Password for the regisering user",
@@ -1072,12 +1072,12 @@ class UserController extends BaseController
 			{
 				$user->user_tagline = Input::get( 'tagline' );
 			}
-			
+
 			if( isset( $input[ 'bio' ] ) )
 			{
 				$user->user_bio = Input::get( 'bio' );
 			}
-			
+
 			if( isset( $input[ 'displayName' ] ) )
 			{
 				$user->user_display_name = Input::get( "displayName" );
@@ -1419,7 +1419,7 @@ class UserController extends BaseController
 		$return = [ ];
 
 		$valid = false;
-	
+
 		//Get users greater than the cursor from
 		//$users = User::where( 'user_user_group', 4 )->get();
 		$include = [ ];
@@ -1541,16 +1541,16 @@ class UserController extends BaseController
 	 */
 	public function follow( )
 	{
-		
+
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
 
 		//Validate Input
 		$rules = array(
-			'star'    => 'required',			
+			'star'    => 'required',
 		);
-		$messages = array(			
+		$messages = array(
 		);
 
 		$validator = Validator::make( Input::all(), $rules, $messages );
@@ -1631,7 +1631,7 @@ class UserController extends BaseController
 				}
 				// End For Notification Table entry
 				// Added for make entry for push badge count
-				$notification_count = 0;						
+				$notification_count = 0;
 				$inputbadge = array(
 							'user_id' => $star->user_star_star_id,
 						);
@@ -1641,7 +1641,7 @@ class UserController extends BaseController
 				{
 					$notification_count = DB::table('notification_counts')
 						->where('user_id','=',$star->user_star_star_id)
-						->pluck( 'notification_count' );					
+						->pluck( 'notification_count' );
 					$notification_count = $notification_count + 1;
 					$notificationcount->notification_count = $notification_count;
 					$notificationcount->save();
@@ -1657,19 +1657,19 @@ class UserController extends BaseController
 					$message = $name." is now following you.";
 					// echo $message;
 					// die();
-					$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
-						(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
+					$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM
+						(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id
 						from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
 						order by device_registration_date_created desc
-						) t1 left join users u on t1.device_registration_user_id = u.user_id 
-						where u.user_deleted = 0 
+						) t1 left join users u on t1.device_registration_user_id = u.user_id
+						where u.user_deleted = 0
 						AND u.user_id = $to
 						order by t1.device_registration_date_created desc"));
 
 					$icon = 'follow.png';
 					$icon = 'http://' . $_ENV[ 'URL' ] . '/images/' . $icon;
 					if(!empty($usersDeviceData))
-					{	
+					{
 						for($k=0;$k<count($usersDeviceData);$k++)
 						{
 							$this->registerSNSEndpoint($usersDeviceData[$k],$message,$to,$name,$icon);
@@ -1681,7 +1681,7 @@ class UserController extends BaseController
 			$status_code = 201;
 		}
 
-		return Response::make( $response, $status_code );	
+		return Response::make( $response, $status_code );
 	}
 	/**
 	 *
@@ -1722,13 +1722,13 @@ class UserController extends BaseController
 		$client = getS3Client();
 		$token = Request::header( "X-API-TOKEN" );
 		$session = $this->token->get_session( $token );
-		
+
 		//Get user
 		$user = ( Input::get( 'user', '0' ) );
 		$user = ( !is_numeric( $user ) ) ? 0 : $user;
 		// Get All users
 		$alluser = ( Input::get( 'all', '0' ) );
-		//Get limit to calculate pagination 
+		//Get limit to calculate pagination
 		$limit = ( Input::get( 'limit', '50' ) );
 
 		//If not numeric set it to the default limit
@@ -1737,7 +1737,7 @@ class UserController extends BaseController
 		//Get page
 		$page = ( Input::get( 'page', '1' ) );
 		$page = ( !is_numeric( $page ) ) ? 1 : $page;
-		
+
 		//Calculate offset
 		$offset = ( $page * $limit ) - $limit;
 
@@ -1754,13 +1754,13 @@ class UserController extends BaseController
 		/* Added By AJ */
 		if( $user != 0 )
 		{
-			$starredBy = [ ];			
+			$starredBy = [ ];
 			$count = DB::table( 'users' )
 				->select( 'users.*','user_stars.user_star_created_date' )
 				->leftJoin( 'user_stars', 'user_stars.user_star_user_id', '=', 'users.user_id' )
 				->where( 'user_stars.user_star_deleted', '=', '0' )
 				->where( 'users.user_deleted', '=', '0' )
-				->where( 'user_stars.user_star_star_id', '=', $user )				
+				->where( 'user_stars.user_star_star_id', '=', $user )
 				->groupBy('users.user_id')
 				->orderBy('user_stars.user_star_created_date', 'DESC')
 				->get();
@@ -1771,7 +1771,7 @@ class UserController extends BaseController
 				->leftJoin( 'user_stars', 'user_stars.user_star_user_id', '=', 'users.user_id' )
 				->where( 'user_stars.user_star_deleted', '=', '0' )
 				->where( 'users.user_deleted', '=', '0' )
-				->where( 'user_stars.user_star_star_id', '=', $user )				
+				->where( 'user_stars.user_star_star_id', '=', $user )
 				->groupBy('users.user_id')
 				->orderBy('user_stars.user_star_created_date', 'DESC')->get();
 			}
@@ -1782,13 +1782,13 @@ class UserController extends BaseController
 				->leftJoin( 'user_stars', 'user_stars.user_star_user_id', '=', 'users.user_id' )
 				->where( 'user_stars.user_star_deleted', '=', '0' )
 				->where( 'users.user_deleted', '=', '0' )
-				->where( 'user_stars.user_star_star_id', '=', $user )				
+				->where( 'user_stars.user_star_star_id', '=', $user )
 				->groupBy('users.user_id')
 				->orderBy('user_stars.user_star_created_date', 'DESC')
 				->take( $limit )->skip( $offset )->get();
 			}
-			
-				
+
+
 			//If the count is greater than the highest number of items displayed show a next link
 			if(count($count)==0)
 			{
@@ -1803,7 +1803,7 @@ class UserController extends BaseController
 			else
 			{
 				$next = false;
-			}			
+			}
 			foreach( $results as $starred )
 			{
 				$starNames = [];
@@ -1815,7 +1815,7 @@ class UserController extends BaseController
 				{
 					if( $starred->user_facebook_id != 0 )
 					{
-						$displayName = DB::table( 'facebook_users' )->where( 'facebook_user_id', '=', $starred->user_facebook_id )->pluck( 'facebook_user_display_name' );							
+						$displayName = DB::table( 'facebook_users' )->where( 'facebook_user_id', '=', $starred->user_facebook_id )->pluck( 'facebook_user_display_name' );
 					}
 					elseif( $starred->user_twitter_id != 0 )
 					{
@@ -1830,7 +1830,7 @@ class UserController extends BaseController
 				{
 					$displayName = $starred->user_display_name;
 				}
-				
+
 				$starredBy[ ] = [ 'starId'       => $starred->user_id,
 								  'starName'     => @$displayName,
 								  'starredDate'  => $starred->user_star_created_date,
@@ -1839,7 +1839,7 @@ class UserController extends BaseController
 									  : '',
 								  'profileCover' => ( isset( $starred->user_cover_image ) )
 								  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->user_cover_image, '+60 minutes' ) : '',
-								  'isMyStar'  => Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $starred->user_id )->where( 'user_star_deleted', '!=', '1' )->count(),		
+								  'isMyStar'  => Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $starred->user_id )->where( 'user_star_deleted', '!=', '1' )->count(),
 				];
 			}
 			//If next is true create next page link
@@ -1883,7 +1883,7 @@ class UserController extends BaseController
 		    ->where(function($query)
 		     {
 		      	$query->where('entries.entry_rank', '!=', 0);
-		     })   
+		     })
 		    ->orderBy( 'entry_rank', 'asc' )
 		    ->get();
 
@@ -1895,7 +1895,7 @@ class UserController extends BaseController
 
 	    	foreach( $entries_star as $entry_star )
 		    {
-				
+
 				$entries_file_count = EntryFile::where('entry_file_entry_id', '=', $entry_star->entry_id)->count();
 				if($entries_file_count <= 0)
 					continue;
@@ -1917,8 +1917,8 @@ class UserController extends BaseController
 							{
 								if( $entry->entry_rank < $stats && $entry->entry_rank != 0 )
 								{
-									$stats = $entry->entry_rank;					
-								}						
+									$stats = $entry->entry_rank;
+								}
 							}
 						}
 						if ($stats == 100000)
@@ -1928,7 +1928,7 @@ class UserController extends BaseController
 							$userRankData = User::find( $User->user_id );
 							$oldrank = $userRankData->user_rank;
 						//end
-						
+
 					   // Update user with its rank and stats
 					   $user_update = User::find( $User->user_id );
 					   $user_update->user_rank =$rank;
@@ -1939,7 +1939,7 @@ class UserController extends BaseController
 							$userNewRankData = User::find( $User->user_id );
 							$newrank = $userNewRankData->user_rank;
 						//end
-						
+
 						// ckeck for position of user
 						/*if( $oldrank != $newrank)
 						{
@@ -1948,11 +1948,11 @@ class UserController extends BaseController
 							if($oldrank > 10 && $newrank < 11)
 							{
 								$message = "You are now in between top 10 and You are at position ".$newrank;
-								
+
 								$STR == $userID." ,Rank = ".$newrank ;
 								//mail("anil@spaceotechnologies.com",time(),$message);
 								// Added for make entry for push badge count
-								$notification_count = 0;						
+								$notification_count = 0;
 								$inputbadge = array(
 											'user_id' => $userID,
 										);
@@ -1962,7 +1962,7 @@ class UserController extends BaseController
 								{
 									$notification_count = DB::table('notification_counts')
 										->where('user_id','=',$userID)
-										->pluck( 'notification_count' );					
+										->pluck( 'notification_count' );
 									$notification_count = $notification_count + 1;
 									$notificationcount->notification_count = $notification_count;
 									$notificationcount->save();
@@ -1973,20 +1973,20 @@ class UserController extends BaseController
 									$notificationcount->save();
 								}
 								// End
-								$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
-								 	(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
+								$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM
+								  (select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id
 								 	from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
 								 	order by device_registration_date_created desc
-								 	) t1 left join users u on t1.device_registration_user_id = u.user_id 
-								 	where u.user_deleted = 0 
+								  ) t1 left join users u on t1.device_registration_user_id = u.user_id
+								  where u.user_deleted = 0
 								 	AND u.user_id = $userID
 								 	order by t1.device_registration_date_created desc LIMIT 1"));
 								if(!empty($usersDeviceData))
-								{	
+								{
 								 	$this->registerSNSEndpoint($usersDeviceData[0],$message);
 								}
 							}
-							elseif ($oldrank < 11) 
+							elseif ($oldrank < 11)
 							{
 								if($newrank < 11)
 								{
@@ -1994,7 +1994,7 @@ class UserController extends BaseController
 									$STR == $userID." ,Rank = ".$newrank ;
 									//mail("anil@spaceotechnologies.com",time(),$message);
 								}
-								elseif ($newrank > 10) 
+								elseif ($newrank > 10)
 								{
 									$message = "You left the position from top 10.";
 									$STR == $userID." ,Rank = ".$newrank ;
@@ -2002,7 +2002,7 @@ class UserController extends BaseController
 
 								}
 								// Added for make entry for push badge count
-								$notification_count = 0;						
+								$notification_count = 0;
 								$inputbadge = array(
 											'user_id' => $userID,
 										);
@@ -2012,7 +2012,7 @@ class UserController extends BaseController
 								{
 									$notification_count = DB::table('notification_counts')
 										->where('user_id','=',$userID)
-										->pluck( 'notification_count' );					
+										->pluck( 'notification_count' );
 									$notification_count = $notification_count + 1;
 									$notificationcount->notification_count = $notification_count;
 									$notificationcount->save();
@@ -2023,16 +2023,16 @@ class UserController extends BaseController
 									$notificationcount->save();
 								}
 								// End
-								$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
-								 	(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
+								$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM
+								  (select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id
 								 	from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
 								 	order by device_registration_date_created desc
-								 	) t1 left join users u on t1.device_registration_user_id = u.user_id 
-								 	where u.user_deleted = 0 
+								  ) t1 left join users u on t1.device_registration_user_id = u.user_id
+								  where u.user_deleted = 0
 								 	AND u.user_id = $userID
 								 	order by t1.device_registration_date_created desc LIMIT 1"));
 								if(!empty($usersDeviceData))
-								{	
+								{
 								 	$this->registerSNSEndpoint($usersDeviceData[0],$message);
 								}
 							}
@@ -2054,7 +2054,7 @@ class UserController extends BaseController
 		{
 			$return = [ 'error' => 'No Entries Found' ];
 			$status_code = 404;
-		}	    		
+		}
 		return Response::make( $return , 200 );
 	}
 	public function registerSNSEndpoint( $device , $message, $to=NULL, $name=NULL,$icon = NULL)
@@ -2075,8 +2075,8 @@ class UserController extends BaseController
 
 		$sns = getSNSClient();
 
-		$Model1 = $sns->listPlatformApplications();  
-		
+		$Model1 = $sns->listPlatformApplications();
+
 		$result1 = $sns->listEndpointsByPlatformApplication(array(
 			// PlatformApplicationArn is required
 			'PlatformApplicationArn' => $arn,
@@ -2085,7 +2085,7 @@ class UserController extends BaseController
 		//$dtoken = 'APA91bHEx658AQzCM3xUHTVjBGJz8a_HMb65Y_2BIIPXODexYlvuCZpaJRKRchTNqQCXs_w9b0AxJbzIQOFNtYkW0bbsiXhiX7uyhGYNTYC2PBOZzAmvqnvOBBhOKNS7Jl0fdoIdNa_riOlJxQi8COrhbw0odIJKBg';
 		//$dtoken = 'c39bac35f298c66d7398673566179deee27618c2036d8c82dcef565c8d732f84';
 		foreach($result1['Endpoints'] as $Endpoint){
-			$EndpointArn = $Endpoint['EndpointArn']; 
+			$EndpointArn = $Endpoint['EndpointArn'];
 			$EndpointToken = $Endpoint['Attributes'];
 			foreach($EndpointToken as $key=>$newVals){
 				if($key=="Token"){
@@ -2113,14 +2113,14 @@ class UserController extends BaseController
 		 ));
 
 		 $endpointDetails = $result->toArray();
-		 
+
 		 //print_r($device);echo "\n".$message."\n";print_r($result);print_r($endpointDetails);
 
 		 //die;
 		 if($device->device_registration_device_type == "apple")
-		 {	
+		 {
 			if(!empty($to) && !empty($name))
-			{	
+			{
 				$publisharray = array(
 					'TargetArn' => $endpointDetails['EndpointArn'],
 					'MessageStructure' => 'json',
@@ -2206,24 +2206,24 @@ class UserController extends BaseController
 			file_put_contents($myfile, date('d-m-Y H:i:s') . ' debug log:', FILE_APPEND);
 			file_put_contents($myfile, print_r($endpointDetails, true), FILE_APPEND);
 
-			//print($EndpointArn . " - Succeeded!\n");    
-		 }   
+			//print($EndpointArn . " - Succeeded!\n");
+		 }
 		 catch (Exception $e)
 		 {
 			//print($endpointDetails['EndpointArn'] . " - Failed: " . $e->getMessage() . "!\n");
-		 } 
+		 }
 
 
 	}
 	public function uploadimage()
-	{		
+	{
 		/*code for upload user profile and cover image*/
 		$user = User::find($_POST['user_id']);
 
 		$userprofile = Input::file( 'user_profile_image' );
-		
+
 		if( !empty( $userprofile ) )
-		{			
+		{
 			$file_in = $userprofile->getRealPath();
 
 			$file_out = 'profile/' . $_POST['user_id'] . "-" . str_random( 12 ) . ".jpg";
@@ -2238,9 +2238,9 @@ class UserController extends BaseController
 
 			Flysystem::connection( 'awss3' )->put( $file_out,
 												   fread( $handle,
-														  filesize( $_ENV[ 'PATH' ] . '/public/' . $file_out ) ) );		
+														  filesize( $_ENV[ 'PATH' ] . '/public/' . $file_out ) ) );
 
-			$user->user_profile_image = $file_out;			
+			$user->user_profile_image = $file_out;
 		}
 
 		$usercoverprofile = Input::file( 'user_cover_image' );
@@ -2262,7 +2262,7 @@ class UserController extends BaseController
 												   fread( $handle,
 														  filesize( $_ENV[ 'PATH' ] . '/public/' . $file_out ) ) );
 
-			$user->user_cover_image = $file_out;			
+			$user->user_cover_image = $file_out;
 		}
 		$user->save();
 		header("Location:http://admin.mobstar.com/user/".$_POST['user_id']);
@@ -2272,18 +2272,18 @@ class UserController extends BaseController
 	// Function for user analytics data capture
 	public function analytic( )
 	{
-		
+
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
 
 		//Validate Input
 		$rules = array(
-			'platform'    => 'required',			
-			'osversion'    => 'required',			
-			'appversion'    => 'required',			
+			'platform'    => 'required',
+			'osversion'    => 'required',
+			'appversion'    => 'required',
 		);
-		$messages = array(			
+		$messages = array(
 		);
 
 		$validator = Validator::make( Input::all(), $rules, $messages );
@@ -2304,9 +2304,9 @@ class UserController extends BaseController
 			$user_analytic_platform = Input::get( 'platform' );
 			$user_analytic_os_version = Input::get( 'osversion' );
 			$user_analytic_device_name = Input::get( 'devicename' );
-			$user_analytic_app_version = Input::get( 'appversion' );			
-			
-			$useranalytic = UserAnalytic::where( 'user_analytic_user_id', '=', $session->token_user_id )->first();			
+			$user_analytic_app_version = Input::get( 'appversion' );
+
+			$useranalytic = UserAnalytic::where( 'user_analytic_user_id', '=', $session->token_user_id )->first();
 			if( $useranalytic )
 			{
 				$useranalytic->user_analytic_user_id = $user_analytic_user_id;
@@ -2330,8 +2330,8 @@ class UserController extends BaseController
 			$status_code = 201;
 		}
 
-		return Response::make( $response, $status_code );	
-	}	
+		return Response::make( $response, $status_code );
+	}
 	// End
 	/**
 	 *
@@ -2372,11 +2372,11 @@ class UserController extends BaseController
 		$client = getS3Client();
 		$token = Request::header( "X-API-TOKEN" );
 		$session = $this->token->get_session( $token );
-		
+
 		//Get user
 		$user = ( Input::get( 'user', '0' ) );
 		$user = ( !is_numeric( $user ) ) ? 0 : $user;
-		//Get limit to calculate pagination 
+		//Get limit to calculate pagination
 		$limit = ( Input::get( 'limit', '50' ) );
 
 		//If not numeric set it to the default limit
@@ -2385,7 +2385,7 @@ class UserController extends BaseController
 		//Get page
 		$page = ( Input::get( 'page', '1' ) );
 		$page = ( !is_numeric( $page ) ) ? 1 : $page;
-		
+
 		//Calculate offset
 		$offset = ( $page * $limit ) - $limit;
 
@@ -2402,13 +2402,13 @@ class UserController extends BaseController
 		/* Added By AJ */
 		if( $user != 0 )
 		{
-			$stars = [ ];			
+			$stars = [ ];
 			$count = DB::table( 'users' )
 				->select( 'users.*','user_stars.user_star_created_date' )
 				->leftJoin( 'user_stars', 'user_stars.user_star_star_id', '=', 'users.user_id' )
 				->where( 'user_stars.user_star_deleted', '=', '0' )
 				->where( 'users.user_deleted', '=', '0' )
-				->where( 'user_stars.user_star_user_id', '=', $user )				
+				->where( 'user_stars.user_star_user_id', '=', $user )
 				->groupBy('users.user_id')
 				->orderBy('user_stars.user_star_created_date', 'DESC')
 				->get();
@@ -2417,7 +2417,7 @@ class UserController extends BaseController
 				->leftJoin( 'user_stars', 'user_stars.user_star_star_id', '=', 'users.user_id' )
 				->where( 'user_stars.user_star_deleted', '=', '0' )
 				->where( 'users.user_deleted', '=', '0' )
-				->where( 'user_stars.user_star_user_id', '=', $user )				
+				->where( 'user_stars.user_star_user_id', '=', $user )
 				->groupBy('users.user_id')
 				->orderBy('user_stars.user_star_created_date', 'DESC')
 				->take( $limit )->skip( $offset )->get();
@@ -2435,7 +2435,7 @@ class UserController extends BaseController
 			else
 			{
 				$next = false;
-			}			
+			}
 			foreach( $results as $starred )
 			{
 				if(!empty($starred->user_id) && $starred->user_id == $session->token_user_id)
@@ -2446,7 +2446,7 @@ class UserController extends BaseController
 				{
 					if( $starred->user_facebook_id != 0 )
 					{
-						$displayName = DB::table( 'facebook_users' )->where( 'facebook_user_id', '=', $starred->user_facebook_id )->pluck( 'facebook_user_display_name' );							
+						$displayName = DB::table( 'facebook_users' )->where( 'facebook_user_id', '=', $starred->user_facebook_id )->pluck( 'facebook_user_display_name' );
 					}
 					elseif( $starred->user_twitter_id != 0 )
 					{
@@ -2461,7 +2461,7 @@ class UserController extends BaseController
 				{
 					$displayName = $starred->user_display_name;
 				}
-				
+
 				$stars[ ] = [ 'starId'       => $starred->user_id,
 								  'starName'     => @$displayName,
 								  'starredDate'  => $starred->user_star_created_date,
@@ -2540,7 +2540,7 @@ class UserController extends BaseController
 					$return = array( "error" => "No such deviceToken found" );
 					$status_code = 401;
 					$response = Response::make( $return, $status_code );
-					return $response;					
+					return $response;
 				}
 			}
 			else

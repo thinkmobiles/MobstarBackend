@@ -5,6 +5,7 @@ return array(
     'DATABASE_PASSWORD'	=> 'd0wnund3r',
     'DATABASE_DATABASE' => 'dotIdol',
     'PATH'				=> '/var/www/api/',
+    'TMP'				=> '/tmp/',
     'URL'				=> 'api.mobstar.com',
 	'DEBUG'				=> true,
     'bucket' => 'mobstar-1',

@@ -17,7 +17,7 @@ return array(
 	| Linux:   '/usr/bin/ffmpeg'
 	|
 	*/
-   
+
    'ffmpeg'		   => '/usr/bin/ffmpeg',
 
     /*
@@ -67,5 +67,5 @@ return array(
 	|
 	*/
 
-   'tmp_dir'      => '/var/wwww/tmp'
+   'tmp_dir'      => Config::get( 'app.tmp' ),
 );
