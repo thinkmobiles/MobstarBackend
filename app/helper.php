@@ -561,5 +561,23 @@ function particUser( $user, $session, $includeStars = false )
 	return $return;
 }
 
+
+function getMediaDurationInSec( $filename )
+{
+  $bin_ffprobe = Config::get( 'app.bin_ffprobe' );
+  $cmd = $bin_ffprobe.' '.$filename.' 2>&1';
+
+  $output = `$cmd`;
+
+  $duration = false;
+  if( preg_match( '|Duration:\s(\d\d):(\d\d):(\d\d)\.(\d\d),|m', $output, $matches ) )
+  {
+    $duration = $matches[1]*3600 + $matches[2]*60 + $matches[3];
+    if( $matches[4] >= 50 ) $duration++;
+  }
+
+  return $duration;
+}
+
 // end of prevent multiple inclusion block
 }

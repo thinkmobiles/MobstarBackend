@@ -1251,6 +1251,14 @@ class EntryController extends BaseController
 					// Transcode Audio
 					shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_in . ' -strict -2 ' . $file_out );
 
+					// Get media duration
+					$duration = getMediaDurationInSec( $file_out );
+					// and save it
+					$entryToUpdate = \Entry::findOrFail( $response['entry_id'] );
+					$entryToUpdate->entry_duration = $duration ? $duration : -1;
+					$entryToUpdate->save();
+					unset( $entryToUpdate );
+
 					$extension = 'mp3';
 
 					$handle = fopen( $file_out, "r" );
@@ -1273,6 +1281,15 @@ class EntryController extends BaseController
 						if($session->token_user_id == 307 || $session->token_user_id == 302)
 						{
 							shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_in . ' -strict -2 ' . $file_out . ' 2>' . Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt' );
+
+							// Get media duration
+							$duration = getMediaDurationInSec( $file_out );
+							// and save it
+							$entryToUpdate = \Entry::findOrFail( $response['entry_id'] );
+							$entryToUpdate->entry_duration = $duration ? $duration : -1;
+							$entryToUpdate->save();
+							unset( $entryToUpdate );
+
 							$file->move( Config::get('app.home') . 'public/uploads/', $filename . '-uploaded.' . $extension );
 							$extension = 'mp4';
 							$handle = fopen( $file_out, "r" );
@@ -1329,6 +1346,15 @@ class EntryController extends BaseController
 						else
 						{
 							shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt' );
+
+							// Get media duration
+							$duration = getMediaDurationInSec( $file_out );
+							// and save it
+							$entryToUpdate = \Entry::findOrFail( $response['entry_id'] );
+							$entryToUpdate->entry_duration = $duration ? $duration : -1;
+							$entryToUpdate->save();
+							unset( $entryToUpdate );
+
 							$file->move( Config::get('app.home') . 'public/uploads/', $filename . '-uploaded.' . $extension );
 							$extension = 'mp4';
 							$handle = fopen( $file_out, "r" );
