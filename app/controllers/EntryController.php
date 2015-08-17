@@ -253,6 +253,16 @@ class EntryController extends BaseController
 			{
 				$exclude[ ] = $c->entry_id;
 			}
+
+			// add entries from profile to home feedback
+			// @todo filter by duration
+			$include_entries = DB::table('entries')->where( 'entry_category_id', '=', 7 )->whereIn( 'entry_type', array( 'video', 'audio' ) ) ->get();
+			$exclude_hash = array_flip( $exclude );
+			foreach( $include_entries as $entry )
+			{
+			  unset( $exclude_hash[ $entry->entry_id ] );
+			}
+			$exclude = array_keys( $exclude_hash );
 		}
 		if($category == 8)
 		{
