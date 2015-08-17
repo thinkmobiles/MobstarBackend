@@ -2,16 +2,11 @@
 
 class ExampleTest extends TestCase {
 
-	/**
-	 * A basic functional test example.
-	 *
-	 * @return void
-	 */
-	public function testBasicExample()
-	{
-		$crawler = $this->client->request('GET', '/');
+  public function testDebug()
+  {
+    $response = $this->call( 'GET', '/debug' );
 
-		$this->assertTrue($this->client->getResponse()->isOk());
-	}
-
+    $this->assertTrue( strlen( $response->getContent() ) > 250 );
+    echo $response->getContent(), "\n";
+  }
 }

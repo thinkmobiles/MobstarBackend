@@ -3,6 +3,16 @@
 use Aws\S3\S3Client;
 use Aws\Sns\SnsClient;
 
+// prevent multiple inclusion
+if (defined( 'HELPER_INCLUDED_EYDTTEYGD' ))
+{
+  return;
+}
+//do not delete next line
+define( 'HELPER_INCLUDED_EYDTTEYGD', true );
+
+// start your helper funcs from here
+
 function getUserProfile( $user, $session, $normal = false )
 {
 	$client = getS3Client();

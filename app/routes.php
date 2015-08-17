@@ -70,8 +70,10 @@ Route::get( 'debug/', function ()
 	var_dump( is_writable( Config::get( 'app.home' ).'/public/uploads' ) );
 	echo "\n";
 
+  /* commented out due to output from ffmpeg while running tests
 	echo 'sonus supported formats: ', "\n";
 	print_r( Sonus::getSupportedFormats() );
+	*/
 
 	var_dump($_ENV);
 
