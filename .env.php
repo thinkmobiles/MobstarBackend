@@ -8,4 +8,5 @@ return array(
     'URL'				=> 'api.mobstar.com',
 	'DEBUG'				=> true,
     'bucket' => 'mobstar-1',
+    'DUMP_REQUESTS' => false,
 );

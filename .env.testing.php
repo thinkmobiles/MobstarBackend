@@ -8,4 +8,5 @@ return array(
 	'URL'				=> 'api2.mobstar.com',
 	'DEBUG'				=> true,
 	'bucket' => 'mobstar-test-local',
+	'DUMP_REQUESTS' => true, // @fixme not work in unit test !!
 );
