@@ -89,7 +89,7 @@ class DefaultNotificationController extends BaseController
 		else
 		{
 			$settings = DB::table( 'settings' )->where( 'vUniqueName', '=', 'SHOW_SYSTEM_NOTIFICATION' )->pluck( 'vSettingValue' );
-			
+
 			$defaultNotifications = DefaultNotification::all();
 			foreach( $defaultNotifications as $defaultNotification )
 			{
@@ -100,15 +100,15 @@ class DefaultNotificationController extends BaseController
 				if ( file_exists($defaultNotification->vDefaultNotificationImage) )
 					$current[ 'defaultNotificationImage' ] = "http://" . $_ENV[ 'URL' ] . '/' . $defaultNotification->vDefaultNotificationImage;
 				else
-					$current[ 'defaultNotificationImage' ] = "http://admin.mobstar.com/" . $defaultNotification->vDefaultNotificationImage;
+					$current[ 'defaultNotificationImage' ] = "http://".Config::get('app.url_admin')."/" . $defaultNotification->vDefaultNotificationImage;
 				$current[ 'description' ] = $defaultNotification->txDescription;
 				$current[ 'show_system_notification' ] = $settings;
 			}
-			
+
 			$status_code = 200;
-			
+
 			return Response::make( $current, $status_code );
 		}
-		
+
 	}
 }

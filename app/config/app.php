@@ -193,4 +193,6 @@ return array(
 
 	'tmp' => isset( $_ENV['TMP'] ) ? $_ENV['TMP'] : sys_get_temp_dir(),
 
+	'url_admin' => isset( $_ENV['URL_ADMIN'] ) ? $_ENV['URL_ADMIN'] : 'admin.mobstar.com',
+
 );

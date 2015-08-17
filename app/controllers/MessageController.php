@@ -18,15 +18,15 @@ class MessageController extends BaseController {
 	{
 
 		$fields = array_values(explode(',',Input::get("fields")));
-		
+
 		if ($fields[0] == "")
 			unset($fields);
-		
+
 		$return = [];
 		$valid = false;
 
 		if(!empty($fields))
-		{	
+		{
 			//Check if fields are valid
 			foreach($fields as $field)
 			{
@@ -38,7 +38,7 @@ class MessageController extends BaseController {
 
 		}
 
-		//Get limit to calculate pagination 
+		//Get limit to calculate pagination
 		$limit = (Input::get('limit', '50'));
 
 		//If not numeric set it to the default limit
@@ -54,17 +54,17 @@ class MessageController extends BaseController {
 		//If page is greter than one show a previous link
 		if($page > 1)
 			$previous = true;
-		else 
+		else
 			$previous = false;
 
 		//Get current user
 		$token =  Request::header("X-API-TOKEN");
 		$session = $this->token->get_session($token);
-		
+
 		//Get Recipient
 		$thread = (Input::get('thread', '0'));
 		$thread = (!is_numeric($thread)) ? 0 : $thread;
-		
+
 		//Get Deleted
 		$deleted = (Input::get('delted', '0'));
 		if($thread)
@@ -72,15 +72,15 @@ class MessageController extends BaseController {
 			//Get a single thread and all messages within it
 			$messages = $this->message->get_message_thread($session['token_user_id'], $thread, $deleted, $limit, $offset, false);
 			$count = $this->message->get_message_thread($session['token_user_id'], $thread, $deleted, $limit, $offset, true);
-		
+
 
 			foreach ($messages as $message){
-				
+
 				$current = array();
 
 				//check to see if fields were specified and at least one is valid
 				if((!empty($fields)) && $valid)
-				{	
+				{
 					if(in_array("id",$fields))
 						$current['id'] = $message->message_id;
 					if(in_array("sender",$fields)){
@@ -102,11 +102,11 @@ class MessageController extends BaseController {
 					if(in_array("date",$fields))
 						$current['date'] = $message->message_created_date;
 					//print_r($current);
-					$return['messages'][]['message'] = $current; 
+					$return['messages'][]['message'] = $current;
 
-					$return['votes'][]['votes'] = $current; 
+					$return['votes'][]['votes'] = $current;
 				}
-				else 
+				else
 				{
 					//print_r($message);
 					$current['id'] = $message->message_id;
@@ -120,27 +120,27 @@ class MessageController extends BaseController {
 					$current['recipient']['userName'] = $message->recipient->user_name;
 					$current['recipient']['userDisplayName'] = $message->recipient->user_display_name;
 					$current['recipient']['messageDeleted'] = ($message->message_recipient_deleted == 1) ? true : false;
-					
+
 					$current['body'] = $message->message_body;
 					$current['date'] = $message->message_created_date;
 					//print_r($current);
-					$return['messages'][]['message'] = $current; 
+					$return['messages'][]['message'] = $current;
 				}
 			}
 		}
 		else
-		{	
+		{
 			//Get users threads
 			$messages = $this->message->get_messages($session['token_user_id'], $deleted, $limit, $offset, false);
 			$count = (count($messages));
 
 			foreach ($messages as $message){
-				
+
 				$current = array();
 
 				//check to see if fields were specified and at least one is valid
 				if((!empty($fields)) && $valid)
-				{	
+				{
 
 					if(in_array("id",$fields))
 						$current['id'] = $message->vote_id;
@@ -172,9 +172,9 @@ class MessageController extends BaseController {
 					if(in_array("date",$fields))
 						$current['date'] = $message->vote_created_date;
 
-					$return['votes'][]['votes'] = $current; 
+					$return['votes'][]['votes'] = $current;
 				}
-				else 
+				else
 				{
 					//print_r($message);
 					$current['id'] = $message->message_id;
@@ -186,15 +186,15 @@ class MessageController extends BaseController {
 					$current['recipient']['userId'] = $message->message_recipient_id;
 					$current['recipient']['userName'] = $message->recipient_user_name;
 					$current['recipient']['userDisplayName'] = $message->recipient_display_name;
-					
+
 					$current['message_body'] = $message->message_body;
 					$current['message_date'] = $message->message_created_date;
 					//print_r($current);
-					$return['messages'][]['message'] = $current; 
+					$return['messages'][]['message'] = $current;
 				}
 			}
 		}
-		
+
 		$status_code = 200;
 
 
@@ -206,10 +206,10 @@ class MessageController extends BaseController {
 
 		//If next is true create next page link
 		if($next)
-			$return['next'] = "http://api.mobstar.com/vote/?" . http_build_query(["limit" => $limit, "page" => $page+1]);
+			$return['next'] = "http://".$_ENV['URL']."/vote/?" . http_build_query(["limit" => $limit, "page" => $page+1]);
 
 		if($previous)
-			$return['previous'] = "http://api.mobstar.com/vote/?" . http_build_query(["limit" => $limit, "page" => $page-1]);
+			$return['previous'] = "http://".$_ENV['URL']."/vote/?" . http_build_query(["limit" => $limit, "page" => $page-1]);
 
 		$response = Response::make($return, $status_code);
 
@@ -226,7 +226,7 @@ class MessageController extends BaseController {
 		$token =  Request::header("X-API-TOKEN");
 
 		$session = $this->token->get_session($token);
-		
+
 		//Validate Input
 		$rules = array(
 			'recipient'  	=> 'required|numeric',
@@ -240,8 +240,8 @@ class MessageController extends BaseController {
 			//var_dump($validator->messages());
 			$response['errors'] = $validator->messages()->all();
 			$status_code = 400;
-		} 
-		else 
+		}
+		else
 		{
 
 
@@ -256,7 +256,7 @@ class MessageController extends BaseController {
 			$response['message'] = "Message sent";
 			$status_code = 201;
 		}
-			
+
 		return Response::make($response, $status_code);
 	}
 
@@ -275,7 +275,7 @@ class MessageController extends BaseController {
 		$token =  Request::header("X-API-TOKEN");
 
 		$session = $this->token->get_session($token);
-		
+
 		$messages = 0;
 
 		if(isset($input['id']))
@@ -295,7 +295,7 @@ class MessageController extends BaseController {
 
 		$response['message'] = $messages . " message(s) deleted";
 		$status_code = 200;
-			
+
 		return Response::make($response, $status_code);
 	}
 

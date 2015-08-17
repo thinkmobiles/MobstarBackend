@@ -266,12 +266,12 @@ class UserController extends BaseController
 		//If next is true create next page link
 		if( $next )
 		{
-			$return[ 'next' ] = "http://api.mobstar.com/user/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
+			$return[ 'next' ] = "http://".$_ENV['URL']."/user/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
 		}
 
 		if( $previous )
 		{
-			$return[ 'previous' ] = "http://api.mobstar.com/user/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
+			$return[ 'previous' ] = "http://".$_ENV['URL']."/user/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
 		}
 
 		$response = Response::make( $return, $status_code );
@@ -548,12 +548,12 @@ class UserController extends BaseController
 		//If next is true create next page link
 		if( $next )
 		{
-			$return[ 'next' ] = "http://api.mobstar.com/user/" . $id_commas . "?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
+			$return[ 'next' ] = "http://".$_ENV['URL']."/user/" . $id_commas . "?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
 		}
 
 		if( $previous )
 		{
-			$return[ 'previous' ] = "http://api.mobstar.com/user/" . $id_commas . "?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
+			$return[ 'previous' ] = "http://".$_ENV['URL']."/user/" . $id_commas . "?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
 		}
 
 		//echo $id_commas;
@@ -561,7 +561,7 @@ class UserController extends BaseController
 
 		$response->header( 'X-Total-Count', $count );
 
-		//$response->header('LINK', "http://api.mobstar.com/user/" . $id_commas . "?limit=50&page=2; rel='next'");
+		//$response->header('LINK', "http://".$_ENV['URL']."/user/" . $id_commas . "?limit=50&page=2; rel='next'");
 
 		return $response;
 		//return $user;
@@ -2265,7 +2265,7 @@ class UserController extends BaseController
 			$user->user_cover_image = $file_out;
 		}
 		$user->save();
-		header("Location:http://admin.mobstar.com/user/".$_POST['user_id']);
+		header("Location:http://".Config::get('app.url_admin')."/user/".$_POST['user_id']);
 		exit();
 		/*end of code for upload user profile and cover image*/
 	}

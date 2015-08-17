@@ -78,7 +78,7 @@ class Message2Controller extends BaseController
 	 */
 	public function index()
 	{
-		/* Commented On 13-04-2015 
+		/* Commented On 13-04-2015
 		//Get limit to calculate pagination
 		$limit = ( Input::get( 'limit', '50' ) );
 
@@ -149,10 +149,10 @@ class Message2Controller extends BaseController
 						$msgs->join_message_recipient_read = '1';
 						$msgs->join_message_recipient_read_date = date( "Y-m-d H:i:s" );
 						$msgs->save();
-					}					
+					}
 				}*/
 			}
-			$user = User::find( $newlastMessage->join_message_recipient_user_id);			
+			$user = User::find( $newlastMessage->join_message_recipient_user_id);
 			$current[ 'lastMessage' ][ 'messageContent' ] = $lastMessage->message->message_body;
 			$current[ 'lastMessage' ][ 'messageSender' ] = oneUser( $user, $session );
 			$current[ 'lastMessage' ][ 'messageReceived' ] = $lastMessage->message->message_created_date;
@@ -167,7 +167,7 @@ class Message2Controller extends BaseController
 			if(is_null($msgread))
 			$msgread = 0;
 			$current[ 'read' ] = $msgread;
-			
+
 			$current[ 'participants' ] = $participants;
 
 			/*foreach( $message->messageParticipants as $participant )
@@ -197,12 +197,12 @@ class Message2Controller extends BaseController
 		//If next is true create next page link
 		if( $next )
 		{
-			$return[ 'next' ] = "http://api.mobstar.com/message/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
+			$return[ 'next' ] = "http://".$_ENV['URL']."/message/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
 		}
 
 		if( $previous )
 		{
-			$return[ 'previous' ] = "http://api.mobstar.com/message/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
+			$return[ 'previous' ] = "http://".$_ENV['URL']."/message/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
 		}
 		*/
 		$response = Response::make( $return, $status_code );
@@ -312,7 +312,7 @@ class Message2Controller extends BaseController
 			$dsort[$key] = $row['messageReceived'];
 		}
 		array_multisort($dsort, SORT_ASC, $receivedMessages);
-		
+
 		$current[ 'messages' ] = $receivedMessages;
 
 		$current[ 'participants' ] = [ ];
@@ -344,12 +344,12 @@ class Message2Controller extends BaseController
 //		//If next is true create next page link
 //		if( $next )
 //		{
-//			$return[ 'next' ] = "http://api.mobstar.com/message/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
+//			$return[ 'next' ] = "http://".$_ENV['URL']."/message/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
 //		}
 //
 //		if( $previous )
 //		{
-//			$return[ 'previous' ] = "http://api.mobstar.com/message/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
+//			$return[ 'previous' ] = "http://".$_ENV['URL']."/message/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
 //		}
 //
 		$response = Response::make( $return, $status_code );
@@ -425,13 +425,13 @@ public function store()
 		$session = $this->token->get_session( $token );
 
 		$recipients = array_values( explode( ',', $recipients ) );
-		if(count($recipients) > 1) 
+		if(count($recipients) > 1)
 			$message_group = 1;
 		else
 			$message_group = 0;
 		$recipArray = [ ];
 		$particArray = [ ];
-		
+
 		$newThread = '';
 		if($message_group == 0)
 		{
@@ -442,7 +442,7 @@ public function store()
 						->groupBy('join_message_participant_message_thread_id')
 						->havingRaw("max(join_message_participants.join_message_participant_user_id =$session->token_user_id ) > 0 and max(join_message_participants.join_message_participant_user_id =$recipients[0] ) > 0 ")
 						->pluck('join_message_participants.join_message_participant_message_thread_id');
-			
+
 			if(empty($thread_id))
 			{
 				$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ),'message_thread_created_by' => $session->token_user_id ] );
@@ -456,12 +456,12 @@ public function store()
 							->count('join_message_participant_id');
 				if($totalCount == 0)
 				{
-					$newThread = $thread_id;					
+					$newThread = $thread_id;
 				}
 				elseif($totalCount > 0)
 				{
 					$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ),'message_thread_created_by' => $session->token_user_id ] );
-					$newThread = $messageThread->message_thread_thread_id;					
+					$newThread = $messageThread->message_thread_thread_id;
 				}
 			}
 		}
@@ -470,9 +470,9 @@ public function store()
 			$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ),'message_thread_created_by' => $session->token_user_id ] );
 			$newThread = $messageThread->message_thread_thread_id;
 		}
-		
+
 		//$messageThread = MessageThread::create( [ 'message_thread_created_date' => date( 'Y-m-d H:i:s' ) ] );
-		
+
 		$messageOb = Message2::create(
 							 [
 								 'message_creator_id'   => $session->token_user_id,
@@ -507,7 +507,7 @@ public function store()
 				'join_message_recipient_read'       => 0,
 			];
 			// Added for make entry for push badge count
-			$notification_count = 0;						
+			$notification_count = 0;
 			$input = array(
 						'user_id' => $recipient,
 					);
@@ -517,7 +517,7 @@ public function store()
 			{
 				$notification_count = DB::table('notification_counts')
 					->where('user_id','=',$recipient)
-					->pluck( 'notification_count' );					
+					->pluck( 'notification_count' );
 				$notification_count = $notification_count + 1;
 				$notificationcount->notification_count = $notification_count;
 				$notificationcount->save();
@@ -578,7 +578,7 @@ public function store()
 				{
 					$prev_not->notification_read = 0;
 					$prev_not->notification_updated_date = date( 'Y-m-d H:i:s' );
-					
+
 					$prev_not->save();
 				}
 			}
@@ -586,18 +586,18 @@ public function store()
 			{
 				$message = $msg;
 				$icon = 'http://' . $_ENV[ 'URL' ] . '/images/message.png';
-				//group by u.user_id 
-				$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
-					(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
-					from device_registrations where device_registration_device_token  != '' 
+				//group by u.user_id
+				$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM
+					(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id
+					from device_registrations where device_registration_device_token  != ''
 					order by device_registration_date_created desc
-					) t1 left join users u on t1.device_registration_user_id = u.user_id 
-					where u.user_deleted = 0 
+					) t1 left join users u on t1.device_registration_user_id = u.user_id
+					where u.user_deleted = 0
 					AND u.user_id = $recipient
 					order by t1.device_registration_date_created desc"));
 
 				if(!empty($usersDeviceData))
-				{	
+				{
 					for($i=0;$i<count($usersDeviceData);$i++)
 					{
 						$this->registerSNSEndpoint($usersDeviceData[$i], $message, $message_group, $name, $icon, $threadid);
@@ -688,14 +688,14 @@ public function reply()
 	{
 		$thread = Input::get( 'thread' );
 		$message = Input::get( 'message' );
-		
+
 		//Get current user
 		$token = Request::header( "X-API-TOKEN" );
 		$session = $this->token->get_session( $token );
-		
+
 		//$recipients = MessageParticipants::where( 'join_message_participant_message_thread_id', $thread );
    	    //$recipients = MessageParticipants::where('join_message_participant_message_thread_id','=',$thread)->groupBy('join_message_participant_user_id')->get();
-		// Commented on 15-May-2015 
+		// Commented on 15-May-2015
 		//$recipients = MessageParticipants::where('join_message_participant_message_thread_id','=',$thread)->groupBy('join_message_participant_user_id')->get();
 		$recipients_count = MessageParticipants::where('join_message_participant_message_thread_id','=',$thread)->where('join_message_participant_user_id','<>','3101')->where('join_message_participant_user_id','<>',$session->token_user_id)->groupBy('join_message_participant_user_id')->count();
    	    $recipients = MessageParticipants::where('join_message_participant_message_thread_id','=',$thread)->where('join_message_participant_user_id','<>','3101')->where('join_message_participant_user_id','<>',$session->token_user_id)->groupBy('join_message_participant_user_id')->get();
@@ -714,14 +714,14 @@ public function reply()
 		}
 		else
 		{
-			if(count($recipients) > 3) 
+			if(count($recipients) > 3)
 				$message_group = 1;
 			else
 				$message_group = 0;
 		}
 		$recipArray = [ ];
 		$particArray = [ ];
-		/*if(count($recipients) > 1) 
+		/*if(count($recipients) > 1)
 			$message_group = 1;
 		else
 			$message_group = 0;*/
@@ -734,16 +734,16 @@ public function reply()
 								 'message_group'		=> $message_group
 							 ]
 		);
-		
+
 		DB::table('message_threads')
             ->where('message_thread_thread_id', $thread )
             ->update(array('message_thread_created_date' => date( 'Y-m-d H:i:s' )));
-			
+
 		$userid = $session->token_user_id;
 		$name = getusernamebyid($userid);
-		$msg = $name.' has messaged you.';	
+		$msg = $name.' has messaged you.';
 		$threadid = $thread;
-		$icon = '';	
+		$icon = '';
 		foreach( $recipients as $recipient )
 		{
 			if( $recipient->join_message_participant_user_id == $session->token_user_id )
@@ -764,7 +764,7 @@ public function reply()
 				'join_message_recipient_read'       => 0,
 			];
 			// Added for make entry for push badge count
-			$notification_count = 0;						
+			$notification_count = 0;
 			$input = array(
 						'user_id' => $recipient->join_message_participant_user_id,
 					);
@@ -774,7 +774,7 @@ public function reply()
 			{
 				$notification_count = DB::table('notification_counts')
 					->where('user_id','=',$recipient->join_message_participant_user_id)
-					->pluck( 'notification_count' );					
+					->pluck( 'notification_count' );
 				$notification_count = $notification_count + 1;
 				$notificationcount->notification_count = $notification_count;
 				$notificationcount->save();
@@ -807,18 +807,18 @@ public function reply()
 											'notification_updated_date' => date( 'Y-m-d H:i:s' ) ] );
 			}
 			else
-			{	
+			{
 				//mail('anil@spaceotechnologies.com',time().'else',print_r($thread,true));
 				$subjects = json_decode( $prev_not->notification_subject_ids );
-				
+
 				if( !in_array( $session->token_user_id, $subjects ) )
 				{
 					array_push( $subjects, $session->token_user_id );
 					$prev_not->notification_subject_ids = json_encode( $subjects );
 				}
 				$prev_not->notification_read = 0;
-				$prev_not->notification_updated_date = date( 'Y-m-d H:i:s' );				
-				$prev_not->save();				
+				$prev_not->notification_updated_date = date( 'Y-m-d H:i:s' );
+				$prev_not->save();
 			}
 		}
 
@@ -842,22 +842,22 @@ public function reply()
 		{
 			$icon = 'http://' . $_ENV[ 'URL' ] . '/images/message.png';
 			for($i=0; $i<count($recipArray);$i++)
-			{	
+			{
 				$u = $recipArray[$i]['join_message_recipient_user_id'];
 				$message = $msg;
 				if($u != $session->token_user_id)
 				{
-					$usersData = DB::select( DB::raw("SELECT t1.* FROM 
-								(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
+					$usersData = DB::select( DB::raw("SELECT t1.* FROM
+								(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id
 								from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
 								order by device_registration_date_created desc
-								) t1 left join users u on t1.device_registration_user_id = u.user_id 
-								where u.user_deleted = 0 
+								) t1 left join users u on t1.device_registration_user_id = u.user_id
+								where u.user_deleted = 0
 								AND u.user_id = $u
 								order by t1.device_registration_date_created desc"));
-					
+
 					if(!empty($usersData))
-					{	
+					{
 							for($j=0;$j<count($usersData);$j++)
 							{
 								$this->registerSNSEndpoint($usersData[$j], $message, $message_group, $name, $icon, $threadid);
@@ -1054,22 +1054,22 @@ public function reply()
 					/*if(!empty($recipArray))
 					{
 						for($i=0; $i<count($recipArray);$i++)
-						{	
+						{
 							$u = $recipArray[$i]['join_message_recipient_user_id'];
 							if($u != $session->token_user_id)
 							{
-								$usersData = DB::select( DB::raw("SELECT t1.* FROM 
-											(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
+								$usersData = DB::select( DB::raw("SELECT t1.* FROM
+											(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id
 											from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar' AND device_registration_device_type = 'apple'
 											order by device_registration_date_created desc
-											) t1 left join users u on t1.device_registration_user_id = u.user_id 
-											where u.user_deleted = 0 
+											) t1 left join users u on t1.device_registration_user_id = u.user_id
+											where u.user_deleted = 0
 											AND u.user_id = $u
-											group by u.user_id 
+											group by u.user_id
 											order by t1.device_registration_date_created desc"));
 
 								if(!empty($usersData))
-								{	
+								{
 										$this->registerSNSEndpoint($usersData[0]);
 								}
 							}
@@ -1091,7 +1091,7 @@ public function reply()
 		);
 
 		$validator = Validator::make( Input::get(), $rules );
-		
+
 		if( $validator->fails() )
 		{
 			$response[ 'errors' ] = $validator->messages();
@@ -1124,33 +1124,33 @@ public function reply()
 
 			$messageRecipientThread = MessageRecipients::where( 'join_message_recipient_thread_id','=', $threadId )
 			->get();
-			foreach ($messageRecipientThread as $thread) 
+			foreach ($messageRecipientThread as $thread)
 			{
 				$thread->delete();
 			}
 
 			$messageParticipantThread = MessageParticipants::where( 'join_message_participant_message_thread_id','=', $threadId )
 			->get();
-			foreach ($messageParticipantThread as $thread) 
+			foreach ($messageParticipantThread as $thread)
 			{
 				$thread->delete();
 			}
 
 			$messagesThread = Message2::where( 'message_thread_id','=', $threadId )
 			->where('message_deleted','=',1)->get();
-			foreach ($messagesThread as $thread) 
+			foreach ($messagesThread as $thread)
 			{
 				$thread->delete();
 			}
 
 			$threadToDelete = MessageThread::where('message_thread_thread_id','=',$threadId)
 			->get();
-			foreach ($threadToDelete as $thread) 
+			foreach ($threadToDelete as $thread)
 			{
 				$thread->delete();
 			}
 
-			
+
 			$response['message'] = "Thread deleted successfully.";
 			$status_code = 200;
 		}
@@ -1161,14 +1161,14 @@ public function reply()
 	{
 		$token = Request::header( "X-API-TOKEN" );
 
-		$session = $this->token->get_session( $token );		
+		$session = $this->token->get_session( $token );
 		$count = DB::table( 'join_message_recipients' )
 					->select( 'join_message_recipients.*' )
 					->where( 'join_message_recipients.join_message_recipient_user_id', '=', $session->token_user_id )
 					->where('join_message_recipients.join_message_recipient_read', '=', 0)
 					->groupBy('join_message_recipients.join_message_recipient_thread_id')
-					->get();	
-					//->count();	
+					->get();
+					//->count();
 		/* Commented on 17-June-2015 for notificaion changes */
 		/*$count = DB::table( 'notifications' )
 			->select( 'notifications.*' )
@@ -1177,7 +1177,7 @@ public function reply()
 			->where('notifications.notification_deleted', '=', 0)
 			->where('notifications.notification_type', '=', 'Message')
 			->count();*/
-		
+
 		//$return[ 'notifications' ]= $count;
 		$return[ 'notifications' ]= count($count);
 
@@ -1210,11 +1210,11 @@ public function reply()
 			$token = Request::header( "X-API-TOKEN" );
 			$session = $this->token->get_session( $token );
 
-			
+
 			$messageToRead = MessageRecipients::where('join_message_recipient_user_id','=',$session->token_user_id)
 								->where('join_message_recipient_thread_id','=',$threadId)
 								->get();
-			foreach ($messageToRead as $msg) 
+			foreach ($messageToRead as $msg)
 			{
 				if( $msg->join_message_recipient_read == 1 )
 				{
@@ -1226,10 +1226,10 @@ public function reply()
 					$msg->save();
 				}
 			}
-			//$notification = Notification::where('notification_user_id', '=', $session->token_user_id)->where('notification_entry_id','=',$threadId)->update(['notification_read' => 1]);					
-			$notification = Notification::where('notification_user_id', '=', $session->token_user_id)->where('notification_entry_id','=',$threadId)->where('notification_type','=','Message')->update(['notification_read' => 1]);					
+			//$notification = Notification::where('notification_user_id', '=', $session->token_user_id)->where('notification_entry_id','=',$threadId)->update(['notification_read' => 1]);
+			$notification = Notification::where('notification_user_id', '=', $session->token_user_id)->where('notification_entry_id','=',$threadId)->where('notification_type','=','Message')->update(['notification_read' => 1]);
 			$response['message'] = "Thread read successfully.";
-			$status_code = 200;			
+			$status_code = 200;
 		}
 		$response = Response::make( $response, $status_code );
 		return $response;
@@ -1253,8 +1253,8 @@ public function reply()
 
 		$sns = getSNSClient();
 
-		$Model1 = $sns->listPlatformApplications();  
-		
+		$Model1 = $sns->listPlatformApplications();
+
 		$result1 = $sns->listEndpointsByPlatformApplication(array(
 			// PlatformApplicationArn is required
 			'PlatformApplicationArn' => $arn,
@@ -1263,7 +1263,7 @@ public function reply()
 		//$dtoken = 'APA91bHEx658AQzCM3xUHTVjBGJz8a_HMb65Y_2BIIPXODexYlvuCZpaJRKRchTNqQCXs_w9b0AxJbzIQOFNtYkW0bbsiXhiX7uyhGYNTYC2PBOZzAmvqnvOBBhOKNS7Jl0fdoIdNa_riOlJxQi8COrhbw0odIJKBg';
 		//$dtoken = 'c39bac35f298c66d7398673566179deee27618c2036d8c82dcef565c8d732f84';
 		foreach($result1['Endpoints'] as $Endpoint){
-			$EndpointArn = $Endpoint['EndpointArn']; 
+			$EndpointArn = $Endpoint['EndpointArn'];
 			$EndpointToken = $Endpoint['Attributes'];
 			foreach($EndpointToken as $key=>$newVals){
 				if($key=="Token"){
@@ -1291,12 +1291,12 @@ public function reply()
 		 ));
 
 		 $endpointDetails = $result->toArray();
-		 
+
 		 //print_r($device);echo "\n".$message."\n";print_r($result);print_r($endpointDetails);
 
 		 //die;
 		 if($device->device_registration_device_type == "apple")
-		 {	
+		 {
 			 $publisharray = array(
 			 	'TargetArn' => $endpointDetails['EndpointArn'],
 			 	'MessageStructure' => 'json',
@@ -1313,11 +1313,11 @@ public function reply()
 							"notificationIcon"=>$icon,
        						"entry_id"=>$threadid,
 							"Type"=>'Message',
-						)						
+						)
 					)),
 				))
 			 );
-			 
+
 		 }
 		 else
 		 {
@@ -1334,7 +1334,7 @@ public function reply()
        						"diaplayname"=>$name,
 							"notificationIcon"=>$icon,
        						"entry_id"=>$threadid,
-							"Type"=>'Message'							
+							"Type"=>'Message'
 						)
 					))
 				))
@@ -1348,8 +1348,8 @@ public function reply()
 			file_put_contents($myfile, date('d-m-Y H:i:s') . ' debug log:', FILE_APPEND);
 			file_put_contents($myfile, print_r($endpointDetails, true), FILE_APPEND);
 
-			//print($EndpointArn . " - Succeeded!\n");    
-		 }   
+			//print($EndpointArn . " - Succeeded!\n");
+		 }
 		 catch (Exception $e)
 		 {
 			return  true;
@@ -1377,24 +1377,24 @@ public function reply()
 
 			//Get current user
 			$token = Request::header( "X-API-TOKEN" );
-			$session = $this->token->get_session( $token );		
-			
+			$session = $this->token->get_session( $token );
+
 			$participants = MessageParticipants::where( 'join_message_participant_message_thread_id', '=', $threadId,'and')
 										->where( 'join_message_participant_user_id','!=', $session->token_user_id,'and')
 										->where( 'join_message_participant_deleted_thread', '=', 0)
 										->groupBy( 'join_message_participant_user_id')
-										->get();		
-										// ->orderBy( 'join_message_participant_id', 'desc' )					
-							
+										->get();
+										// ->orderBy( 'join_message_participant_id', 'desc' )
+
 			$current[ 'participants' ] = [ ];
-			foreach ($participants as $participant) 
+			foreach ($participants as $participant)
 			{
 				$current[ 'participants' ][] = particUser( $participant->user, $session, false );
 			}
 			$response['message'] = "Display thread participants successfully.";
 			$return[ 'thread' ] = $current;
 			$status_code = 200;
-		}		
+		}
 		$response = Response::make( $return, $status_code );
 		return $response;
 	}
@@ -1403,21 +1403,21 @@ public function reply()
 		$return = array();
 		if(!empty($threadId) && !empty($session))
 		{
-			//Get current user			
+			//Get current user
 			$participants = MessageParticipants::where( 'join_message_participant_message_thread_id', '=', $threadId,'and')
 										->where( 'join_message_participant_user_id','!=', $session->token_user_id,'and')
 										->where( 'join_message_participant_deleted_thread', '=', 0)
 										->groupBy( 'join_message_participant_user_id')
-										->get();		
-										// ->orderBy( 'join_message_participant_id', 'desc' )					
-							
+										->get();
+										// ->orderBy( 'join_message_participant_id', 'desc' )
+
 			$current = [ ];
-			foreach ($participants as $participant) 
+			foreach ($participants as $participant)
 			{
 				$current[] = particUser( $participant->user, $session, false );
 			}
 			$return = $current;
-		}			
+		}
 		return $return;
 	}
 	public function badgeread()
@@ -1428,7 +1428,7 @@ public function reply()
 
 		$affectedRows = DB::table('notification_counts')->where('user_id', '=', $session->token_user_id)->update(array('notification_count' => 0));
 		$response['message'] = "Badge count read successfully.";
-		$status_code = 200;			
+		$status_code = 200;
 		$response = Response::make( $response, $status_code );
 		return $response;
 	}

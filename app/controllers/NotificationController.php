@@ -74,7 +74,7 @@ class NotificationController extends BaseController
 
 		$session = $this->token->get_session( $token );
 
-		//Get limit to calculate pagination 
+		//Get limit to calculate pagination
 		$limit = ( Input::get( 'limit', '50' ) );
 
 		//If not numeric set it to the default limit
@@ -141,26 +141,26 @@ class NotificationController extends BaseController
 					continue;
 				}
 				$checkIdArray[] = @$notification->notification_entry_id;
-				$condition = @$notification->notification_entry_id;				
+				$condition = @$notification->notification_entry_id;
 			}
 			///////
 			$type = $notification->notification_type;
 			$condition = '';
 			$entryIdsArray = array();
-			
+
 			if($type == 'Message')
 			{
-				$condition = @$notification->notification_entry_id;				
+				$condition = @$notification->notification_entry_id;
 			}
 			elseif($type == 'Follow')
 			{
-				$condition = @$notification->notification_entry_id;				
+				$condition = @$notification->notification_entry_id;
 			}
 			else
 			{
 				$condition = @$notification->entry->entry_id;
 			}
-			
+
 			if(!empty(@$condition))
 			{
 				$current = [ ];
@@ -240,7 +240,7 @@ class NotificationController extends BaseController
 				}
 				else
 				{
-					$current[ 'notificationDate' ] = $notification->notification_updated_date;	
+					$current[ 'notificationDate' ] = $notification->notification_updated_date;
 				}
 				//$current[ 'notificationRead' ] = ($notification->notification_read == 1) ? 1 : 0;
 				/* Added for notification count issue on 17-June-2015 */
@@ -274,12 +274,12 @@ class NotificationController extends BaseController
 
 					/*$countThread = DB::table('join_message_recipients')
 								->where('join_message_recipient_thread_id','=',$notification->notification_entry_id)
-								->count();*/					
+								->count();*/
 					$message_group = 0;
 					$message_group = DB::table('messages')
 								->where('message_thread_id','=',$notification->notification_entry_id)
 								->pluck( 'message_group' );
-								
+
 					/*if($countThread >= 2 )
 					{
 						$message_group = 1;
@@ -289,7 +289,7 @@ class NotificationController extends BaseController
 						$message_group = 0;
 					}*/
 					$current[ 'messageGroup' ] = $message_group;
-					
+
 				}
 				elseif($notification->notification_type == 'Follow')
 				{
@@ -299,11 +299,11 @@ class NotificationController extends BaseController
 					$userid = @$notification->notification_entry_id;
 					$displayname = getusernamebyid($userid);
 					$current['entry']['entry_name'] = $displayname;
-					
+
 					$user = User::find( @$notification->notification_entry_id );
 					$profileImage = ( isset( $user->user_profile_image ) ) ? $client->getObjectUrl( Config::get('app.bucket'), $user->user_profile_image, '+720 minutes' ) : '';
 					$profileCover = ( isset( $user->user_cover_image ) )   ? $client->getObjectUrl( Config::get('app.bucket'), $user->user_cover_image, '+720 minutes' ) : '';
-					
+
 					$current['entry']['profileImage'] = $profileImage;
 					$current['entry']['profileCover'] = $profileCover;
 				}
@@ -332,12 +332,12 @@ class NotificationController extends BaseController
 		//If next is true create next page link
 		if( $next )
 		{
-			$return[ 'next' ] = "http://api.mobstar.com/notification/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
+			$return[ 'next' ] = "http://".$_ENV['URL']."/notification/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
 		}
 
 		if( $previous )
 		{
-			$return[ 'previous' ] = "http://api.mobstar.com/notification/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
+			$return[ 'previous' ] = "http://".$_ENV['URL']."/notification/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
 		}
 
 		$response = Response::make( $return, $status_code );
@@ -456,7 +456,7 @@ class NotificationController extends BaseController
 
 		return $response;
 	}
-	
+
 	/**
 	*
 	* @SWG\Api(
@@ -501,9 +501,9 @@ class NotificationController extends BaseController
 
 		//Validate Input
 		$rules = array(
-			'notificationIds'    => 'required',			
+			'notificationIds'    => 'required',
 		);
-		$messages = array(			
+		$messages = array(
 		);
 
 		$validator = Validator::make( Input::all(), $rules, $messages );
@@ -535,12 +535,12 @@ class NotificationController extends BaseController
 				else
 				{
 					continue;
-				}			
+				}
 			}*/
 			$response[ 'message' ] = "Notification read successfully";
 			$status_code = 201;
 		}
-		return Response::make( $response, $status_code );	
+		return Response::make( $response, $status_code );
 	}
 	///////
 	public function markreadnew( )
@@ -552,9 +552,9 @@ class NotificationController extends BaseController
 
 		//Validate Input
 		$rules = array(
-			'notificationIds'    => 'required',			
+			'notificationIds'    => 'required',
 		);
-		$messages = array(			
+		$messages = array(
 		);
 
 		$validator = Validator::make( Input::all(), $rules, $messages );
@@ -586,12 +586,12 @@ class NotificationController extends BaseController
 				else
 				{
 					continue;
-				}			
+				}
 			}
 			$response[ 'message' ] = "Notification read successfully";
 			$status_code = 201;
 		}
-		return Response::make( $response, $status_code );	
+		return Response::make( $response, $status_code );
 	}
 	///////
 }

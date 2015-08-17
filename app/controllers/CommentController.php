@@ -125,8 +125,8 @@ class CommentController extends BaseController
 		   ->with('User', 'Entry');
 		}
 		else
-		{			
-			$comments = Comment::join('users as u', 'u.user_id', '=', 'comments.comment_user_id')		   
+		{
+			$comments = Comment::join('users as u', 'u.user_id', '=', 'comments.comment_user_id')
 			   ->orderBy('u.user_user_group', 'desc')
 			   ->select('comments.*')       // just to avoid fetching anything from joined table
 			   ->with('User', 'Entry');
@@ -199,12 +199,12 @@ class CommentController extends BaseController
 		//If next is true create next page link
 		if( $next )
 		{
-			$return[ 'next' ] = "http://api.mobstar.com/comment/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
+			$return[ 'next' ] = "http://".$_ENV['URL']."/comment/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
 		}
 
 		if( $previous )
 		{
-			$return[ 'previous' ] = "http://api.mobstar.com/comment/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
+			$return[ 'previous' ] = "http://".$_ENV['URL']."/comment/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
 		}
 
 		$response = Response::make( $return, $status_code );
@@ -281,7 +281,7 @@ class CommentController extends BaseController
 
 			$record = Entry::find( $entry );
 			// Added for make entry for push badge count
-			$notification_count = 0;						
+			$notification_count = 0;
 			$input = array(
 						'user_id' => $record->entry_user_id,
 					);
@@ -291,7 +291,7 @@ class CommentController extends BaseController
 			{
 				$notification_count = DB::table('notification_counts')
 					->where('user_id','=',$record->entry_user_id)
-					->pluck( 'notification_count' );					
+					->pluck( 'notification_count' );
 				$notification_count = $notification_count + 1;
 				$notificationcount->notification_count = $notification_count;
 				$notificationcount->save();
@@ -366,17 +366,17 @@ class CommentController extends BaseController
 
 				// echo $message;
 				// die();
-				$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
-					(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
+				$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM
+					(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id
 					from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
 					order by device_registration_date_created desc
-					) t1 left join users u on t1.device_registration_user_id = u.user_id 
-					where u.user_deleted = 0 
+					) t1 left join users u on t1.device_registration_user_id = u.user_id
+					where u.user_deleted = 0
 					AND u.user_id = $to
 					order by t1.device_registration_date_created desc"));
 
 				if(!empty($usersDeviceData))
-				{	
+				{
 					for($i=0;$i<count($usersDeviceData);$i++)
 					{
 						$this->registerSNSEndpoint($usersDeviceData[$i],$message,$name,$entryid,$icon);
@@ -455,7 +455,7 @@ class CommentController extends BaseController
 		$badge_count = DB::table('notification_counts')
 					->where('user_id','=',$device->device_registration_user_id)
 					->pluck( 'notification_count' );
-					
+
 		if( $device->device_registration_device_type == "apple" )
 		{
 			$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushdemo";
@@ -468,8 +468,8 @@ class CommentController extends BaseController
 
 		$sns = getSNSClient();
 
-		$Model1 = $sns->listPlatformApplications();  
-		
+		$Model1 = $sns->listPlatformApplications();
+
 		$result1 = $sns->listEndpointsByPlatformApplication(array(
 			// PlatformApplicationArn is required
 			'PlatformApplicationArn' => $arn,
@@ -478,7 +478,7 @@ class CommentController extends BaseController
 		//$dtoken = 'APA91bHEx658AQzCM3xUHTVjBGJz8a_HMb65Y_2BIIPXODexYlvuCZpaJRKRchTNqQCXs_w9b0AxJbzIQOFNtYkW0bbsiXhiX7uyhGYNTYC2PBOZzAmvqnvOBBhOKNS7Jl0fdoIdNa_riOlJxQi8COrhbw0odIJKBg';
 		//$dtoken = 'c39bac35f298c66d7398673566179deee27618c2036d8c82dcef565c8d732f84';
 		foreach($result1['Endpoints'] as $Endpoint){
-			$EndpointArn = $Endpoint['EndpointArn']; 
+			$EndpointArn = $Endpoint['EndpointArn'];
 			$EndpointToken = $Endpoint['Attributes'];
 			foreach($EndpointToken as $key=>$newVals){
 				if($key=="Token"){
@@ -506,12 +506,12 @@ class CommentController extends BaseController
 		 ));
 
 		 $endpointDetails = $result->toArray();
-		 
+
 		 //print_r($device);echo "\n".$message."\n";print_r($result);print_r($endpointDetails);
 
 		 //die;
 		 if($device->device_registration_device_type == "apple")
-		 {	
+		 {
 			 $publisharray = array(
 			 	'TargetArn' => $endpointDetails['EndpointArn'],
 			 	'MessageStructure' => 'json',
@@ -560,12 +560,12 @@ class CommentController extends BaseController
 			file_put_contents($myfile, date('d-m-Y H:i:s') . ' debug log:', FILE_APPEND);
 			file_put_contents($myfile, print_r($endpointDetails, true), FILE_APPEND);
 
-			//print($EndpointArn . " - Succeeded!\n");    
-		 }   
+			//print($EndpointArn . " - Succeeded!\n");
+		 }
 		 catch (Exception $e)
 		 {
 			//print($endpointDetails['EndpointArn'] . " - Failed: " . $e->getMessage() . "!\n");
-		 } 
+		 }
 
 
 	}
@@ -616,11 +616,11 @@ class CommentController extends BaseController
 		   ->orderBy('u.user_user_group', 'desc')
 		   ->select('comments.*')       // just to avoid fetching anything from joined table
 		   ->with('User', 'Entry');
-		   
+
 		}
 		else
-		{			
-			$comments = Comment::join('users as u', 'u.user_id', '=', 'comments.comment_user_id')		   
+		{
+			$comments = Comment::join('users as u', 'u.user_id', '=', 'comments.comment_user_id')
 			   //->groupBy('comments.comment_entry_id')
 			   ->orderBy('u.user_user_group', 'desc')
 			   ->select('comments.*')       // just to avoid fetching anything from joined table
@@ -645,7 +645,7 @@ class CommentController extends BaseController
 		$count = count($count);
 		$comments =$comments->take( $limit )->skip( $offset )->get();
 		//dd(DB::getQueryLog());
-		
+
 
 		if( $count == 0 )
 		{
@@ -673,7 +673,7 @@ class CommentController extends BaseController
 		$client = getS3Client();
 		foreach( $comments as $comment )
 		{
-			$current = array();			
+			$current = array();
 			$current['entry'][ 'id' ] = $comment->Entry->entry_id;
 			$current['entry'][ 'name' ] = $comment->Entry->entry_name;
 			$current['entry'][ 'description' ] = $comment->Entry->entry_description;
@@ -692,19 +692,19 @@ class CommentController extends BaseController
 					$client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
 					: "";
 			}
-			
+
 			$return[ 'comments' ][ ][ 'comment' ] = $current;
 		}
 		$status_code = 200;
 		//If next is true create next page link
 		if( $next )
 		{
-			$return[ 'next' ] = "http://api.mobstar.com/comment/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
+			$return[ 'next' ] = "http://".$_ENV['URL']."/comment/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
 		}
 
 		if( $previous )
 		{
-			$return[ 'previous' ] = "http://api.mobstar.com/comment/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
+			$return[ 'previous' ] = "http://".$_ENV['URL']."/comment/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
 		}
 
 		$response = Response::make( $return, $status_code );

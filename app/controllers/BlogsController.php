@@ -1,7 +1,7 @@
 <?php
 //use Swagger\Annotations as SWG;
 
-class BlogsController extends BaseController 
+class BlogsController extends BaseController
 {
 
 /**
@@ -38,7 +38,7 @@ class BlogsController extends BaseController
 
 		}
 
-		//Get limit to calculate pagination 
+		//Get limit to calculate pagination
 		$limit = ( Input::get( 'limit', '50' ) );
 
 		//If not numeric set it to the default limit
@@ -113,7 +113,7 @@ class BlogsController extends BaseController
 					if ( file_exists($blog->vBlogImage) )
 						$current[ 'blogImage' ] = "http://" . $_ENV[ 'URL' ] . '/' . $blog->vBlogImage;
 					else
-						$current[ 'blogImage' ] = "http://admin.mobstar.com/" . $blog->vBlogImage;
+						$current[ 'blogImage' ] = "http://".Config::get('app.url_admin')."/" . $blog->vBlogImage;
 				}
 
 				if( in_array( "description", $fields ) )
@@ -138,7 +138,7 @@ class BlogsController extends BaseController
 				if ( file_exists($blog->vBlogImage) )
 					$current[ 'blogImage' ] = "http://" . $_ENV[ 'URL' ] . '/' . $blog->vBlogImage;
 				else
-					$current[ 'blogImage' ] = "http://admin.mobstar.com/" . $blog->vBlogImage;
+					$current[ 'blogImage' ] = "http://".Config::get('app.url_admin')."/" . $blog->vBlogImage;
 				$current[ 'description' ] = $blog->txDescription;
 				$current[ 'CreatedAt' ] = date('d/m/Y',strtotime($blog->tsCreatedAt));
 				$return[ 'blogs' ][ ][ 'blog' ] = $current;
@@ -150,12 +150,12 @@ class BlogsController extends BaseController
 		//If next is true create next page link
 		if( $next )
 		{
-			$return[ 'next' ] = "http://api.mobstar.com/blogs/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
+			$return[ 'next' ] = "http://".$_ENV['URL']."/blogs/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
 		}
 
 		if( $previous )
 		{
-			$return[ 'previous' ] = "http://api.mobstar.com/blogs/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
+			$return[ 'previous' ] = "http://".$_ENV['URL']."/blogs/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
 		}
 
 		$response = Response::make( $return, $status_code );

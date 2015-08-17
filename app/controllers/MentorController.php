@@ -103,7 +103,7 @@ class MentorController extends BaseController
 
 		}
 
-		//Get limit to calculate pagination 
+		//Get limit to calculate pagination
 		$limit = ( Input::get( 'limit', '50' ) );
 
 		//If not numeric set it to the default limit
@@ -187,7 +187,7 @@ class MentorController extends BaseController
 					if ( file_exists($mentor->mentor_profile_picture) )
 						$current[ 'profilePicture' ] = "http://" . $_ENV[ 'URL' ] . '/' . $mentor->mentor_profile_picture;
 					else
-						$current[ 'profilePicture' ] = "http://admin.mobstar.com/" . $mentor->mentor_profile_picture;
+						$current[ 'profilePicture' ] = "http://".Config::get('app.url_admin')."/" . $mentor->mentor_profile_picture;
 					//$current[ 'profilePicture' ] = "http://" . $_ENV[ 'URL' ] . '/' . $mentor->mentor_profile_picture;
 				}
 
@@ -228,7 +228,7 @@ class MentorController extends BaseController
 				if ( file_exists($mentor->mentor_profile_picture) )
 					$current[ 'profilePicture' ] = "http://" . $_ENV[ 'URL' ] . '/' . $mentor->mentor_profile_picture;
 				else
-					$current[ 'profilePicture' ] = "http://admin.mobstar.com/" . $mentor->mentor_profile_picture;
+					$current[ 'profilePicture' ] = "http://".Config::get('app.url_admin')."/" . $mentor->mentor_profile_picture;
 				//$current[ 'profilePicture' ] = "http://" . $_ENV[ 'URL' ] . '/' . $mentor->mentor_profile_picture;
 				$current[ 'video' ] = $mentor->mentor_video;
 				$current[ 'info' ] = $mentor->mentor_bio;
@@ -252,12 +252,12 @@ class MentorController extends BaseController
 		//If next is true create next page link
 		if( $next )
 		{
-			$return[ 'next' ] = "http://api.mobstar.com/mentor/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
+			$return[ 'next' ] = "http://".$_ENV['URL']."/mentor/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
 		}
 
 		if( $previous )
 		{
-			$return[ 'previous' ] = "http://api.mobstar.com/mentor/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
+			$return[ 'previous' ] = "http://".$_ENV['URL']."/mentor/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
 		}
 
 		$response = Response::make( $return, $status_code );
@@ -354,7 +354,7 @@ class MentorController extends BaseController
 			}
 		}
 
-		//Get limit to calculate pagination 
+		//Get limit to calculate pagination
 		$limit = ( Input::get( 'limit', '5' ) );
 
 		//If not numeric set it to the default limit
@@ -434,7 +434,7 @@ class MentorController extends BaseController
 					if ( file_exists($mentor->mentor_profile_picture) )
 						$current[ 'profilePicture' ] = "http://" . $_ENV[ 'URL' ] . '/' . $mentor->mentor_profile_picture;
 					else
-						$current[ 'profilePicture' ] = "http://admin.mobstar.com/" . $mentor->mentor_profile_picture;
+						$current[ 'profilePicture' ] = "http://".Config::get('app.url_admin')."/" . $mentor->mentor_profile_picture;
 					//$current[ 'profilePicture' ] = "http://" . $_ENV[ 'URL' ] . '/' . $mentor->mentor_profile_picture;
 				}
 
@@ -475,7 +475,7 @@ class MentorController extends BaseController
 				if ( file_exists($mentor->mentor_profile_picture) )
 					$current[ 'profilePicture' ] = "http://" . $_ENV[ 'URL' ] . '/' . $mentor->mentor_profile_picture;
 				else
-					$current[ 'profilePicture' ] = "http://admin.mobstar.com/" . $mentor->mentor_profile_picture;
+					$current[ 'profilePicture' ] = "http://".Config::get('app.url_admin')."/" . $mentor->mentor_profile_picture;
 				//$current[ 'profilePicture' ] = "http://" . $_ENV[ 'URL' ] . '/' . $mentor->mentor_profile_picture;
 				$current[ 'video' ] = $mentor->mentor_video;
 				$current[ 'info' ] = $mentor->mentor_bio;
@@ -498,12 +498,12 @@ class MentorController extends BaseController
 		//If next is true create next page link
 		if( $next )
 		{
-			$return[ 'next' ] = "http://api.mobstar.com/mentor/" . $id_commas . "?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
+			$return[ 'next' ] = "http://".$_ENV['URL']."/mentor/" . $id_commas . "?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
 		}
 
 		if( $previous )
 		{
-			$return[ 'previous' ] = "http://api.mobstar.com/mentor/" . $id_commas . "?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
+			$return[ 'previous' ] = "http://".$_ENV['URL']."/mentor/" . $id_commas . "?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
 		}
 
 		$response = Response::make( $return, $status_code );

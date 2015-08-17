@@ -46,6 +46,9 @@ Route::get( 'debug/', function ()
 
   echo '<pre>';
 
+  echo 'Api url: ', $_ENV['URL'], "\n";
+  echo 'Admin url: ', Config::get( 'app.url_admin' ), "\n";
+
   echo 'App home path: ', Config::get( 'app.home' ), "\n";
   echo 'App tmp path: ', Config::get( 'app.tmp' ), "\n";
 

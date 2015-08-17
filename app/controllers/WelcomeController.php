@@ -46,11 +46,11 @@ class WelcomeController extends BaseController {
      *   )
      * )
      */
-	
+
 	public function index()
 	{
 
-		$return['url'] = "http://api.mobstar.com/uploads/7Abt9hFVKxTe.mp4";
+		$return['url'] = "http://".$_ENV['URL']."/uploads/7Abt9hFVKxTe.mp4";
 
 		$response = Response::make($return, 200);
 

@@ -989,7 +989,7 @@ class LoginController extends BaseController
 							$message = $client->account->calls->create(
 							'+353766805001', // Verified Outgoing Caller ID or Twilio number
 							$user_phone_country.$user_phone_number,// The phone number you wish to dial
-							'http://api.mobstar.com/login/twiml' // The URL of twiml.php on your server
+							'http://'.$_ENV['URL'].'/login/twiml' // The URL of twiml.php on your server
 							);
 						}
 						catch (Services_Twilio_RestException $e) {

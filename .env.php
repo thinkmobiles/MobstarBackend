@@ -7,6 +7,7 @@ return array(
     'PATH'				=> '/var/www/api/',
     'TMP'				=> '/tmp/',
     'URL'				=> 'api.mobstar.com',
+    'URL_ADMIN'				=> 'admin.mobstar.com',
 	'DEBUG'				=> true,
     'bucket' => 'mobstar-1',
     'DUMP_REQUESTS' => false,

@@ -1025,12 +1025,12 @@ class EntryController extends BaseController
 		//If next is true create next page link
 		if( $next )
 		{
-			$return[ 'next' ] = "http://api.mobstar.com/entry/" . $id_commas . "?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
+			$return[ 'next' ] = "http://".$_ENV['URL']."/entry/" . $id_commas . "?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
 		}
 
 		if( $previous )
 		{
-			$return[ 'previous' ] = "http://api.mobstar.com/entry/" . $id_commas . "?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
+			$return[ 'previous' ] = "http://".$_ENV['URL']."/entry/" . $id_commas . "?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
 		}
 
 		$response = Response::make( $return, $status_code );
@@ -1321,7 +1321,7 @@ class EntryController extends BaseController
 								$serviceDetails["description"] = Input::get( 'description' );
 								$serviceDetails["category"] = Input::get( 'category' );
 
-								$this->backgroundPost('http://api.mobstar.com/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
+								$this->backgroundPost('http://".$_ENV['URL']."/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
 							}
 							/* End */
 						}
@@ -1377,7 +1377,7 @@ class EntryController extends BaseController
 								$serviceDetails["description"] = Input::get( 'description' );
 								$serviceDetails["category"] = Input::get( 'category' );
 
-								$this->backgroundPost('http://api.mobstar.com/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
+								$this->backgroundPost('http://".$_ENV['URL']."/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
 							}
 							/* End */
 						}
@@ -3900,7 +3900,7 @@ class EntryController extends BaseController
 						$serviceDetails["description"] = Input::get( 'description' );
 						$serviceDetails["category"] = Input::get( 'category' );
 
-						$this->backgroundPost('http://api.mobstar.com/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
+						$this->backgroundPost('http://".$_ENV['URL']."/entry/youtubeUpload?jsonData='.urlencode(json_encode($serviceDetails)));
 //						unlink($file_out);
 //						unlink($thumb);
 					}

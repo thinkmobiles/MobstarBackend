@@ -1,6 +1,6 @@
 <?php
 
-class ModelingVideoController extends BaseController 
+class ModelingVideoController extends BaseController
 {
 
 /**
@@ -13,8 +13,8 @@ class ModelingVideoController extends BaseController
 		$videoData = DB::table('modeling_video')->first();
 		$url = $videoData->vModelingVideoURL;
 		$text = $videoData->txDescription;
-	
-		$return['url'] = "http://admin.mobstar.com/uploads/modelingVideo/1/".$url;
+
+		$return['url'] = "http://".Config::get('app.url_admin')."/uploads/modelingVideo/1/".$url;
 		$return['text'] = $text;
 		$response = Response::make($return, 200);
 

@@ -146,7 +146,7 @@ class CategoryController extends BaseController {
 		{
 			$ids[] = $order->category_id;
 		}
-		array_unshift($ids , '8');		
+		array_unshift($ids , '8');
 		$newOrderBy = '';
 		$newOrderBy = implode(",",$ids);
 		//$categories =  Category::take($limit)->skip($offset)->get();
@@ -172,10 +172,10 @@ class CategoryController extends BaseController {
 
 				if(in_array("categoryDescription",$fields))
 					$current['categoryDescription'] = $category->category_description;
-				
+
 				if(in_array("categoryIcon",$fields) && !empty( $category->category_icon ))
-					$current['categoryIcon'] = $client->getObjectUrl( Config::get('app.bucket'), $category->category_icon, '+60 minutes' );	
-				
+					$current['categoryIcon'] = $client->getObjectUrl( Config::get('app.bucket'), $category->category_icon, '+60 minutes' );
+
 				/*
 				if(in_array("mentors",$fields)){
 
@@ -234,10 +234,10 @@ class CategoryController extends BaseController {
 
 		//If next is true create next page link
 		if($next)
-			$return['next'] = "http://api.mobstar.com/category/?" . http_build_query(["limit" => $limit, "page" => $page+1]);
+			$return['next'] = "http://".$_ENV['URL']."/category/?" . http_build_query(["limit" => $limit, "page" => $page+1]);
 
 		if($previous)
-			$return['previous'] = "http://api.mobstar.com/category/?" . http_build_query(["limit" => $limit, "page" => $page-1]);
+			$return['previous'] = "http://".$_ENV['URL']."/category/?" . http_build_query(["limit" => $limit, "page" => $page-1]);
 
 		$response = Response::make($return, $status_code);
 
@@ -444,10 +444,10 @@ class CategoryController extends BaseController {
 
 		//If next is true create next page link
 		if($next)
-			$return['next'] = "http://api.mobstar.com/category/" . $id_commas . "?" . http_build_query(["limit" => $limit, "page" => $page+1]);
+			$return['next'] = "http://".$_ENV['URL']."/category/" . $id_commas . "?" . http_build_query(["limit" => $limit, "page" => $page+1]);
 
 		if($previous)
-			$return['previous'] = "http://api.mobstar.com/category/" . $id_commas . "?" . http_build_query(["limit" => $limit, "page" => $page-1]);
+			$return['previous'] = "http://".$_ENV['URL']."/category/" . $id_commas . "?" . http_build_query(["limit" => $limit, "page" => $page-1]);
 
 		$response = Response::make($return, $status_code);
 

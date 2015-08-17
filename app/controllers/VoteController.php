@@ -134,7 +134,7 @@ class VoteController extends BaseController
 
 		}
 
-		//Get limit to calculate pagination 
+		//Get limit to calculate pagination
 		$limit = ( Input::get( 'limit', '20' ) );
 
 		//If not numeric set it to the default limit
@@ -297,12 +297,12 @@ class VoteController extends BaseController
 		//If next is true create next page link
 		if( $next )
 		{
-			$return[ 'next' ] = "http://api.mobstar.com/vote/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
+			$return[ 'next' ] = "http://".$_ENV['URL']."/vote/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] );
 		}
 
 		if( $previous )
 		{
-			$return[ 'previous' ] = "http://api.mobstar.com/vote/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
+			$return[ 'previous' ] = "http://".$_ENV['URL']."/vote/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] );
 		}
 
 		$response = Response::make( $return, $status_code );
@@ -451,7 +451,7 @@ class VoteController extends BaseController
 				$name = getusernamebyid($userid);
 				$to = $entry->entry_user_id;
 				// Added for make entry for push badge count
-				$notification_count = 0;						
+				$notification_count = 0;
 				$inputbadge = array(
 							'user_id' => $to,
 						);
@@ -461,7 +461,7 @@ class VoteController extends BaseController
 				{
 					$notification_count = DB::table('notification_counts')
 						->where('user_id','=',$to)
-						->pluck( 'notification_count' );					
+						->pluck( 'notification_count' );
 					$notification_count = $notification_count + 1;
 					$notificationcount->notification_count = $notification_count;
 					$notificationcount->save();
@@ -483,17 +483,17 @@ class VoteController extends BaseController
 						$message = $name.' just voted for your entry.'; //.$entryType;
 					}
 					$icon = 'http://' . $_ENV[ 'URL' ] . '/images/' . $icon;
-					$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
-						(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
-						from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar' 
+					$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM
+						(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id
+						from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
 						order by device_registration_date_created desc
-						) t1 left join users u on t1.device_registration_user_id = u.user_id 
-						where u.user_deleted = 0 
+						) t1 left join users u on t1.device_registration_user_id = u.user_id
+						where u.user_deleted = 0
 						AND u.user_id = $to
 						order by t1.device_registration_date_created desc"));
 
 					if(!empty($usersDeviceData))
-					{	
+					{
 						for($k=0;$k<count($usersDeviceData);$k++)
 						{
 							$this->registerSNSEndpoint($usersDeviceData[$k],$message,$to,$notif_Type,$name,$icon,$entryId);
@@ -515,7 +515,7 @@ class VoteController extends BaseController
 				{
 					$star->user_star_created_date = date( 'Y-m-d H:i:s' );
 					$star->save();
-				}				
+				}
 				/* Change Yes vote to follow End*/
 			}
 			elseif( Input::get( 'type' ) == 'down' )
@@ -579,7 +579,7 @@ class VoteController extends BaseController
 			if($userData == 10)
 			{
 				// Added for make entry for push badge count
-				$notification_count = 0;						
+				$notification_count = 0;
 				$inputbadge = array(
 							'user_id' => $userid,
 						);
@@ -589,7 +589,7 @@ class VoteController extends BaseController
 				{
 					$notification_count = DB::table('notification_counts')
 						->where('user_id','=',$userid)
-						->pluck( 'notification_count' );					
+						->pluck( 'notification_count' );
 					$notification_count = $notification_count + 1;
 					$notificationcount->notification_count = $notification_count;
 					$notificationcount->save();
@@ -601,17 +601,17 @@ class VoteController extends BaseController
 				}
 				// End
 				$message = "You have 10 votes";
-				$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM 
-					(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id 
+				$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM
+					(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id
 					from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
 					order by device_registration_date_created desc
-					) t1 left join users u on t1.device_registration_user_id = u.user_id 
-					where u.user_deleted = 0 
+					) t1 left join users u on t1.device_registration_user_id = u.user_id
+					where u.user_deleted = 0
 					AND u.user_id = $userid
 					order by t1.device_registration_date_created desc"));
 
 				if(!empty($usersDeviceData))
-				{	
+				{
 					for($k=0;$k<count($usersDeviceData);$k++)
 					{
 						$this->registerSNSEndpoint($usersDeviceData[$k],$message);
@@ -815,7 +815,7 @@ class VoteController extends BaseController
 
 		$token = Request::header( "X-API-TOKEN" );
 		$session = $this->token->get_session( $token );
-		
+
 		//Get entry
 		$entry = ( Input::get( 'entry', '0' ) );
 		$entry = ( !is_numeric( $entry ) ) ? 0 : $entry;
@@ -830,12 +830,12 @@ class VoteController extends BaseController
                     ->where('vote_up', '=', '1')
                     ->where('vote_deleted', '=', '0')
                     ->get();
-			$return= array();		
+			$return= array();
 			$i = 0;
 			if(count($user)>0)
 			{
 				foreach( $user as $vote )
-				{  
+				{
 					$user = User::find( $vote->vote_user_id );
 					$return[$i]['userId'] = $user->user_id;
 					 if( ( $user->user_display_name == '' ) || ( is_null( $user->user_name ) ) || ( is_null( $user->user_email ) ) )
@@ -858,14 +858,14 @@ class VoteController extends BaseController
 						   $return[$i][ 'displayName' ] = $user->GoogleUser->google_user_display_name;
 						   //$return[$i][ 'fullName' ] = $user->GoogleUser->google_user_full_name;
 						  }
-						  
+
 					 }
 					 else
 					 {
 					  //$return[$i][ 'userName' ] = $user->user_name;
 					  $return[$i][ 'displayName' ] = $user->user_display_name;
 					  //$return[$i][ 'fullName' ] = $user->user_full_name;
-			
+
 					 }
 
 					 $return[$i]['profileImage'] = ( isset( $user->user_profile_image ) )
@@ -884,9 +884,9 @@ class VoteController extends BaseController
 				$return = [ 'error' => 'No Entries Found' ];
 				$status_code = 404;
 			}
-				
+
 			//$return[]['fans'] = count($return);
-			
+
 
 		}
 		else
@@ -915,8 +915,8 @@ class VoteController extends BaseController
 
 		$sns = getSNSClient();
 
-		$Model1 = $sns->listPlatformApplications();  
-		
+		$Model1 = $sns->listPlatformApplications();
+
 		$result1 = $sns->listEndpointsByPlatformApplication(array(
 			// PlatformApplicationArn is required
 			'PlatformApplicationArn' => $arn,
@@ -925,7 +925,7 @@ class VoteController extends BaseController
 		//$dtoken = 'APA91bHEx658AQzCM3xUHTVjBGJz8a_HMb65Y_2BIIPXODexYlvuCZpaJRKRchTNqQCXs_w9b0AxJbzIQOFNtYkW0bbsiXhiX7uyhGYNTYC2PBOZzAmvqnvOBBhOKNS7Jl0fdoIdNa_riOlJxQi8COrhbw0odIJKBg';
 		//$dtoken = 'c39bac35f298c66d7398673566179deee27618c2036d8c82dcef565c8d732f84';
 		foreach($result1['Endpoints'] as $Endpoint){
-			$EndpointArn = $Endpoint['EndpointArn']; 
+			$EndpointArn = $Endpoint['EndpointArn'];
 			$EndpointToken = $Endpoint['Attributes'];
 			foreach($EndpointToken as $key=>$newVals){
 				if($key=="Token"){
@@ -953,12 +953,12 @@ class VoteController extends BaseController
 		 ));
 
 		 $endpointDetails = $result->toArray();
-		 
+
 		 //print_r($device);echo "\n".$message."\n";print_r($result);print_r($endpointDetails);
 
 		 //die;
 		 if($device->device_registration_device_type == "apple")
-		 {	
+		 {
 			if(!empty($to) && !empty($name) && !empty($notif_Type))
 			{
 				$publisharray = array(
@@ -994,11 +994,11 @@ class VoteController extends BaseController
 							'aps' => array(
 								"sound" => "default",
 								"alert" => $message,
-								"badge"=> intval($badge_count),								
+								"badge"=> intval($badge_count),
 							)
 						)),
 					))
-				 );				
+				 );
 			}
 		 }
 		 else
@@ -1049,12 +1049,12 @@ class VoteController extends BaseController
 			file_put_contents($myfile, date('d-m-Y H:i:s') . ' debug log:', FILE_APPEND);
 			file_put_contents($myfile, print_r($endpointDetails, true), FILE_APPEND);
 
-			//print($EndpointArn . " - Succeeded!\n");    
-		 }   
+			//print($EndpointArn . " - Succeeded!\n");
+		 }
 		 catch (Exception $e)
 		 {
 			//print($endpointDetails['EndpointArn'] . " - Failed: " . $e->getMessage() . "!\n");
-		 } 
+		 }
 
 	}
 }
