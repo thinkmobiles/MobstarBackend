@@ -11,4 +11,6 @@ return array(
 	'DEBUG'				=> true,
     'bucket' => 'mobstar-1',
     'DUMP_REQUESTS' => false,
+    'BIN_FFMPEG' => '/usr/bin/ffmpeg',
+    'BIN_FFPROBE' => '/usr/bin/ffprobe',
 );

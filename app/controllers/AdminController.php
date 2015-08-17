@@ -193,7 +193,7 @@ class AdminController extends BaseController
 					$file_out = Config::get('app.home') . 'public/uploads/' . $filename . '.mp3';
 
 					// Transcode Audio
-					shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
+					shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_in . ' -strict -2 ' . $file_out );
 
 					$extension = 'mp3';
 
@@ -214,7 +214,7 @@ class AdminController extends BaseController
 						$file_out = Config::get('app.home') . 'public/uploads/' . $filename . '.mp4';
 
 						// Transcode Video
-						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt' );
+						shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt' );
 						$file->move( Config::get('app.home') . 'public/uploads/', $filename . '-uploaded.' . $extension );
 
 						$extension = 'mp4';
@@ -225,7 +225,7 @@ class AdminController extends BaseController
 
 						$thumb = Config::get('app.home') . 'public/uploads/' . $filename . '-thumb.jpg';
 
-						exec( '/usr/bin/ffprobe 2>&1 ' . $file_out . ' | grep "rotate          :"', $rotation );
+						exec( Config::get( 'app.bin_ffprobe' ).' 2>&1 ' . $file_out . ' | grep "rotate          :"', $rotation );
 
 						if( isset( $rotation[ 0 ] ) )
 						{
@@ -253,7 +253,7 @@ class AdminController extends BaseController
 							}
 						}
 
-						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . $transpose . ' -vframes 1 -an -vf scale=300:-1 -ss 00:00:00.10 ' . $thumb );
+						shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_out . $transpose . ' -vframes 1 -an -vf scale=300:-1 -ss 00:00:00.10 ' . $thumb );
 
 						$handle = fopen( $thumb, "r" );
 

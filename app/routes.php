@@ -52,6 +52,9 @@ Route::get( 'debug/', function ()
   echo 'App home path: ', Config::get( 'app.home' ), "\n";
   echo 'App tmp path: ', Config::get( 'app.tmp' ), "\n";
 
+  echo 'ffmpeg bin: ', Config::get( 'app.bin_ffmpeg' ), "\n";
+  echo 'ffprobe bin: ', Config::get( 'app.bin_ffprobe' ), "\n";
+
 	echo "tmp read:";
 	var_dump( is_readable( Config::get( 'app.tmp' ) ) );
 	echo "\n";
@@ -67,8 +70,8 @@ Route::get( 'debug/', function ()
 	var_dump( is_writable( Config::get( 'app.home' ).'/public/uploads' ) );
 	echo "\n";
 
-	echo 'sonus:';
-	var_dump( Sonus::getSupportedFormats() );
+	echo 'sonus supported formats: ', "\n";
+	print_r( Sonus::getSupportedFormats() );
 
 	var_dump($_ENV);
 

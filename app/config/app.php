@@ -195,4 +195,7 @@ return array(
 
 	'url_admin' => isset( $_ENV['URL_ADMIN'] ) ? $_ENV['URL_ADMIN'] : 'admin.mobstar.com',
 
+	'bin_ffmpeg' => $_ENV['BIN_FFMPEG'],
+
+	'bin_ffprobe' => $_ENV['BIN_FFPROBE'],
 );

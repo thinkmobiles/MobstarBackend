@@ -18,7 +18,7 @@ return array(
 	|
 	*/
 
-   'ffmpeg'		   => '/usr/bin/ffmpeg',
+   'ffmpeg'		   => Config::get( 'app.bin_ffmpeg' ),
 
     /*
 	|--------------------------------------------------------------------------
@@ -31,7 +31,7 @@ return array(
 	|
 	*/
 
-   'ffprobe'        => '/usr/bin/ffprobe',
+   'ffprobe'        => Config::get( 'app.bin_ffprobe' ),
 
    /*
 	|--------------------------------------------------------------------------

@@ -11,4 +11,6 @@ return array(
 	'DEBUG'				=> true,
 	'bucket' => 'mobstar-test-local',
 	'DUMP_REQUESTS' => true, // @fixme not work in unit test !!
+	'BIN_FFMPEG' => 'd:\\bin\\ffmpeg-20150814-git-affbecb-win32-static\\bin\\ffmpeg.exe',
+	'BIN_FFPROBE' => 'd:\\bin\\ffmpeg-20150814-git-affbecb-win32-static\\bin\\ffprobe.exe',
 );

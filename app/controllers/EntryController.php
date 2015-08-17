@@ -1248,7 +1248,7 @@ class EntryController extends BaseController
 					$file_out = Config::get('app.home') . 'public/uploads/' . $filename . '.mp3';
 
 					// Transcode Audio
-					shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
+					shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_in . ' -strict -2 ' . $file_out );
 
 					$extension = 'mp3';
 
@@ -1271,13 +1271,13 @@ class EntryController extends BaseController
 						// Transcode Video
 						if($session->token_user_id == 307 || $session->token_user_id == 302)
 						{
-							shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out . ' 2>' . Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt' );
+							shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_in . ' -strict -2 ' . $file_out . ' 2>' . Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt' );
 							$file->move( Config::get('app.home') . 'public/uploads/', $filename . '-uploaded.' . $extension );
 							$extension = 'mp4';
 							$handle = fopen( $file_out, "r" );
 							Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, fread( $handle, filesize( $file_out ) ) );
 							$thumb = Config::get('app.home') . 'public/uploads/' . $filename . '-thumb.jpg';
-							exec( '/usr/bin/ffprobe 2>&1 ' . $file_out . ' | grep "rotate          :"', $rotation );
+							exec( Config::get( 'app.bin_ffprobe' ).' 2>&1 ' . $file_out . ' | grep "rotate          :"', $rotation );
 							if( isset( $rotation[ 0 ] ) )
 							{
 								$rotation = substr( $rotation[ 0 ], 17 );
@@ -1306,7 +1306,7 @@ class EntryController extends BaseController
 										break;
 								}
 							}
-							shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . $transpose . ' -vframes 1 -an -ss 00:00:00.10 ' . $thumb );
+							shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_out . $transpose . ' -vframes 1 -an -ss 00:00:00.10 ' . $thumb );
 							$handle = fopen( $thumb, "r" );
 							Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", fread( $handle, filesize( $thumb ) ) );
 							/* Added By AJ on 09-Jul-2015 for youtube and water mark */
@@ -1327,13 +1327,13 @@ class EntryController extends BaseController
 						}
 						else
 						{
-							shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt' );
+							shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt' );
 							$file->move( Config::get('app.home') . 'public/uploads/', $filename . '-uploaded.' . $extension );
 							$extension = 'mp4';
 							$handle = fopen( $file_out, "r" );
 							Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, fread( $handle, filesize( $file_out ) ) );
 							$thumb = Config::get('app.home') . 'public/uploads/' . $filename . '-thumb.jpg';
-							exec( '/usr/bin/ffprobe 2>&1 ' . $file_out . ' | grep "rotate          :"', $rotation );
+							exec( Config::get( 'app.bin_ffprobe' ).' 2>&1 ' . $file_out . ' | grep "rotate          :"', $rotation );
 							if( isset( $rotation[ 0 ] ) )
 							{
 								$rotation = substr( $rotation[ 0 ], 17 );
@@ -1362,7 +1362,7 @@ class EntryController extends BaseController
 										break;
 								}
 							}
-							shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . $transpose . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
+							shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_out . $transpose . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
 							$handle = fopen( $thumb, "r" );
 							Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", fread( $handle, filesize( $thumb ) ) );
 							/* Added By AJ on 09-Jul-2015 for youtube and water mark */
@@ -3539,7 +3539,7 @@ class EntryController extends BaseController
 			$file_out = Config::get('app.home') . 'public/uploads/' . $filename . '.mp4';
 
 			// Transcode Video
-			shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt' );
+			shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt' );
 			$file->move( Config::get('app.home') . 'public/uploads/', $filename . '-uploaded.' . $extension );
 
 			$extension = 'mp4';
@@ -3550,7 +3550,7 @@ class EntryController extends BaseController
 
 			$thumb = Config::get('app.home') . 'public/uploads/' . $filename . '-thumb.jpg';
 
-			exec( '/usr/bin/ffprobe 2>&1 ' . $file_out . ' | grep "rotate          :"', $rotation );
+			exec( Config::get( 'app.bin_ffprobe' ).' 2>&1 ' . $file_out . ' | grep "rotate          :"', $rotation );
 
 			if( isset( $rotation[ 0 ] ) )
 			{
@@ -3578,7 +3578,7 @@ class EntryController extends BaseController
 				}
 			}
 
-			shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . $transpose . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
+			shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_out . $transpose . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
 
 			$handle = fopen( $thumb, "r" );
 
@@ -3821,7 +3821,7 @@ class EntryController extends BaseController
 					$file_out = Config::get('app.home') . 'public/uploads/' . $filename . '.mp3';
 
 					// Transcode Audio
-					shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -strict -2 ' . $file_out );
+					shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_in . ' -strict -2 ' . $file_out );
 
 					$extension = 'mp3';
 
@@ -3842,8 +3842,8 @@ class EntryController extends BaseController
 						$file_out = Config::get('app.home') . 'public/uploads/' . $filename . '.mp4';
 
 						// Transcode Video
-						shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt' );
-						//shell_exec( '/usr/bin/ffmpeg -i ' . $file_in . ' -vsync 2 -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt' );
+						shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt' );
+						//shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_in . ' -vsync 2 -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt' );
 
 						$file->move( Config::get('app.home') . 'public/uploads/', $filename . '-uploaded.' . $extension );
 
@@ -3855,7 +3855,7 @@ class EntryController extends BaseController
 
 						$thumb = Config::get('app.home') . 'public/uploads/' . $filename . '-thumb.jpg';
 
-						exec( '/usr/bin/ffprobe 2>&1 ' . $file_out . ' | grep "rotate          :"', $rotation );
+						exec( Config::get( 'app.bin_ffprobe' ).' 2>&1 ' . $file_out . ' | grep "rotate          :"', $rotation );
 
 						if( isset( $rotation[ 0 ] ) )
 						{
@@ -3886,7 +3886,7 @@ class EntryController extends BaseController
 							}
 						}
 
-						shell_exec( '/usr/bin/ffmpeg -i ' . $file_out . $transpose . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
+						shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_out . $transpose . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
 
 						$handle = fopen( $thumb, "r" );
 
@@ -4074,21 +4074,21 @@ class EntryController extends BaseController
 					if($serviceDetails["rotation_angel"] == '90')
 					{
 						$img_path = Config::get('app.home') . 'public/images/mob_img.png';
-						shell_exec( '/usr/bin/ffmpeg -i '.$videoPath_original.' -vf "movie="'.$img_path.'" [watermark]; [in][watermark] overlay=10:10 [out]" '.$file_out);
+						shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i '.$videoPath_original.' -vf "movie="'.$img_path.'" [watermark]; [in][watermark] overlay=10:10 [out]" '.$file_out);
 						sleep(10);
 						$videoPath = $file_out;
 					}
 					if($serviceDetails["rotation_angel"] == '180')
 					{
 						$img_path = Config::get('app.home') . 'public/images/mob_img180.png';
-						shell_exec( '/usr/bin/ffmpeg -i '.$videoPath_original.' -vf "movie="'.$img_path.'" [watermark]; [in][watermark] overlay=10:main_h-overlay_h-10 [out]" '.$file_out);
+						shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i '.$videoPath_original.' -vf "movie="'.$img_path.'" [watermark]; [in][watermark] overlay=10:main_h-overlay_h-10 [out]" '.$file_out);
 						sleep(10);
 						$videoPath = $file_out;
 					}
 					if($serviceDetails["rotation_angel"] == '270')
 					{
 						$img_path = Config::get('app.home') . 'public/images/mob_img_270.png';
-						shell_exec( '/usr/bin/ffmpeg -i '.$videoPath_original.' -vf "movie="'.$img_path.'" [watermark]; [in][watermark] overlay=main_w-overlay_w-10:main_h-overlay_h-10 [out]" '.$file_out);
+						shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i '.$videoPath_original.' -vf "movie="'.$img_path.'" [watermark]; [in][watermark] overlay=main_w-overlay_w-10:main_h-overlay_h-10 [out]" '.$file_out);
 						sleep(10);
 						$videoPath = $file_out;
 					}
@@ -4096,7 +4096,7 @@ class EntryController extends BaseController
 				else
 				{
 					$img_path = Config::get('app.home') . 'public/images/watermark1.png';
-					shell_exec( '/usr/bin/ffmpeg -i '.$videoPath_original.' -vf "movie="'.$img_path.'" [watermark]; [in][watermark] overlay=main_w-overlay_w-10:10 [out]" '.$file_out);
+					shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i '.$videoPath_original.' -vf "movie="'.$img_path.'" [watermark]; [in][watermark] overlay=main_w-overlay_w-10:10 [out]" '.$file_out);
 					sleep(10);
 					$videoPath = $file_out;
 				}
