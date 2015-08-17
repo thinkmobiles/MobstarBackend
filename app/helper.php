@@ -8,6 +8,8 @@ if (defined( 'HELPER_INCLUDED_EYDTTEYGD' ))
 {
   return;
 }
+else
+{
 //do not delete next line
 define( 'HELPER_INCLUDED_EYDTTEYGD', true );
 
@@ -557,4 +559,7 @@ function particUser( $user, $session, $includeStars = false )
 		$return[ 'displayName' ] = $user->user_display_name;
 	}
 	return $return;
+}
+
+// end of prevent multiple inclusion block
 }
