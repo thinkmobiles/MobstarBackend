@@ -229,7 +229,11 @@ class EntryController extends BaseController
 
 		if( Input::get( 'excludeVotes' ) == 'true' )
 		{
-			$votes = Vote::where( 'vote_user_id', '=', $session->token_user_id )->get();
+		  // skip entries, voted down by user
+			$votes = Vote::where( 'vote_user_id', '=', $session->token_user_id )
+			  ->where( 'vote_deleted', '=', 0 )
+			  ->where( 'vote_down', '>', 0 )->get();
+
 			foreach( $votes as $vote )
 			{
 				$exclude[ ] = $vote->vote_entry_id;

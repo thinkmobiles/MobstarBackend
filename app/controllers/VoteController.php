@@ -387,6 +387,7 @@ class VoteController extends BaseController
 			];
 
 			//Delete previous votes for this entry cast by this user
+			// @todo this will only mark votes as deleted. Whether we need them in database, or delete them completely?
 			$this->vote->delete_previous( $input );
 			$entryType = '';
 			$entry = Entry::find( $input[ 'vote_entry_id' ] );
