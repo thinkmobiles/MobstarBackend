@@ -255,14 +255,22 @@ class EntryController extends BaseController
 			}
 
 			// add entries from profile to home feedback
-			// @todo filter by duration
-			$include_entries = DB::table('entries')->where( 'entry_category_id', '=', 7 )->whereIn( 'entry_type', array( 'video', 'audio' ) ) ->get();
-			$exclude_hash = array_flip( $exclude );
-			foreach( $include_entries as $entry )
+			$max_media_duration_for_home_feed = isset( $_ENV['MAX_MEDIA_DURATION_FOR_HOME_FEED'] ) ? $_ENV['MAX_MEDIA_DURATION_FOR_HOME_FEED'] : 0;
+			$max_media_duration_for_home_feed = (int)$max_media_duration_for_home_feed;
+			if( $max_media_duration_for_home_feed > 0 )
 			{
-			  unset( $exclude_hash[ $entry->entry_id ] );
+				$include_entries = DB::table('entries')
+				  ->where( 'entry_category_id', '=', 7 )
+				  ->whereIn( 'entry_type', array( 'video', 'audio' ) )
+				  ->whereBetween( 'entry_duration', array( 0, $max_media_duration_for_home_feed ) )
+				  ->lists( 'entry_id' );
+				$exclude_hash = array_flip( $exclude );
+				foreach( $include_entries as $entry_id )
+				{
+				  unset( $exclude_hash[ $entry_id ] );
+				}
+				$exclude = array_keys( $exclude_hash );
 			}
-			$exclude = array_keys( $exclude_hash );
 		}
 		if($category == 8)
 		{
