@@ -2,6 +2,12 @@
 
 class ExampleTest extends TestCase {
 
+  protected function dumpJSONResponse( $response )
+  {
+    $data = json_decode( $response->getContent() );
+    error_log( print_r( $data, true ) );
+  }
+
   public function testDebug()
   {
     $response = $this->call( 'GET', '/debug' );
@@ -21,6 +27,7 @@ class ExampleTest extends TestCase {
 
     $this->assertNotEmpty( $contentJSON );
 
+    $this->dumpJSONResponse( $response );
     $content = json_decode( $contentJSON );
 
     $this->assertINstanceOf( 'stdClass', $content );
@@ -30,6 +37,24 @@ class ExampleTest extends TestCase {
 
     $entries = $content->entries;
     $this->assertTrue( count( $entries ) == 20 );
+  }
+
+
+  public function testGetFirstPageOfEntries()
+  {
+    $response = $this->call(
+      'GET',
+      '/entry',
+      array(
+        'excludeVotes' => true,
+        'orderBy' => 'latest',
+        'page' => 1
+      ),
+      array(),
+      array( 'HTTP_X-API-TOKEN' => '07516258357' )
+    );
+
+    $this->assertEquals( 200, $response->getStatusCode() );
   }
 
 
