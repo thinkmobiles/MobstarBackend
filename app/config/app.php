@@ -200,4 +200,6 @@ return array(
 	'bin_ffprobe' => $_ENV['BIN_FFPROBE'],
 
 	'disable_sns' => empty( $_ENV['DISABLE_SNS'] ) ? false : true,
+
+	'disable_youtube_upload' => empty( $_ENV['DISABLE_YOUTUBE_UPLOAD'] ) ? false : true,
 );

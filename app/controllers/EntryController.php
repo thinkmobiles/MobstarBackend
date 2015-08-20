@@ -4046,6 +4046,8 @@ class EntryController extends BaseController
 	// youtube upload
 	public function youtubeUpload()
  	{
+		if( Config::get('app.disable_youtube_upload') ) return;
+
 		$serviceDetails = json_decode($_REQUEST['jsonData'], true);
 		//mail('anil@spaceotechnologies.com','i am in_'.time(),print_r($serviceDetails,true));
 		require_once Config::get( 'app.home' ).'/vendor/google-api-php-client-master/src/Google/autoload.php';
