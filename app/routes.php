@@ -84,6 +84,8 @@ Route::get( 'debug/', function ()
 	print_r( Config::get( 'database.connections' )['mysql'] );
 	echo 'AWS bucket: ', Config::get( 'app.bucket' ), "\n";
 
+	echo 'AWS SNS disabled: ', Config::get('app.disable_sns') ? 'yes' : 'no' , "\n";
+
 	echo "\n", '</pre>';
 
 	return ob_get_clean();

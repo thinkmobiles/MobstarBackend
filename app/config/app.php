@@ -198,4 +198,6 @@ return array(
 	'bin_ffmpeg' => $_ENV['BIN_FFMPEG'],
 
 	'bin_ffprobe' => $_ENV['BIN_FFPROBE'],
+
+	'disable_sns' => empty( $_ENV['DISABLE_SNS'] ) ? false : true,
 );

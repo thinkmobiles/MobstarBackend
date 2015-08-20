@@ -2059,6 +2059,8 @@ class UserController extends BaseController
 	}
 	public function registerSNSEndpoint( $device , $message, $to=NULL, $name=NULL,$icon = NULL)
 	{
+	  if( Config::get('app.disable_sns') ) return;
+
 		$badge_count = 0;
 		$badge_count = DB::table('notification_counts')
 					->where('user_id','=',$device->device_registration_user_id)

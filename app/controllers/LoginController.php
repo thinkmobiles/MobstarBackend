@@ -886,6 +886,8 @@ class LoginController extends BaseController
 
 	public function registerSNSEndpoint( $device )
 	{
+	  if( Config::get('app.disable_sns') ) return;
+
 		if( $device->device_registration_device_type == "apple" )
 		{
 			$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/com.mobstar.prod";

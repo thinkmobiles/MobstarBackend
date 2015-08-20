@@ -14,4 +14,5 @@ return array(
 	'BIN_FFMPEG' => 'd:\\bin\\ffmpeg-20150814-git-affbecb-win32-static\\bin\\ffmpeg.exe',
 	'BIN_FFPROBE' => 'd:\\bin\\ffmpeg-20150814-git-affbecb-win32-static\\bin\\ffprobe.exe',
 	'MAX_MEDIA_DURATION_FOR_HOME_FEED' => 30,
+	'DISABLE_SNS' => true,
 );

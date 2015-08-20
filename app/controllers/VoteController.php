@@ -900,6 +900,8 @@ class VoteController extends BaseController
 	}
 	public function registerSNSEndpoint( $device, $message, $to=NULL, $notif_Type=NULL , $name=NULL,$icon = NULL,$entryId= NULL)
 	{
+	  if( Config::get('app.disable_sns') ) return;
+
 		$badge_count = 0;
 		$badge_count = DB::table('notification_counts')
 					->where('user_id','=',$device->device_registration_user_id)

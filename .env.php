@@ -14,4 +14,5 @@ return array(
     'BIN_FFMPEG' => '/usr/bin/ffmpeg',
     'BIN_FFPROBE' => '/usr/bin/ffprobe',
     'MAX_MEDIA_DURATION_FOR_HOME_FEED' => 30,
+    'DISABLE_SNS' => false,
 );

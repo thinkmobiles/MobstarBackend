@@ -228,6 +228,8 @@ class ProfileContentController extends BaseController
 	}
 	public function pushmessage()
 	{
+	  if( Config::get('app.disable_sns') ) return;
+
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );

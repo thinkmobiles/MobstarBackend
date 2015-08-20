@@ -459,6 +459,15 @@ function getS3Client()
 
 function getSNSClient()
 {
+  if( Config::get('app.disable_sns') ) { // SNS disabled in config
+    // get backtrace
+    ob_start();
+    debug_print_backtrace();
+    $backtrace = ob_get_clean();
+    error_log( 'called getSNSClient while SNS is disabled in configuration. Stack backtrace is: '.$backtrace );
+    return;
+  }
+  return false; // for testing
 	$config = array(
 		'key'    => Creds::ENV_KEY,
 		'secret' => Creds::ENV_SECRET,

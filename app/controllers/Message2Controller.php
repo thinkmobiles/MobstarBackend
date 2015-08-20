@@ -1236,6 +1236,8 @@ public function reply()
 	}
 	public function registerSNSEndpoint( $device , $message, $message_group, $name, $icon, $threadid)
 	{
+	  if( Config::get('app.disable_sns') ) return;
+
 		$badge_count = 0;
 		$badge_count = DB::table('notification_counts')
 					->where('user_id','=',$device->device_registration_user_id)
