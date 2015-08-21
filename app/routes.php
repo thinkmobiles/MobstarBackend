@@ -86,6 +86,10 @@ Route::get( 'debug/', function ()
 
 	echo 'AWS SNS disabled: ', Config::get('app.disable_sns') ? 'yes' : 'no' , "\n";
 
+	echo 'youtube upload disabled: ', Config::get('app.disable_youtube_upload') ? 'yes' : 'no' , "\n";
+
+	echo 'keep uploaded entry files: ', Config::get('app.keep_uploaded_entry_files') ? 'yes' : 'no' , "\n";
+
 	echo "\n", '</pre>';
 
 	return ob_get_clean();

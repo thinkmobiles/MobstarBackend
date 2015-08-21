@@ -16,4 +16,5 @@ return array(
     'MAX_MEDIA_DURATION_FOR_HOME_FEED' => 30,
     'DISABLE_SNS' => false,
     'DISABLE_YOUTUBE_UPLOAD' => false,
+    'KEEP_UPLOADED_ENTRY_FILES' => false,
 );

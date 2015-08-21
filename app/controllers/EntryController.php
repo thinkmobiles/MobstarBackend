@@ -1154,6 +1154,8 @@ class EntryController extends BaseController
 
 		$session = $this->token->get_session( $token );
 
+		$tmp_filenames = array(); // array of temporary created files. we need to delete them before return
+
 		//Validate Input
 		$rules = array(
 			'category'    => 'required|numeric',
@@ -1257,6 +1259,7 @@ class EntryController extends BaseController
 
 				$dest = 'uploads';
 
+				// @todo check that name not exists
 				$filename = str_random( 12 );
 
 				$extension = $file->getClientOriginalExtension();
@@ -1273,6 +1276,8 @@ class EntryController extends BaseController
 					// Transcode Audio
 					shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_in . ' -strict -2 ' . $file_out );
 
+					$tmp_filenames['result'] = $file_out;
+
 					// Get media duration
 					$duration = getMediaDurationInSec( $file_out );
 					// and save it
@@ -1283,12 +1288,7 @@ class EntryController extends BaseController
 
 					$extension = 'mp3';
 
-					$handle = fopen( $file_out, "r" );
-
-					Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, fread( $handle, filesize( $file_out ) ) );
-
-					unlink( $file_out );
-
+					Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, file_get_contents( $file_out ) );
 				}
 				else
 				{
@@ -1302,7 +1302,11 @@ class EntryController extends BaseController
 						// Transcode Video
 						if($session->token_user_id == 307 || $session->token_user_id == 302)
 						{
-							shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_in . ' -strict -2 ' . $file_out . ' 2>' . Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt' );
+							$log_filename = Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt';
+							shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_in . ' -strict -2 ' . $file_out . ' 2>' . $log_filename );
+
+							$tmp_filenames['result'] = $file_out;
+							$tmp_filenames['log'] = $log_filename;
 
 							// Get media duration
 							$duration = getMediaDurationInSec( $file_out );
@@ -1312,43 +1316,19 @@ class EntryController extends BaseController
 							$entryToUpdate->save();
 							unset( $entryToUpdate );
 
-							$file->move( Config::get('app.home') . 'public/uploads/', $filename . '-uploaded.' . $extension );
+							$fileMoved = $file->move( Config::get('app.home') . 'public/uploads/', $filename . '-uploaded.' . $extension );
+
+							$tmp_filenames['uploaded'] = $fileMoved->getPathname();
+
 							$extension = 'mp4';
-							$handle = fopen( $file_out, "r" );
-							Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, fread( $handle, filesize( $file_out ) ) );
+							Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, file_get_contents( $file_out ) );
+
 							$thumb = Config::get('app.home') . 'public/uploads/' . $filename . '-thumb.jpg';
-							exec( Config::get( 'app.bin_ffprobe' ).' 2>&1 ' . $file_out . ' | grep "rotate          :"', $rotation );
-							if( isset( $rotation[ 0 ] ) )
-							{
-								$rotation = substr( $rotation[ 0 ], 17 );
-							}
-							$contents = file_get_contents( Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt' );
-							preg_match( "#rotate.*?([0-9]{1,3})#im", $contents, $rotationMatches );
-							preg_match( "#displaymatrix.*?([0-9]{1,3})#im", $contents, $displayMatches );
-							$transpose = '';
-							$rotation_angel = '';
-							$display_angel = '';
-							if( count( $rotationMatches ) > 0 )
-							{
-								switch( $rotationMatches[ 1 ] )
-								{
-									case '90':
-										$transpose = ' -vf transpose=1';
-										$rotation_angel = '90';
-										break;
-									case '180':
-										$transpose = ' -vf vflip,hflip';
-										$rotation_angel = '180';
-										break;
-									case '270':
-										$transpose = ' -vf transpose=2';
-										$rotation_angel = '270';
-										break;
-								}
-							}
-							shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_out . $transpose . ' -vframes 1 -an -ss 00:00:00.10 ' . $thumb );
-							$handle = fopen( $thumb, "r" );
-							Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", fread( $handle, filesize( $thumb ) ) );
+
+							makeVideoThumbnail( $file_out, $thumb );
+							$tmp_filenames['thumb'] = $thumb;
+
+							Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", file_get_contents( $thumb ) );
 							/* Added By AJ on 09-Jul-2015 for youtube and water mark */
 							if( Input::get( 'category' ) != 7 && Input::get( 'category' ) != 8 )
 							{
@@ -1367,7 +1347,11 @@ class EntryController extends BaseController
 						}
 						else
 						{
-							shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt' );
+							$log_filename = Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt';
+							shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_in . ' -vf scale=306:306 -strict -2 ' . $file_out . ' 2>' . $log_filename );
+
+							$tmp_filenames['result'] = $file_out;
+							$tmp_filenames['log'] = $log_filename;
 
 							// Get media duration
 							$duration = getMediaDurationInSec( $file_out );
@@ -1377,66 +1361,19 @@ class EntryController extends BaseController
 							$entryToUpdate->save();
 							unset( $entryToUpdate );
 
-							$file->move( Config::get('app.home') . 'public/uploads/', $filename . '-uploaded.' . $extension );
+							$fileMoved = $file->move( Config::get('app.home') . 'public/uploads/', $filename . '-uploaded.' . $extension );
+
+							$tmp_filenames['uploaded'] = $fileMoved->getPathname();
+
 							$extension = 'mp4';
-							$handle = fopen( $file_out, "r" );
-							Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, fread( $handle, filesize( $file_out ) ) );
+							Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, file_get_contents( $file_out ) );
+
 							$thumb = Config::get('app.home') . 'public/uploads/' . $filename . '-thumb.jpg';
-							exec( Config::get( 'app.bin_ffprobe' ).' 2>&1 ' . $file_out . ' | grep "rotate          :"', $rotation );
-							if( isset( $rotation[ 0 ] ) )
-							{
-								$rotation = substr( $rotation[ 0 ], 17 );
-							}
-							$contents = file_get_contents( Config::get('app.home') . 'public/uploads/' . $filename . '-log.txt' );
-							preg_match( "#rotate.*?([0-9]{1,3})#im", $contents, $rotationMatches );
-							preg_match( "#displaymatrix.*?([0-9]{1,3})#im", $contents, $displayMatches );
-							$transpose = '';
-							$rotation_angel = '';
-							$display_angel = '';
-							/*
-							if( count( $rotationMatches ) > 0 )
-							{
-								switch( $rotationMatches[ 1 ] )
-								{
-									case '90':
-										$transpose = ' -vf transpose=1';
-										$rotation_angel = '90';
-										break;
-									case '180':
-										$transpose = ' -vf vflip,hflip';
-										$rotation_angel = '180';
-										break;
-									case '270':
-										$transpose = ' -vf transpose=2';
-										$rotation_angel = '270';
-										break;
-								}
-							}
-							*/
-							$videoInfo = getMediaInfo( $file_out );
-							if( empty( $videoInfo ) )
-							{
-							  error_log( 'can not get media info from file: '.$file_out );
-							} else {
-							  switch( $videoInfo['rotate'] )
-							  {
-							    case 90:
-							      $transpose = '';
-							      $rotation_angel = '90';
-							      break;
-							    case 180:
-							      $transpose = '';
-							      $rotation_angel = '180';
-							      break;
-							    case 270:
-							      $transpose = '';
-							      $rotation_angel = '270';
-							      break;
-							  }
-							}
-							shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_out . $transpose . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
-							$handle = fopen( $thumb, "r" );
-							Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", fread( $handle, filesize( $thumb ) ) );
+
+							makeVideoThumbnail( $file_out, $thumb );
+							$tmp_filenames['thumb'] = $thumb;
+
+							Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", file_get_contents( $thumb ) );
 							/* Added By AJ on 09-Jul-2015 for youtube and water mark */
 							if( Input::get( 'category' ) != 7 && Input::get( 'category' ) != 8 )
 							{
@@ -1468,11 +1405,9 @@ class EntryController extends BaseController
 
 						$image->save( $file_out );
 
-						$handle = fopen( $file_out, "r" );
+						$tmp_filenames['result'] = $file_out;
 
-						Flysystem::connection( 'awss3' )->put( $filename . "." . $extension,
-															   fread( $handle,
-																	  filesize( $file_out ) ) );
+						Flysystem::connection( 'awss3' )->put( $filename . "." . $extension, file_get_contents( $file_out ) );
 					}
 				}
 
@@ -1508,11 +1443,9 @@ class EntryController extends BaseController
 
 					$image->save( $file_out, 80 );
 
-					$handle = fopen( $file_out, "r" );
+					$tmp_filenames['file2'] = $file_out;
 
-					Flysystem::connection( 'awss3' )->put( $filename . "." . $extension,
-														   fread( $handle,
-																  filesize( $file_out ) ) );
+					Flysystem::connection( 'awss3' )->put( $filename . "." . $extension,  file_get_contents( $file_out ) );
 
 
 
@@ -1529,8 +1462,6 @@ class EntryController extends BaseController
 									   ] );
 
 					Eloquent::reguard();
-
-					unlink( $file_out );
 				}
 			}
 			else
@@ -1540,6 +1471,15 @@ class EntryController extends BaseController
 				$status_code = 400;
 			}
 
+		}
+
+		// delete uploaded files
+		if( ! Config::get( 'app.keep_uploaded_entry_files') )
+		{
+		  foreach( $tmp_filenames as $tmp_filename )
+		  {
+		    if( file_exists( $tmp_filename ) ) unlink( $tmp_filename );
+		  }
 		}
 
 		return Response::make( $response, $status_code );

@@ -67,7 +67,7 @@ class ExampleTest extends TestCase {
 
     $file = new \Symfony\Component\HttpFoundation\File\UploadedFile(
       $uploadedFilename,
-      'test_file'
+      'test_file.mp4'
     );
 
     $response = $this->call( 'POST', '/entry',
