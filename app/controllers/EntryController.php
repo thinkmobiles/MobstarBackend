@@ -1393,6 +1393,7 @@ class EntryController extends BaseController
 							$transpose = '';
 							$rotation_angel = '';
 							$display_angel = '';
+							/*
 							if( count( $rotationMatches ) > 0 )
 							{
 								switch( $rotationMatches[ 1 ] )
@@ -1410,6 +1411,28 @@ class EntryController extends BaseController
 										$rotation_angel = '270';
 										break;
 								}
+							}
+							*/
+							$videoInfo = getMediaInfo( $file_out );
+							if( empty( $videoInfo ) )
+							{
+							  error_log( 'can not get media info from file: '.$file_out );
+							} else {
+							  switch( $videoInfo['rotate'] )
+							  {
+							    case 90:
+							      $transpose = '';
+							      $rotation_angel = '90';
+							      break;
+							    case 180:
+							      $transpose = '';
+							      $rotation_angel = '180';
+							      break;
+							    case 270:
+							      $transpose = '';
+							      $rotation_angel = '270';
+							      break;
+							  }
 							}
 							shell_exec( Config::get( 'app.bin_ffmpeg' ).' -i ' . $file_out . $transpose . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 ' . $thumb );
 							$handle = fopen( $thumb, "r" );
