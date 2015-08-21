@@ -588,5 +588,51 @@ function getMediaDurationInSec( $filename )
   return $duration;
 }
 
+
+function getMediaInfo( $filename )
+{
+  // get ouput from ffprobe
+  $bin_ffprobe = Config::get( 'app.bin_ffprobe' );
+  $cmd = $bin_ffprobe.' '.$filename.' 2>&1';
+
+  $output = `$cmd`;
+
+  $info = array();
+
+  // get media type
+  $info['type'] = 'unknown';
+  if( preg_match_all( '#^\s*Stream.*(Video|Audio).*$#m', $output, $matches ) )
+  {
+    $streamTypes = $matches[1];
+    unset( $matches );
+    if( in_array( 'Video', $streamTypes ) ) $info['type'] = 'video';
+    elseif( in_array( 'Audio', $streamTypes ) ) $info['type'] = 'audio';
+  }
+
+  // get media duration
+  $info['duration'] = false;
+  if( preg_match( '#^\s*Duration:\s(\d\d):(\d\d):(\d\d)\.(\d\d),#m', $output, $matches ) )
+  {
+    $duration = $matches[1]*3600 + $matches[2]*60 + $matches[3];
+    if( $matches[4] >= 50 ) $duration++;
+    $info['duration'] = $duration;
+  }
+
+  // get video rotation
+  $info['rotate'] = false;
+  if( $info['type'] == 'video' )
+  {
+    if( preg_match( '#^\s*rotate\s*:\s(\d+)\s*$#m', $output, $matches ) )
+    {
+      $info['rotate'] = $matches[1];
+    } else {
+      $info['rotate'] = 0;
+    }
+  }
+
+  return $info;
+}
+
+
 // end of prevent multiple inclusion block
 }
