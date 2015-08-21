@@ -50,4 +50,41 @@ class HelperTest extends TestCase {
     $this->assertEquals( 15, $info['duration'] );
     $this->assertEquals( false, $info['rotate'] );
   }
+
+
+  public function testGetVideoThumbnail()
+  {
+    $filesDir = __DIR__.'/files/';
+
+    $filename = 'test_movie';
+    $ext = '.mp4';
+    $thumbName = $filesDir.'out/'.$filename.'-thumb.jpeg';
+    $filename .= $ext;
+
+    if( file_exists( $thumbName ) ) unlink( $thumbName );
+
+    makeVideoThumbnail( $filesDir.$filename, $thumbName);
+
+    $this->assertFileExists( $thumbName );
+  }
+
+
+  public function testGetVideoThumbnailWithMediaInfo()
+  {
+    $filesDir = __DIR__.'/files/';
+
+    $filename = 'no_rotate';
+    $ext = '.mp4';
+    $thumbName = $filesDir.'out/'.$filename.'-thumb.jpeg';
+    $filename .= $ext;
+
+    if( file_exists( $thumbName ) ) unlink( $thumbName );
+
+    $videoInfo = getMediaInfo( $filename );
+
+    makeVideoThumbnail( $filesDir.$filename, $thumbName, $videoInfo );
+
+    $this->assertFileExists( $thumbName );
+  }
+
 }

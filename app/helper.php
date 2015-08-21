@@ -634,5 +634,46 @@ function getMediaInfo( $filename )
 }
 
 
+function makeVideoThumbnail( $videoPath, $thumbnailPath, $videoInfo = false  )
+{
+  $transpose = '';
+  $rotation_angel = '';
+  $display_angel = '';
+
+  if( empty( $videoInfo ) ) getMediaInfo( $videoPath );
+
+  if( empty( $videoInfo ) )
+  {
+    error_log( 'can not get media info from file: '.$videoPath );
+  }
+  else
+  {
+    switch( $videoInfo['rotate'] )
+    {
+      case 90:
+        $transpose = '';
+        $rotation_angel = '90';
+        break;
+      case 180:
+        $transpose = '';
+        $rotation_angel = '180';
+        break;
+      case 270:
+        $transpose = '';
+        $rotation_angel = '270';
+        break;
+    }
+  }
+
+  $cmd = Config::get( 'app.bin_ffmpeg' )
+    . ' -i ' . $videoPath
+    . $transpose
+    . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 '
+    . $thumbnailPath;
+
+  shell_exec( $cmd );
+}
+
+
 // end of prevent multiple inclusion block
 }
