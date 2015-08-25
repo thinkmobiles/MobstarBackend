@@ -16,3 +16,11 @@ public/profile/357-gClql014RU5F.jpg
 public/profile/357-l7yuKUFH21Tu.jpg
 public/profile/357-qSIYgpCxIcKE.jpg
 public/profile/357-ZYXcmLzA33P2.jpg
+
+# some eclipse-related staff
+.buildpath
+.project
+.settings
+
+
+/temp/*
