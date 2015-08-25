@@ -8,6 +8,7 @@ class ExampleTest extends TestCase {
     error_log( print_r( $data, true ) );
   }
 
+
   public function testDebug()
   {
     $response = $this->call( 'GET', '/debug' );
@@ -84,4 +85,68 @@ class ExampleTest extends TestCase {
 
     $this->assertEquals( 201, $response->getStatusCode() );
   }
+
+
+  public function testPostEntryUnicodeUserName()
+  {
+    $testFilename = __DIR__.'/files/test_movie.mp4';
+    $uploadedFilename = __DIR__.'/files/test_movie_for_upload.mp4';
+
+    $this->assertTrue( copy( $testFilename, $uploadedFilename ), 'can not create temp file for uploading' );
+
+    $file = new \Symfony\Component\HttpFoundation\File\UploadedFile(
+        $uploadedFilename,
+        'test_file.mp4'
+    );
+
+    $userName = 'Користувач';
+    $category = 7; // user profile
+
+    // add entry to user profile
+    $response = $this->call( 'POST', '/entry',
+        array(
+          'category' => 7,
+          'type' => 'video',
+          'language' => 'english',
+          'name' => $userName,
+          'description' => 'Test Video',
+        ),
+        array( 'file1' => $file ),
+        array( 'HTTP_X-API-TOKEN' => '07516258357' )
+    );
+
+    $this->assertEquals( 201, $response->getStatusCode() );
+
+    $content = json_decode( $response->getContent() );
+    $entry_id = $content->entry_id;
+
+    // get entries from user profile
+    $response = $this->call(
+      'GET',
+      '/entry',
+      array(
+        'category' => $category,
+      ),
+      array(),
+      array( 'HTTP_X-API-TOKEN' => '07516258357' )
+    );
+
+    $this->assertEquals( 200, $response->getStatusCode() );
+    $content = json_decode( $response->getContents() );
+
+    $entries = $content->entries;
+
+    // find uploaded entry
+    $uploadedEntry = null;
+    foreach( $entries as $entryObj ) {
+      if( $entryObj->entry->id == $entry_id ) {
+        $uploadedEntry = $entryObj->entry;
+        break;
+      }
+    }
+    $this->assertFalse( empty( $uploadedEntry ), 'uploaded entry not found in entries first page' );
+
+    $this->assertEquals( $userName, $entry->name );
+  }
+
 }
