@@ -24,3 +24,6 @@ public/profile/357-ZYXcmLzA33P2.jpg
 
 
 /temp/*
+
+# do not track environment settings. Them may be different on other installations.
+.env.*
