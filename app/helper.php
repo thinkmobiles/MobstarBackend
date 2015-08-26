@@ -669,9 +669,10 @@ function makeVideoThumbnail( $videoPath, $thumbnailPath, $videoInfo = false  )
     . ' -i ' . $videoPath
     . $transpose
     . ' -vframes 1 -an -s 300x300 -ss 00:00:00.10 '
-    . $thumbnailPath;
+    . $thumbnailPath
+    . ' 2>&1';
 
-  shell_exec( $cmd );
+  `$cmd`;
 }
 
 
