@@ -640,7 +640,7 @@ function makeVideoThumbnail( $videoPath, $thumbnailPath, $videoInfo = false  )
   $rotation_angel = '';
   $display_angel = '';
 
-  if( empty( $videoInfo ) ) getMediaInfo( $videoPath );
+  if( empty( $videoInfo ) ) $videoInfo = getMediaInfo( $videoPath );
 
   if( empty( $videoInfo ) )
   {
