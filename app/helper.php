@@ -634,6 +634,7 @@ function getMediaInfo( $filename )
 }
 
 
+// @todo remove unused variables
 function makeVideoThumbnail( $videoPath, $thumbnailPath, $videoInfo = false  )
 {
   $transpose = '';

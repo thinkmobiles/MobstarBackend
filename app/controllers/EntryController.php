@@ -259,6 +259,7 @@ class EntryController extends BaseController
 			}
 
 			// add entries from profile to home feedback
+			// @todo video from user profile will go to all categories except 7 and 8. Is it right?
 			$max_media_duration_for_home_feed = isset( $_ENV['MAX_MEDIA_DURATION_FOR_HOME_FEED'] ) ? $_ENV['MAX_MEDIA_DURATION_FOR_HOME_FEED'] : 0;
 			$max_media_duration_for_home_feed = (int)$max_media_duration_for_home_feed;
 			if( $max_media_duration_for_home_feed > 0 )
@@ -1185,6 +1186,7 @@ class EntryController extends BaseController
 				$categoryId = DB::table( 'categories' )->where( 'category_id', '=', Input::get( 'category' ) )->pluck( 'category_id' );
 				if(empty($categoryId))
 				{
+					// @todo currently, if no catagory provided, it sets category to 1, saves entry and returns error and created entry_id
 					$response[ 'error' ] = "No category selected";
 					$status_code = 400;
 				}
@@ -1325,8 +1327,11 @@ class EntryController extends BaseController
 
 							$thumb = Config::get('app.home') . 'public/uploads/' . $filename . '-thumb.jpg';
 
-							makeVideoThumbnail( $file_out, $thumb );
+							$videoInfo = getMediaInfo( $file_out );
+							makeVideoThumbnail( $file_out, $thumb, $videoInfo );
 							$tmp_filenames['thumb'] = $thumb;
+
+							$rotation_angel = empty( $videoInfo['rotate'] ) ? '' : $videoInfo['rotate'];
 
 							Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", file_get_contents( $thumb ) );
 							/* Added By AJ on 09-Jul-2015 for youtube and water mark */
@@ -1370,8 +1375,11 @@ class EntryController extends BaseController
 
 							$thumb = Config::get('app.home') . 'public/uploads/' . $filename . '-thumb.jpg';
 
-							makeVideoThumbnail( $file_out, $thumb );
+							$videoInfo = getMediaInfo( $file_out );
+							makeVideoThumbnail( $file_out, $thumb, $videoInfo );
 							$tmp_filenames['thumb'] = $thumb;
+
+							$rotation_angel = empty( $videoInfo['rotate'] ) ? '' : $videoInfo['rotate'];
 
 							Flysystem::connection( 'awss3' )->put( "thumbs/" . $filename . "-thumb.jpg", file_get_contents( $thumb ) );
 							/* Added By AJ on 09-Jul-2015 for youtube and water mark */
