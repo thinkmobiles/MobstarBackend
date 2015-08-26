@@ -126,13 +126,14 @@ class ExampleTest extends TestCase {
       '/entry',
       array(
         'category' => $category,
+        'orderBy' => 'latest'
       ),
       array(),
       array( 'HTTP_X-API-TOKEN' => '07516258357' )
     );
 
     $this->assertEquals( 200, $response->getStatusCode() );
-    $content = json_decode( $response->getContents() );
+    $content = json_decode( $response->getContent() );
 
     $entries = $content->entries;
 
@@ -146,7 +147,7 @@ class ExampleTest extends TestCase {
     }
     $this->assertFalse( empty( $uploadedEntry ), 'uploaded entry not found in entries first page' );
 
-    $this->assertEquals( $userName, $entry->name );
+    $this->assertEquals( $userName, $uploadedEntry->name );
   }
 
 }
