@@ -230,75 +230,22 @@ class EntryController extends BaseController
 		if( Input::get( 'excludeVotes' ) == 'true' )
 		{
 		  // skip entries, voted down by user
-			$votes = Vote::where( 'vote_user_id', '=', $session->token_user_id )
-			  ->where( 'vote_deleted', '=', 0 )
-			  ->where( 'vote_down', '>', 0 )->get();
-
-			foreach( $votes as $vote )
-			{
-				$exclude[ ] = $vote->vote_entry_id;
-			}
+		  $exclude['excludeVotes'] = $session->token_user_id;
 		}
 		if( $order_by == 'popular' )
 		{
-			$entry_rank = DB::table( 'entries' )->where( 'entry_rank', '=', '0' )->get();
-			foreach( $entry_rank as $rank )
-			{
-				$exclude[ ] = $rank->entry_id;
-			}
+		  // skip not popular entries
+		  $exclude['notPopular'] = true;
 		}
 		/* Added for exclude MOBIT category in All entry list */
-		$excludeCategory = array();
 		if($category != 8 && $category != 7)
 		{
-			$excludeCategory = [7,8];
-			$entry_category = DB::table('entries')->whereIn( 'entry_category_id', $excludeCategory )->get();
-			foreach( $entry_category as $c )
-			{
-				$exclude[ ] = $c->entry_id;
-			}
-
-			// add entries from profile to home feedback
-			// @todo video from user profile will go to all categories except 7 and 8. Is it right?
-			$max_media_duration_for_home_feed = isset( $_ENV['MAX_MEDIA_DURATION_FOR_HOME_FEED'] ) ? $_ENV['MAX_MEDIA_DURATION_FOR_HOME_FEED'] : 0;
-			$max_media_duration_for_home_feed = (int)$max_media_duration_for_home_feed;
-			if( $max_media_duration_for_home_feed > 0 )
-			{
-				$include_entries = DB::table('entries')
-				  ->where( 'entry_category_id', '=', 7 )
-				  ->whereIn( 'entry_type', array( 'video', 'audio' ) )
-				  ->whereBetween( 'entry_duration', array( 0, $max_media_duration_for_home_feed ) )
-				  ->lists( 'entry_id' );
-				$exclude_hash = array_flip( $exclude );
-				foreach( $include_entries as $entry_id )
-				{
-				  unset( $exclude_hash[ $entry_id ] );
-				}
-				$exclude = array_keys( $exclude_hash );
-			}
-		}
-		if($category == 8)
-		{
-			$excludeCategory = [8];
-			$entry_category = DB::table('entries')->whereNotIn( 'entry_category_id', $excludeCategory )->get();
-			foreach( $entry_category as $c )
-			{
-				$exclude[ ] = $c->entry_id;
-			}
-		}
-		if($category == 7)
-		{
-			$excludeCategory = [7];
-			$entry_category = DB::table('entries')->whereNotIn( 'entry_category_id', $excludeCategory )->get();
-			foreach( $entry_category as $c )
-			{
-				$exclude[ ] = $c->entry_id;
-			}
+		  $exclude['category'] = array(7, 8);
 		}
 		/* End */
-		$entries = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false, true );
+		$entries = $this->entry->allComplexExclude( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false, true );
 		//dd(DB::getQueryLog());
-		$count = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, true );
+		$count = $this->entry->allComplexExclude( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, true );
 
 		if( $count == 0 )
 		{

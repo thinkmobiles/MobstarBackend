@@ -1,11 +1,45 @@
 <?php
 
-class ExampleTest extends TestCase {
+class EntryTest extends TestCase {
+
+
+  // check in tokens table
+  protected $authInfo = array(
+    'tokenId' => '07516258357',
+    'userId' => 301,
+  );
+
 
   protected function dumpJSONResponse( $response )
   {
     $data = json_decode( $response->getContent() );
     error_log( print_r( $data, true ) );
+  }
+
+
+  protected function getEntries( $pars = array() )
+  {
+    $response = $this->call( 'GET', '/entry', $pars, array(), array( 'HTTP_X-API-TOKEN' => $this->authInfo['tokenId'] ) );
+
+    $this->assertEquals( 200, $response->getStatusCode() );
+
+    $content = json_decode( $response->getContent() );
+    $entries = $content->entries;
+
+    return $entries;
+  }
+
+
+  protected function getEntryIds( $entries )
+  {
+    $ids = array();
+
+    foreach( $entries as $entryObj )
+    {
+      $ids[] = $entryObj->entry->id;
+    }
+
+    return $ids;
   }
 
 
@@ -28,7 +62,6 @@ class ExampleTest extends TestCase {
 
     $this->assertNotEmpty( $contentJSON );
 
-    $this->dumpJSONResponse( $response );
     $content = json_decode( $contentJSON );
 
     $this->assertINstanceOf( 'stdClass', $content );
@@ -38,6 +71,32 @@ class ExampleTest extends TestCase {
 
     $entries = $content->entries;
     $this->assertTrue( count( $entries ) == 20 );
+  }
+
+
+  public function testProfileEntriesNotAppearOnCategoryListing()
+  {
+    $entries = $this->getEntries( array(
+      'category' => 4, // dance
+      'excludeVotes' => true,
+      'orderBy' => 'latest',
+      'page' => 1,
+      'limit' => 20,
+    ));
+
+    $this->assertTrue( count($entries) > 0, 'No entries in category' );
+
+    // get categories of entries
+    $categories = array();
+    foreach( $entries as $entryObj )
+    {
+      $categories[] = $entryObj->entry->category;
+    }
+
+    $this->assertFalse(
+      in_array( 'Profile Content', $categories ),
+      'Profile entries appear in category listing'
+    );
   }
 
 
