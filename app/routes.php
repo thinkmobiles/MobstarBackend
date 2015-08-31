@@ -97,6 +97,13 @@ Route::get( 'debug/', function ()
 //    throw new RuntimeException("Oopsie!");
 } );
 
+//---------------------------------------------------------
+// Server
+//---------------------------------------------------------
+
+Route::get( 'server/time', 'ServerController@time' );
+
+
 Route::group( [ "before" => "auth" ], function ()
 {
 
