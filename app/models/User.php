@@ -146,4 +146,12 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 
 		return $return;
 	}
+
+
+	public function save( array $options = array() )
+	{
+	  if( is_null( $this->user_bio ) ) $this->user_bio = '';
+
+	  parent::save( $options );
+	}
 }

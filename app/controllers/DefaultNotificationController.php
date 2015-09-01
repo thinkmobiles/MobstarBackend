@@ -97,6 +97,7 @@ class DefaultNotificationController extends BaseController
 
 				$current[ 'id' ] = $defaultNotification->iDefaultNotificationId;
 				$current[ 'defaultNotificationTitle' ] = $defaultNotification->vDefaultNotificationTitle;
+				// @TODO loads images from admin site. Need to redo to loads images from api site.
 				if ( file_exists($defaultNotification->vDefaultNotificationImage) )
 					$current[ 'defaultNotificationImage' ] = "http://" . $_ENV[ 'URL' ] . '/' . $defaultNotification->vDefaultNotificationImage;
 				else
