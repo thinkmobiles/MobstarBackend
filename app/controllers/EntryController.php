@@ -1418,6 +1418,16 @@ class EntryController extends BaseController
 
 					Eloquent::reguard();
 				}
+
+				// is entry is split video, send notifications
+				if( Input::get( 'splitVideoId', false ) )
+				{
+				  $this->processSplitVideoNotifications(
+				    $session->token_user_id,
+				    $response['entry_id'],
+				    Input::get( 'splitVideoId' )
+				  );
+				}
 			}
 			else
 			{
@@ -4380,6 +4390,201 @@ class EntryController extends BaseController
 		}
 		//return Response::make( $response, $status_code );
  	}
+
+
+    public function processSplitVideoNotifications(
+      $creatorUserId,
+      $createdEntryId,
+      $usedEntryId
+    )
+    {
+        //@todo do not send notification to yourself !!
+        //@todo check that provided correct base video id
+      $usedEntry = \Entry::find( $usedEntryId );
+      $usedUserId = $usedEntry->entry_user_id;
+      $creatorName = getusernamebyid( $creatorUserId );
+      $notifType = 'splitScreen';
+      $notifIcon = 'noti_share@2x.png';
+      $msg = sprintf(
+        'Your entry %s has been collaborated on by %s. Check it out...',
+        $usedEntry->entry_description,
+        $creatorName
+      );
+
+      $messageData = array(
+        "creatorId" => $creatorUserId,
+        "creatorName" => $creatorName,
+        "createdEntryId" => $createdEntryId,
+        "usedEntryId" => $usedEntryId,
+        "Type" => $notifType,
+      );
+
+      Notification::create( [
+        'notification_user_id'      => $usedUserId,
+        'notification_subject_ids'  => json_encode( [ $messageData ] ),
+        'notification_details'      => $msg,
+        'notification_icon'			=> $notifIcon,
+        'notification_read'         => 0,
+        'notification_entry_id'     => $usedEntryId,
+        'notification_type'         => $notifType,
+        'notification_created_date' => date( 'Y-m-d H:i:s' ),
+        'notification_updated_date' => date( 'Y-m-d H:i:s' ) ]
+      );
+
+      // update notification count
+      // @todo need to rewrite, very complex and unclean
+      $notificationcount = NotificationCount::firstOrNew( array('user_id' => $usedUserId ) );
+      $notificationsCount = isset( $notificationcount->id ) ? $notificationcount->notification_count : 0;
+      $notificationsCount++;
+      $notificationcount->notification_count = $notificationsCount;
+      $notificationcount->save();
+
+      // set count of messages to user
+      $messageData["badge"] = intval( $notificationsCount );
+
+      $this->sendPushNotification( $usedUserId, $msg, $messageData );
+    }
+
+
+    public static function sendPushNotification( $toUserId, $message, $data )
+    {
+      // get user device data
+      $userDevices = DB::select( DB::raw("SELECT t1.* FROM
+        (select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id
+        from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
+        order by device_registration_date_created desc
+      ) t1 left join users u on t1.device_registration_user_id = u.user_id
+        where u.user_deleted = 0
+        AND u.user_id = $toUserId
+        order by t1.device_registration_date_created desc"
+      ));
+
+      if( ! empty( $userDevices ) )
+      {
+        for( $k=0; $k < count($userDevices); $k++ )
+        {
+          self::registerSNSEndpoint(
+            $userDevices[$k],
+            $message,
+            $data
+          );
+        }
+      }
+    }
+
+
+    public static function registerSNSEndpoint(
+      $device,
+      $message,
+      $messageData
+    )
+    {
+      if( Config::get('app.disable_sns') ) return;
+
+      if( $device->device_registration_device_type == "apple" )
+      {
+        $arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushdemo";
+        //$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS_SANDBOX/adminsandbox";
+      }
+      else
+      {
+        $arn = "arn:aws:sns:eu-west-1:830026328040:app/GCM/admin-android-notification";
+      }
+
+      $sns = getSNSClient();
+
+      $Model1 = $sns->listPlatformApplications();
+
+      $result1 = $sns->listEndpointsByPlatformApplication(array(
+        // PlatformApplicationArn is required
+        'PlatformApplicationArn' => $arn,
+      ));
+      //echo '<pre>';
+      //$dtoken = 'APA91bHEx658AQzCM3xUHTVjBGJz8a_HMb65Y_2BIIPXODexYlvuCZpaJRKRchTNqQCXs_w9b0AxJbzIQOFNtYkW0bbsiXhiX7uyhGYNTYC2PBOZzAmvqnvOBBhOKNS7Jl0fdoIdNa_riOlJxQi8COrhbw0odIJKBg';
+      //$dtoken = 'c39bac35f298c66d7398673566179deee27618c2036d8c82dcef565c8d732f84';
+      foreach($result1['Endpoints'] as $Endpoint){
+        $EndpointArn = $Endpoint['EndpointArn'];
+        $EndpointToken = $Endpoint['Attributes'];
+        foreach($EndpointToken as $key=>$newVals){
+          if($key=="Token"){
+            if($device->device_registration_device_token==$newVals){
+              //if($dtoken==$newVals){
+              //Delete ARN
+              $result = $sns->deleteEndpoint(array(
+                // EndpointArn is required
+                'EndpointArn' => $EndpointArn,
+              ));
+            }
+          }
+          //print_r($EndpointToken);
+        }
+        //print_r($Endpoint);
+      }
+
+      $result = $sns->createPlatformEndpoint(array(
+        // PlatformApplicationArn is required
+        'PlatformApplicationArn' => $arn,
+        // Token is required
+        //'Token' => $dtoken,
+        'Token' => $device->device_registration_device_token,
+
+      ));
+
+      $endpointDetails = $result->toArray();
+
+      //print_r($device);echo "\n".$message."\n";print_r($result);print_r($endpointDetails);
+
+      //die;
+      if($device->device_registration_device_type == "apple")
+      {
+        $data = $messageData;
+        $data['sound'] = 'default';
+        $data['alert'] = $message;
+
+        $publisharray = array(
+          'TargetArn' => $endpointDetails['EndpointArn'],
+          'MessageStructure' => 'json',
+          'Message' => json_encode( array(
+            'default' => $message,
+            //'APNS_SANDBOX' => json_encode(array(
+            'APNS' => json_encode( array(
+              'aps' => $data
+            )),
+          ))
+        );
+      }
+      else
+      {
+        $data = $messageData;
+        $data['message'] = $message;
+
+        $publisharray = array(
+          'TargetArn' => $endpointDetails['EndpointArn'],
+          'MessageStructure' => 'json',
+          'Message' => json_encode( array(
+            'default' => $message,
+            'GCM' => json_encode( array(
+              'data' => $data
+            ))
+          ))
+        );
+      }
+      try
+      {
+        $sns->publish($publisharray);
+
+        $myfile = 'sns-log.txt';
+        file_put_contents($myfile, date('d-m-Y H:i:s') . ' debug log:', FILE_APPEND);
+        file_put_contents($myfile, print_r($endpointDetails, true), FILE_APPEND);
+
+        //print($EndpointArn . " - Succeeded!\n");
+      }
+      catch (Exception $e)
+      {
+        //print($endpointDetails['EndpointArn'] . " - Failed: " . $e->getMessage() . "!\n");
+      }
+
+    }
 
 
 	/* End */

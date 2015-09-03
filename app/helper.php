@@ -467,7 +467,6 @@ function getSNSClient()
     error_log( 'called getSNSClient while SNS is disabled in configuration. Stack backtrace is: '.$backtrace );
     return;
   }
-  return false; // for testing
 	$config = array(
 		'key'    => Creds::ENV_KEY,
 		'secret' => Creds::ENV_SECRET,
