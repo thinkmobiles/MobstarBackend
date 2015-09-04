@@ -230,75 +230,22 @@ class EntryController extends BaseController
 		if( Input::get( 'excludeVotes' ) == 'true' )
 		{
 		  // skip entries, voted down by user
-			$votes = Vote::where( 'vote_user_id', '=', $session->token_user_id )
-			  ->where( 'vote_deleted', '=', 0 )
-			  ->where( 'vote_down', '>', 0 )->get();
-
-			foreach( $votes as $vote )
-			{
-				$exclude[ ] = $vote->vote_entry_id;
-			}
+		  $exclude['excludeVotes'] = $session->token_user_id;
 		}
 		if( $order_by == 'popular' )
 		{
-			$entry_rank = DB::table( 'entries' )->where( 'entry_rank', '=', '0' )->get();
-			foreach( $entry_rank as $rank )
-			{
-				$exclude[ ] = $rank->entry_id;
-			}
+		  // skip not popular entries
+		  $exclude['notPopular'] = true;
 		}
 		/* Added for exclude MOBIT category in All entry list */
-		$excludeCategory = array();
 		if($category != 8 && $category != 7)
 		{
-			$excludeCategory = [7,8];
-			$entry_category = DB::table('entries')->whereIn( 'entry_category_id', $excludeCategory )->get();
-			foreach( $entry_category as $c )
-			{
-				$exclude[ ] = $c->entry_id;
-			}
-
-			// add entries from profile to home feedback
-			// @todo video from user profile will go to all categories except 7 and 8. Is it right?
-			$max_media_duration_for_home_feed = isset( $_ENV['MAX_MEDIA_DURATION_FOR_HOME_FEED'] ) ? $_ENV['MAX_MEDIA_DURATION_FOR_HOME_FEED'] : 0;
-			$max_media_duration_for_home_feed = (int)$max_media_duration_for_home_feed;
-			if( $max_media_duration_for_home_feed > 0 )
-			{
-				$include_entries = DB::table('entries')
-				  ->where( 'entry_category_id', '=', 7 )
-				  ->whereIn( 'entry_type', array( 'video', 'audio' ) )
-				  ->whereBetween( 'entry_duration', array( 0, $max_media_duration_for_home_feed ) )
-				  ->lists( 'entry_id' );
-				$exclude_hash = array_flip( $exclude );
-				foreach( $include_entries as $entry_id )
-				{
-				  unset( $exclude_hash[ $entry_id ] );
-				}
-				$exclude = array_keys( $exclude_hash );
-			}
-		}
-		if($category == 8)
-		{
-			$excludeCategory = [8];
-			$entry_category = DB::table('entries')->whereNotIn( 'entry_category_id', $excludeCategory )->get();
-			foreach( $entry_category as $c )
-			{
-				$exclude[ ] = $c->entry_id;
-			}
-		}
-		if($category == 7)
-		{
-			$excludeCategory = [7];
-			$entry_category = DB::table('entries')->whereNotIn( 'entry_category_id', $excludeCategory )->get();
-			foreach( $entry_category as $c )
-			{
-				$exclude[ ] = $c->entry_id;
-			}
+		  $exclude['category'] = array(7, 8);
 		}
 		/* End */
-		$entries = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false, true );
+		$entries = $this->entry->allComplexExclude( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false, true );
 		//dd(DB::getQueryLog());
-		$count = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, true );
+		$count = $this->entry->allComplexExclude( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, true );
 
 		if( $count == 0 )
 		{
@@ -389,6 +336,9 @@ class EntryController extends BaseController
 			}
 
 			$current = array();
+
+			if( $entry->entry_splitVideoId ) $current['splitVideoId'] = $entry->entry_splitVideoId;
+
 			//check to see if fields were specified and at least one is valid
 			if( ( !empty( $fields ) ) && $valid )
 			{
@@ -1240,6 +1190,7 @@ class EntryController extends BaseController
 				}
 				if( empty( $input['entry_subcategory'] ) ) unset( $input['entry_subcategory'] );
 				if( empty( $input['entry_age'] ) ) unset( $input['entry_age'] );
+				if( Input::get( 'splitVideoId', false ) ) $input['entry_splitVideoId'] = (int)Input::get( 'splitVideoId' );
 				Eloquent::unguard();
 				$response[ 'entry_id' ] = $this->entry->create( $input )->entry_id;
 				$status_code = 201;
@@ -1470,6 +1421,16 @@ class EntryController extends BaseController
 									   ] );
 
 					Eloquent::reguard();
+				}
+
+				// is entry is split video, send notifications
+				if( Input::get( 'splitVideoId', false ) )
+				{
+				  $this->processSplitVideoNotifications(
+				    $session->token_user_id,
+				    \Entry::findOrFail( $response['entry_id'] ),
+				    Input::get( 'splitVideoId' )
+				  );
 				}
 			}
 			else
@@ -2386,6 +2347,7 @@ class EntryController extends BaseController
 		}
 
 		$current[ 'id' ] = $entry->entry_id;
+		if( $entry->entry_splitVideoId ) $current['splitVideoId'] = $entry->entry_splitVideoId;
 		$current[ 'category' ] = $entry->category->category_name;
 		if( isset( $entry->entry_category_id )  && $entry->entry_category_id == 3 )
 		{
@@ -2560,6 +2522,7 @@ class EntryController extends BaseController
 
 		}
 		$current[ 'id' ] = $entry->entry_id;
+		if( $entry->entry_splitVideoId ) $current['splitVideoId'] = $entry->entry_splitVideoId;
 		if( isset( $entry->entry_category_id )  && $entry->entry_category_id == 3 )
 		{
 			$current[ 'subcategory' ] = $entry->entry_subcategory;
@@ -3201,6 +3164,7 @@ class EntryController extends BaseController
 			}
 
 			$current = array();
+			if( $entry->entry_splitVideoId ) $current['splitVideoId'] = $entry->entry_splitVideoId;
 			if($entry->entry_category_id == 7)
 			{
 				$votes = DB::table('votes')->where('vote_user_id', '=', $session->token_user_id)->where('vote_entry_id', '=', $entry->entry_id)->where('vote_deleted', '=', '0')->orderBy( 'vote_id','desc')->get();
@@ -4433,6 +4397,218 @@ class EntryController extends BaseController
 		}
 		//return Response::make( $response, $status_code );
  	}
+
+
+    public function processSplitVideoNotifications(
+      $creatorUserId,
+      $createdEntry,
+      $usedEntryId
+    )
+    {
+        //@todo do not send notification to yourself !!
+        //@todo check that provided correct base video id
+      $usedEntry = \Entry::find( $usedEntryId );
+      $usedUserId = $usedEntry->entry_user_id;
+      $createdEntryId = $createdEntry->id;
+      $creatorName = getusernamebyid( $creatorUserId );
+      $notifType = 'splitScreen';
+      $notifIcon = 'noti_share@2x.png';
+      $msg = sprintf(
+        'Your entry %s has been collaborated on by %s. Check it out...',
+        $usedEntry->entry_description,
+        $creatorName
+      );
+
+      $messageData = array(
+        "creatorId" => $creatorUserId,
+        "creatorName" => $creatorName,
+        "createdEntryId" => $createdEntryId,
+        "createdEntryName" => $createdEntry->entry_description,
+        "usedEntryId" => $usedEntryId,
+        "usedEntryName" => $usedEntry->entry_description,
+        "Type" => $notifType,
+      );
+
+      Notification::create( [
+        'notification_user_id'      => $usedUserId,
+        'notification_subject_ids'  => json_encode( [ $messageData ] ),
+        'notification_details'      => $msg,
+        'notification_icon'			=> $notifIcon,
+        'notification_read'         => 0,
+        'notification_entry_id'     => $usedEntryId,
+        'notification_type'         => $notifType,
+        'notification_created_date' => date( 'Y-m-d H:i:s' ),
+        'notification_updated_date' => date( 'Y-m-d H:i:s' ) ]
+      );
+
+      // update notification count
+      // @todo need to rewrite, very complex and unclean
+      $notificationcount = NotificationCount::firstOrNew( array('user_id' => $usedUserId ) );
+      $notificationsCount = isset( $notificationcount->id ) ? $notificationcount->notification_count : 0;
+      $notificationsCount++;
+      $notificationcount->notification_count = $notificationsCount;
+      $notificationcount->save();
+
+      // set count of messages to user
+      $messageData["badge"] = intval( $notificationsCount );
+
+      //recreate message data for Push notification
+      $pushData = array(
+        'Type' => $messageData['Type'],
+        'usedEntryName' => $messageData['usedEntryName'],
+        'creatorName' => $messageData['creatorName'],
+        'createdEntryId' => $messageData['createdEntryId'],
+      );
+
+      $this->sendPushNotification( $usedUserId, $msg, $pushData );
+    }
+
+
+    public static function sendPushNotification( $toUserId, $message, $data )
+    {
+      // get user device data
+      $userDevices = DB::select( DB::raw("SELECT t1.* FROM
+        (select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id
+        from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
+        order by device_registration_date_created desc
+      ) t1 left join users u on t1.device_registration_user_id = u.user_id
+        where u.user_deleted = 0
+        AND u.user_id = $toUserId
+        order by t1.device_registration_date_created desc"
+      ));
+
+      if( ! empty( $userDevices ) )
+      {
+        for( $k=0; $k < count($userDevices); $k++ )
+        {
+          self::registerSNSEndpoint(
+            $userDevices[$k],
+            $message,
+            $data
+          );
+        }
+      }
+    }
+
+
+    public static function registerSNSEndpoint(
+      $device,
+      $message,
+      $messageData
+    )
+    {
+      if( Config::get('app.disable_sns') ) return;
+
+      if( $device->device_registration_device_type == "apple" )
+      {
+        $arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushdemo";
+        //$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS_SANDBOX/adminsandbox";
+      }
+      else
+      {
+        $arn = "arn:aws:sns:eu-west-1:830026328040:app/GCM/admin-android-notification";
+      }
+
+      $sns = getSNSClient();
+
+      $Model1 = $sns->listPlatformApplications();
+
+      $result1 = $sns->listEndpointsByPlatformApplication(array(
+        // PlatformApplicationArn is required
+        'PlatformApplicationArn' => $arn,
+      ));
+      //echo '<pre>';
+      //$dtoken = 'APA91bHEx658AQzCM3xUHTVjBGJz8a_HMb65Y_2BIIPXODexYlvuCZpaJRKRchTNqQCXs_w9b0AxJbzIQOFNtYkW0bbsiXhiX7uyhGYNTYC2PBOZzAmvqnvOBBhOKNS7Jl0fdoIdNa_riOlJxQi8COrhbw0odIJKBg';
+      //$dtoken = 'c39bac35f298c66d7398673566179deee27618c2036d8c82dcef565c8d732f84';
+      foreach($result1['Endpoints'] as $Endpoint){
+        $EndpointArn = $Endpoint['EndpointArn'];
+        $EndpointToken = $Endpoint['Attributes'];
+        foreach($EndpointToken as $key=>$newVals){
+          if($key=="Token"){
+            if($device->device_registration_device_token==$newVals){
+              //if($dtoken==$newVals){
+              //Delete ARN
+              $result = $sns->deleteEndpoint(array(
+                // EndpointArn is required
+                'EndpointArn' => $EndpointArn,
+              ));
+            }
+          }
+          //print_r($EndpointToken);
+        }
+        //print_r($Endpoint);
+      }
+
+      // Sometimes the device token becomes invalid and endpoint creating throws exception.
+      try{
+      $result = $sns->createPlatformEndpoint(array(
+        // PlatformApplicationArn is required
+        'PlatformApplicationArn' => $arn,
+        // Token is required
+        //'Token' => $dtoken,
+        'Token' => $device->device_registration_device_token,
+
+      ));
+      } catch( \Exception $e )
+      {
+          return; // we can not create endpoint, so nothing to do.
+      }
+
+      $endpointDetails = $result->toArray();
+
+      //print_r($device);echo "\n".$message."\n";print_r($result);print_r($endpointDetails);
+
+      //die;
+      if($device->device_registration_device_type == "apple")
+      {
+        $data = $messageData;
+        $data['sound'] = 'default';
+        $data['alert'] = $message;
+
+        $publisharray = array(
+          'TargetArn' => $endpointDetails['EndpointArn'],
+          'MessageStructure' => 'json',
+          'Message' => json_encode( array(
+            'default' => $message,
+            //'APNS_SANDBOX' => json_encode(array(
+            'APNS' => json_encode( array(
+              'aps' => $data
+            )),
+          ))
+        );
+      }
+      else
+      {
+        $data = $messageData;
+        $data['message'] = $message;
+
+        $publisharray = array(
+          'TargetArn' => $endpointDetails['EndpointArn'],
+          'MessageStructure' => 'json',
+          'Message' => json_encode( array(
+            'default' => $message,
+            'GCM' => json_encode( array(
+              'data' => $data
+            ))
+          ))
+        );
+      }
+      try
+      {
+        $sns->publish($publisharray);
+
+        $myfile = 'sns-log.txt';
+        file_put_contents($myfile, date('d-m-Y H:i:s') . ' debug log:', FILE_APPEND);
+        file_put_contents($myfile, print_r($endpointDetails, true), FILE_APPEND);
+
+        //print($EndpointArn . " - Succeeded!\n");
+      }
+      catch (Exception $e)
+      {
+        //print($endpointDetails['EndpointArn'] . " - Failed: " . $e->getMessage() . "!\n");
+      }
+
+    }
 
 
 	/* End */

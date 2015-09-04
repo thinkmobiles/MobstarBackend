@@ -45,12 +45,12 @@ class Entry extends \Eloquent
 	{
 		return $this->hasMany( 'Comment', 'comment_entry_id' )->where( 'comment_deleted', '=', '0' );
 	}
-	
+
 	public function entryViews()
 	{
 		return $this->hasMany( 'EntryView', 'entry_view_entry_id' );
 	}
-	
+
 	public function oneEntry( $entry, $session, $includeUser = false )
 	{
 
@@ -74,6 +74,7 @@ class Entry extends \Eloquent
 		}
 
 		$current[ 'id' ] = $entry->entry_id;
+		if( $entry->entry_splitVideoId ) $current['splitVideoId'] = $entry->entry_splitVideoId;
 		$current[ 'category' ] = $entry->category->category_name;
 		$current[ 'type' ] = $entry->entry_type;
 

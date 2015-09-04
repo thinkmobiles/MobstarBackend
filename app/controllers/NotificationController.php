@@ -156,6 +156,10 @@ class NotificationController extends BaseController
 			{
 				$condition = @$notification->notification_entry_id;
 			}
+			elseif($type == 'splitScreen')
+			{
+			    $condition = @$notification->notification_entry_id;
+			}
 			else
 			{
 				$condition = @$notification->entry->entry_id;
@@ -306,6 +310,20 @@ class NotificationController extends BaseController
 
 					$current['entry']['profileImage'] = $profileImage;
 					$current['entry']['profileCover'] = $profileCover;
+				}
+				elseif( $notification->notification_type == 'splitScreen' )
+				{
+
+				  $current[ 'notificationType' ] = $notification->notification_type;
+				  $current[ 'notificationId' ] = $notification->notification_id;
+				  $current[ 'notificationDate' ] = $notification->notification_updated_date;
+				  $current[ 'notificationContent' ] = $notification->notification_details;
+				  $current[ 'notificationIcon' ] = $notification->notification_icon;
+				  $current[ 'notificationRead' ] = ($notification->notification_read == 1) ? 1 : 0;
+				  $data = json_decode( $notification->notification_subject_ids );
+				  $current[ 'entry']['entry_id'] = $data[0]->createdEntryId;
+				  $current[ 'entry']['entry_name'] = $data[0]->creatorName;
+
 				}
 				else
 				{

@@ -392,6 +392,7 @@ function oneEntry( $entry, $session, $includeUser = false )
 	}
 
 	$current[ 'id' ] = $entry->entry_id;
+	if( $entry->entry_splitVideoId ) $current['splitVideoId'] = $entry->entry_splitVideoId;
 	$current[ 'category' ] = $entry->category->category_name;
 	$current[ 'type' ] = $entry->entry_type;
 
@@ -467,7 +468,6 @@ function getSNSClient()
     error_log( 'called getSNSClient while SNS is disabled in configuration. Stack backtrace is: '.$backtrace );
     return;
   }
-  return false; // for testing
 	$config = array(
 		'key'    => Creds::ENV_KEY,
 		'secret' => Creds::ENV_SECRET,
