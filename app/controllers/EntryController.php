@@ -4528,6 +4528,8 @@ class EntryController extends BaseController
         //print_r($Endpoint);
       }
 
+      // Sometimes the device token becomes invalid and endpoint creating throws exception.
+      try{
       $result = $sns->createPlatformEndpoint(array(
         // PlatformApplicationArn is required
         'PlatformApplicationArn' => $arn,
@@ -4536,6 +4538,10 @@ class EntryController extends BaseController
         'Token' => $device->device_registration_device_token,
 
       ));
+      } catch( \Exception $e )
+      {
+          return; // we can not create endpoint, so nothing to do.
+      }
 
       $endpointDetails = $result->toArray();
 
