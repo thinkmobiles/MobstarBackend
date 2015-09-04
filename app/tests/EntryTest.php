@@ -148,6 +148,8 @@ class EntryTest extends TestCase {
 
   public function testPostEntry_SplitScreen()
   {
+      $baseEntryId = 4600;
+
       $testFilename = __DIR__.'/files/test_movie.mp4';
       $uploadedFilename = __DIR__.'/files/test_movie_for_upload.mp4';
 
@@ -165,13 +167,32 @@ class EntryTest extends TestCase {
               'language' => 'english',
               'name' => 'Test',
               'description' => 'Test Video',
-              'splitVideoId' => 4600,
+              'splitVideoId' => $baseEntryId,
           ),
           array( 'file1' => $file ),
           array( 'HTTP_X-API-TOKEN' => '07516258357' )
       );
 
       $this->assertEquals( 201, $response->getStatusCode() );
+
+      $content = json_decode( $response->getContent() );
+      $this->assertNotEmpty( $content );
+      $this->assertObjectHasAttribute( 'entry_id', $content );
+      $uploadedEntryId = $content->entry_id;
+      $this->assertNotEmpty( $uploadedEntryId );
+
+      // get list of entries
+      $entries = $this->getEntries( array( 'orderBy' => 'latest', 'user' => $this->authInfo['userId'] ) );
+      $this->assertNotEmpty( $entries );
+
+      foreach( $entries as $entryObj )
+      {
+          $entry = $entryObj->entry;
+          if( $entry->id != $uploadedEntryId ) continue;
+          $this->assertObjectHasAtribute( 'splitVideoId', $entry );
+          $this->assertEquals( $baseEntryId, $entry->splitVideoId );
+      }
+
   }
 
 

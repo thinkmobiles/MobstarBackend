@@ -392,6 +392,7 @@ function oneEntry( $entry, $session, $includeUser = false )
 	}
 
 	$current[ 'id' ] = $entry->entry_id;
+	if( $entry->entry_splitVideoId ) $current['splitVideoId'] = $entry->entry_splitVideoId;
 	$current[ 'category' ] = $entry->category->category_name;
 	$current[ 'type' ] = $entry->entry_type;
 

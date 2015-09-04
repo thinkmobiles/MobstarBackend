@@ -336,6 +336,9 @@ class EntryController extends BaseController
 			}
 
 			$current = array();
+
+			if( $entry->entry_splitVideoId ) $current['splitVideoId'] = $entry->entry_splitVideoId;
+
 			//check to see if fields were specified and at least one is valid
 			if( ( !empty( $fields ) ) && $valid )
 			{
@@ -1187,6 +1190,7 @@ class EntryController extends BaseController
 				}
 				if( empty( $input['entry_subcategory'] ) ) unset( $input['entry_subcategory'] );
 				if( empty( $input['entry_age'] ) ) unset( $input['entry_age'] );
+				if( Input::get( 'splitVideoId', false ) ) $input['entry_splitVideoId'] = (int)Input::get( 'splitVideoId' );
 				Eloquent::unguard();
 				$response[ 'entry_id' ] = $this->entry->create( $input )->entry_id;
 				$status_code = 201;
@@ -2343,6 +2347,7 @@ class EntryController extends BaseController
 		}
 
 		$current[ 'id' ] = $entry->entry_id;
+		if( $entry->entry_splitVideoId ) $current['splitVideoId'] = $entry->entry_splitVideoId;
 		$current[ 'category' ] = $entry->category->category_name;
 		if( isset( $entry->entry_category_id )  && $entry->entry_category_id == 3 )
 		{
@@ -2517,6 +2522,7 @@ class EntryController extends BaseController
 
 		}
 		$current[ 'id' ] = $entry->entry_id;
+		if( $entry->entry_splitVideoId ) $current['splitVideoId'] = $entry->entry_splitVideoId;
 		if( isset( $entry->entry_category_id )  && $entry->entry_category_id == 3 )
 		{
 			$current[ 'subcategory' ] = $entry->entry_subcategory;
@@ -3158,6 +3164,7 @@ class EntryController extends BaseController
 			}
 
 			$current = array();
+			if( $entry->entry_splitVideoId ) $current['splitVideoId'] = $entry->entry_splitVideoId;
 			if($entry->entry_category_id == 7)
 			{
 				$votes = DB::table('votes')->where('vote_user_id', '=', $session->token_user_id)->where('vote_entry_id', '=', $entry->entry_id)->where('vote_deleted', '=', '0')->orderBy( 'vote_id','desc')->get();
