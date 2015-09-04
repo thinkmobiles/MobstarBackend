@@ -1428,7 +1428,7 @@ class EntryController extends BaseController
 				{
 				  $this->processSplitVideoNotifications(
 				    $session->token_user_id,
-				    $response['entry_id'],
+				    \Entry::findOrFail( $response['entry_id'] ),
 				    Input::get( 'splitVideoId' )
 				  );
 				}
@@ -4401,7 +4401,7 @@ class EntryController extends BaseController
 
     public function processSplitVideoNotifications(
       $creatorUserId,
-      $createdEntryId,
+      $createdEntry,
       $usedEntryId
     )
     {
@@ -4409,6 +4409,7 @@ class EntryController extends BaseController
         //@todo check that provided correct base video id
       $usedEntry = \Entry::find( $usedEntryId );
       $usedUserId = $usedEntry->entry_user_id;
+      $createdEntryId = $createdEntry->id;
       $creatorName = getusernamebyid( $creatorUserId );
       $notifType = 'splitScreen';
       $notifIcon = 'noti_share@2x.png';
@@ -4422,7 +4423,9 @@ class EntryController extends BaseController
         "creatorId" => $creatorUserId,
         "creatorName" => $creatorName,
         "createdEntryId" => $createdEntryId,
+        "createdEntryName" => $createdEntry->entry_description,
         "usedEntryId" => $usedEntryId,
+        "usedEntryName" => $usedEntry->entry_description,
         "Type" => $notifType,
       );
 
@@ -4449,7 +4452,15 @@ class EntryController extends BaseController
       // set count of messages to user
       $messageData["badge"] = intval( $notificationsCount );
 
-      $this->sendPushNotification( $usedUserId, $msg, $messageData );
+      //recreate message data for Push notification
+      $pushData = array(
+        'Type' => $messageData['Type'],
+        'usedEntryName' => $messageData['usedEntryName'],
+        'creatorName' => $messageData['creatorName'],
+        'createdEntryId' => $messageData['createdEntryId'],
+      );
+
+      $this->sendPushNotification( $usedUserId, $msg, $pushData );
     }
 
 
