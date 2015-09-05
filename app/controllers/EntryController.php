@@ -4409,7 +4409,7 @@ class EntryController extends BaseController
         //@todo check that provided correct base video id
       $usedEntry = \Entry::find( $usedEntryId );
       $usedUserId = $usedEntry->entry_user_id;
-      $createdEntryId = $createdEntry->id;
+      $createdEntryId = $createdEntry->entry_id;
       $creatorName = getusernamebyid( $creatorUserId );
       $notifType = 'splitScreen';
       $notifIcon = 'noti_share@2x.png';
