@@ -40,7 +40,7 @@ class ServerController extends BaseController
 
     if( empty( $msec ) ) $msec = 0;
 
-    $timeInMillisecs = round( ((float)$sec + (float)$msec ) * 100, 0 );
+    $timeInMillisecs = round( ((float)$sec + (float)$msec ) * 1000, 0 );
 
     $return = array(
       'serverCurrentTime' => $timeInMillisecs,

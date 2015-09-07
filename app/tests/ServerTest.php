@@ -15,7 +15,7 @@ class ServerTest extends TestCase {
     $receivedTimeMillisec = $content->serverCurrentTime;
 
     list( $msecs, $secs ) = explode( ' ', microtime() );
-    $currentTimeMillisec = round( ((float)$secs + (float)$msecs)*100, 0 );
+    $currentTimeMillisec = round( ((float)$secs + (float)$msecs)*1000, 0 );
 
     $this->assertLessThanOrEqual(
       $currentTimeMillisec,
