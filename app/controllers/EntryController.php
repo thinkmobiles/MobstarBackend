@@ -4409,7 +4409,7 @@ class EntryController extends BaseController
         //@todo check that provided correct base video id
       $usedEntry = \Entry::find( $usedEntryId );
       $usedUserId = $usedEntry->entry_user_id;
-      $createdEntryId = $createdEntry->id;
+      $createdEntryId = $createdEntry->entry_id;
       $creatorName = getusernamebyid( $creatorUserId );
       $notifType = 'splitScreen';
       $notifIcon = 'noti_share@2x.png';
@@ -4449,12 +4449,10 @@ class EntryController extends BaseController
       $notificationcount->notification_count = $notificationsCount;
       $notificationcount->save();
 
-      // set count of messages to user
-      $messageData["badge"] = intval( $notificationsCount );
-
       //recreate message data for Push notification
       $pushData = array(
         'Type' => $messageData['Type'],
+        'badge' => intval( $notificationsCount ), // set count of messages to user
         'usedEntryName' => $messageData['usedEntryName'],
         'creatorName' => $messageData['creatorName'],
         'createdEntryId' => $messageData['createdEntryId'],
