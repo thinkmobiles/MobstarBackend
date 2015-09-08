@@ -4412,7 +4412,7 @@ class EntryController extends BaseController
       $createdEntryId = $createdEntry->entry_id;
       $creatorName = getusernamebyid( $creatorUserId );
       $notifType = 'splitScreen';
-      $notifIcon = 'noti_share@2x.png';
+      $notifIcon = 'splitScreen.png';
       $msg = sprintf(
         'Your entry %s has been collaborated on by %s. Check it out...',
         $usedEntry->entry_description,
