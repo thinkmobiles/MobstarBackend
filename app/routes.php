@@ -90,6 +90,8 @@ Route::get( 'debug/', function ()
 
 	echo 'keep uploaded entry files: ', Config::get('app.keep_uploaded_entry_files') ? 'yes' : 'no' , "\n";
 
+	echo 'append all world entries to continent filter: ', Config::get('app.force_include_all_world') ? 'yes' : 'no' , "\n";
+
 	echo "\n", '</pre>';
 
 	return ob_get_clean();

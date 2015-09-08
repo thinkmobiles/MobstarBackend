@@ -204,4 +204,6 @@ return array(
 	'disable_youtube_upload' => empty( $_ENV['DISABLE_YOUTUBE_UPLOAD'] ) ? false : true,
 
     'keep_uploaded_entry_files' => empty( $_ENV['KEEP_UPLOADED_ENTRY_FILES'] ) ? false : true,
+
+    'force_include_all_world' => empty( $_ENV['FORCE_INCLUDE_ALL_WORLD'] ) ? false : true,
 );

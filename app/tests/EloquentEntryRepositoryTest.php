@@ -460,4 +460,30 @@ class EloquentEntryRepositoryTest extends TestCase {
         $this->getEntryCountUsingComplextExclude( $params, $exclude )
     );
   }
+
+
+  public function testGetWithGeoLocation()
+  {
+      $entryRepository = $this->getEntryRepository();
+
+      // no geoLocation
+      $entries = $entryRepository->allWithGeoLocation(
+          0
+      );
+      $this->assertNotNull( $entries );
+
+      // two continents
+      $entries = $entryRepository->allWithGeoLocation(
+          array( 1, 3 )
+      );
+      $this->assertNotNull( $entries );
+
+      // disable including all world entries
+      \Config::set( 'app.force_include_all_world', false );
+
+      $entries = $entryRepository->allWithGeoLocation(
+          array( 1, 3 )
+      );
+      $this->assertNotNull( $entries );
+  }
 }
