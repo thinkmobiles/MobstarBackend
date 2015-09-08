@@ -1191,6 +1191,10 @@ class EntryController extends BaseController
 				if( empty( $input['entry_subcategory'] ) ) unset( $input['entry_subcategory'] );
 				if( empty( $input['entry_age'] ) ) unset( $input['entry_age'] );
 				if( Input::get( 'splitVideoId', false ) ) $input['entry_splitVideoId'] = (int)Input::get( 'splitVideoId' );
+				// set entry continent based on user continent
+				$user = \User::findOrFail( $session->token_user_id );
+				$input['entry_continent'] = $user->user_continent;
+				unset( $user );
 				Eloquent::unguard();
 				$response[ 'entry_id' ] = $this->entry->create( $input )->entry_id;
 				$status_code = 201;

@@ -196,6 +196,70 @@ class EntryTest extends TestCase {
   }
 
 
+  public function testPostEntry_SetContinent()
+  {
+      // user with continent 1 (Africa)
+      $authInfo = array(
+          'userId' => 303,
+          'token' => 'B1LCrnzS7Xdugs1KIwt3JbbrReLF8wlYIK29JOCB'
+      );
+      $userContinent = 1; // africa
+      // check that user has set its continent
+      $user = \User::find( $authInfo['userId'] );
+      $user->user_continent = $userContinent;
+      $user->save();
+
+      $testFilename = __DIR__.'/files/test_movie.mp4';
+      $uploadedFilename = __DIR__.'/files/test_movie_for_upload.mp4';
+
+      $this->assertTrue( copy( $testFilename, $uploadedFilename ), 'can not create temp file for uploading' );
+
+
+      $file = new \Symfony\Component\HttpFoundation\File\UploadedFile(
+          $uploadedFilename,
+          'test_file.mp4'
+      );
+
+      $response = $this->call( 'POST', '/entry',
+          array(
+              'category' => 1,
+              'type' => 'video',
+              'language' => 'english',
+              'name' => 'Test',
+              'description' => 'Test Video',
+          ),
+          array( 'file1' => $file ),
+          array( 'HTTP_X-API-TOKEN' => $authInfo['token'] )
+      );
+
+      $this->assertEquals( 201, $response->getStatusCode() );
+
+      $content = json_decode( $response->getContent() );
+      $this->assertNotEmpty( $content );
+      $this->assertObjectHasAttribute( 'entry_id', $content );
+      $uploadedEntryId = $content->entry_id;
+      $this->assertNotEmpty( $uploadedEntryId );
+
+      // get list of entries
+      $entries = $this->getEntries( array( 'orderBy' => 'latest', 'user' => $authInfo['userId'] ) );
+      $this->assertNotEmpty( $entries );
+
+      $entryFound = false;
+      foreach( $entries as $entryObj )
+      {
+          $entry = $entryObj->entry;
+          if( $entry->id != $uploadedEntryId ) continue;
+          $entryFound = true;
+      }
+      $this->assertTrue( $entryFound, 'Uploaded entry not found' );
+
+      // check that entry has its continent set to $userContinent
+      $entry = \Entry::findOrFail( $uploadedEntryId );
+
+      $this->assertEquals( $userContinent, $entry->entry_continent );
+  }
+
+
   public function testPostEntryMusicCategory()
   {
     $testFilename = __DIR__.'/files/test_movie.mp4';
