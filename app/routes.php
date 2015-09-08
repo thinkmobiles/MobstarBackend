@@ -619,6 +619,11 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "SettingsController@addAccount"
 		] );
 
+		Route::post( 'settings/userContinent', [
+		    'as'   => 'settings/userContinent',
+		    'uses' => 'SettingsController@setUserContinent'
+		]);
+
 	} );
 
 	// -------------------------------------------------------

@@ -57,6 +57,7 @@ class SettingsController extends BaseController
 
 		$user = User::find( $session->token_user_id );
 		$return[ 'user' ][ 'id' ] = $session->token_user_id;
+		$return[ 'user' ][ 'userContinent' ] = $user->user_continent;
 
 		if( $user->user_facebook_id != 0 )
 		{
@@ -261,5 +262,51 @@ class SettingsController extends BaseController
 		}
 
 		return $return;
+	}
+
+
+	public function setUserContinent()
+	{
+	    $return = [ ];
+
+	    $token = Request::header( "X-API-TOKEN" );
+
+	    $session = $this->token->get_session( $token );
+
+	    $user = User::find( $session->token_user_id );
+
+	    if( empty( $user ) ) // must never happens
+	    {
+	        error_log( 'User, registered in session, not found. User id: '.$session->token_user_id );
+	        $return['error'] = 'User not found';
+	        $return['userContinent'] = 0;
+	        return Response::make( $return, 400 );
+	    }
+
+	    // get continents ids
+	    // continet 0 (all world) is not allowed to set manualy
+	    $continentIds = DB::table('continents')->where( 'continent_id', '<>', 0 )->lists( 'continent_id');
+
+	    // validate input fields
+	    $validator = Validator::make( Input::get(), array(
+	        'userContinent' => 'required|numeric|in:'.implode( ',', $continentIds )
+	    ));
+
+	    if( $validator->fails() )
+	    {
+	        $return['errors'] = $validator->messages();
+	        $return['userContinent'] = $user->user_continent;
+	        return Response::make( $return, 400 );
+	    }
+
+	    $newUserContinent = (int)Input::get( 'userContinent' );
+
+	    $user->user_continent = $newUserContinent;
+
+	    $user->save();
+
+	    $return['userContinent'] = $user->user_continent;
+
+	    return Response::make( $return, 200 );
 	}
 }
