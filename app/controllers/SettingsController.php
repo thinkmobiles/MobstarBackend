@@ -305,6 +305,12 @@ class SettingsController extends BaseController
 
 	    $user->save();
 
+	    // update user entries without continent
+	    DB::table( 'entries' )
+	       ->where( 'entry_user_id', '=', $user->user_id )
+	       ->where( 'entry_continent', '=', 0 )
+	       ->update( array( 'entry_continent' => $user->user_continent ) );
+
 	    $return['userContinent'] = $user->user_continent;
 
 	    return Response::make( $return, 200 );
