@@ -328,17 +328,17 @@ class SettingsController extends BaseController
 
 	    // validate input fields
 	    $validator = Validator::make( Input::get(), array(
-	        'userContinentFilter' => 'required',
+	        'continentFilter' => 'required',
 	    ));
 
 	    if( $validator->fails() )
 	    {
 	        $return['errors'] = $validator->messages();
-	        $return['userContinentFilter'] = $currentFilter; // return current user filter
+	        $return['continentFilter'] = $currentFilter; // return current user filter
 	        return Response::make( $return, 400 );
 	    }
 
-	    $newFilter = $this->makeContinentFilterFromParam( Input::get( 'userContinentFilter' ), $continentIds );
+	    $newFilter = $this->makeContinentFilterFromParam( Input::get( 'continentFilter' ), $continentIds );
 
 	    // validate continent ids. Also verifies that 0 continent id is not present
 	    $invalidIds = array();
@@ -349,7 +349,7 @@ class SettingsController extends BaseController
 	    if( $invalidIds )
 	    {
 	        $return['error'] = 'Invalid continent ids: '.implode( ', ', $invalidIds );
-	        $return['userContinentFilter'] = $currentFilter;
+	        $return['continentFilter'] = $currentFilter;
 	        return Response::make( $return, 400 );
 	    }
 
@@ -358,7 +358,7 @@ class SettingsController extends BaseController
 
 	    $user->save();
 
-	    $return['userContinentFilter'] = $user->getContinentFilter();
+	    $return['continentFilter'] = $user->getContinentFilter();
 
 	    return Response::make( $return, 200 );
 	}
@@ -374,7 +374,7 @@ class SettingsController extends BaseController
 
 	    $user = User::find( $session->token_user_id );
 
-	    $return['userContinentFilter'] = $user->getContinentFilter();
+	    $return['continentFilter'] = $user->getContinentFilter();
 
 	    return Response::make( $return, 200 );
 	}

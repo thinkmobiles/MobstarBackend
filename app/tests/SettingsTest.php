@@ -38,8 +38,8 @@ class SettingsTest extends TestCase
     {
         $response = $this->call(
             'POST',
-            '/settings/userContinentFilter',
-            array( 'userContinentFilter' => $continentFilter ),
+            '/settings/continentFilter',
+            array( 'continentFilter' => $continentFilter ),
             array(),
             array( 'HTTP_X-API-TOKEN' => $token )
         );
@@ -52,7 +52,7 @@ class SettingsTest extends TestCase
     {
         $response = $this->call(
             'GET',
-            '/settings/userContinentFilter',
+            '/settings/continentFilter',
             array(),
             array(),
             array( 'HTTP_X-API-TOKEN' => $token )
@@ -211,8 +211,8 @@ class SettingsTest extends TestCase
 
         $this->assertNotEmpty( $content );
         $this->assertHasNoErrors( $content );
-        $this->assertObjectHasAttribute( 'userContinentFilter', $content );
-        $this->assertEquals( $continentFilter, $content->userContinentFilter );
+        $this->assertObjectHasAttribute( 'continentFilter', $content );
+        $this->assertEquals( $continentFilter, $content->continentFilter );
     }
 
 
@@ -228,8 +228,8 @@ class SettingsTest extends TestCase
 
         $this->assertNotEmpty( $content );
         $this->assertHasNoErrors( $content );
-        $this->assertObjectHasAttribute( 'userContinentFilter', $content );
-        $this->assertEquals( $continentFilter, $content->userContinentFilter );
+        $this->assertObjectHasAttribute( 'continentFilter', $content );
+        $this->assertEquals( $continentFilter, $content->continentFilter );
 
         // try to set with all world
         $continentFilterWithWorld = array( 1, 3, 0 );
@@ -244,8 +244,8 @@ class SettingsTest extends TestCase
         error_log( print_r( $content, true ) );
 
         $this->assertTrue( isset( $content->error) || isset( $content->errors), 'no error description returned' );
-        $this->assertObjectHasAttribute( 'userContinentFilter', $content );
-        $this->assertEquals( $continentFilter, $content->userContinentFilter );
+        $this->assertObjectHasAttribute( 'continentFilter', $content );
+        $this->assertEquals( $continentFilter, $content->continentFilter );
     }
 
 
@@ -261,8 +261,8 @@ class SettingsTest extends TestCase
 
         $this->assertNotEmpty( $content );
         $this->assertHasNoErrors( $content );
-        $this->assertObjectHasAttribute( 'userContinentFilter', $content );
-        $this->assertEquals( $continentFilter, $content->userContinentFilter );
+        $this->assertObjectHasAttribute( 'continentFilter', $content );
+        $this->assertEquals( $continentFilter, $content->continentFilter );
 
         // try to set to no value
         $continentFilterNoValue = array();
@@ -275,8 +275,8 @@ class SettingsTest extends TestCase
         $content = json_decode( $response->getContent() );
 
         $this->assertHasNoErrors( $content );
-        $this->assertObjectHasAttribute( 'userContinentFilter', $content );
-        $this->assertEquals( $continentFilterNoValue, $content->userContinentFilter );
+        $this->assertObjectHasAttribute( 'continentFilter', $content );
+        $this->assertEquals( $continentFilterNoValue, $content->continentFilter );
     }
 
 
@@ -292,8 +292,8 @@ class SettingsTest extends TestCase
 
         $this->assertNotEmpty( $content );
         $this->assertHasNoErrors( $content );
-        $this->assertObjectHasAttribute( 'userContinentFilter', $content );
-        $this->assertEquals( $continentFilter, $content->userContinentFilter );
+        $this->assertObjectHasAttribute( 'continentFilter', $content );
+        $this->assertEquals( $continentFilter, $content->continentFilter );
 
 
         // try to set wrong
@@ -307,8 +307,8 @@ class SettingsTest extends TestCase
         $content = json_decode( $response->getContent() );
 
         $this->assertTrue( isset( $content->error) || isset( $content->errors), 'no error description returned' );
-        $this->assertObjectHasAttribute( 'userContinentFilter', $content );
-        $this->assertEquals( $continentFilter, $content->userContinentFilter );
+        $this->assertObjectHasAttribute( 'continentFilter', $content );
+        $this->assertEquals( $continentFilter, $content->continentFilter );
     }
 
 
@@ -322,8 +322,8 @@ class SettingsTest extends TestCase
 
         $this->assertNotEmpty( $content );
         $this->assertHasNoErrors( $content );
-        $this->assertObjectHasAttribute( 'userContinentFilter', $content );
-        $this->assertEquals( array(), $content->userContinentFilter );
+        $this->assertObjectHasAttribute( 'continentFilter', $content );
+        $this->assertEquals( array(), $content->continentFilter );
     }
 
 
@@ -345,8 +345,8 @@ class SettingsTest extends TestCase
 
         $this->assertNotEmpty( $content );
         $this->assertHasNoErrors( $content );
-        $this->assertObjectHasAttribute( 'userContinentFilter', $content );
-        $this->assertEquals( $continentFilterGood, $content->userContinentFilter );
+        $this->assertObjectHasAttribute( 'continentFilter', $content );
+        $this->assertEquals( $continentFilterGood, $content->continentFilter );
     }
 
 
@@ -368,9 +368,9 @@ class SettingsTest extends TestCase
 
         $this->assertNotEmpty( $content );
         $this->assertHasNoErrors( $content );
-        $this->assertObjectHasAttribute( 'userContinentFilter', $content );
+        $this->assertObjectHasAttribute( 'continentFilter', $content );
         // must return empty array
-        $this->assertEquals( array(), $content->userContinentFilter );
+        $this->assertEquals( array(), $content->continentFilter );
 
     }
 }
