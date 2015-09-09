@@ -86,6 +86,29 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 		return 'remember_token';
 	}
 
+
+	public function getContinentFilter()
+	{
+	    if( $this->user_continent_filter )
+	    {
+	        $filter = json_decode( $this->user_continent_filter );
+	        if( ! $filter ) $filter = array();
+	    }
+	    else
+	    {
+	        $filter = array();
+	    }
+
+	    return $filter;
+	}
+
+
+	public function setContinentFilter( array $filter )
+	{
+	    $this->user_continent_filter = json_encode( $filter );
+	}
+
+
 	public function oneUser( $user, $session, $includeStars = false )
 	{
 

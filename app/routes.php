@@ -626,6 +626,16 @@ Route::group( [ "before" => "auth" ], function ()
 		    'uses' => 'SettingsController@setUserContinent'
 		]);
 
+		Route::post( 'settings/userContinentFilter', [
+		    'as'   => 'settings/userContinentFilter',
+		    'uses' => 'SettingsController@setUserContinentFilter'
+		]);
+
+		Route::get( 'settings/userContinentFilter', [
+		    'as'   => 'settings/userContinentFilter',
+		    'uses' => 'SettingsController@getUserContinentFilter'
+		]);
+
 	} );
 
 	// -------------------------------------------------------

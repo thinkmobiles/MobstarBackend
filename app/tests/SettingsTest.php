@@ -7,6 +7,12 @@ class SettingsTest extends TestCase
         'userId' => 310,
     );
 
+
+    protected $authInfoNoFilter = array(
+        'userId' => 311,
+        'tokenId' => '7NQLtJXXEABt3CeJ5FKDp0dph7EAXeOzuhMW4J9r'
+    );
+
     protected function assertHasNoErrors( $jsonObject )
     {
         $this->assertObjectNotHasAttribute( 'error', $jsonObject );
@@ -26,6 +32,35 @@ class SettingsTest extends TestCase
 
         return $response;
     }
+
+
+    protected function setUserContinentFilter( $continentFilter, $token )
+    {
+        $response = $this->call(
+            'POST',
+            '/settings/userContinentFilter',
+            array( 'userContinentFilter' => $continentFilter ),
+            array(),
+            array( 'HTTP_X-API-TOKEN' => $token )
+        );
+
+        return $response;
+    }
+
+
+    protected function getUserContinentFilter( $token )
+    {
+        $response = $this->call(
+            'GET',
+            '/settings/userContinentFilter',
+            array(),
+            array(),
+            array( 'HTTP_X-API-TOKEN' => $token )
+        );
+
+        return $response;
+    }
+
 
 
     public function testSetUserContinent_OK()
@@ -127,12 +162,7 @@ class SettingsTest extends TestCase
 
     public function testAccountReturnUserContinent_noContinent()
     {
-        $userWithoutContinent = array(
-            'userId' => 311,
-            'token' => '7NQLtJXXEABt3CeJ5FKDp0dph7EAXeOzuhMW4J9r'
-        );
-
-        $response = $this->call( 'GET', '/settings/account', array(), array(), array( 'HTTP_X-API-TOKEN' => $userWithoutContinent['token'] ));
+        $response = $this->call( 'GET', '/settings/account', array(), array(), array( 'HTTP_X-API-TOKEN' => $this->authInfoNoFilter['tokenId'] ));
 
         $this->assertEquals( 200, $response->getStatusCode() );
 
@@ -165,6 +195,182 @@ class SettingsTest extends TestCase
 
         $this->assertObjectHasAttribute( 'userContinent', $user );
         $this->assertEquals( $userContinent, $user->userContinent );
+
+    }
+
+
+    public function testSetContinentFilter_OK()
+    {
+        $continentFilter = array( 1, 3 );
+
+        $response = $this->setUserContinentFilter( json_encode( $continentFilter ), $this->authInfo['tokenId'] );
+
+        $this->assertEquals( 200, $response->getStatusCode() );
+
+        $content = json_decode( $response->getContent() );
+
+        $this->assertNotEmpty( $content );
+        $this->assertHasNoErrors( $content );
+        $this->assertObjectHasAttribute( 'userContinentFilter', $content );
+        $this->assertEquals( $continentFilter, $content->userContinentFilter );
+    }
+
+
+    public function testSetContinentFilter_withAllWorld()
+    {
+        // first set to good
+        $continentFilter = array( 2, 4 );
+        $response = $this->setUserContinentFilter( json_encode( $continentFilter ), $this->authInfo['tokenId'] );
+
+        $this->assertEquals( 200, $response->getStatusCode() );
+
+        $content = json_decode( $response->getContent() );
+
+        $this->assertNotEmpty( $content );
+        $this->assertHasNoErrors( $content );
+        $this->assertObjectHasAttribute( 'userContinentFilter', $content );
+        $this->assertEquals( $continentFilter, $content->userContinentFilter );
+
+        // try to set with all world
+        $continentFilterWithWorld = array( 1, 3, 0 );
+
+        $response = $this->setUserContinentFilter( json_encode( $continentFilterWithWorld ), $this->authInfo['tokenId'] );
+
+        $this->assertEquals( 400, $response->getStatusCode(), "setting 0 (all world) is not allowed" );
+
+        //check that user continent filter remains valid
+        error_log( $response->getContent() );
+        $content = json_decode( $response->getContent() );
+        error_log( print_r( $content, true ) );
+
+        $this->assertTrue( isset( $content->error) || isset( $content->errors), 'no error description returned' );
+        $this->assertObjectHasAttribute( 'userContinentFilter', $content );
+        $this->assertEquals( $continentFilter, $content->userContinentFilter );
+    }
+
+
+    public function testSetContinentFilter_noValue()
+    {
+        // first set to good
+        $continentFilter = array( 3, 5 );
+        $response = $this->setUserContinentFilter( json_encode( $continentFilter ), $this->authInfo['tokenId'] );
+
+        $this->assertEquals( 200, $response->getStatusCode() );
+
+        $content = json_decode( $response->getContent() );
+
+        $this->assertNotEmpty( $content );
+        $this->assertHasNoErrors( $content );
+        $this->assertObjectHasAttribute( 'userContinentFilter', $content );
+        $this->assertEquals( $continentFilter, $content->userContinentFilter );
+
+        // try to set to no value
+        $continentFilterNoValue = array();
+
+        $response = $this->setUserContinentFilter( json_encode( $continentFilterNoValue ), $this->authInfo['tokenId'] );
+
+        $this->assertEquals( 200, $response->getStatusCode() );
+
+        //check that user continent filter remains valid
+        $content = json_decode( $response->getContent() );
+
+        $this->assertHasNoErrors( $content );
+        $this->assertObjectHasAttribute( 'userContinentFilter', $content );
+        $this->assertEquals( $continentFilterNoValue, $content->userContinentFilter );
+    }
+
+
+    public function testSetContinentFilter_wrongValue()
+    {
+        // first set to good
+        $continentFilter = array( 1, 3 );
+        $response = $this->setUserContinentFilter( json_encode( $continentFilter ), $this->authInfo['tokenId'] );
+
+        $this->assertEquals( 200, $response->getStatusCode() );
+
+        $content = json_decode( $response->getContent() );
+
+        $this->assertNotEmpty( $content );
+        $this->assertHasNoErrors( $content );
+        $this->assertObjectHasAttribute( 'userContinentFilter', $content );
+        $this->assertEquals( $continentFilter, $content->userContinentFilter );
+
+
+        // try to set wrong
+        $continentFilterWrong = array(1234, 5678);
+
+        $response = $this->setUserContinentFilter( json_encode( $continentFilterWrong ), $this->authInfo['tokenId'] );
+
+        $this->assertEquals( 400, $response->getStatusCode() );
+
+        //check that user continent filter remains valid
+        $content = json_decode( $response->getContent() );
+
+        $this->assertTrue( isset( $content->error) || isset( $content->errors), 'no error description returned' );
+        $this->assertObjectHasAttribute( 'userContinentFilter', $content );
+        $this->assertEquals( $continentFilter, $content->userContinentFilter );
+    }
+
+
+    public function testGetContinentFilter_noFilter()
+    {
+        $response = $this->getUserContinentFilter( $this->authInfoNoFilter['tokenId'] );
+
+        $this->assertEquals( 200, $response->getStatusCode() );
+
+        $content = json_decode( $response->getContent() );
+
+        $this->assertNotEmpty( $content );
+        $this->assertHasNoErrors( $content );
+        $this->assertObjectHasAttribute( 'userContinentFilter', $content );
+        $this->assertEquals( array(), $content->userContinentFilter );
+    }
+
+
+    public function testGetContinentFilter_OK()
+    {
+        // first set filter to good values
+        $continentFilterGood = array( 1, 2, 3 );
+
+        $response = $this->setUserContinentFilter( json_encode( $continentFilterGood ), $this->authInfo['tokenId'] );
+
+        $this->assertEquals( 200, $response->getStatusCode() );
+
+        // get filter
+        $response = $this->getUserContinentFilter( $this->authInfo['tokenId'] );
+
+        $this->assertEquals( 200, $response->getStatusCode() );
+
+        $content = json_decode( $response->getContent() );
+
+        $this->assertNotEmpty( $content );
+        $this->assertHasNoErrors( $content );
+        $this->assertObjectHasAttribute( 'userContinentFilter', $content );
+        $this->assertEquals( $continentFilterGood, $content->userContinentFilter );
+    }
+
+
+    public function testGetContinentFilter_AllContinents()
+    {
+        // first set filter to all continents
+        $continentFilterAllContinents = array( 1, 2, 3, 4, 5, 6 );
+
+        $response = $this->setUserContinentFilter( json_encode( $continentFilterAllContinents ), $this->authInfo['tokenId'] );
+
+        $this->assertEquals( 200, $response->getStatusCode() );
+
+        // get filter
+        $response = $this->getUserContinentFilter( $this->authInfo['tokenId'] );
+
+        $this->assertEquals( 200, $response->getStatusCode() );
+
+        $content = json_decode( $response->getContent() );
+
+        $this->assertNotEmpty( $content );
+        $this->assertHasNoErrors( $content );
+        $this->assertObjectHasAttribute( 'userContinentFilter', $content );
+        // must return empty array
+        $this->assertEquals( array(), $content->userContinentFilter );
 
     }
 }

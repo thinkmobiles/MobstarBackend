@@ -309,4 +309,106 @@ class SettingsController extends BaseController
 
 	    return Response::make( $return, 200 );
 	}
+
+
+	public function setUserContinentFilter()
+	{
+	    $return = [];
+
+	    $token = Request::header( "X-API-TOKEN" );
+
+	    $session = $this->token->get_session( $token );
+
+	    $user = User::find( $session->token_user_id );
+
+	    $currentFilter = $user->getContinentFilter();
+
+	    // get continents ids
+	    $continentIds = DB::table('continents')->where( 'continent_id', '<>', 0 )->lists( 'continent_id');
+
+	    // validate input fields
+	    $validator = Validator::make( Input::get(), array(
+	        'userContinentFilter' => 'required',
+	    ));
+
+	    if( $validator->fails() )
+	    {
+	        $return['errors'] = $validator->messages();
+	        $return['userContinentFilter'] = $currentFilter; // return current user filter
+	        return Response::make( $return, 400 );
+	    }
+
+	    $newFilter = $this->makeContinentFilterFromParam( Input::get( 'userContinentFilter' ), $continentIds );
+
+	    // validate continent ids. Also verifies that 0 continent id is not present
+	    $invalidIds = array();
+	    foreach( $newFilter as $id )
+	    {
+	        if( ! in_array( $id, $continentIds ) ) $invalidIds[] = $id;
+	    }
+	    if( $invalidIds )
+	    {
+	        $return['error'] = 'Invalid continent ids: '.implode( ', ', $invalidIds );
+	        $return['userContinentFilter'] = $currentFilter;
+	        return Response::make( $return, 400 );
+	    }
+
+	    // input validated, save new filter
+	    $user->setContinentFilter( $newFilter );
+
+	    $user->save();
+
+	    $return['userContinentFilter'] = $user->getContinentFilter();
+
+	    return Response::make( $return, 200 );
+	}
+
+
+	public function getUserContinentFilter()
+	{
+	    $return = [];
+
+	    $token = Request::header( "X-API-TOKEN" );
+
+	    $session = $this->token->get_session( $token );
+
+	    $user = User::find( $session->token_user_id );
+
+	    $return['userContinentFilter'] = $user->getContinentFilter();
+
+	    return Response::make( $return, 200 );
+	}
+
+
+	private function makeContinentFilterFromParam( $param, array $allIds = null )
+	{
+	    if( $param )
+	    {
+	        $filter = json_decode( $param );
+	        if( ! $filter ) $filter = array();
+	    }
+	    else
+	    {
+	        $filter = array();
+	    }
+
+	    // if there is set all continent ids, collapse them to empty array
+	    $isAllIds = true;
+	    if( $filter && $allIds )
+	    {
+            foreach( $allIds as $id )
+            {
+                if( ! in_array( $id, $filter ) )
+                {
+                    $isAllIds = false;
+                    break;
+                }
+            }
+	    }
+
+	    if( $isAllIds ) $filter = array();
+	    else $filter = array_unique( $filter );
+
+	    return $filter;
+	}
 }

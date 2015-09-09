@@ -54,3 +54,8 @@ alter table `users` add column
 alter table `entries` add column
   `entry_continent` int not null default 0
   comment 'the continent, the entry belong to';
+
+-- add column `user_continent_filter` to table `users` to store comma separated list of continent ids
+alter table `users` add column
+  `user_continent_filter` varchar( 200 ) not null default ''
+  comment 'comma separated continent ids to use as filter';
