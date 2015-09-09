@@ -9,6 +9,17 @@ class EntryTest extends TestCase {
     'userId' => 301,
   );
 
+  protected $users = array(
+      'withFilter' => array(
+        'tokenId' => 'vXISaFByuOlWyju6z7uu3CyAtjBAnNJzIhYEQWnI',
+        'userId' => 310,
+      ),
+      'noFilter' => array(
+          'userId' => 311,
+          'tokenId' => '7NQLtJXXEABt3CeJ5FKDp0dph7EAXeOzuhMW4J9r'
+      ),
+  );
+
 
   protected function dumpJSONResponse( $response )
   {
@@ -71,6 +82,36 @@ class EntryTest extends TestCase {
 
     $entries = $content->entries;
     $this->assertTrue( count( $entries ) == 20 );
+  }
+
+
+  public function testGetEntries_withGeo()
+  {
+      // set user geo filter
+      $user = $this->users['withFilter'];
+      // set filter to Africa (1)
+      $response = $this->call(
+          'POST',
+          '/settings/continentFilter',
+          array( 'continentFilter' => json_encode( array( 1 ) ) ),
+          array(),
+          array( 'HTTP_X-API-TOKEN' => $user['tokenId'] )
+      );
+      $this->assertEquals( 200, $response->getStatusCode() );
+
+      \Config::set( 'app.force_include_all_world', false );
+
+      $response = $this->call(
+          'GET',
+          '/entry',
+          array(),
+          array(),
+          array( 'HTTP_X-API-TOKEN' => $user['tokenId'] )
+      );
+      $this->assertEquals( 200, $response->getStatusCode() );
+
+      $content = json_decode( $response->getContent() );
+      $this->assertTrue( count( $content->entries ) < 10 );
   }
 
 
@@ -352,4 +393,33 @@ class EntryTest extends TestCase {
     $this->assertEquals( $userName, $uploadedEntry->name );
   }
 
+
+  public function testSearch()
+  {
+      $user = $this->users['withFilter'];
+      // set filter to Africa (1)
+      $response = $this->call(
+          'POST',
+          '/settings/continentFilter',
+          array( 'continentFilter' => json_encode( array( 1 ) ) ),
+          array(),
+          array( 'HTTP_X-API-TOKEN' => $user['tokenId'] )
+      );
+      $this->assertEquals( 200, $response->getStatusCode() );
+
+      \Config::set( 'app.force_include_all_world', false );
+
+      $response = $this->call(
+          'GET',
+          '/entry/search4',
+          array( 'term' => 'Vas' ),
+          array(),
+          array( 'HTTP_X-API-TOKEN' => $this->users['withFilter']['tokenId'] )
+      );
+
+      $this->assertEquals( 200, $response->getStatusCode() );
+
+      $content = json_decode( $response->getContent() );
+      error_log( print_r( $content, true ) );
+  }
 }

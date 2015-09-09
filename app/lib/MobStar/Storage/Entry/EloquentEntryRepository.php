@@ -79,11 +79,11 @@ class EloquentEntryRepository implements EntryRepository
 	    }
 
 
-	    $continentsFilter = $this->getContinentFilter( $geoLocationFilter );
-
-	    if( $continentsFilter )
+	    if( $geoLocationFilter )
 	    {
-	        $query->whereIn( 'entry_continent', $continentsFilter );
+	        if( ! is_array( $geoLocationFilter ) ) $geoLocationFilter = array( $geoLocationFilter );
+	        if( \Config::get( 'app.force_include_all_world', false ) ) $geoLocationFilter[] = 0;
+	        $query->whereIn( 'entry_continent', $geoLocationFilter );
 	    }
 
 
@@ -122,11 +122,18 @@ class EloquentEntryRepository implements EntryRepository
 	            $self = $this;
 
 	            $query->orWhere( function( $query )
-	                use( $max_media_duration_for_home_feed, $self, $localExclude ) {
+	                use( $max_media_duration_for_home_feed, $self, $localExclude, $geoLocationFilter ) {
 	                $query->where( 'entry_category_id', '=', 7 )
 	                ->where( 'entry_deleted', '=', 0 )
 	                ->whereIn( 'entry_type', array( 'video', 'audio' ) )
 	                ->whereBetween( 'entry_duration', array( 0, $max_media_duration_for_home_feed ) );
+
+	                if( $geoLocationFilter )
+	                {
+	                    if( ! is_array( $geoLocationFilter ) ) $geoLocationFilter = array( $geoLocationFilter );
+	                    if( \Config::get( 'app.force_include_all_world', false ) ) $geoLocationFilter[] = 0;
+	                    $query->whereIn( 'entry_continent', $geoLocationFilter );
+	                }
 
 	                $self->addExcludeRules( $query, $localExclude );
 	            });
@@ -154,44 +161,6 @@ class EloquentEntryRepository implements EntryRepository
 
 	    return $entries;
 	}
-
-
-	/**
-	 * returns continents ids, based on location filter
-	 *
-	 * There may be three cases:
-	 * 1. none or empty geoLocationFilter. Then return empty continents.
-	 * 2. some valid continents in geoLocationFilter. Then return array of this continents.
-	 * 3. zero (all world) among other continents in geoLocationFilter. Then return array of this continents and with zero.
-	 *
-	 * @param number|array $geoLocationFilter
-	 *
-	 * @return array array of continent ids to filter entries on. Array is indexed by continent id.
-	 */
-	private function getContinentFilter( $geoLocationFilter = 0 )
-	{
-	    $continents = array();
-
-	    if( ! empty( $geoLocationFilter ) )
-	    {
-	        if( ! is_array( $geoLocationFilter ) ) $geoLocationFilter = array( $geoLocationFilter );
-
-	        // remove 0 from filter, if any (we will handle it manualy)
-	        foreach( $geoLocationFilter as $continentId )
-	        {
-	            $id = (int) $continentId;
-	            $continents[ $id ] = $id;
-	        }
-	    }
-
-	    if( \Config::get( 'app.force_include_all_world', false ) )
-	    {
-	        $continents[0] = 0;
-	    }
-
-	    return $continents;
-	}
-
 
 
 	public function allComplexExclude_convertToIds($user = 0, $category = 0, $tag = 0, $exclude = 0, $order_by = 0, $order = 'desc', $limit = 50, $offset = 0, $count = false, $withAll = true)

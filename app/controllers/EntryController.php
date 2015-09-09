@@ -141,6 +141,12 @@ class EntryController extends BaseController
 
 		$session = $this->token->get_session( $token );
 
+		$currentUser = User::find( $session->token_user_id );
+
+		if( $currentUser->getContinentFilter() ) {
+		    return $this->index_v2(); // new version. Use geoFilter
+		}
+
 		$fields = array_values( explode( ',', Input::get( "fields" ) ) );
 
 		if( $fields[ 0 ] == "" )
@@ -597,6 +603,489 @@ class EntryController extends BaseController
 
 		return $response;
 	}
+
+
+	/**
+	 * returns list of entires using geoLocation filter
+	 * @return unknown
+	 */
+	public function index_v2()
+	{
+	    $client = getS3Client();
+
+	    $token = Request::header( "X-API-TOKEN" );
+
+	    $session = $this->token->get_session( $token );
+
+	    $currentUser = User::findOrFail( $session->token_user_id );
+
+	    $fields = array_values( explode( ',', Input::get( "fields" ) ) );
+
+	    if( $fields[ 0 ] == "" )
+	    {
+	        unset( $fields );
+	    }
+
+	    $return = [ ];
+	    $valid = false;
+
+	    if( !empty( $fields ) )
+	    {
+	        //Check if fields are valid
+	        foreach( $fields as $field )
+	        {
+	            if( !in_array( $field, $this->valid_fields ) )
+	            {
+	                $return[ 'errors' ][ ] = [ $field . " is not a valid field." ];
+	            }
+	            else
+	            {
+	                $valid = true;
+	            }
+	        }
+
+	    }
+
+	    //Get limit to calculate pagination
+	    $limit = ( Input::get( 'limit', '20' ) );
+
+	    //If not numeric set it to the default limit
+	    $limit = ( !is_numeric( $limit ) || $limit < 1 ) ? 20 : $limit;
+
+	    //Get page
+	    $page = ( Input::get( 'page', '1' ) );
+	    $page = ( !is_numeric( $page ) ) ? 1 : $page;
+
+	    //Get page
+	    $order_by = ( Input::get( 'orderBy', 'id' ) );
+
+	    $debug = false;
+
+	    switch( $order_by )
+	    {
+	        case "popular":
+	            $order = 'entry_rank';
+	            $dir = 'asc';
+	            break;
+	        case "latest":
+	            $order = 'entry_created_date';
+	            $dir = 'desc';
+	            break;
+	        default:
+	            $order = 0;
+	            $dir = 0;
+	    }
+
+	    //Calculate offset
+	    $offset = ( $page * $limit ) - $limit;
+
+	    //If page is greter than one show a previous link
+	    if( $page > 1 )
+	    {
+	        $previous = true;
+	    }
+	    else
+	    {
+	        $previous = false;
+	    }
+
+	    //Get user
+	    $user = ( Input::get( 'user', '0' ) );
+	    $user = ( !is_numeric( $user ) ) ? 0 : $user;
+
+	    //Get Category
+	    $category = ( Input::get( 'category', '0' ) );
+	    $category = ( !is_numeric( $category ) ) ? 0 : $category;
+
+	    $showFeedback = ( Input::get( 'showFeedback', '0' ) );
+
+	    //Get tags
+	    $tag = ( Input::get( 'tagId', '0' ) );
+	    $tag = ( !is_numeric( $tag ) ) ? 0 : $tag;
+
+	    $exclude = [ ];
+
+	    if( Input::get( 'excludeVotes' ) == 'true' )
+	    {
+	        // skip entries, voted down by user
+	        $exclude['excludeVotes'] = $session->token_user_id;
+	    }
+	    if( $order_by == 'popular' )
+	    {
+	        // skip not popular entries
+	        $exclude['notPopular'] = true;
+	    }
+	    /* Added for exclude MOBIT category in All entry list */
+	    if($category != 8 && $category != 7)
+	    {
+	        $exclude['category'] = array(7, 8);
+	    }
+	    /* End */
+	    if( ! $user ) // use geoLocation filtering
+	    {
+	        $geoFilter = $currentUser->getContinentFilter();
+	        $entries = $this->entry->allWithGeoLocation( $geoFilter, $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false, true );
+	        $count = $this->entry->allWithGeoLocation( $geoFilter, $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, true );
+	    }
+	    else // skip geoLocation filtering. User want to see all other users entries
+	    {
+            $entries = $this->entry->allComplexExclude( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false, true );
+            //dd(DB::getQueryLog());
+            $count = $this->entry->allComplexExclude( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, true );
+	    }
+
+	    if( $count == 0 )
+	    {
+	        if( $user != 0 )
+	        {
+	            $user = User::find( $user );
+	            $current[ 'id' ] = null;
+	            $current[ 'user' ] = oneUser( $user, $session );
+	            $current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $user->user_id )->where( 'user_star_deleted', '=', '0')->count();
+	            $iAmStarFlag = Star::where( 'user_star_user_id', '=', $user->user_id )->where( 'user_star_star_id', '=', $session->token_user_id )->where( 'user_star_deleted', '=', '0')->count();
+	            if($iAmStarFlag > 0)
+	            {
+	                $current[ 'user' ][ 'iAmStar' ] = 1;
+	            }
+	            else
+	            {
+	                $current[ 'user' ][ 'iAmStar' ] = 0;
+	            }
+	            $current[ 'category' ] = null;
+	            $current[ 'type' ] = null;
+	            $current[ 'name' ] = null;
+	            $current[ 'description' ] = null;
+	            $current[ 'created' ] = null;
+	            $current[ 'modified' ] = null;
+
+	            $return[ 'entries' ][ ][ 'entry' ] = $current;
+	            /* Added By AJ for getting followrs */
+	            $starredBy = [ ];
+	            foreach( $user->StarredBy as $starred )
+	            {
+	                if( $starred->user_star_deleted == 0 )
+	                {
+	                    $starNames = [];
+	                    $starNames = userDetails($starred->User);
+
+	                    $starredBy[ ] = [ 'starId'       => $starred->User->user_id,
+	                        'starName'     => @$starNames['displayName'],
+	                        'starredDate'  => $starred->user_star_created_date,
+	                        'profileImage' => ( isset( $starred->User->user_profile_image ) )
+	                        ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_profile_image, '+720 minutes' )
+	                        : '',
+	                        'profileCover' => ( isset( $starred->User->user_cover_image ) )
+	                        ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_cover_image, '+720 minutes' ) : '',
+	                    ];
+	                }
+	            }
+	            $return[ 'starredBy' ] = $starredBy;
+	            $return['fans'] = count($starredBy);
+	            /* End */
+	            $status_code = 200;
+
+	        }
+	        else
+	        {
+	            $return = [ 'error' => 'No Entries Found' ];
+	            $status_code = 404;
+	        }
+
+	        return Response::make( $return, $status_code );
+	    }
+
+	    //If the count is greater than the highest number of items displayed show a next link
+	    elseif( $count > ( $limit * $page ) )
+	    {
+	        $next = true;
+	    }
+	    else
+	    {
+	        $next = false;
+	    }
+
+	    foreach( $entries as $entry )
+	    {
+
+	        $up_votes = 0;
+	        $down_votes = 0;
+	        foreach( $entry->vote as $vote )
+	        {
+	            if( $vote->vote_up == 1 && $vote->vote_deleted == 0 )
+	            {
+	                $up_votes++;
+	            }
+	            elseif( $vote->vote_down == 1 && $vote->vote_deleted == 0 )
+	            {
+	                $down_votes++;
+	            }
+
+	        }
+
+	        $current = array();
+
+	        if( $entry->entry_splitVideoId ) $current['splitVideoId'] = $entry->entry_splitVideoId;
+
+	        //check to see if fields were specified and at least one is valid
+	        if( ( !empty( $fields ) ) && $valid )
+	        {
+
+	            if( in_array( "id", $fields ) )
+	            {
+	                $current[ 'id' ] = $entry->entry_id;
+	            }
+
+	            if( in_array( "user", $fields ) )
+	            {
+	                $current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
+	                $current[ 'user' ][ 'userName' ] = $entry->User->user_name;
+	            }
+
+	            if( in_array( "userName", $fields ) )
+	            {
+
+	                $current[ 'user' ] = oneUser( $entry->User, $session );
+
+	            }
+
+	            if( in_array( "category", $fields ) )
+	            {
+	                $current[ 'category' ] = $entry->category->category_name;
+	            }
+
+	            if( in_array( "type", $fields ) )
+	            {
+	                $current[ 'type' ] = $entry->entry_type;
+	            }
+
+	            if( in_array( "name", $fields ) )
+	            {
+	                $current[ 'name' ] = $entry->entry_name;
+	            }
+
+	            if( in_array( "description", $fields ) )
+	            {
+	                $current[ 'description' ] = $entry->entry_description;
+	            }
+
+	            if( in_array( "created", $fields ) )
+	            {
+	                $current[ 'created' ] = $entry->entry_created_date;
+	            }
+
+	            if( in_array( "modified", $fields ) )
+	            {
+	                $current[ 'modified' ] = $entry->entry_modified_date;
+	            }
+
+	            if( in_array( "tags", $fields ) )
+	            {
+	                $current[ 'tags' ] = array();
+	                foreach( $entry->entryTag as $tag )
+	                {
+	                    $current[ 'tags' ][ ] = Tag::find( $tag->entry_tag_tag_id )->tag_name;
+	                }
+	            }
+
+	            if( in_array( "entryFiles", $fields ) )
+	            {
+	                $current[ 'entryFiles' ] = array();
+	                if(count($entry->file) <= 0)
+	                    continue;
+	                foreach( $entry->file as $file )
+	                {
+
+	                    $url = $client->getObjectUrl( Config::get('app.bucket'), $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
+	                    $current[ 'entryFiles' ][ ] = [
+	                        'fileType' => $file->entry_file_type,
+	                        'filePath' => $url ];
+
+	                    $current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
+	                    $client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
+	                    : "";
+	                }
+	                if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
+	                    continue;
+	                if( ( count( $current[ 'entryFiles' ] ) < 1 ) &&  $entry->entry_type === 'video' )
+	                    continue;
+	            }
+
+	            if( in_array( "upVotes", $fields ) )
+	            {
+	                $current[ 'upVotes' ] = $up_votes;
+	            }
+
+	            if( in_array( "upVotes", $fields ) )
+	            {
+	                $current[ 'downVotes' ] = $down_votes;
+	            }
+
+	            if( in_array( "rank", $fields ) )
+	            {
+	                $current[ 'rank' ] = $entry->entry_rank;
+	            }
+
+	            if( in_array( "language", $fields ) )
+	            {
+	                $current[ 'language' ] = $entry->entry_language;
+	            }
+
+	            if( $entry->entry_deleted )
+	            {
+	                $current[ 'deleted' ] = true;
+	            }
+	            else
+	            {
+	                $current[ 'deleted' ] = false;
+	            }
+
+	            $return[ 'entries' ][ ][ 'entry' ] = $current;
+	        }
+
+	        else
+	        {
+
+	            $current[ 'id' ] = $entry->entry_id;
+	            $current[ 'user' ] = oneUser( $entry->User, $session );
+
+	            //				$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
+	            //				$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
+	            //				$current[ 'user' ][ 'displayName' ] = $entry->User->user_display_name;
+	            //				$current[ 'user' ][ 'email' ] = $entry->User->user_email;
+	            //				$current[ 'user' ][ 'profileImage' ] = ( !empty( $entry->user->user_profile_image ) )
+	            //					? "http://" . $_ENV[ 'URL' ] . "/" . $entry->user->user_profile_image : "";
+	            //				$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
+	            //					? "http://" . $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
+	            //				$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $entry->entry_user_id )->count();
+	            if( isset( $entry->entry_category_id )  && $entry->entry_category_id == 3 )
+	            {
+	                $current[ 'subcategory' ] = $entry->entry_subcategory;
+	                $current[ 'age' ] = $entry->entry_age;
+	                $current[ 'height' ] = $entry->entry_height;
+	            }
+	            $current[ 'category' ] = $entry->category->category_name;
+	            $current[ 'type' ] = $entry->entry_type;
+	            $current[ 'name' ] = $entry->entry_name;
+	            $current[ 'description' ] = $entry->entry_description;
+	            $current[ 'totalComments' ] = $entry->comments->count();
+	            $current[ 'totalviews' ] = $entry->entryViews->count();
+	            $current[ 'created' ] = $entry->entry_created_date;
+	            $current[ 'modified' ] = $entry->entry_modified_date;
+
+	            $current[ 'tags' ] = array();
+	            foreach( $entry->entryTag as $entry_tag )
+	            {
+	                //TODO: Fix tags so that we do not need to find this
+	                $current[ 'tags' ][ ] = $entry_tag->tag->tag_name;
+	            }
+	            if(count($entry->file) <= 0)
+	                continue;
+	            foreach( $entry->file as $file )
+	            {
+
+	                $signedUrl = $client->getObjectUrl( Config::get('app.bucket'), $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
+
+	                $current[ 'entryFiles' ][ ] = [
+	                    'fileType' => $file->entry_file_type,
+	                    'filePath' => $signedUrl ];
+
+	                $current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
+	                $client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
+	                : "";
+	            }
+	            if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
+	            {
+	                continue;
+	            }
+	            if( ( count( $current[ 'entryFiles' ] ) < 1 ) &&  $entry->entry_type === 'video' )
+	            {
+	                continue;
+	            }
+
+	            $current[ 'upVotes' ] = $up_votes;
+	            $current[ 'downVotes' ] = $down_votes;
+	            $current[ 'rank' ] = $entry->entry_rank;
+	            $current[ 'language' ] = $entry->entry_language;
+
+	            if( $showFeedback == 1 )
+	            {
+	                $currentFeedback = [ ];
+
+	                foreach( $entry->comments as $comment )
+	                {
+	                    $currentFeedback[ ] = [
+	                        'comment'        => $comment->comment_content,
+	                        'commentDate'    => $comment->comment_added_date,
+	                        'commentDeleted' => (bool)$comment->comment_deleted ];
+	                }
+	                $current[ 'feedback' ] = $currentFeedback;
+	            }
+
+	            if( $entry->entry_deleted )
+	            {
+	                $current[ 'deleted' ] = true;
+	            }
+	            else
+	            {
+	                $current[ 'deleted' ] = false;
+	            }
+
+	            $return[ 'entries' ][ ][ 'entry' ] = $current;
+	        }
+	    }
+
+	    /* Added By AJ for getting followers */
+	    if( $user != 0 )
+	    {
+	        $aj = User::find( $user );
+	        $starredBy = [ ];
+	        foreach( $aj->StarredBy as $starred )
+	        {
+	            if( $starred->user_star_deleted == 0 )
+	            {
+	                $starNames = [];
+	                $starNames = userDetails($starred->User);
+
+	                $starredBy[ ] = [ 'starId'       => $starred->User->user_id,
+	                    'starName'     => @$starNames['displayName'],
+	                    'starredDate'  => $starred->user_star_created_date,
+	                    'profileImage' => ( isset( $starred->User->user_profile_image ) )
+	                    ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_profile_image, '+720 minutes' )
+	                    : '',
+	                    'profileCover' => ( isset( $starred->User->user_cover_image ) )
+	                    ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_cover_image, '+720 minutes' ) : '',
+	                ];
+	            }
+	        }
+	        $return[ 'starredBy' ] = $starredBy;
+	        $return['fans'] = count($starredBy);
+	    }
+	    /* End */
+	    $status_code = 200;
+
+	    if( $debug !== false )
+	    {
+	        $return[ 'debug' ] = $debug;
+	    }
+	    //If next is true create next page link
+	    if( $next )
+	    {
+	        $return[ 'next' ] = url( "index.php/entry/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] ) );
+	    }
+
+	    if( $previous )
+	    {
+	        $return[ 'previous' ] = url( "index.php/entry/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] ) );
+	    }
+
+	    $response = Response::make( $return, $status_code );
+
+	    $response->header( 'X-Total-Count', $count );
+
+	    return $response;
+	}
+
+
 
 	/**
 	 *
@@ -3596,6 +4085,13 @@ class EntryController extends BaseController
 
 		$session = $this->token->get_session( $token );
 
+		$currentUser = User::find( $session->token_user_id );
+
+		if( $currentUser->getContinentFilter() )
+		{
+		    return $this->search4_v2();
+		}
+
 		$term = Input::get( "term" );
 
 		//Get limit to calculate pagination
@@ -3690,6 +4186,127 @@ class EntryController extends BaseController
 		}
 		return Response::make( $return, $status_code );
 	}
+
+
+	public function search4_v2()
+	{
+	    $token = Request::header( "X-API-TOKEN" );
+
+	    $session = $this->token->get_session( $token );
+
+	    $currentUser = User::find( $session->token_user_id );
+
+	    $geoFilter = $currentUser->getContinentFilter();
+	    if( $geoFilter )
+	    {
+	       if( \Config::get( 'app.force_include_all_world', false ) ) $geoFilter[] = 0;
+	    }
+
+	    $term = Input::get( "term" );
+
+	    //Get limit to calculate pagination
+	    $limit = ( Input::get( 'limit', '50' ) );
+
+	    //If not numeric set it to the default limit
+	    $limit = ( !is_numeric( $limit ) || $limit < 1 ) ? 50 : $limit;
+
+	    //Get page
+	    $page = ( Input::get( 'page', '1' ) );
+	    $page = ( !is_numeric( $page ) ) ? 1 : $page;
+
+	    //Calculate offset
+	    $offset = ( $page * $limit ) - $limit;
+
+	    //If page is greter than one show a previous link
+	    if( $page > 1 )
+	    {
+	        $previous = true;
+	    }
+	    else
+	    {
+	        $previous = false;
+	    }
+
+	    $return = [ ];
+	    //$excludeCategory = [7,8];
+	    $results =
+	    $entriesQuery = DB::table( 'entries' )
+	    ->select( 'entries.*' )
+	    ->leftJoin( 'users', 'entries.entry_user_id', '=', 'users.user_id' )
+	    ->leftJoin('comments', 'comments.comment_entry_id', '=', 'entries.entry_id')
+	    ->leftJoin('facebook_users', 'users.user_facebook_id', '=', 'facebook_users.facebook_user_id')
+	    ->leftJoin('google_users', 'users.user_google_id', '=', 'google_users.google_user_id')
+	    // ->whereNotIn( 'entries.entry_category_id', $excludeCategory )
+	    ->where( 'entries.entry_deleted', '=', '0' )
+	    ->where( 'users.user_deleted', '=', '0' );
+	    if( ! empty( $geoFilter ) )
+	    {
+	        $entriesQuery = $entriesQuery->whereIn( 'entries.entry_continent', $geoFilter );
+	    }
+	    $entriesQuery = $entriesQuery->where( function ( $query ) use ( $term )
+	    {
+	        $query->orWhere( 'entries.entry_name', 'LIKE', '%' . $term . '%' )
+	        ->orWhere( 'entries.entry_description', 'LIKE', '%' . $term . '%' )
+	        ->orWhere( 'users.user_name', 'LIKE', '%' . $term . '%' )
+	        ->orWhere( 'users.user_full_name', 'LIKE', '%' . $term . '%' )
+	        ->orWhere( 'facebook_users.facebook_user_display_name', 'LIKE', '%' . $term . '%' )
+	        ->orWhere( 'facebook_users.facebook_user_user_name', 'LIKE', '%' . $term . '%' )
+	        ->orWhere( 'google_users.google_user_display_name', 'LIKE', '%' . $term . '%' )
+	        ->orWhere( 'google_users.google_user_user_name', 'LIKE', '%' . $term . '%' )
+	        ->orWhere( 'comments.comment_content', 'LIKE','%' . $term . '%' );
+	    } );
+	    $results = $entriesQuery->groupBy('entry_id')
+	    //->get();
+	    ->take( $limit )->skip( $offset )->get();
+	    $status_code = 200;
+
+
+	    $usersQuery = DB::table( 'users' )
+	    ->select( 'users.*' )
+	    ->leftJoin('facebook_users', 'users.user_facebook_id', '=', 'facebook_users.facebook_user_id')
+	    ->leftJoin('google_users', 'users.user_google_id', '=', 'google_users.google_user_id')
+	    ->where( 'users.user_deleted', '=', '0' );
+	    if( ! empty( $geoFilter ) )
+	    {
+	       $usersQuery = $usersQuery->whereIn( 'users.user_continent', $geoFilter );
+	    }
+	    $usersQuery = $usersQuery->where( function ( $query ) use ( $term )
+	    {
+	        $query->orWhere( 'users.user_name', 'LIKE', '%' . $term . '%' )
+	        ->orWhere( 'users.user_full_name', 'LIKE', '%' . $term . '%' )
+	        ->orWhere( 'facebook_users.facebook_user_display_name', 'LIKE', '%' . $term . '%' )
+	        ->orWhere( 'facebook_users.facebook_user_user_name', 'LIKE', '%' . $term . '%' )
+	        ->orWhere( 'google_users.google_user_display_name', 'LIKE', '%' . $term . '%' )
+	        ->orWhere( 'google_users.google_user_user_name', 'LIKE', '%' . $term . '%' );
+	    } );
+	    //->get();
+	    $results_user = $usersQuery->take( $limit )->skip( $offset )->get();
+	    if(count($results_user) > 0)
+	    {
+	        for( $i = 0; $i < count( $results_user ); $i++ )
+	        {
+	            $User = User::where( 'user_id', '=', $results_user[$i]->user_id )->first();
+	            $current[ 'category' ] = 'onlyprofile';
+	            $current[ 'user' ] = oneUser( $User, $session );
+	            $return[ 'entries' ][ ][ 'entry' ] = $current;
+	        }
+	    }
+	    for( $i = 0; $i < count( $results ); $i++ )
+	    {
+	        if( $results[ $i ]->entry_deleted === 1 )
+	        {
+	            continue;
+	        }
+	        else
+	        {
+	            if(!$this->oneEntryNew( $results[ $i ], $session, true ))
+	                continue;
+	            $return[ 'entries' ][ ][ 'entry' ] = $this->oneEntryNew( $results[ $i ], $session, true );
+	        }
+	    }
+	    return Response::make( $return, $status_code );
+	}
+
 
 	/* Added by Anil for testing youtube upload and watermark symbol add in video */
 	public function store2()
