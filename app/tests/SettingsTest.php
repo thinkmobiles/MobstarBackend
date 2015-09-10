@@ -48,6 +48,20 @@ class SettingsTest extends TestCase
     }
 
 
+    protected function setUserCategoryFilter( $categoryFilter, $token )
+    {
+        $response = $this->call(
+            'POST',
+            '/settings/categoryFilter',
+            array( 'categoryFilter' => $categoryFilter ),
+            array(),
+            array( 'HTTP_X-API-TOKEN' => $token )
+        );
+
+        return $response;
+    }
+
+
     protected function getUserContinentFilter( $token )
     {
         $response = $this->call(
@@ -59,6 +73,54 @@ class SettingsTest extends TestCase
         );
 
         return $response;
+    }
+
+
+    protected function assertUserHasCategoryFilter( $expected, $token )
+    {
+        $response = $this->call(
+            'GET',
+            '/settings/categoryFilter',
+            array(),
+            array(),
+            array( 'HTTP_X-API-TOKEN' => $token )
+        );
+
+        $this->assertEquals( 200, $response->getStatusCode() );
+
+        $content = json_decode( $response->getContent() );
+
+        $this->assertNotEmpty( $content );
+        $this->assertHasNoErrors( $content );
+        $this->assertContentHasCategoryFilter( $expected, $content );
+    }
+
+
+    protected function assertResponseIsOkAndHasCategoryFilter( $filter, $response )
+    {
+        $this->assertEquals( 200, $response->getStatusCode() );
+
+        $content = json_decode( $response->getContent() );
+
+        $this->assertNotEmpty( $content );
+        $this->assertHasNoErrors( $content );
+        $this->assertContentHasCategoryFilter($filter, $content);
+    }
+
+
+    protected function assertResponseHasCategoryFilter( $filter, $response )
+    {
+        $content = json_decode( $response->getContent() );
+
+        $this->assertNotEmpty( $content );
+        $this->assertContentHasCategoryFilter( $filter, $content );
+    }
+
+
+    protected function assertContentHasCategoryFilter( $filter, $content )
+    {
+        $this->assertObjectHasAttribute( 'categoryFilter', $content );
+        $this->assertEquals( $filter, $content->categoryFilter );
     }
 
 
@@ -372,5 +434,102 @@ class SettingsTest extends TestCase
         // must return empty array
         $this->assertEquals( array(), $content->continentFilter );
 
+    }
+
+
+    public function testSetCategoryFilter_OK()
+    {
+        $categoryFilter = array( 1, 3 );
+
+        $response = $this->setUserCategoryFilter( json_encode( $categoryFilter ), $this->authInfo['tokenId'] );
+
+        $this->assertResponseIsOkAndHasCategoryFilter( $categoryFilter, $response );
+    }
+
+
+    public function testSetCategoryFilter_withZero()
+    {
+        // first set to good
+        $goodFilter = array( 3, 4, 6 );
+        $response = $this->setUserCategoryFilter( json_encode( $goodFilter ), $this->authInfo['tokenId'] );
+
+        $this->assertResponseIsOkAndHasCategoryFilter( $goodFilter, $response );
+
+        // try to set with zero
+        $categoryFilterWithZero = array( 1, 3, 0 );
+
+        $response = $this->setUserCategoryFilter( json_encode( $categoryFilterWithZero ), $this->authInfo['tokenId'] );
+
+        $this->assertEquals( 400, $response->getStatusCode(), "setting 0 category is not allowed" );
+        $this->assertResponseHasCategoryFilter( $goodFilter, $response, "current filter is not returned" );
+    }
+
+
+    public function testSetCategoryFilter_wrongCategory()
+    {
+        // first set to good
+        $goodFilter = array( 1, 5 );
+        $response = $this->setUserCategoryFilter( json_encode( $goodFilter ), $this->authInfo['tokenId'] );
+
+        $this->assertResponseIsOkAndHasCategoryFilter( $goodFilter, $response );
+
+        // try to set with invalid id (9)
+        $invalidFilter = array( 4, 9 );
+
+        $response = $this->setUserCategoryFilter( json_encode( $invalidFilter ), $this->authInfo['tokenId'] );
+
+        $this->assertEquals( 400, $response->getStatusCode(), "setting invalid category is not allowed" );
+        $this->assertResponseHasCategoryFilter( $goodFilter, $response, "current filter is not returned" );
+    }
+
+
+    public function testSetCategoryFilter_noFilter()
+    {
+        // first set to good
+        $goodFilter = array( 3, 6 );
+        $response = $this->setUserCategoryFilter( json_encode( $goodFilter ), $this->authInfo['tokenId'] );
+
+        $this->assertResponseIsOkAndHasCategoryFilter( $goodFilter, $response );
+
+        // try to set with invalid id (9)
+        $noFilter = array();
+
+        $response = $this->setUserCategoryFilter( json_encode( $noFilter ), $this->authInfo['tokenId'] );
+
+        $this->assertResponseIsOkAndHasCategoryFilter( $noFilter, $response );
+    }
+
+
+    public function testGetCategoryFilter_noFilter()
+    {
+        $this->assertUserHasCategoryFilter( array(), $this->authInfoNoFilter['tokenId'] );
+    }
+
+
+    public function testGetCategoryFilter_OK()
+    {
+        // first set filter to good values
+        $categoryFilter = array( 1, 5 );
+
+        $response = $this->setUserCategoryFilter( json_encode( $categoryFilter ), $this->authInfo['tokenId'] );
+
+        $this->assertEquals( 200, $response->getStatusCode() );
+
+        // get filter
+        $this->assertUserHasCategoryFilter( $categoryFilter, $this->authInfo['tokenId'] );
+    }
+
+
+    public function testGetCategoryFilter_AllCategories()
+    {
+        // first set filter to all categories
+        $categoryFilterAllCategories = array( 1, 3, 4, 5, 6 );
+
+        $response = $this->setUserCategoryFilter( json_encode( $categoryFilterAllCategories ), $this->authInfo['tokenId'] );
+
+        $this->assertEquals( 200, $response->getStatusCode() );
+
+        // get filter
+        $this->assertUserHasCategoryFilter( array() , $this->authInfo['tokenId'] );
     }
 }

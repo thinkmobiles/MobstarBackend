@@ -417,4 +417,109 @@ class SettingsController extends BaseController
 
 	    return $filter;
 	}
+
+
+	public function setUserCategoryFilter()
+	{
+	    $return = [];
+
+	    $token = Request::header( "X-API-TOKEN" );
+
+	    $session = $this->token->get_session( $token );
+
+	    $user = User::find( $session->token_user_id );
+
+	    $currentFilter = $user->getCategoryFilter();
+
+	    // get continents ids
+	    $categoryIds = DB::table('categories')
+	       ->whereNotIn( 'category_id', array(7,8) )
+	       ->where( 'category_active', '>', 0)
+	       ->lists( 'category_id');
+
+	    // validate input fields
+	    $validator = Validator::make( Input::get(), array(
+	        'categoryFilter' => 'required',
+	    ));
+
+	    if( $validator->fails() )
+	    {
+	        $return['errors'] = $validator->messages();
+	        $return['categoryFilter'] = $currentFilter; // return current user filter
+	        return Response::make( $return, 400 );
+	    }
+
+	    $newFilter = $this->makeCategoryFilterFromParam( Input::get( 'categoryFilter' ), $categoryIds );
+
+	    // validate category ids. Also verifies that 0 category id is not present
+	    $invalidIds = array();
+	    foreach( $newFilter as $id )
+	    {
+	        if( ! in_array( $id, $categoryIds ) ) $invalidIds[] = $id;
+	    }
+	    if( $invalidIds )
+	    {
+	        $return['error'] = 'Invalid category ids: '.implode( ', ', $invalidIds );
+	        $return['categoryFilter'] = $currentFilter;
+	        return Response::make( $return, 400 );
+	    }
+
+	    // input validated, save new filter
+	    $user->setCategoryFilter( $newFilter );
+
+	    $user->save();
+
+	    $return['categoryFilter'] = $user->getCategoryFilter();
+
+	    return Response::make( $return, 200 );
+	}
+
+
+	public function getUserCategoryFilter()
+	{
+	    $return = [];
+
+	    $token = Request::header( "X-API-TOKEN" );
+
+	    $session = $this->token->get_session( $token );
+
+	    $user = User::find( $session->token_user_id );
+
+	    $return['categoryFilter'] = $user->getCategoryFilter();
+
+	    return Response::make( $return, 200 );
+	}
+
+
+	private function makeCategoryFilterFromParam( $param, array $allIds = null )
+	{
+	    if( $param )
+	    {
+	        $filter = json_decode( $param );
+	        if( ! $filter ) $filter = array();
+	    }
+	    else
+	    {
+	        $filter = array();
+	    }
+
+	    // if there is set all continent ids, collapse them to empty array
+	    $isAllIds = true;
+	    if( $filter && $allIds )
+	    {
+	        foreach( $allIds as $id )
+	        {
+	            if( ! in_array( $id, $filter ) )
+	            {
+	                $isAllIds = false;
+	                break;
+	            }
+	        }
+	    }
+
+	    if( $isAllIds ) $filter = array();
+	    else $filter = array_unique( $filter );
+
+	    return $filter;
+	}
 }

@@ -55,7 +55,12 @@ alter table `entries` add column
   `entry_continent` int not null default 0
   comment 'the continent, the entry belong to';
 
--- add column `user_continent_filter` to table `users` to store comma separated list of continent ids
+-- add column `user_continent_filter` to table `users` to store JSON array of continent filter
 alter table `users` add column
   `user_continent_filter` varchar( 200 ) not null default ''
-  comment 'comma separated continent ids to use as filter';
+  comment 'array of continent ids to use as filter';
+
+-- add column `user_category_filter` to table `users` to store JSON array of category filter
+alter table `users` add column
+  `user_category_filter` varchar( 200 ) not null default ''
+  comment 'array of category ids to use as filter';

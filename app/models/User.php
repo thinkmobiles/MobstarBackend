@@ -109,6 +109,28 @@ class User extends \Eloquent implements UserInterface, RemindableInterface
 	}
 
 
+	public function getCategoryFilter()
+	{
+	    if( $this->user_category_filter )
+	    {
+	        $filter = json_decode( $this->user_category_filter );
+	        if( ! $filter ) $filter = array();
+	    }
+	    else
+	    {
+	        $filter = array();
+	    }
+
+	    return $filter;
+	}
+
+
+	public function setCategoryFilter( array $filter )
+	{
+	    $this->user_category_filter = json_encode( $filter );
+	}
+
+
 	public function oneUser( $user, $session, $includeStars = false )
 	{
 
