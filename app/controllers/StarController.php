@@ -156,24 +156,19 @@ class StarController extends BaseController
 						// End
 						if(!empty($name))
 						{
-							$message = $name." is now following you.";
-							$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM
-								(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id
-								from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
-								order by device_registration_date_created desc
-								) t1 left join users u on t1.device_registration_user_id = u.user_id
-								where u.user_deleted = 0
-								AND u.user_id = $to
-								order by t1.device_registration_date_created desc"));
-							$icon = 'follow.png';
-							$icon = 'http://' . $_ENV[ 'URL' ] . '/images/' . $icon;
-							if(!empty($usersDeviceData))
-							{
-								for($j=0;$j<count($usersDeviceData);$j++)
-								{
-									$this->registerSNSEndpoint($usersDeviceData[$j],$message,$to,$name,$icon);
-								}
-							}
+						    $message = $name." is now following you.";
+						    $icon = 'follow.png';
+						    $icon = 'http://' . $_ENV[ 'URL' ] . '/images/' . $icon;
+						    $pushMessage = $message;
+						    $pushData = array(
+						        "badge"=> (int)$notification_count,
+						        "userId"=>$to,
+						        "diaplayname"=>$name,
+						        "Type"=>"Follow",
+						        "notificationIcon"=>$icon,
+						    );
+
+						    \MobStar\SnsHelper::sendNotification( $to, $pushMessage, $pushData );
 						}
 					}
 					else
@@ -266,22 +261,17 @@ class StarController extends BaseController
 					$message = $name." is now following you.";
 					$icon = 'follow.png';
 					$icon = 'http://' . $_ENV[ 'URL' ] . '/images/' . $icon;
-					$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM
-						(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id
-						from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
-						order by device_registration_date_created desc
-						) t1 left join users u on t1.device_registration_user_id = u.user_id
-						where u.user_deleted = 0
-						AND u.user_id = $to
-						order by t1.device_registration_date_created desc"));
 
-					if(!empty($usersDeviceData))
-					{
-						for($k=0;$k<count($usersDeviceData);$k++)
-						{
-							$this->registerSNSEndpoint($usersDeviceData[$k],$message,$to,$name,$icon = NULL);
-						}
-					}
+					$pushMessage = $message;
+					$pushData = array(
+					    "badge"=> (int)$notification_count,
+					    "userId"=>$to,
+					    "diaplayname"=>$name,
+					    "Type"=>"Follow",
+					    "notificationIcon"=>$icon,
+					);
+
+					\MobStar\SnsHelper::sendNotification( $to, $pushMessage, $pushData );
 				}
 			}
 			$response[ 'message' ] = "star added";
@@ -343,150 +333,5 @@ class StarController extends BaseController
 		$status_code = 200;
 
 		return Response::make( $response, $status_code );
-	}
-	public function registerSNSEndpoint( $device , $message, $to=NULL, $name=NULL,$icon = NULL)
-	{
-	  if( Config::get('app.disable_sns') ) return;
-
-		$badge_count = 0;
-		$badge_count = DB::table('notification_counts')
-					->where('user_id','=',$device->device_registration_user_id)
-					->pluck( 'notification_count' );
-		if( $device->device_registration_device_type == "apple" )
-		{
-			$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushdemo";
-			//$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS_SANDBOX/adminsandbox";
-		}
-		else
-		{
-			$arn = "arn:aws:sns:eu-west-1:830026328040:app/GCM/admin-android-notification";
-		}
-
-		$sns = getSNSClient();
-
-		$Model1 = $sns->listPlatformApplications();
-
-		$result1 = $sns->listEndpointsByPlatformApplication(array(
-			// PlatformApplicationArn is required
-			'PlatformApplicationArn' => $arn,
-		));
-		foreach($result1['Endpoints'] as $Endpoint){
-			$EndpointArn = $Endpoint['EndpointArn'];
-			$EndpointToken = $Endpoint['Attributes'];
-			foreach($EndpointToken as $key=>$newVals){
-				if($key=="Token"){
-					if($device->device_registration_device_token==$newVals){
-					//Delete ARN
-						$result = $sns->deleteEndpoint(array(
-							// EndpointArn is required
-							'EndpointArn' => $EndpointArn,
-						));
-					}
-				}
-			}
-		}
-
-		$result = $sns->createPlatformEndpoint(array(
-			 // PlatformApplicationArn is required
-			 'PlatformApplicationArn' => $arn,
-			 // Token is required
-			 'Token' => $device->device_registration_device_token,
-
-		));
-
-		$endpointDetails = $result->toArray();
-		if($device->device_registration_device_type == "apple")
-		{
-			if(!empty($to) && !empty($name))
-			{
-				$publisharray = array(
-					'TargetArn' => $endpointDetails['EndpointArn'],
-					'MessageStructure' => 'json',
-					 'Message' => json_encode(array(
-						'default' => $message,
-						//'APNS_SANDBOX' => json_encode(array(
-						'APNS' => json_encode(array(
-							'aps' => array(
-								"sound" => "default",
-								"alert" => $message,
-								"badge"=> intval($badge_count),
-								"userId"=>$to,
-								"diaplayname"=>$name,
-								"Type"=>"Follow",
-								"notificationIcon"=>$icon,
-							)
-						)),
-					))
-				 );
-			}
-			else
-			{
-				$publisharray = array(
-					'TargetArn' => $endpointDetails['EndpointArn'],
-					'MessageStructure' => 'json',
-					 'Message' => json_encode(array(
-						'default' => $message,
-						//'APNS_SANDBOX' => json_encode(array(
-						'APNS' => json_encode(array(
-							'aps' => array(
-								"sound" => "default",
-								"alert" => $message,
-								"badge"=> intval($badge_count),
-							)
-						)),
-					))
-				 );
-			}
-		}
-		else
-		{
-			if(!empty($to) && !empty($name))
-			{
-				$publisharray = array(
-					'TargetArn' => $endpointDetails['EndpointArn'],
-					'MessageStructure' => 'json',
-					'Message' => json_encode(array(
-						'default' => $message,
-						'GCM'=>json_encode(array(
-							'data'=>array(
-								'message'=> $message,
-								"badge"=> intval($badge_count),
-								"userId"=>$to,
-								"diaplayname"=>$name,
-								"Type"=>"Follow",
-								"notificationIcon"=>$icon
-							)
-						))
-					))
-				);
-			}
-			else
-			{
-				$publisharray = array(
-					'TargetArn' => $endpointDetails['EndpointArn'],
-					'MessageStructure' => 'json',
-					'Message' => json_encode(array(
-						'default' => $message,
-						'GCM'=>json_encode(array(
-							'data'=>array(
-								'message'=> $message,
-								"badge"=> intval($badge_count)
-							)
-						))
-					))
-				);
-			}
-		}
-		try
-		{
-			$sns->publish($publisharray);
-			$myfile = 'sns-log.txt';
-			file_put_contents($myfile, date('d-m-Y H:i:s') . ' debug log:', FILE_APPEND);
-			file_put_contents($myfile, print_r($endpointDetails, true), FILE_APPEND);
-		}
-		catch (Exception $e)
-		{
-			//print($endpointDetails['EndpointArn'] . " - Failed: " . $e->getMessage() . "!\n");
-		}
 	}
 }

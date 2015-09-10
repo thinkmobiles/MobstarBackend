@@ -3,6 +3,7 @@
 namespace MobStar;
 
 use DB;
+use Config;
 
 class SnsHelper
 {
@@ -15,6 +16,8 @@ class SnsHelper
     public static function sendNotification( $toUserId, $messageText, $messageData )
     {
         self::init();
+
+        if( Config::get('app.disable_sns') ) return;
 
         // get user devices
         $devices = DB::table( 'users as u' )

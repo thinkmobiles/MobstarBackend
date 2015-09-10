@@ -5079,7 +5079,7 @@ class EntryController extends BaseController
         'createdEntryId' => $messageData['createdEntryId'],
       );
 
-      $this->sendPushNotification( $usedUserId, $msg, $pushData );
+      \MobStar\SnsHelper::sendNotification( $usedUserId, $msg, $pushData );
     }
 
 
@@ -5108,127 +5108,6 @@ class EntryController extends BaseController
         }
       }
     }
-
-
-    public static function registerSNSEndpoint(
-      $device,
-      $message,
-      $messageData
-    )
-    {
-      if( Config::get('app.disable_sns') ) return;
-
-      if( $device->device_registration_device_type == "apple" )
-      {
-        $arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushdemo";
-        //$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS_SANDBOX/adminsandbox";
-      }
-      else
-      {
-        $arn = "arn:aws:sns:eu-west-1:830026328040:app/GCM/admin-android-notification";
-      }
-
-      $sns = getSNSClient();
-
-      $Model1 = $sns->listPlatformApplications();
-
-      $result1 = $sns->listEndpointsByPlatformApplication(array(
-        // PlatformApplicationArn is required
-        'PlatformApplicationArn' => $arn,
-      ));
-      //echo '<pre>';
-      //$dtoken = 'APA91bHEx658AQzCM3xUHTVjBGJz8a_HMb65Y_2BIIPXODexYlvuCZpaJRKRchTNqQCXs_w9b0AxJbzIQOFNtYkW0bbsiXhiX7uyhGYNTYC2PBOZzAmvqnvOBBhOKNS7Jl0fdoIdNa_riOlJxQi8COrhbw0odIJKBg';
-      //$dtoken = 'c39bac35f298c66d7398673566179deee27618c2036d8c82dcef565c8d732f84';
-      foreach($result1['Endpoints'] as $Endpoint){
-        $EndpointArn = $Endpoint['EndpointArn'];
-        $EndpointToken = $Endpoint['Attributes'];
-        foreach($EndpointToken as $key=>$newVals){
-          if($key=="Token"){
-            if($device->device_registration_device_token==$newVals){
-              //if($dtoken==$newVals){
-              //Delete ARN
-              $result = $sns->deleteEndpoint(array(
-                // EndpointArn is required
-                'EndpointArn' => $EndpointArn,
-              ));
-            }
-          }
-          //print_r($EndpointToken);
-        }
-        //print_r($Endpoint);
-      }
-
-      // Sometimes the device token becomes invalid and endpoint creating throws exception.
-      try{
-      $result = $sns->createPlatformEndpoint(array(
-        // PlatformApplicationArn is required
-        'PlatformApplicationArn' => $arn,
-        // Token is required
-        //'Token' => $dtoken,
-        'Token' => $device->device_registration_device_token,
-
-      ));
-      } catch( \Exception $e )
-      {
-          return; // we can not create endpoint, so nothing to do.
-      }
-
-      $endpointDetails = $result->toArray();
-
-      //print_r($device);echo "\n".$message."\n";print_r($result);print_r($endpointDetails);
-
-      //die;
-      if($device->device_registration_device_type == "apple")
-      {
-        $data = $messageData;
-        $data['sound'] = 'default';
-        $data['alert'] = $message;
-
-        $publisharray = array(
-          'TargetArn' => $endpointDetails['EndpointArn'],
-          'MessageStructure' => 'json',
-          'Message' => json_encode( array(
-            'default' => $message,
-            //'APNS_SANDBOX' => json_encode(array(
-            'APNS' => json_encode( array(
-              'aps' => $data
-            )),
-          ))
-        );
-      }
-      else
-      {
-        $data = $messageData;
-        $data['message'] = $message;
-
-        $publisharray = array(
-          'TargetArn' => $endpointDetails['EndpointArn'],
-          'MessageStructure' => 'json',
-          'Message' => json_encode( array(
-            'default' => $message,
-            'GCM' => json_encode( array(
-              'data' => $data
-            ))
-          ))
-        );
-      }
-      try
-      {
-        $sns->publish($publisharray);
-
-        $myfile = 'sns-log.txt';
-        file_put_contents($myfile, date('d-m-Y H:i:s') . ' debug log:', FILE_APPEND);
-        file_put_contents($myfile, print_r($endpointDetails, true), FILE_APPEND);
-
-        //print($EndpointArn . " - Succeeded!\n");
-      }
-      catch (Exception $e)
-      {
-        //print($endpointDetails['EndpointArn'] . " - Failed: " . $e->getMessage() . "!\n");
-      }
-
-    }
-
 
 	/* End */
 }

@@ -884,52 +884,7 @@ class LoginController extends BaseController
 
 	}
 
-	public function registerSNSEndpoint( $device )
-	{
-	  if( Config::get('app.disable_sns') ) return;
 
-		if( $device->device_registration_device_type == "apple" )
-		{
-			$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/com.mobstar.prod";
-		}
-		else
-		{
-			$arn = "arn:aws:sns:eu-west-1:830026328040:app/GCM/Mobstar-Android";
-		}
-
-		$client = getSNSClient();
-
-		$endpoint = $client->createPlatformEndpoint( [
-													'PlatformApplicationArn' =>
-														$arn,
-													'Token'                  =>
-														$device->device_registration_device_token
-												] );
-
-		$endpointDetails = $endpoint->toArray();
-
-		$response = $client->publish( [
-							  'TargetArn'          => $endpointDetails['EndpointArn'],
-							  'Message'            => 'Welcome to Push Notifications',
-							  'Subject'            => 'MobStar',
-							  'MessageAttributues' => [
-								  'String' => [
-									  'DataType' => 'string',
-								  ]
-							  ]
-						  ] );
-
-		//log contents
-		try{
-			$myfile = Config::get('app.home') . 'public/sns-log.txt';
-			file_put_contents($myfile, date('d-m-Y H:i:s') . ' debug log:', FILE_APPEND);
-			file_put_contents($myfile, print_r($endpointDetails, true), FILE_APPEND);
-		}
-		catch(\League\Flysystem\Exception $ex){
-
-		}
-
-	}
 	public function verifyphonenumber()
 	{
 		// validate the info, create rules for the inputs

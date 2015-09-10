@@ -361,27 +361,17 @@ class CommentController extends BaseController
 			$icon = 'http://' . $_ENV[ 'URL' ] . '/images/comment.png';
 			if(!empty($name))
 			{
-				$message = $name." commented on your entry.";
-				$entryid = $record->entry_id;
+			    $pushMessage = $name." commented on your entry.";
+			    $pushData = array(
+			        "badge" => (int) $notification_count,
+			        "displayname"=>$name,
+			        "Type"=>'Entry Comment',
+			        "EntryId"=>$record->entry_id,
+			        "notificationIcon"=>$icon,
+			    );
 
-				// echo $message;
-				// die();
-				$usersDeviceData = DB::select( DB::raw("SELECT t1.* FROM
-					(select device_registration_id,device_registration_device_type,device_registration_device_token,device_registration_date_created,device_registration_user_id
-					from device_registrations where device_registration_device_token  != '' AND device_registration_device_token != 'mobstar'
-					order by device_registration_date_created desc
-					) t1 left join users u on t1.device_registration_user_id = u.user_id
-					where u.user_deleted = 0
-					AND u.user_id = $to
-					order by t1.device_registration_date_created desc"));
 
-				if(!empty($usersDeviceData))
-				{
-					for($i=0;$i<count($usersDeviceData);$i++)
-					{
-						$this->registerSNSEndpoint($usersDeviceData[$i],$message,$name,$entryid,$icon);
-					}
-				}
+			    \MobStar\SnsHelper::sendNotification( $to, $pushMessage, $pushData );
 			}
 
 			$response[ 'message' ] = "comment added";
@@ -449,127 +439,8 @@ class CommentController extends BaseController
 
 		return Response::make( $response, $status_code );
 	}
-	public function registerSNSEndpoint( $device , $message, $name, $entryid,$icon = NULL)
-	{
-	  if( Config::get('app.disable_sns') ) return;
-		$badge_count = 0;
-		$badge_count = DB::table('notification_counts')
-					->where('user_id','=',$device->device_registration_user_id)
-					->pluck( 'notification_count' );
-
-		if( $device->device_registration_device_type == "apple" )
-		{
-			$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushdemo";
-			//$arn = "arn:aws:sns:eu-west-1:830026328040:app/APNS_SANDBOX/adminsandbox";
-		}
-		else
-		{
-			$arn = "arn:aws:sns:eu-west-1:830026328040:app/GCM/admin-android-notification";
-		}
-
-		$sns = getSNSClient();
-
-		$Model1 = $sns->listPlatformApplications();
-
-		$result1 = $sns->listEndpointsByPlatformApplication(array(
-			// PlatformApplicationArn is required
-			'PlatformApplicationArn' => $arn,
-		));
-		//echo '<pre>';
-		//$dtoken = 'APA91bHEx658AQzCM3xUHTVjBGJz8a_HMb65Y_2BIIPXODexYlvuCZpaJRKRchTNqQCXs_w9b0AxJbzIQOFNtYkW0bbsiXhiX7uyhGYNTYC2PBOZzAmvqnvOBBhOKNS7Jl0fdoIdNa_riOlJxQi8COrhbw0odIJKBg';
-		//$dtoken = 'c39bac35f298c66d7398673566179deee27618c2036d8c82dcef565c8d732f84';
-		foreach($result1['Endpoints'] as $Endpoint){
-			$EndpointArn = $Endpoint['EndpointArn'];
-			$EndpointToken = $Endpoint['Attributes'];
-			foreach($EndpointToken as $key=>$newVals){
-				if($key=="Token"){
-					if($device->device_registration_device_token==$newVals){
-					//if($dtoken==$newVals){
-					//Delete ARN
-						$result = $sns->deleteEndpoint(array(
-							// EndpointArn is required
-							'EndpointArn' => $EndpointArn,
-						));
-					}
-				}
-				//print_r($EndpointToken);
-			}
-			//print_r($Endpoint);
-		}
-
-		 $result = $sns->createPlatformEndpoint(array(
-			 // PlatformApplicationArn is required
-			 'PlatformApplicationArn' => $arn,
-			 // Token is required
-			 //'Token' => $dtoken,
-			 'Token' => $device->device_registration_device_token,
-
-		 ));
-
-		 $endpointDetails = $result->toArray();
-
-		 //print_r($device);echo "\n".$message."\n";print_r($result);print_r($endpointDetails);
-
-		 //die;
-		 if($device->device_registration_device_type == "apple")
-		 {
-			 $publisharray = array(
-			 	'TargetArn' => $endpointDetails['EndpointArn'],
-			 	'MessageStructure' => 'json',
-			 	 'Message' => json_encode(array(
-					'default' => $message,
-					//'APNS_SANDBOX' => json_encode(array(
-					'APNS' => json_encode(array(
-						'aps' => array(
-							"sound" => "default",
-							"alert" => $message,
-							"badge"=> intval($badge_count),
-							"displayname"=>$name,
-							"Type"=>'Entry Comment',
-							"EntryId"=>$entryid,
-							"notificationIcon"=>$icon,
-						)
-					)),
-				))
-			 );
-		 }
-		 else
-		 {
-			 $publisharray = array(
-			 	'TargetArn' => $endpointDetails['EndpointArn'],
-			 	'MessageStructure' => 'json',
-			 	'Message' => json_encode(array(
-					'default' => $message,
-					'GCM'=>json_encode(array(
-						'data'=>array(
-							'message'=> $message,
-							"badge"=> intval($badge_count),
-							"displayname"=>$name,
-							"Type"=>'Entry Comment',
-							"EntryId"=>$entryid,
-							"notificationIcon"=>$icon
-						)
-					))
-				))
-			 );
-		 }
-		 try
-		 {
-			$sns->publish($publisharray);
-
-			$myfile = 'sns-log.txt';
-			file_put_contents($myfile, date('d-m-Y H:i:s') . ' debug log:', FILE_APPEND);
-			file_put_contents($myfile, print_r($endpointDetails, true), FILE_APPEND);
-
-			//print($EndpointArn . " - Succeeded!\n");
-		 }
-		 catch (Exception $e)
-		 {
-			//print($endpointDetails['EndpointArn'] . " - Failed: " . $e->getMessage() . "!\n");
-		 }
 
 
-	}
 	// New API for comments with pagination created on 30-June-2015
 	public function index2()
 	{
