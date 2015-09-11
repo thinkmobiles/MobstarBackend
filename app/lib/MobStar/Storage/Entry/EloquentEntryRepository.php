@@ -61,7 +61,7 @@ class EloquentEntryRepository implements EntryRepository
 	}
 
 
-	public function allWithGeoLocation( $geoLocationFilter = 0, $userId = 0, $categoryId = 0, $tagId = 0, $exclude = array(), $order_by = 0, $order = 'desc', $limit= 50, $offset = 0, $count = false, $withAll = true)
+	public function allWithFilters( $geoLocationFilter = 0, $categoryFilter = 0, $tagId = 0, $exclude = array(), $order_by = 0, $order = 'desc', $limit= 50, $offset = 0, $count = false, $withAll = true)
 	{
 	    if( $withAll ) {
 	        $query = Entry::with('category', 'vote', 'user', 'file', 'entryTag.tag', 'comments');
@@ -87,14 +87,10 @@ class EloquentEntryRepository implements EntryRepository
 	    }
 
 
-	    if( $userId )
+	    if( $categoryFilter )
 	    {
-	        $query->where( 'entry_user_id', '=', (int)$userId );
-	    }
-
-	    if( $categoryId )
-	    {
-	        $query->where( 'entry_category_id', '=', (int)$categoryId );
+	        if( ! is_array( $categoryFilter ) ) $categoryFilter = array( $categoryFilter );
+	        $query->whereIn( 'entry_category_id', $categoryFilter );
 	    }
 
 	    // process excludes
@@ -102,7 +98,7 @@ class EloquentEntryRepository implements EntryRepository
 
 	    // @todo we can skip adding profile entries if there is no 'category' == 7 in exclude
 	    // add entries from profile to home feedback
-	    if( empty( $categoryId ) && empty( $userId ) && empty( $tagId ) ) // home feedback
+	    if( empty( $tagId ) ) // home feedback
 	    {
 	        $max_media_duration_for_home_feed =
 	        isset( $_ENV['MAX_MEDIA_DURATION_FOR_HOME_FEED'] )

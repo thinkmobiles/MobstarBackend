@@ -462,18 +462,18 @@ class EloquentEntryRepositoryTest extends TestCase {
   }
 
 
-  public function testGetWithGeoLocation()
+  public function testGetWithGeoLocationFilter()
   {
       $entryRepository = $this->getEntryRepository();
 
       // no geoLocation
-      $entries = $entryRepository->allWithGeoLocation(
+      $entries = $entryRepository->allWithFilters(
           0
       );
       $this->assertNotNull( $entries );
 
       // two continents
-      $entries = $entryRepository->allWithGeoLocation(
+      $entries = $entryRepository->allWithFilters(
           array( 1, 3 )
       );
       $this->assertNotNull( $entries );
@@ -481,9 +481,39 @@ class EloquentEntryRepositoryTest extends TestCase {
       // disable including all world entries
       \Config::set( 'app.force_include_all_world', false );
 
-      $entries = $entryRepository->allWithGeoLocation(
+      $entries = $entryRepository->allWithFilters(
           array( 1, 3 )
       );
       $this->assertNotNull( $entries );
   }
+
+
+  public function testGetWithCategoryFilter()
+  {
+      $entryRepository = $this->getEntryRepository();
+
+      // no category filter
+      $entries = $entryRepository->allWithFilters(
+          0,
+          0
+      );
+      $this->assertNotNull( $entries );
+
+      // two categories
+      $entries = $entryRepository->allWithFilters(
+          0,
+          array( 1, 3 )
+      );
+      $this->assertNotNull( $entries );
+
+      // disable including all world entries
+      \Config::set( 'app.force_include_all_world', false );
+
+      $entries = $entryRepository->allWithFilters(
+          0,
+          array( 1, 3 )
+      );
+      $this->assertNotNull( $entries );
+  }
+
 }

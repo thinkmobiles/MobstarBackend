@@ -606,7 +606,7 @@ class EntryController extends BaseController
 
 
 	/**
-	 * returns list of entires using geoLocation filter
+	 * returns list of entires using geoLocation and category filter
 	 * @return unknown
 	 */
 	public function index_v2()
@@ -724,8 +724,13 @@ class EntryController extends BaseController
 	    if( ! $user ) // use geoLocation filtering
 	    {
 	        $geoFilter = $currentUser->getContinentFilter();
-	        $entries = $this->entry->allWithGeoLocation( $geoFilter, $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false, true );
-	        $count = $this->entry->allWithGeoLocation( $geoFilter, $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, true );
+	        $categoryFilter = $currentUser->getCategoryFilter();
+	        if( $category ) // users asks some category (in some way)
+	        {
+	            $categoryFilter = array( $category );
+	        }
+	        $entries = $this->entry->allWithFilters( $geoFilter, $categoryFilter, $tag, $exclude, $order, $dir, $limit, $offset, false, true );
+	        $count = $this->entry->allWithFilters( $geoFilter, $categoryFilter, $tag, $exclude, $order, $dir, $limit, $offset, true );
 	    }
 	    else // skip geoLocation filtering. User want to see all other users entries
 	    {
@@ -4202,6 +4207,8 @@ class EntryController extends BaseController
 	       if( \Config::get( 'app.force_include_all_world', false ) ) $geoFilter[] = 0;
 	    }
 
+	    $categoryFilter = $currentUser->getCategoryFilter();
+
 	    $term = Input::get( "term" );
 
 	    //Get limit to calculate pagination
@@ -4242,6 +4249,10 @@ class EntryController extends BaseController
 	    if( ! empty( $geoFilter ) )
 	    {
 	        $entriesQuery = $entriesQuery->whereIn( 'entries.entry_continent', $geoFilter );
+	    }
+	    if( ! empty( $categoryFilter ) )
+	    {
+	        $entriesQuery = $entriesQuery->whereIn( 'entries.entry_category', $categoryFilter );
 	    }
 	    $entriesQuery = $entriesQuery->where( function ( $query ) use ( $term )
 	    {
