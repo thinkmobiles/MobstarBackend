@@ -173,7 +173,7 @@ class StarController extends BaseController
 					}
 					else
 					{
-						return Response::make( [ 'error' => 'Already a star' ], 403 );
+// 						return Response::make( [ 'error' => 'Already a star' ], 403 );
 					}
 				}
 			}
@@ -188,7 +188,7 @@ class StarController extends BaseController
 				$star = Star::firstOrNew( $input );
 				if( isset( $star->user_star_created_date ) )
 				{
-					return Response::make( [ 'error' => 'Already a star' ], 403 );
+// 					return Response::make( [ 'error' => 'Already a star' ], 403 );
 				}
 				$star->user_star_created_date = date( 'Y-m-d H:i:s' );
 				$star->save();
