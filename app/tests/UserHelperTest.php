@@ -60,6 +60,50 @@ class UserHelperTest extends TestCase
     }
 
 
+    private function checkUser462Stars( $stars )
+    {
+        $userId = 462;
+        $this->assertArrayHasKey( 'my', $stars );
+        $this->assertArrayHasKey( 'me', $stars );
+        $this->assertCount( 2, $stars['my'] );
+        $this->assertCount( 24, $stars['me'] );
+        // if order is Ok, first row must be user own star
+        $this->assertEquals( $userId, $stars['my'][0]['star_user_id'] );
+        $this->assertEquals( $userId, $stars['me'][8]['star_user_id'] );
+    }
+
+
+    private function checkUser462Stars_withUserInfo( $stars )
+    {
+        $userId = 462;
+        $this->checkUser462Stars( $stars );
+        $this->assertArrayHasKey( 'user_info', $stars['my'][0] );
+        $this->assertArrayHasKey( 'user_info', $stars['me'][8] );
+        $this->assertNotEmpty( $stars['my'][0]['user_info'] );
+        $this->assertNotEmpty( $stars['me'][8]['user_info'] );
+        $this->assertEquals( $userId, $stars['my'][0]['user_info']['user_id'] );
+        $this->assertEquals( $userId, $stars['me'][8]['user_info']['user_id'] );
+    }
+
+
+    private function checkUser440Stars( $stars )
+    {
+        $userId = 440;
+        $this->assertArrayHasKey( 'my', $stars );
+        $this->assertArrayHasKey( 'me', $stars );
+        $this->assertCount( 2, $stars['my'] );
+        $this->assertCount( 0, $stars['me'] );
+    }
+
+
+    private function checkUser440Stars_withUserInfo( $stars )
+    {
+        $this->checkUser440Stars( $stars );
+        $this->assertNotEmpty( $stars['my'][0]['user_info'] );
+        $this->assertEquals( 450, $stars['my'][0]['user_info']['user_id'] );
+    }
+
+
     private function checkGoogleUserNames($googleUserId, $socialNames)
     {
         $this->assertArrayHasKey($googleUserId, $this->socialUsers['google'], 'not etalon google user');
@@ -217,6 +261,126 @@ class UserHelperTest extends TestCase
         {
             $this->checkUserBasicInfo( $userId, $usersInfo );
         }
+    }
+
+
+    public function testGetStars_oneUser()
+    {
+        $userId = 462;
+
+        $stars = UserHelper::getStars( array( $userId ) );
+
+        $this->assertArrayHasKey( $userId, $stars );
+        $userStars = $stars[ $userId ];
+        $this->checkUser462Stars( $userStars );
+    }
+
+
+    public function testGetStars_oneUser_withUserInfo()
+    {
+        $userId = 462;
+
+        $stars = UserHelper::getStars( array( $userId ), true );
+
+        $this->assertArrayHasKey( $userId, $stars );
+        $userStars = $stars[ $userId ];
+        $this->checkUser462Stars_withUserInfo( $userStars );
+    }
+
+
+    public function testGetStars_manyUsers()
+    {
+        $user1 = 462;
+        $user2 = 440;
+
+        $stars = UserHelper::getStars( array( $user1, $user2 ) );
+
+        // check first user
+        $this->assertArrayHasKey( $user1, $stars );
+        $user1Stars = $stars[ $user1 ];
+        $this->checkUser462Stars($user1Stars);
+
+        // check second user
+        $this->assertArrayHasKey( $user2, $stars );
+        $user2Stars = $stars[ $user2 ];
+        $this->checkUser440Stars($user2Stars);
+    }
+
+
+    public function testGetStars_manyUsers_withUserInfo()
+    {
+        $user1 = 462;
+        $user2 = 440;
+
+        $stars = UserHelper::getStars( array( $user1, $user2 ), true );
+
+        // check first user
+        $this->assertArrayHasKey( $user1, $stars );
+        $user1Stars = $stars[ $user1 ];
+        $this->checkUser462Stars_withUserInfo($user1Stars);
+
+        // check second user
+        $this->assertArrayHasKey( $user2, $stars );
+        $user2Stars = $stars[ $user2 ];
+        $this->checkUser440Stars_withUserInfo($user2Stars);
+    }
+
+
+    public function testGetUsersInfo_withStars_oneUser()
+    {
+        $userId = 462;
+
+        $usersInfo = UserHelper::getUsersInfo( array( $userId ), array( 'stars' ) );
+
+        $this->assertArrayHasKey( $userId, $usersInfo );
+        $userInfo = $usersInfo[ $userId ];
+        $this->assertArrayHasKey( 'stars_info', $userInfo );
+        $this->checkUser462Stars( $userInfo['stars_info'] );
+    }
+
+
+    public function testGetUsersInfo_withStars_withUserInfo_oneUser()
+    {
+        $userId = 462;
+
+        $usersInfo = UserHelper::getUsersInfo( array( $userId ), array( 'stars', 'stars.users' ) );
+
+        $this->assertArrayHasKey( $userId, $usersInfo );
+        $userInfo = $usersInfo[ $userId ];
+        $this->assertArrayHasKey( 'stars_info', $userInfo );
+        $this->checkUser462Stars_withUserInfo( $userInfo['stars_info'] );
+    }
+
+
+    public function testGetUsersInfo_withStars_manyUsers()
+    {
+        $user1 = 462;
+        $user2 = 440;
+
+        $usersInfo = UserHelper::getUsersInfo( array( $user1, $user2 ), array( 'stars' ) );
+
+        $this->assertArrayHasKey( $user1, $usersInfo );
+        $this->assertArrayHasKey( $user2, $usersInfo );
+        $this->assertArrayHasKey( 'stars_info', $usersInfo[ $user1 ] );
+        $this->assertArrayHasKey( 'stars_info', $usersInfo[ $user2 ] );
+        $this->checkUser462Stars( $usersInfo[ $user1 ]['stars_info'] );
+        $this->checkUser440Stars( $usersInfo[ $user2 ]['stars_info'] );
+    }
+
+
+    public function testGetUsersInfo_withStars_withUserInfo_manyUsers()
+    {
+        $user1 = 462;
+        $user2 = 440;
+
+        $usersInfo = UserHelper::getUsersInfo( array( $user1, $user2 ), array( 'stars', 'stars.users' ) );
+
+        $this->assertArrayHasKey( $user1, $usersInfo );
+        $this->assertArrayHasKey( $user2, $usersInfo );
+        $this->assertArrayHasKey( 'stars_info', $usersInfo[ $user1 ] );
+        $this->assertArrayHasKey( 'stars_info', $usersInfo[ $user2 ] );
+        $this->checkUser462Stars_withUserInfo( $usersInfo[ $user1 ]['stars_info'] );
+        $this->checkUser440Stars_withUserInfo( $usersInfo[ $user2 ]['stars_info'] );
     }
 
 }

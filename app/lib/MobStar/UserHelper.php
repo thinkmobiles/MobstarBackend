@@ -23,6 +23,9 @@ class UserHelper
         if (empty($users))
             return array(); // no users found
 
+        if ( in_array( 'stars', $fields ) )
+            $users = self::addStars( $users, in_array( 'stars.users', $fields ) );
+
         return $users;
     }
 
@@ -183,5 +186,86 @@ class UserHelper
         }
 
         return $socialNames;
+    }
+
+
+    private static function addStars( array $users, $includeUsersInfo = false )
+    {
+        $stars = self::getStars( array_keys( $users ), $includeUsersInfo );
+
+        foreach( $stars as $userId => $starInfo ) {
+
+            $users[ $userId ]['stars_info'] = $starInfo;
+        }
+
+        return $users;
+    }
+
+
+    public static function getStars( array $userIds, $includeUsersInfo = false )
+    {
+        $queryMyStars = DB::table( 'user_stars' )
+            ->select(
+                'user_star_user_id as user_id',
+                'user_star_created_date as star_date',
+                DB::Raw("'my' as star_type"),
+                'user_star_star_id as star_user_id')
+            ->where('user_star_deleted', '=', 0)
+            ->whereIn( 'user_star_user_id', $userIds );
+
+        $queryMeStars = DB::table( 'user_stars' )
+            ->select(
+                'user_star_star_id as user_id',
+                'user_star_created_date as star_date',
+                DB::Raw("'me' as star_type"),
+                'user_star_user_id as star_user_id')
+                ->where('user_star_deleted', '=', 0)
+                ->whereIn( 'user_star_star_id', $userIds );
+
+        $query = $queryMyStars
+            ->union( $queryMeStars );
+
+        // workaround to sord result by star_date
+        $sql = $query->toSql().' order by star_date desc';
+
+        $rows = DB::select( $sql, $query->getBindings() );
+
+        $stars = array();
+        $starUsers = array();
+
+        foreach( $rows as $row ) {
+
+            $user_id = $row->user_id;
+            if( empty( $stars[ $user_id ] ) ) // create an array, describing user stars
+                $stars[ $user_id ] = array( 'my' => array(), 'me' => array() );
+
+            $star = array(
+                'user_id' => $row->user_id,
+                'star_date' => $row->star_date,
+                'star_type' => $row->star_type,
+                'star_user_id' => $row->star_user_id,
+            );
+            $stars[ $user_id ][ $row->star_type ][] = &$star;
+
+            $starUsers[ $star['star_user_id'] ][] = &$star;
+
+            unset( $star ); // to keep links correct
+        }
+
+        if( $includeUsersInfo AND $starUsers ) { // add basic user info to stars
+
+            $userInfo = self::getUsersInfo( array_keys( $starUsers ) );
+
+            foreach( $starUsers as $userId => $userStars ) {
+
+                foreach( $userStars as &$star ) {
+
+                    $star['user_info'] = isset( $userInfo[ $userId ] ) ? $userInfo[ $userId ] : array();
+                }
+                unset( $star );
+            }
+        }
+
+        return $stars;
     }
 }
