@@ -15,6 +15,7 @@ class UserHelper
      *     stars - info about stars, both user stars and starred by.
      *     stars.users - star array contain basic user info about users, who made this star.
      *     votes - count of up and down votes, made by user.
+     *     phones - info about user phones
      *
      * @param array $userIds
      *            array of userId, which info to return.
@@ -33,6 +34,9 @@ class UserHelper
 
         if( in_array( 'votes', $fields ) )
             $users = self::addVotes( $users );
+
+        if( in_array( 'phones', $fields ) )
+            $users = self::addPhones( $users );
 
         return $users;
     }
@@ -318,5 +322,41 @@ class UserHelper
         }
 
         return $votes;
+    }
+
+
+    private static function addPhones( $users )
+    {
+        $phones = self::getPhones( array_keys( $users ) );
+
+        foreach( $phones as $userId => $phoneInfo ) {
+            $users[ $userId ]['phone_info'] = $phoneInfo;
+        }
+
+        return $users;
+    }
+
+
+    public static function getPhones( array $userIds )
+    {
+        $query = DB::table( 'user_phones' )
+            ->whereIn('user_phone_user_id', $userIds );
+
+        $rows = $query->get();
+
+        $phones = array();
+
+        foreach( $rows as $row ) {
+
+            $phones[ $row->user_phone_user_id ] = array(
+                'user_id' => $row->user_phone_user_id,
+                'number' => $row->user_phone_number,
+                'country' => $row->user_phone_country,
+                'verification_code' => $row->user_phone_verification_code,
+                'verified' => $row->user_phone_verified,
+            );
+        }
+
+        return $phones;
     }
 }

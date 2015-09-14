@@ -58,6 +58,24 @@ class UserHelperTest extends TestCase
     );
 
 
+    private $userPhones = array(
+        462 => array(
+            'user_id' => 462,
+            'number' => '2549792724',
+            'country' => 1,
+            'verification_code' => 4820,
+            'verified' => 1
+        ),
+        692 => array(
+            'user_id' => 692,
+            'number' => '7878060124',
+            'country' => 91,
+            'verification_code' => 4683,
+            'verified' => 0
+        ),
+    );
+
+
     private function assertSameNames($etalon, $user)
     {
         $this->assertEquals($etalon['user_name'], $user['user_name'] );
@@ -161,6 +179,14 @@ class UserHelperTest extends TestCase
         $this->assertArrayHasKey( 'down', $votes );
         $this->assertEquals( $this->userVotes[ $userId ]['up'], $votes['up'] );
         $this->assertEquals( $this->userVotes[ $userId ]['down'], $votes['down'] );
+    }
+
+
+    private function checkUserPhone( $userId, $phoneInfo )
+    {
+        $this->assertArrayHasKey( $userId, $this->userPhones, 'not etalon user' );
+
+        $this->assertEquals( $this->userPhones[ $userId ], $phoneInfo );
     }
 
 
@@ -450,6 +476,62 @@ class UserHelperTest extends TestCase
             $this->assertArrayHasKey( $userId, $usersInfo );
             $this->assertArrayHasKey( 'votes', $usersInfo[ $userId ] );
             $this->checkUserVotes( $userId, $usersInfo[ $userId ]['votes'] );
+        }
+    }
+
+
+    public function testGetPhones_oneUser()
+    {
+        $userId = 462;
+
+        $phones = UserHelper::getPhones( array( $userId ) );
+
+        $this->assertNotEmpty( $phones );
+        $this->assertArrayHasKey( $userId, $phones );
+        $this->checkUserPhone( $userId, $phones[ $userId ] );
+    }
+
+
+    public function testGetPhones_manyUsers()
+    {
+        $userIds = array( 462, 692 );
+
+        $phones = UserHelper::getPhones( $userIds );
+
+        $this->assertNotEmpty( $phones );
+
+        foreach( $userIds as $userId ) {
+            $this->assertArrayHasKey( $userId, $phones );
+            $this->checkUserPhone( $userId, $phones[ $userId ] );
+        }
+    }
+
+
+    public function testGetUsersInfo_withPhones_oneUser()
+    {
+        $userId = 692;
+
+        $usersInfo = UserHelper::getUsersInfo( array( $userId ), array( 'phones' ) );
+
+        $this->assertNotEmpty( $usersInfo );
+        $this->assertArrayHasKey( $userId, $usersInfo );
+        $this->assertArrayHasKey( 'phone_info', $usersInfo[ $userId ] );
+        $this->checkUserPhone( $userId, $usersInfo[ $userId ]['phone_info'] );
+    }
+
+
+    public function testGetUsersInfo_withPhones_manyUsers()
+    {
+        $userIds = array( 462, 692 );
+
+        $usersInfo = UserHelper::getUsersInfo( $userIds, array( 'phones' ) );
+
+        $this->assertNotEmpty( $usersInfo );
+
+        foreach( $userIds as $userId ) {
+            $this->assertArrayHasKey( $userId, $usersInfo );
+            $this->assertArrayHasKey( 'phone_info', $usersInfo[ $userId ] );
+            $this->checkUserPhone( $userId, $usersInfo[ $userId ]['phone_info'] );
         }
     }
 }
