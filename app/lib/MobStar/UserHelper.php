@@ -292,14 +292,17 @@ class UserHelper
 
     public static function getVotes( array $userIds )
     {
-        $query = DB::table( 'votes')
+        $query = DB::table( 'votes as v')
             ->select(
-                'vote_user_id as user_id',
-                DB::raw('sum( if( vote_up > 0, 1, 0 ) ) as up'),
-                DB::raw('sum( if( vote_down > 0, 1, 0 ) ) as down'))
-            ->where( 'vote_deleted', '=', 0 )
-            ->whereIn( 'vote_user_id', $userIds )
-            ->groupBy( 'vote_user_id' );
+                'v.vote_user_id as user_id',
+                DB::raw('sum( if( v.vote_up > 0, 1, 0 ) ) as up'),
+                DB::raw('sum( if( v.vote_down > 0, 1, 0 ) ) as down'))
+            ->leftJoin( 'entries as e', 'v.vote_entry_id', '=', 'e.entry_id')
+            ->where( 'e.entry_deleted', '=', 0 )
+            ->whereNotIn( 'e.entry_category_id', array( 7, 8 ) )
+            ->where( 'v.vote_deleted', '=', 0 )
+            ->whereIn( 'v.vote_user_id', $userIds )
+            ->groupBy( 'v.vote_user_id' );
 
         $rows = $query->get();
 

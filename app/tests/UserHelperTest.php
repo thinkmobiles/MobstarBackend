@@ -53,8 +53,8 @@ class UserHelperTest extends TestCase
 
 
     private $userVotes = array(
-        440 => array( 'up' => 3, 'down' => 4 ),
-        462 => array( 'up' => 9, 'down' => 2 ),
+        440 => array( 'up' => 1, 'down' => 1 ),
+        462 => array( 'up' => 7, 'down' => 2 ),
     );
 
 
