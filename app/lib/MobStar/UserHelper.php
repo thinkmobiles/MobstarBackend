@@ -11,6 +11,11 @@ class UserHelper
     /**
      * Return array of user information, indexed with user id.
      *
+     * Basic user info is retuned anyway. Also, next info may be requested (using $fields array):
+     *     stars - info about stars, both user stars and starred by.
+     *     stars.users - star array contain basic user info about users, who made this star.
+     *     votes - count of up and down votes, made by user.
+     *
      * @param array $userIds
      *            array of userId, which info to return.
      * @param array $fields
@@ -23,8 +28,11 @@ class UserHelper
         if (empty($users))
             return array(); // no users found
 
-        if ( in_array( 'stars', $fields ) )
+        if ( in_array( 'stars.users', $fields ) OR in_array( 'stars', $fields ) )
             $users = self::addStars( $users, in_array( 'stars.users', $fields ) );
+
+        if( in_array( 'votes', $fields ) )
+            $users = self::addVotes( $users );
 
         return $users;
     }
@@ -267,5 +275,45 @@ class UserHelper
         }
 
         return $stars;
+    }
+
+
+    private static function addVotes( $users )
+    {
+        $votes = self::getVotes( array_keys( $users ) );
+
+        foreach( $votes as $userId => $voteInfo ) {
+            $users[ $userId ]['votes'] = $voteInfo;
+        }
+
+        return $users;
+    }
+
+
+    public static function getVotes( array $userIds )
+    {
+        $query = DB::table( 'votes')
+            ->select(
+                'vote_user_id as user_id',
+                DB::raw('sum( if( vote_up > 0, 1, 0 ) ) as up'),
+                DB::raw('sum( if( vote_down > 0, 1, 0 ) ) as down'))
+            ->where( 'vote_deleted', '=', 0 )
+            ->whereIn( 'vote_user_id', $userIds )
+            ->groupBy( 'vote_user_id' );
+
+        $rows = $query->get();
+
+        $votes = array();
+
+        foreach( $rows as $row ) {
+
+            $votes[ $row->user_id ] = array(
+                'user_id' => $row->user_id,
+                'up' => $row->up,
+                'down' => $row->down,
+            );
+        }
+
+        return $votes;
     }
 }

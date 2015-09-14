@@ -52,6 +52,12 @@ class UserHelperTest extends TestCase
     );
 
 
+    private $userVotes = array(
+        440 => array( 'up' => 3, 'down' => 4 ),
+        462 => array( 'up' => 9, 'down' => 2 ),
+    );
+
+
     private function assertSameNames($etalon, $user)
     {
         $this->assertEquals($etalon['user_name'], $user['user_name'] );
@@ -147,6 +153,17 @@ class UserHelperTest extends TestCase
     }
 
 
+    private function checkUserVotes( $userId, $votes )
+    {
+        $this->assertArrayHasKey( $userId, $this->userVotes, 'not etalon user' );
+
+        $this->assertArrayHasKey( 'up', $votes );
+        $this->assertArrayHasKey( 'down', $votes );
+        $this->assertEquals( $this->userVotes[ $userId ]['up'], $votes['up'] );
+        $this->assertEquals( $this->userVotes[ $userId ]['down'], $votes['down'] );
+    }
+
+
     public function testGetUsersInfo_notexistingUser()
     {
         $userId = 99999999;
@@ -167,7 +184,6 @@ class UserHelperTest extends TestCase
         $socialNames = UserHelper::getSocialUserNames(array(
             'facebook' => array( $facebookUserId )
         ));
-        error_log( 'social names: '.print_r( $socialNames, true ) );
 
         $this->checkFacebookUserNames( $facebookUserId, $socialNames );
 
@@ -245,7 +261,6 @@ class UserHelperTest extends TestCase
         $usersInfo = UserHelper::getUsersInfo(array(
             $userId
         ));
-        error_log( print_r( $usersInfo, true ));
 
         $this->checkUserBasicInfo( $userId, $usersInfo );
     }
@@ -343,7 +358,7 @@ class UserHelperTest extends TestCase
     {
         $userId = 462;
 
-        $usersInfo = UserHelper::getUsersInfo( array( $userId ), array( 'stars', 'stars.users' ) );
+        $usersInfo = UserHelper::getUsersInfo( array( $userId ), array( 'stars.users' ) );
 
         $this->assertArrayHasKey( $userId, $usersInfo );
         $userInfo = $usersInfo[ $userId ];
@@ -373,7 +388,7 @@ class UserHelperTest extends TestCase
         $user1 = 462;
         $user2 = 440;
 
-        $usersInfo = UserHelper::getUsersInfo( array( $user1, $user2 ), array( 'stars', 'stars.users' ) );
+        $usersInfo = UserHelper::getUsersInfo( array( $user1, $user2 ), array( 'stars.users' ) );
 
         $this->assertArrayHasKey( $user1, $usersInfo );
         $this->assertArrayHasKey( $user2, $usersInfo );
@@ -383,4 +398,58 @@ class UserHelperTest extends TestCase
         $this->checkUser440Stars_withUserInfo( $usersInfo[ $user2 ]['stars_info'] );
     }
 
+
+    public function testGetVotes_oneUser()
+    {
+        $userId = 440;
+
+        $votes = UserHelper::getVotes( array( $userId ) );
+
+        $this->assertNotEmpty( $votes );
+        $this->assertArrayHasKey( $userId, $votes );
+        $this->checkUserVotes( $userId, $votes[ $userId ] );
+    }
+
+
+    public function testGetVotes_manyUsers()
+    {
+        $userIds = array( 440, 462 );
+
+        $votes = UserHelper::getVotes( $userIds );
+
+        $this->assertNotEmpty( $votes );
+
+        foreach( $userIds as $userId ) {
+            $this->assertArrayHasKey( $userId, $votes );
+            $this->checkUserVotes( $userId, $votes[ $userId ] );
+        }
+    }
+
+
+    public function testGetUsersInfo_withVotes_oneUser()
+    {
+        $userId = 440;
+
+        $usersInfo = UserHelper::getUsersInfo( array( $userId ), array( 'votes' ) );
+
+        $this->assertNotEmpty( $usersInfo );
+        $this->assertArrayHasKey( $userId, $usersInfo );
+        $this->assertArrayHasKey( 'votes', $usersInfo[ $userId ] );
+        $this->checkUserVotes( $userId, $usersInfo[ $userId ]['votes'] );
+    }
+
+
+    public function testGetUserInfo_withVotes_manyUsers()
+    {
+        $userIds = array( 440, 462 );
+
+        $usersInfo = UserHelper::getUsersInfo( $userIds, array( 'votes' ) );
+
+        $this->assertNotEmpty( $usersInfo );
+        foreach( $userIds as $userId ) {
+            $this->assertArrayHasKey( $userId, $usersInfo );
+            $this->assertArrayHasKey( 'votes', $usersInfo[ $userId ] );
+            $this->checkUserVotes( $userId, $usersInfo[ $userId ]['votes'] );
+        }
+    }
 }
