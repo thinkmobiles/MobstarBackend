@@ -201,9 +201,14 @@ class UserHelper
     }
 
 
-    private static function addStars( array $users, $includeUsersInfo = false )
+    public static function addStars( array $users, $includeUsersInfo = false )
     {
-        $stars = self::getStars( array_keys( $users ), $includeUsersInfo );
+        // get list of users without stars
+        $userIds = array();
+        foreach( $users as $userId => $user )
+            if ( ! isset( $user['stars_info'] ) ) $userIds[] = $userId;
+
+        $stars = self::getStars( $userIds, $includeUsersInfo );
 
         foreach( $stars as $userId => $starInfo ) {
 
@@ -282,9 +287,14 @@ class UserHelper
     }
 
 
-    private static function addVotes( $users )
+    public static function addVotes( array $users )
     {
-        $votes = self::getVotes( array_keys( $users ) );
+        // get users without votes
+        $userIds = array();
+        foreach( $users as $userId => $user )
+            if ( !isset( $user['votes'] ) ) $userIds[] = $userId;
+
+        $votes = self::getVotes( $userIds );
 
         foreach( $votes as $userId => $voteInfo ) {
             $users[ $userId ]['votes'] = $voteInfo;
@@ -325,9 +335,14 @@ class UserHelper
     }
 
 
-    private static function addPhones( $users )
+    public static function addPhones( array $users )
     {
-        $phones = self::getPhones( array_keys( $users ) );
+        // get users without phones info
+        $userIds = array();
+        foreach( $users as $userId => $user )
+            if( !isset( $user['phone_info'] ) ) $userIds[] = $userId;
+
+        $phones = self::getPhones( $userIds );
 
         foreach( $phones as $userId => $phoneInfo ) {
             $users[ $userId ]['phone_info'] = $phoneInfo;
