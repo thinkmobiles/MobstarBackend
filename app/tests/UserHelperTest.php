@@ -191,6 +191,8 @@ class UserHelperTest extends TestCase
 
     public function testGetUsersInfo_notexistingUser()
     {
+        UserHelper::clear();
+
         $userId = 99999999;
 
         $usersInfo = UserHelper::getUsersInfo(array(
@@ -203,6 +205,8 @@ class UserHelperTest extends TestCase
 
     public function testGetSocialUserNames_oneUser()
     {
+        UserHelper::clear();
+
         // facebook user
         $facebookUserId = 1975;
 
@@ -234,6 +238,7 @@ class UserHelperTest extends TestCase
 
     public function testGetSocialUserNames_manyUsers()
     {
+        UserHelper::clear();
 
         // facebook users
         $facebookUserIds = array(
@@ -281,6 +286,8 @@ class UserHelperTest extends TestCase
 
     public function testGetUsersInfo_basicInfo_oneUser()
     {
+        UserHelper::clear();
+
         $userId = 4902;
 
         $usersInfo = UserHelper::getUsersInfo(array(
@@ -293,6 +300,8 @@ class UserHelperTest extends TestCase
 
     public function testGetUsersInfo_basicInfo_manyUsers()
     {
+        UserHelper::clear();
+
         $userIds = array( 4902, 4897, 4876, 4887 );
 
         $usersInfo = UserHelper::getUsersInfo( $userIds );
@@ -306,6 +315,8 @@ class UserHelperTest extends TestCase
 
     public function testGetStars_oneUser()
     {
+        UserHelper::clear();
+
         $userId = 462;
 
         $stars = UserHelper::getStars( array( $userId ) );
@@ -318,6 +329,8 @@ class UserHelperTest extends TestCase
 
     public function testGetStars_oneUser_withUserInfo()
     {
+        UserHelper::clear();
+
         $userId = 462;
 
         $stars = UserHelper::getStars( array( $userId ), true );
@@ -330,6 +343,8 @@ class UserHelperTest extends TestCase
 
     public function testGetStars_manyUsers()
     {
+        UserHelper::clear();
+
         $user1 = 462;
         $user2 = 440;
 
@@ -349,6 +364,8 @@ class UserHelperTest extends TestCase
 
     public function testGetStars_manyUsers_withUserInfo()
     {
+        UserHelper::clear();
+
         $user1 = 462;
         $user2 = 440;
 
@@ -368,6 +385,8 @@ class UserHelperTest extends TestCase
 
     public function testGetUsersInfo_withStars_oneUser()
     {
+        UserHelper::clear();
+
         $userId = 462;
 
         $usersInfo = UserHelper::getUsersInfo( array( $userId ), array( 'stars' ) );
@@ -381,6 +400,8 @@ class UserHelperTest extends TestCase
 
     public function testGetUsersInfo_withStars_withUserInfo_oneUser()
     {
+        UserHelper::clear();
+
         $userId = 462;
 
         $usersInfo = UserHelper::getUsersInfo( array( $userId ), array( 'stars.users' ) );
@@ -394,6 +415,8 @@ class UserHelperTest extends TestCase
 
     public function testGetUsersInfo_withStars_manyUsers()
     {
+        UserHelper::clear();
+
         $user1 = 462;
         $user2 = 440;
 
@@ -410,6 +433,8 @@ class UserHelperTest extends TestCase
 
     public function testGetUsersInfo_withStars_withUserInfo_manyUsers()
     {
+        UserHelper::clear();
+
         $user1 = 462;
         $user2 = 440;
 
@@ -426,6 +451,8 @@ class UserHelperTest extends TestCase
 
     public function testGetVotes_oneUser()
     {
+        UserHelper::clear();
+
         $userId = 440;
 
         $votes = UserHelper::getVotes( array( $userId ) );
@@ -438,6 +465,8 @@ class UserHelperTest extends TestCase
 
     public function testGetVotes_manyUsers()
     {
+        UserHelper::clear();
+
         $userIds = array( 440, 462 );
 
         $votes = UserHelper::getVotes( $userIds );
@@ -453,6 +482,8 @@ class UserHelperTest extends TestCase
 
     public function testGetUsersInfo_withVotes_oneUser()
     {
+        UserHelper::clear();
+
         $userId = 440;
 
         $usersInfo = UserHelper::getUsersInfo( array( $userId ), array( 'votes' ) );
@@ -466,6 +497,8 @@ class UserHelperTest extends TestCase
 
     public function testGetUserInfo_withVotes_manyUsers()
     {
+        UserHelper::clear();
+
         $userIds = array( 440, 462 );
 
         $usersInfo = UserHelper::getUsersInfo( $userIds, array( 'votes' ) );
@@ -481,6 +514,8 @@ class UserHelperTest extends TestCase
 
     public function testGetPhones_oneUser()
     {
+        UserHelper::clear();
+
         $userId = 462;
 
         $phones = UserHelper::getPhones( array( $userId ) );
@@ -493,6 +528,8 @@ class UserHelperTest extends TestCase
 
     public function testGetPhones_manyUsers()
     {
+        UserHelper::clear();
+
         $userIds = array( 462, 692 );
 
         $phones = UserHelper::getPhones( $userIds );
@@ -508,6 +545,8 @@ class UserHelperTest extends TestCase
 
     public function testGetUsersInfo_withPhones_oneUser()
     {
+        UserHelper::clear();
+
         $userId = 692;
 
         $usersInfo = UserHelper::getUsersInfo( array( $userId ), array( 'phones' ) );
@@ -521,6 +560,8 @@ class UserHelperTest extends TestCase
 
     public function testGetUsersInfo_withPhones_manyUsers()
     {
+        UserHelper::clear();
+
         $userIds = array( 462, 692 );
 
         $usersInfo = UserHelper::getUsersInfo( $userIds, array( 'phones' ) );
@@ -535,47 +576,24 @@ class UserHelperTest extends TestCase
     }
 
 
-    public function testAddStarNames_oneUser()
+    public function testPrepareUsers_oneUser()
     {
-        $userId = 462;
+        UserHelper::clear();
 
-        // first get user info
-        $usersInfo = UserHelper::getUsersInfo( array( $userId ) );
+        $userId = 440;
 
-        $usersInfo = UserHelper::addStarNames( $usersInfo );
-
-        $this->assertNotEmpty( $usersInfo );
-
-        $this->assertArrayHasKey( $userId, $usersInfo );
-        $userInfo = $usersInfo[ $userId ];
-        $this->assertArrayHasKey( 'stars_info', $userInfo );
-        $this->checkUser462Stars_withUserInfo( $userInfo['stars_info'] );
+        UserHelper::prepareUsers( array( $userId ), array( 'stars.users', 'votes' ) );
     }
 
 
-    public function testAddStarNames_manyUsers()
+    public function testPrepareUsers_manyUser()
     {
+        UserHelper::clear();
+
         $user1 = 440;
         $user2 = 462;
 
-        // first get user info
-        $usersInfo = UserHelper::getUsersInfo( array( $user1, $user2 ) );
-
-        $usersInfo = UserHelper::addStarNames( $usersInfo );
-
-        $this->assertNotEmpty( $usersInfo );
-
-        // check first user
-        $this->assertArrayHasKey( $user1, $usersInfo );
-        $user1Info = $usersInfo[ $user1 ];
-        $this->assertArrayHasKey( 'stars_info', $user1Info );
-        $this->checkUser440Stars_withUserInfo($user1Info['stars_info']);
-
-        // check second user
-        $this->assertArrayHasKey( $user2, $usersInfo );
-        $user2Info = $usersInfo[ $user2 ];
-        $this->assertArrayHasKey( 'stars_info', $user2Info );
-        $this->checkUser462Stars_withUserInfo($user2Info['stars_info']);
-
+        UserHelper::prepareUsers( array( $user1, $user2 ), array( 'stars.users' ) );
     }
+
 }

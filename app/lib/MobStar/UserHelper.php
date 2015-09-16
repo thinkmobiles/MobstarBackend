@@ -3,10 +3,31 @@ namespace MobStar;
 
 use User;
 use DB;
-use Illuminate\Support\Arr;
 
 class UserHelper
 {
+
+    private static $basicInfo = array();
+
+    private static $starsInfo = array();
+
+    private static $starNamesReady = array();
+
+    private static $starNamesInfo = array();
+
+    private static $votesInfo = array();
+
+    private static $phonesInfo = array();
+
+    private static $emptyVote = array(
+        'up' => 0,
+        'down' => 0,
+    );
+
+    private static $emptyStars = array(
+        'my' => array(),
+        'me' => array(),
+    );
 
     /**
      * Return array of user information, indexed with user id.
@@ -23,9 +44,234 @@ class UserHelper
      *            what info to include.
      * @return array: array of user information indexed with user ids. Each element is array, describing an user, ready to jsonify in response
      */
+    public static function prepareUsers( array $userIds, array $fields = array() )
+    {
+        self::prepareBasicInfo( $userIds );
+
+        if ( in_array( 'stars.users', $fields ) OR in_array( 'stars', $fields ) )
+            self::prepareStarsInfo( $userIds, in_array( 'stars.users', $fields ) );
+
+        if( in_array( 'votes', $fields ) )
+            self::prepareVotesInfo( $userIds );
+
+        if( in_array( 'phones', $fields ) )
+            self::preparePhonesInfo( $userIds );
+
+    }
+
+
+    public static function prepareBasicInfo( array $userIds )
+    {
+        $newUserIds = array();
+
+        foreach( $userIds as $userId )
+            if (!isset( self::$basicInfo[ $userId ] ) ) $newUserIds[] = $userId;
+
+        if( empty( $newUserIds ) ) return;
+
+        $newUsers = User::whereIn('user_id', $newUserIds)->get();
+
+        if (empty($newUsers))
+            return array();
+
+        $newUsers = self::fixUserNames($newUsers);
+
+        $newUsers = $newUsers->toArray();
+
+        foreach( $newUsers as $user )
+            self::$basicInfo[ $user['user_id' ] ] = $user;
+    }
+
+
+    public static function prepareStarsInfo( array $userIds, $includeUsers = false )
+    {
+        $newUserIds = array();
+
+        foreach( $userIds as $userId )
+            if (!isset( self::$starsInfo[ $userId ] ) ) $newUserIds[] = $userId;
+
+        if( empty( $newUserIds ) ) {
+
+            if( $includeUsers )
+                self::prepareStarNamesInfo( $userIds );
+
+            return;
+        }
+
+        $queryMyStars = DB::table( 'user_stars' )
+            ->select(
+                'user_star_user_id as user_id',
+                'user_star_created_date as star_date',
+                DB::Raw("'my' as star_type"),
+                'user_star_star_id as star_user_id')
+                ->where('user_star_deleted', '=', 0)
+                ->whereIn( 'user_star_user_id', $newUserIds );
+
+        $queryMeStars = DB::table( 'user_stars' )
+        ->select(
+            'user_star_star_id as user_id',
+            'user_star_created_date as star_date',
+            DB::Raw("'me' as star_type"),
+            'user_star_user_id as star_user_id')
+            ->where('user_star_deleted', '=', 0)
+            ->whereIn( 'user_star_star_id', $newUserIds );
+
+        $query = $queryMyStars
+            ->union( $queryMeStars );
+
+        // workaround to sord result by star_date
+        $sql = $query->toSql().' order by star_date desc';
+
+        $rows = DB::select( $sql, $query->getBindings() );
+
+        $newStars = array();
+
+        foreach( $rows as $row ) {
+
+            $user_id = $row->user_id;
+            if( empty( $newStars[ $user_id ] ) ) // create an array, describing user stars
+                $newStars[ $user_id ] = self::$emptyStars;
+
+            $star = array(
+                'user_id' => $row->user_id,
+                'star_date' => $row->star_date,
+                'star_type' => $row->star_type,
+                'star_user_id' => $row->star_user_id,
+            );
+            $newStars[ $user_id ][ $row->star_type ][] = $star;
+        }
+
+        foreach( $newStars as $userId => $starInfo )
+            self::$starsInfo[ $userId ] = $starInfo;
+
+        // mark other users as users with zero stars
+        foreach( $newUserIds as $userId ) {
+
+            if( isset( self::$starsInfo[ $userId ] ) ) continue;
+
+            self::$starsInfo[ $userId ] = self::$emptyStars;
+            self::$starsInfo[ $userId ]['user_id'] = $userId;
+        }
+
+        if( $includeUsers )
+            self::prepareStarNamesInfo( $userIds );
+    }
+
+
+    public static function prepareStarNamesInfo( array $userIds )
+    {
+        // first add stars
+        self::prepareStarsInfo( $userIds );
+
+        $newUserIds = array();
+
+        foreach( $userIds as $userId ) {
+
+            if ( isset( self::$starNamesReady[ $userId ] ) ) continue; // already have star users for this user
+
+            foreach( self::$starsInfo[ $userId ]['my'] as $star_info ) {
+                if( !isset( self::$starNamesInfo[ $star_info['star_user_id' ] ] ) )
+                    $newUserIds[ $star_info['star_user_id' ] ] = $star_info['star_user_id' ];
+            }
+
+            foreach( self::$starsInfo[ $userId ]['me'] as $star_info ) {
+                if( !isset( self::$starNamesInfo[ $star_info['star_user_id' ] ] ) )
+                    $newUserIds[ $star_info['star_user_id' ] ] = $star_info['star_user_id' ];
+            }
+        }
+
+        if( empty( $newUserIds ) ) return;
+
+        $newStarNames = self::getBasicInfo( $newUserIds );
+
+        foreach( $newStarNames as $userId => $userNames )
+            self::$starNamesInfo[ $userId ] = $userNames;
+
+        // update starNamesReady
+        foreach( $userIds as $userId )
+            self::$starNamesReady[ $userId ] = $userId;
+    }
+
+
+    public static function prepareVotesInfo( array $userIds )
+    {
+        $newUserIds = array();
+
+        foreach( $userIds as $userId )
+            if (!isset( self::$votesInfo[ $userId ] ) ) $newUserIds[] = $userId;
+
+        if( empty( $newUserIds ) ) return;
+
+        $query = DB::table( 'votes as v')
+        ->select(
+            'v.vote_user_id as user_id',
+            DB::raw('sum( if( v.vote_up > 0, 1, 0 ) ) as up'),
+            DB::raw('sum( if( v.vote_down > 0, 1, 0 ) ) as down'))
+            ->leftJoin( 'entries as e', 'v.vote_entry_id', '=', 'e.entry_id')
+            ->where( 'e.entry_deleted', '=', 0 )
+            ->whereNotIn( 'e.entry_category_id', array( 7, 8 ) )
+            ->where( 'v.vote_deleted', '=', 0 )
+            ->whereIn( 'v.vote_user_id', $newUserIds )
+            ->groupBy( 'v.vote_user_id' );
+
+        $rows = $query->get();
+
+        foreach( $rows as $row ) {
+
+            self::$votesInfo[ $row->user_id ]['up'] = $row->up;
+            self::$votesInfo[ $row->user_id ]['down'] = $row->down;
+            self::$votesInfo[ $row->user_id ]['user_id'] = $row->user_id;
+        }
+
+        // mark other users as users with zero votes
+        foreach( $newUserIds as $userId ) {
+
+            if( isset( self::$votesInfo[ $userId ] ) ) continue;
+
+            self::$votesInfo[ $userId ] = self::$emptyVote;
+            self::$votesInfo[ $userId ]['user_id'] = $userId;
+        }
+    }
+
+
+    public static function preparePhonesInfo( array $userIds )
+    {
+        $newUserIds = array();
+
+        foreach( $userIds as $userId )
+            if (!isset( self::$phonesInfo[ $userId ] ) ) $newUserIds[] = $userId;
+
+        if( empty( $newUserIds ) ) return;
+
+        $query = DB::table( 'user_phones' )
+            ->whereIn('user_phone_user_id', $newUserIds );
+
+        $rows = $query->get();
+
+        foreach( $rows as $row ) {
+
+            self::$phonesInfo[ $row->user_phone_user_id ] = array(
+                'user_id' => $row->user_phone_user_id,
+                'number' => $row->user_phone_number,
+                'country' => $row->user_phone_country,
+                'verification_code' => $row->user_phone_verification_code,
+                'verified' => $row->user_phone_verified,
+            );
+        }
+
+        // mark other users as users without phones
+        foreach( $newUserIds as $userId ) {
+
+            if( !isset( self::$phonesInfo[ $userId ] ) )
+                self::$phonesInfo[ $userId ] = false;
+        }
+    }
+
+
     public static function getUsersInfo( array $userIds, array $fields = array() )
     {
         $users = self::getBasicInfo($userIds);
+
         if (empty($users))
             return array(); // no users found
 
@@ -42,8 +288,23 @@ class UserHelper
     }
 
 
-    protected static function getBasicInfo( $userIds )
+    public static function getBasicInfo( $userIds )
     {
+        self::prepareBasicInfo( $userIds );
+
+        $users = array();
+
+        foreach( $userIds as $userId ) {
+
+            if ( isset( self::$basicInfo[ $userId ] ) ) {
+                $users[ $userId ] = self::$basicInfo[ $userId ];
+            } else {
+                error_log( 'can not get basic info info for user: '. $userId );
+            }
+        }
+
+        return $users;
+
         $users = User::whereIn('user_id', $userIds)->get();
 
         if (empty($users))
@@ -81,7 +342,7 @@ class UserHelper
 
                 if ($socialInfo) {
                     $socialIds[ $socialInfo[0] ][] = $socialInfo[1];
-                    $usersToFix[ $user->user_id ] = $socialInfo;
+                    $usersToFix[ $index ] = $socialInfo;
                 }
             }
         }
@@ -201,63 +462,14 @@ class UserHelper
     }
 
 
-    public static function addStars( array $users, $includeUsersInfo = false )
+    private static function addStars( array $users, $includeUsersInfo = false )
     {
-        if ( $includeUsersInfo )
-            return self::addStarNames( $users );
+        $stars = $includeUsersInfo
+            ? self::getStarsWithUsers( array_keys( $users ) )
+            : self::getStars( array_keys( $users ) );
 
-        // get list of users without stars
-        $userIds = array();
-        foreach( $users as $userId => $user )
-            if ( ! isset( $user['stars_info'] ) ) $userIds[] = $userId;
-
-
-        $stars = self::getStars( $userIds );
-
-        foreach( $stars as $userId => $starInfo ) {
-
-            $users[ $userId ]['stars_info'] = $starInfo;
-        }
-
-        return $users;
-    }
-
-
-    public static function addStarNames( array $users )
-    {
-        // first add stars
-        $users = self::addStars( $users );
-
-
-        // get stars without user names
-        $starsWithoutNames = array();
-
-        foreach( $users as &$user ) {
-
-            foreach( $user['stars_info']['my'] as &$star_info ) {
-                if( ! isset( $star_info['user_info'] ) ) $starsWithoutNames[ $star_info['star_user_id'] ][] = &$star_info;
-            }
-            unset( $star_info );
-
-            foreach( $user['stars_info']['me'] as &$star_info ) {
-                if( ! isset( $star_info['user_info'] ) ) $starsWithoutNames[ $star_info['star_user_id'] ][] = &$star_info;
-            }
-            unset( $star_info );
-        }
-        unset( $user );
-
-        if( empty( $starsWithoutNames ) ) return $users;
-
-
-        $starNames = self::getUsersInfo( array_keys( $starsWithoutNames ) );
-
-        foreach( $starNames as $userId => $user ) {
-
-            foreach( $starsWithoutNames[ $userId ] as &$star_info ) {
-                $star_info['user_info'] = $user;
-            }
-            unset( $star_info );
-        }
+        foreach( $stars as $userId => $starsInfo )
+            $users[ $userId ]['stars_info'] = $starsInfo;
 
         return $users;
     }
@@ -265,67 +477,22 @@ class UserHelper
 
     public static function getStars( array $userIds, $includeUsersInfo = false )
     {
-        if( empty( $userIds ) ) return array();
 
-        $queryMyStars = DB::table( 'user_stars' )
-            ->select(
-                'user_star_user_id as user_id',
-                'user_star_created_date as star_date',
-                DB::Raw("'my' as star_type"),
-                'user_star_star_id as star_user_id')
-            ->where('user_star_deleted', '=', 0)
-            ->whereIn( 'user_star_user_id', $userIds );
+        if( $includeUsersInfo )
+            return self::getStarsWithUsers( $userIds );
 
-        $queryMeStars = DB::table( 'user_stars' )
-            ->select(
-                'user_star_star_id as user_id',
-                'user_star_created_date as star_date',
-                DB::Raw("'me' as star_type"),
-                'user_star_user_id as star_user_id')
-                ->where('user_star_deleted', '=', 0)
-                ->whereIn( 'user_star_star_id', $userIds );
-
-        $query = $queryMyStars
-            ->union( $queryMeStars );
-
-        // workaround to sord result by star_date
-        $sql = $query->toSql().' order by star_date desc';
-
-        $rows = DB::select( $sql, $query->getBindings() );
+        self::prepareStarsInfo( $userIds );
 
         $stars = array();
-        $starUsers = array();
 
-        foreach( $rows as $row ) {
+        foreach( $userIds as $userId ) {
 
-            $user_id = $row->user_id;
-            if( empty( $stars[ $user_id ] ) ) // create an array, describing user stars
-                $stars[ $user_id ] = array( 'my' => array(), 'me' => array() );
-
-            $star = array(
-                'user_id' => $row->user_id,
-                'star_date' => $row->star_date,
-                'star_type' => $row->star_type,
-                'star_user_id' => $row->star_user_id,
-            );
-            $stars[ $user_id ][ $row->star_type ][] = &$star;
-
-            $starUsers[ $star['star_user_id'] ][] = &$star;
-
-            unset( $star ); // to keep links correct
-        }
-
-        if( $includeUsersInfo AND $starUsers ) { // add basic user info to stars
-
-            $userInfo = self::getUsersInfo( array_keys( $starUsers ) );
-
-            foreach( $starUsers as $userId => $userStars ) {
-
-                foreach( $userStars as &$star ) {
-
-                    $star['user_info'] = isset( $userInfo[ $userId ] ) ? $userInfo[ $userId ] : array();
-                }
-                unset( $star );
+            if ( isset( self::$starsInfo[ $userId ] ) ) {
+                $stars[ $userId ] = self::$starsInfo[ $userId ];
+            } else {
+                error_log( 'can not get stars info for user: '. $userId );
+                $stars[ $userId ] = self::$emptyStars;
+                $stars[ $userId ]['user_id'] = $userId;
             }
         }
 
@@ -333,17 +500,51 @@ class UserHelper
     }
 
 
-    public static function addVotes( array $users )
+    public static function getStarsWithUsers( array $userIds )
     {
-        // get users without votes
-        $userIds = array();
-        foreach( $users as $userId => $user )
-            if ( !isset( $user['votes'] ) ) $userIds[] = $userId;
+        self::prepareStarNamesInfo( $userIds );
 
-        if( empty( $userIds ) ) return $users;
+        $stars = self::getStars( $userIds );
+
+        foreach( $stars as $userId => &$starsInfo ) {
+
+            foreach( $starsInfo['my'] as &$starInfo ) {
+
+                $starUserId = $starInfo['star_user_id'];
+
+                if ( isset( self::$starNamesInfo[ $starUserId ] ) ) {
+
+                    $starInfo['user_info'] = self::$starNamesInfo[ $starUserId ];
+                } else {
+                    error_log( 'can not get star user info for user: '.$userId.' star user id: '.$starUserId );
+                    $starInfo['user_info'] = false;
+                }
+            }
+            unset( $starInfo );
+
+            foreach( $starsInfo['me'] as &$starInfo ) {
+
+                $starUserId = $starInfo['star_user_id'];
+
+                if ( isset( self::$starNamesInfo[ $starUserId ] ) ) {
+
+                    $starInfo['user_info'] = self::$starNamesInfo[ $starUserId ];
+                } else {
+                    error_log( 'can not get star user info for user: '.$userId.' star user id: '.$starUserId );
+                    $starInfo['user_info'] = false;
+                }
+            }
+            unset( $starInfo );
+        }
+        unset( $starsInfo );
+
+        return $stars;
+    }
 
 
-        $votes = self::getVotes( $userIds );
+    private static function addVotes( array $users )
+    {
+        $votes = self::getVotes( array_keys( $users ) );
 
         foreach( $votes as $userId => $voteInfo ) {
             $users[ $userId ]['votes'] = $voteInfo;
@@ -355,54 +556,31 @@ class UserHelper
 
     public static function getVotes( array $userIds )
     {
-        $query = DB::table( 'votes as v')
-            ->select(
-                'v.vote_user_id as user_id',
-                DB::raw('sum( if( v.vote_up > 0, 1, 0 ) ) as up'),
-                DB::raw('sum( if( v.vote_down > 0, 1, 0 ) ) as down'))
-            ->leftJoin( 'entries as e', 'v.vote_entry_id', '=', 'e.entry_id')
-            ->where( 'e.entry_deleted', '=', 0 )
-            ->whereNotIn( 'e.entry_category_id', array( 7, 8 ) )
-            ->where( 'v.vote_deleted', '=', 0 )
-            ->whereIn( 'v.vote_user_id', $userIds )
-            ->groupBy( 'v.vote_user_id' );
+        self::prepareVotesInfo( $userIds );
 
-        $rows = $query->get();
+        $votes = array();
 
-        // make votes with zero votes
-        $votes = array_fill_keys( $userIds, array(
-            'up' => 0,
-            'down' => 0
-        ));
+        foreach( $userIds as $userId ) {
 
-        // add user_id to votes
-        foreach( $votes as $userId => &$vote )
-            $vote['user_id'] = $userId;
-
-        foreach( $rows as $row ) {
-
-            $votes[ $row->user_id ]['up'] = $row->up;
-            $votes[ $row->user_id ]['down'] = $row->down;
+            if ( isset( self::$votesInfo[ $userId ] ) ) {
+                $votes[ $userId ] = self::$votesInfo[ $userId ];
+            } else {
+                error_log( 'can not get votes info for user: '. $userId );
+                $votes[ $userId ] = self::$emptyVote;
+                $votes[ $userId ]['user_id'] = $userId;
+            }
         }
 
         return $votes;
     }
 
 
-    public static function addPhones( array $users )
+    private static function addPhones( array $users )
     {
-        // get users without phones info
-        $userIds = array();
-        foreach( $users as $userId => $user )
-            if( !isset( $user['phone_info'] ) ) $userIds[] = $userId;
+        $phones = self::getPhones( array_keys( $users ) );
 
-        if( empty( $userIds ) ) return $users;
-
-        $phones = self::getPhones( $userIds );
-
-        foreach( $phones as $userId => $phoneInfo ) {
+        foreach( $phones as $userId => $phoneInfo )
             $users[ $userId ]['phone_info'] = $phoneInfo;
-        }
 
         return $users;
     }
@@ -410,24 +588,38 @@ class UserHelper
 
     public static function getPhones( array $userIds )
     {
-        $query = DB::table( 'user_phones' )
-            ->whereIn('user_phone_user_id', $userIds );
-
-        $rows = $query->get();
+        self::preparePhonesInfo( $userIds );
 
         $phones = array();
 
-        foreach( $rows as $row ) {
+        foreach( $userIds as $userId ) {
 
-            $phones[ $row->user_phone_user_id ] = array(
-                'user_id' => $row->user_phone_user_id,
-                'number' => $row->user_phone_number,
-                'country' => $row->user_phone_country,
-                'verification_code' => $row->user_phone_verification_code,
-                'verified' => $row->user_phone_verified,
-            );
+            if ( isset( self::$phonesInfo[ $userId ] ) ) {
+                $phones[ $userId ] = self::$phonesInfo[ $userId ];
+            } else {
+                error_log( 'can not get phones info for user: '. $userId );
+                $phones[ $userId ] = false;
+            }
         }
 
         return $phones;
+    }
+
+
+    public static function clear()
+    {
+        self::$basicInfo = self::$votesInfo = self::$phonesInfo = array();
+        self::$starsInfo = self::$starNamesReady = self::$starsInfo = array();
+    }
+
+
+    public static function dump()
+    {
+        error_log( 'basicInfo: '.print_r( self::$basicInfo, true ) );
+        error_log( 'starsInfo: '.print_r( self::$starsInfo, true ) );
+        error_log( 'starNamesReady Info: '.print_r( self::$starNamesReady, true ) );
+        error_log( 'starNamesInfo: '.print_r( self::$starNamesInfo, true ) );
+        error_log( 'votesInfo: '.print_r( self::$votesInfo, true ) );
+        error_log( 'phonesInfo: '.print_r( self::$phonesInfo, true ) );
     }
 }
