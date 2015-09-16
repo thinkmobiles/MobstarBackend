@@ -112,7 +112,6 @@ class UserHelperTest extends TestCase
 
     private function checkUser440Stars( $stars )
     {
-        $userId = 440;
         $this->assertArrayHasKey( 'my', $stars );
         $this->assertArrayHasKey( 'me', $stars );
         $this->assertCount( 2, $stars['my'] );
@@ -533,5 +532,50 @@ class UserHelperTest extends TestCase
             $this->assertArrayHasKey( 'phone_info', $usersInfo[ $userId ] );
             $this->checkUserPhone( $userId, $usersInfo[ $userId ]['phone_info'] );
         }
+    }
+
+
+    public function testAddStarNames_oneUser()
+    {
+        $userId = 462;
+
+        // first get user info
+        $usersInfo = UserHelper::getUsersInfo( array( $userId ) );
+
+        $usersInfo = UserHelper::addStarNames( $usersInfo );
+
+        $this->assertNotEmpty( $usersInfo );
+
+        $this->assertArrayHasKey( $userId, $usersInfo );
+        $userInfo = $usersInfo[ $userId ];
+        $this->assertArrayHasKey( 'stars_info', $userInfo );
+        $this->checkUser462Stars_withUserInfo( $userInfo['stars_info'] );
+    }
+
+
+    public function testAddStarNames_manyUsers()
+    {
+        $user1 = 440;
+        $user2 = 462;
+
+        // first get user info
+        $usersInfo = UserHelper::getUsersInfo( array( $user1, $user2 ) );
+
+        $usersInfo = UserHelper::addStarNames( $usersInfo );
+
+        $this->assertNotEmpty( $usersInfo );
+
+        // check first user
+        $this->assertArrayHasKey( $user1, $usersInfo );
+        $user1Info = $usersInfo[ $user1 ];
+        $this->assertArrayHasKey( 'stars_info', $user1Info );
+        $this->checkUser440Stars_withUserInfo($user1Info['stars_info']);
+
+        // check second user
+        $this->assertArrayHasKey( $user2, $usersInfo );
+        $user2Info = $usersInfo[ $user2 ];
+        $this->assertArrayHasKey( 'stars_info', $user2Info );
+        $this->checkUser462Stars_withUserInfo($user2Info['stars_info']);
+
     }
 }

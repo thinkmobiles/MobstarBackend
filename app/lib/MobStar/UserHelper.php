@@ -203,12 +203,16 @@ class UserHelper
 
     public static function addStars( array $users, $includeUsersInfo = false )
     {
+        if ( $includeUsersInfo )
+            return self::addStarNames( $users );
+
         // get list of users without stars
         $userIds = array();
         foreach( $users as $userId => $user )
             if ( ! isset( $user['stars_info'] ) ) $userIds[] = $userId;
 
-        $stars = self::getStars( $userIds, $includeUsersInfo );
+
+        $stars = self::getStars( $userIds );
 
         foreach( $stars as $userId => $starInfo ) {
 
@@ -219,8 +223,50 @@ class UserHelper
     }
 
 
+    public static function addStarNames( array $users )
+    {
+        // first add stars
+        $users = self::addStars( $users );
+
+
+        // get stars without user names
+        $starsWithoutNames = array();
+
+        foreach( $users as &$user ) {
+
+            foreach( $user['stars_info']['my'] as &$star_info ) {
+                if( ! isset( $star_info['user_info'] ) ) $starsWithoutNames[ $star_info['star_user_id'] ][] = &$star_info;
+            }
+            unset( $star_info );
+
+            foreach( $user['stars_info']['me'] as &$star_info ) {
+                if( ! isset( $star_info['user_info'] ) ) $starsWithoutNames[ $star_info['star_user_id'] ][] = &$star_info;
+            }
+            unset( $star_info );
+        }
+        unset( $user );
+
+        if( empty( $starsWithoutNames ) ) return $users;
+
+
+        $starNames = self::getUsersInfo( array_keys( $starsWithoutNames ) );
+
+        foreach( $starNames as $userId => $user ) {
+
+            foreach( $starsWithoutNames[ $userId ] as &$star_info ) {
+                $star_info['user_info'] = $user;
+            }
+            unset( $star_info );
+        }
+
+        return $users;
+    }
+
+
     public static function getStars( array $userIds, $includeUsersInfo = false )
     {
+        if( empty( $userIds ) ) return array();
+
         $queryMyStars = DB::table( 'user_stars' )
             ->select(
                 'user_star_user_id as user_id',
@@ -294,6 +340,9 @@ class UserHelper
         foreach( $users as $userId => $user )
             if ( !isset( $user['votes'] ) ) $userIds[] = $userId;
 
+        if( empty( $userIds ) ) return $users;
+
+
         $votes = self::getVotes( $userIds );
 
         foreach( $votes as $userId => $voteInfo ) {
@@ -320,15 +369,20 @@ class UserHelper
 
         $rows = $query->get();
 
-        $votes = array();
+        // make votes with zero votes
+        $votes = array_fill_keys( $userIds, array(
+            'up' => 0,
+            'down' => 0
+        ));
+
+        // add user_id to votes
+        foreach( $votes as $userId => &$vote )
+            $vote['user_id'] = $userId;
 
         foreach( $rows as $row ) {
 
-            $votes[ $row->user_id ] = array(
-                'user_id' => $row->user_id,
-                'up' => $row->up,
-                'down' => $row->down,
-            );
+            $votes[ $row->user_id ]['up'] = $row->up;
+            $votes[ $row->user_id ]['down'] = $row->down;
         }
 
         return $votes;
@@ -341,6 +395,8 @@ class UserHelper
         $userIds = array();
         foreach( $users as $userId => $user )
             if( !isset( $user['phone_info'] ) ) $userIds[] = $userId;
+
+        if( empty( $userIds ) ) return $users;
 
         $phones = self::getPhones( $userIds );
 
