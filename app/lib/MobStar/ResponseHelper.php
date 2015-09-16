@@ -8,17 +8,13 @@ class ResponseHelper
     private static $starsInfo = array();
 
 
-    public static function getUserProfile( array& $users, $session, $normal = false )
+    public static function getUserProfile( $session, $normal = false )
     {
         $userId = (int)$session->token_user_id;
 
-        if( ! isset( $users[ $userId ] ) ) {
-            error_log( 'no user prepared in ResponseHelper::getUserProfile. User id: '.$userId );
-            $usersInfo = UserHelper::getUsersInfo( array( $userId ) );
-            $users[ $userId ] = $usersInfo[ $userId ];
-        }
+        $users = UserHelper::getUsersInfo( array( $userId ) );
 
-        $user = &$users[ $userId ];
+        $user = $users[ $userId ];
 
         $client = getS3Client();
 
@@ -63,15 +59,11 @@ class ResponseHelper
     }
 
 
-    public static function userDetails( array& $users, $userId )
+    public static function userDetails( $userId )
     {
-        if ( ! isset( $users[ $userId ] ) ) {
-            error_log( 'no user prepared in ResponseHelper::userDetails. User id: '.$userId );
-            $usersInfo = UserHelper::getUsersInfo( array( $userId ) );
-            $users[ $userId ] = $usersInfo[ $userId ];
-        }
+        $users = UserHelper::getUsersInfo( array( $userId ) );
 
-        $user = &$users[ $userId ];
+        $user = $users[ $userId ];
 
         $return = array();
 
@@ -83,29 +75,21 @@ class ResponseHelper
     }
 
 
-    public static function getusernamebyid( array& $users, $userId )
+    public static function getusernamebyid( $userId )
     {
-        if ( ! isset( $users[ $userId ] ) ) {
-            error_log( 'no user prepared in ResponseHelper::getusernamebyid. User id: '.$userId );
-            $usersInfo = UserHelper::getUsersInfo( array( $userId ) );
-            $users[ $userId ] = $usersInfo[ $userId ];
-        }
+        $users = UserHelper::getUsersInfo( array( $userId ) );
 
-        $user = &$users[ $userId ];
+        $user = $users[ $userId ];
 
         return isset( $user['user_display_name'] ) ? $user['user_display_name'] : 'Guest';
     }
 
 
-    public static function particUser( array& $users, $userId, $session, $includeStars = false )
+    public static function particUser( $userId, $session, $includeStars = false )
     {
-        if ( ! isset( $users[ $userId ] ) ) {
-            error_log( 'no user prepared in ResponseHelper::particUser. User id: '.$userId );
-            $usersInfo = UserHelper::getUsersInfo( array( $userId ) );
-            $users[ $userId ] = $usersInfo[ $userId ];
-        }
+        $users = UserHelper::getUsersInfo( array( $userId ) );
 
-        $user = &$users[ $userId ];
+        $user = $users[ $userId ];
 
         $client = getS3Client();
 
@@ -127,21 +111,18 @@ class ResponseHelper
     }
 
 
-    public static function oneUser( array& $users, $userId, $session, $includeStars, $normal )
+    public static function oneUser( $userId, $session, $includeStars, $normal )
     {
-        if ( ! isset( $users[ $userId ] ) ) {
-            error_log( 'no user prepared in ResponseHelper::oneUser. User id: '.$userId );
-            $usersInfo = UserHelper::getUsersInfo( array( $userId ) );
-            $users[ $userId ] = $usersInfo[ $userId ];
-        }
+        $fields = array( 'votes' );
 
-        $users = UserHelper::addVotes( $users );
         if ($includeStars)
-            $users = UserHelper::addStarNames( $users );
+            $fields[] = 'stars.users';
         else
-            $users = UserHelper::addStars( $users );
+            $fields[] = 'stars';
 
-        $user = &$users[ $userId ];
+        $users = UserHelper::getUsersInfo( array( $userId ), $fields );
+
+        $user = $users[ $userId ];
 
         $client = getS3Client();
 
@@ -217,22 +198,26 @@ class ResponseHelper
                 unset( $star );
             }
 
-            foreach( $user['stars_info']['me'] as $star_info ) {
+            $followersInfo = self::getFollowers( $userId );
+            $starredBy = $followersInfo['starredBy'];
+            unset( $followersInfo );
 
-                $star = array();
-                $star['starId'] = $star_info['star_user_id'];
-                $star['starName'] = $star_info['user_info']['user_display_name'];
-                $star['starredDate'] = $star_info['star_date'];
-                $star['profileImage'] = isset( $star_info['user_info']['user_profile_image'] )
-                    ? $client->getObjectUrl( \Config::get('app.bucket'), $star_info['user_info']['user_profile_image'], '+720 minutes' )
-                    : '';
-                $star['profileCover'] = isset( $star_info['user_info']['user_cover_image'] )
-                    ? $client->getObjectUrl( \Config::get('app.bucket'), $star_info['user_info']['user_cover_image'], '+720 minutes' )
-                    : '';
+//             foreach( $user['stars_info']['me'] as $star_info ) {
 
-                $starredBy[] = $star;
-                unset( $star );
-            }
+//                 $star = array();
+//                 $star['starId'] = $star_info['star_user_id'];
+//                 $star['starName'] = $star_info['user_info']['user_display_name'];
+//                 $star['starredDate'] = $star_info['star_date'];
+//                 $star['profileImage'] = isset( $star_info['user_info']['user_profile_image'] )
+//                     ? $client->getObjectUrl( \Config::get('app.bucket'), $star_info['user_info']['user_profile_image'], '+720 minutes' )
+//                     : '';
+//                 $star['profileCover'] = isset( $star_info['user_info']['user_cover_image'] )
+//                     ? $client->getObjectUrl( \Config::get('app.bucket'), $star_info['user_info']['user_cover_image'], '+720 minutes' )
+//                     : '';
+
+//                 $starredBy[] = $star;
+//                 unset( $star );
+//             }
         }
 
         $return['stars'] = $stars;
@@ -243,5 +228,41 @@ class ResponseHelper
         $return['votes'] = $user['votes']['up'];
 
         return $return;
+    }
+
+
+    public static function getFollowers( $userId, array& $data = array() )
+    {
+        $client = getS3Client();
+
+        $users = UserHelper::getUsersInfo( array( $userId ), array( 'stars.users') );
+
+        $user = $users[ $userId ];
+
+        $starredBy = array();
+
+        foreach( $user['stars_info']['me'] as $star_info ) {
+
+            $star = array();
+
+            $star['starId'] = $star_info['star_user_id'];
+            $star['starName'] = $star_info['user_info']['user_display_name']; // @todo fix it
+            $star['starredDate'] = $star_info['star_date'];
+
+            $star['profileImage'] = isset( $star_info['user_info']['user_profile_image'] )
+                ? $client->getObjectUrl( \Config::get('app.bucket'), $star_info['user_info']['user_profile_image'], '+720 minutes' )
+                : '';
+            $star['profileCover'] = isset( $star_info['user_info']['user_cover_image'] )
+                ? $client->getObjectUrl( \Config::get('app.bucket'), $star_info['user_info']['user_cover_image'], '+720 minutes' )
+                : '';
+
+            $starredBy[] = $star;
+            unset( $star );
+        }
+
+        $data['starredBy'] = $starredBy;
+        $data['fans'] = count( $starredBy );
+
+        return $data;
     }
 }

@@ -21,13 +21,15 @@ class ResponseHelperTest extends TestCase{
         $userIds = array();
         foreach( $testData as $data ) $userIds[] = $data['userId'];
 
-        $users = UserHelper::getUsersInfo( $userIds );
+        UserHelper::clear();
+
+        UserHelper::prepareUsers( $userIds );
 
         foreach( $testData as $data ) {
             $session = $token->get_session( $data['token'] );
             $normal = $data['normal'];
 
-            $userProfile = ResponseHelper::getUserProfile( $users, $session, $normal );
+            $userProfile = ResponseHelper::getUserProfile( $session, $normal );
 
             // adjust AWS urls
             $data['data']['profileImage'] = self::adjustAWSUrl( $data['data']['profileImage'] );
@@ -51,10 +53,12 @@ class ResponseHelperTest extends TestCase{
         $userIds = array();
         foreach( $testData as $data ) $userIds[] = $data['userId'];
 
-        $users = UserHelper::getUsersInfo( $userIds );
+        UserHelper::clear();
+
+        UserHelper::prepareUsers( $userIds );
 
         foreach( $testData as $data ) {
-            $userDetails = ResponseHelper::userDetails( $users, $data['userId'] );
+            $userDetails = ResponseHelper::userDetails( $data['userId'] );
 
             $this->assertEquals( $data['data'], $userDetails );
         }
@@ -71,10 +75,12 @@ class ResponseHelperTest extends TestCase{
         $userIds = array();
         foreach( $testData as $data ) $userIds[] = $data['userId'];
 
-        $users = UserHelper::getUsersInfo( $userIds );
+        UserHelper::clear();
+
+        UserHelper::prepareUsers( $userIds );
 
         foreach( $testData as $data ) {
-            $userNames = ResponseHelper::getusernamebyid( $users, $data['userId'] );
+            $userNames = ResponseHelper::getusernamebyid( $data['userId'] );
 
             $this->assertEquals( $data['data'], $userNames );
         }
@@ -93,7 +99,10 @@ class ResponseHelperTest extends TestCase{
         $userIds = array();
         foreach( $testData as $data ) $userIds[] = $data['userId'];
 
-        $users = UserHelper::getUsersInfo( $userIds );
+        UserHelper::clear();
+
+        UserHelper::prepareUsers( $userIds );
+
 
         foreach( $testData as $data ) {
 
@@ -101,7 +110,7 @@ class ResponseHelperTest extends TestCase{
             $session = $token->get_session( $data['token'] );
             $includeStars = $data['includeStars'];
 
-            $particUser = ResponseHelper::particUser( $users, $userId, $session, $includeStars );
+            $particUser = ResponseHelper::particUser( $userId, $session, $includeStars );
 
             // adjust AWS urls
             $data['data']['profileImage'] = self::adjustAWSUrl( $data['data']['profileImage'] );
@@ -127,7 +136,10 @@ class ResponseHelperTest extends TestCase{
         $userIds = array();
         foreach( $testData as $data ) $userIds[] = $data['userId'];
 
-        $users = UserHelper::getUsersInfo( $userIds );
+        UserHelper::clear();
+
+        UserHelper::prepareUsers( $userIds );
+
 
         foreach( $testData as $data ) {
 
@@ -136,7 +148,7 @@ class ResponseHelperTest extends TestCase{
             $includeStars = $data['includeStars'];
             $normal = $data['normal'];
 
-            $oneUser = ResponseHelper::oneUser( $users, $userId, $session, $includeStars, $normal );
+            $oneUser = ResponseHelper::oneUser( $userId, $session, $includeStars, $normal );
 
             // adjust AWS urls
             $data['data']['profileImage'] = self::adjustAWSUrl( $data['data']['profileImage'] );
@@ -164,24 +176,6 @@ class ResponseHelperTest extends TestCase{
                 $starInfo['profileCover'] = self::adjustAWSUrl( $starInfo['profileCover'] );
             }
             unset( $starInfo );
-
-            //resort stars (some of them has same timestamp)
-            usort( $data['data']['stars'], function( $par1, $par2 ) {
-                if ( (int)$par1['starId'] == (int)$par2['starId'] ) return 0;
-                return (int)$par1['starId'] > (int)$par2['starId'] ? 1 : -1;
-            });
-            usort( $data['data']['starredBy'], function( $par1, $par2 ) {
-                if ( (int)$par1['starId'] == (int)$par2['starId'] ) return 0;
-                return (int)$par1['starId'] > (int)$par2['starId'] ? 1 : -1;
-            });
-            usort( $oneUser['stars'], function( $par1, $par2 ) {
-                if ( (int)$par1['starId'] == (int)$par2['starId'] ) return 0;
-                return (int)$par1['starId'] > (int)$par2['starId'] ? 1 : -1;
-            });
-            usort( $oneUser['starredBy'], function( $par1, $par2 ) {
-                if ( (int)$par1['starId'] == (int)$par2['starId'] ) return 0;
-                return (int)$par1['starId'] > (int)$par2['starId'] ? 1 : -1;
-            });
 
             if ( $userId == 462 ) {
                 // unset starredBY 3198 user. He has own user_display_name, but old version gets it from facebook anyway.
