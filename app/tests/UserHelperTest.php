@@ -7,28 +7,60 @@ class UserHelperTest extends TestCase
     private $socialUsers = array(
         'facebook' => array(
             1975 => array(
-                'user_name' => 'Naldinho Novato',
-                'user_display_name' => 'Naldinho Novato',
-                'user_full_name' => 'Naldinho'
+                'name' => 'Naldinho Novato',
+                'display_name' => 'Naldinho Novato',
+                'full_name' => 'Naldinho'
             ),
             1972 => array(
-                'user_name' => 'Romain Close',
-                'user_display_name' => 'Romain Close',
-                'user_full_name' => 'Romain'
+                'name' => 'Romain Close',
+                'display_name' => 'Romain Close',
+                'full_name' => 'Romain'
             )
         ),
         'google' => array(
             790 => array(
-                'user_name' => 'Kwstantinos',
-                'user_display_name' => 'Kwstantinos Neratzoulis',
-                'user_full_name' => 'Kwstantinos Neratzoulis'
+                'name' => 'Kwstantinos',
+                'display_name' => 'Kwstantinos Neratzoulis',
+                'full_name' => 'Kwstantinos Neratzoulis'
             ),
             789 => array(
-                'user_name' => 'Shayla Dixon',
-                'user_display_name' => 'Shayla',
-                'user_full_name' => 'Shayla'
+                'name' => 'Shayla Dixon',
+                'display_name' => 'Shayla',
+                'full_name' => 'Shayla'
             )
         )
+    );
+
+
+    private $socialUserNames = array(
+        4902 => array(
+            'facebook' => array(
+                'name' => 'Naldinho Novato',
+                'display_name' => 'Naldinho Novato',
+                'full_name' => 'Naldinho'
+            ),
+        ),
+        4897 => array(
+            'facebook' => array(
+                'name' => 'Romain Close',
+                'display_name' => 'Romain Close',
+                'full_name' => 'Romain'
+            ),
+        ),
+        4876 => array(
+            'google' => array(
+                'name' => 'Shayla Dixon',
+                'display_name' => 'Shayla',
+                'full_name' => 'Shayla'
+            ),
+        ),
+        4887 => array(
+            'google' => array(
+                'name' => 'Kwstantinos',
+                'display_name' => 'Kwstantinos Neratzoulis',
+                'full_name' => 'Kwstantinos Neratzoulis'
+            ),
+        ),
     );
 
 
@@ -53,8 +85,16 @@ class UserHelperTest extends TestCase
 
 
     private $userVotes = array(
-        440 => array( 'up' => 1, 'down' => 1 ),
-        462 => array( 'up' => 7, 'down' => 2 ),
+        440 => array(
+            'my' => array( 'up' => 1, 'down' => 1 ),
+            'me' => array( 'up' => 0, 'down' => 0 ),
+            'user_id' => 440,
+        ),
+        462 => array(
+            'my' => array( 'up' => 7, 'down' => 2 ),
+            'me' => array( 'up' => 39, 'down' => 51 ),
+            'user_id' => 462,
+        ),
     );
 
 
@@ -78,9 +118,9 @@ class UserHelperTest extends TestCase
 
     private function assertSameNames($etalon, $user)
     {
-        $this->assertEquals($etalon['user_name'], $user['user_name'] );
-        $this->assertEquals($etalon['user_display_name'], $user['user_display_name'] );
-        $this->assertEquals($etalon['user_full_name'], $user['user_full_name']);
+        $this->assertEquals($etalon['name'], $user['name'] );
+        $this->assertEquals($etalon['display_name'], $user['display_name'] );
+        $this->assertEquals($etalon['full_name'], $user['full_name']);
     }
 
 
@@ -127,33 +167,14 @@ class UserHelperTest extends TestCase
     }
 
 
-    private function checkGoogleUserNames($googleUserId, $socialNames)
+    private function assertUserSocialNames( $userId, $socialNames )
     {
-        $this->assertArrayHasKey($googleUserId, $this->socialUsers['google'], 'not etalon google user');
+        $this->assertArrayHasKey($userId, $this->socialUserNames, 'not etalon google user');
 
-        $this->assertNotEmpty($socialNames);
-        $this->assertArrayHasKey('google', $socialNames);
-        $this->assertArrayHasKey($googleUserId, $socialNames['google']);
+        $this->assertNotEmpty( $socialNames );
+        $this->assertArrayHasKey( $userId, $socialNames );
 
-        $this->assertSameNames(
-            $this->socialUsers['google'][$googleUserId],
-            $socialNames['google'][$googleUserId]
-        );
-    }
-
-
-    private function checkFacebookUserNames($facebookUserId, $socialNames)
-    {
-        $this->assertArrayHasKey($facebookUserId, $this->socialUsers['facebook'], 'not etalon facebook user');
-
-        $this->assertNotEmpty($socialNames);
-        $this->assertArrayHasKey('facebook', $socialNames);
-        $this->assertArrayHasKey($facebookUserId, $socialNames['facebook']);
-
-        $this->assertSameNames(
-            $this->socialUsers['facebook'][$facebookUserId],
-            $socialNames['facebook'][$facebookUserId]
-        );
+        $this->assertEquals( $this->socialUserNames[ $userId ], $socialNames[ $userId ] );
     }
 
 
@@ -170,18 +191,15 @@ class UserHelperTest extends TestCase
     }
 
 
-    private function checkUserVotes( $userId, $votes )
+    private function assertUserVotes( $userId, $votes )
     {
         $this->assertArrayHasKey( $userId, $this->userVotes, 'not etalon user' );
 
-        $this->assertArrayHasKey( 'up', $votes );
-        $this->assertArrayHasKey( 'down', $votes );
-        $this->assertEquals( $this->userVotes[ $userId ]['up'], $votes['up'] );
-        $this->assertEquals( $this->userVotes[ $userId ]['down'], $votes['down'] );
+        $this->assertEquals( $this->userVotes[ $userId ], $votes );
     }
 
 
-    private function checkUserPhone( $userId, $phoneInfo )
+    private function assertUserPhone( $userId, $phoneInfo )
     {
         $this->assertArrayHasKey( $userId, $this->userPhones, 'not etalon user' );
 
@@ -208,31 +226,34 @@ class UserHelperTest extends TestCase
         UserHelper::clear();
 
         // facebook user
-        $facebookUserId = 1975;
+        $userId = 4902;
+        $users = UserHelper::getBasicInfo(array($userId) );
 
-        $socialNames = UserHelper::getSocialUserNames(array(
-            'facebook' => array( $facebookUserId )
-        ));
+        $socialNames = UserHelper::getSocialUserNames( $users );
 
-        $this->checkFacebookUserNames( $facebookUserId, $socialNames );
+        $this->assertUserSocialNames( $userId, $socialNames );
 
         // google user
-        $googleUserId = 790;
+        $userId = 4887;
+        $users = UserHelper::getBasicInfo(array($userId) );
 
-        $socialNames = UserHelper::getSocialUserNames(array(
-            'google' => array( $googleUserId )
-        ));
+        $socialNames = UserHelper::getSocialUserNames( $users );
 
-        $this->checkGoogleUserNames( $googleUserId, $socialNames );
+        $this->assertUserSocialNames( $userId, $socialNames );
 
         // one user of facebook and google
-        $socialNames = UserHelper::getSocialUserNames(array(
-            'facebook' => array( $facebookUserId ),
-            'google' => array( $googleUserId )
-        ));
+        $googleUserId = 4887;
+        $facebookUserId = 4902;
 
-        $this->checkFacebookUserNames( $facebookUserId, $socialNames );
-        $this->checkGoogleUserNames( $googleUserId, $socialNames );
+        $userIds = array( $googleUserId, $facebookUserId );
+
+        $users = UserHelper::getBasicInfo( $userIds );
+
+        $socialNames = UserHelper::getSocialUserNames( $users );
+
+        foreach( $userIds as $userId ) {
+            $this->assertUserSocialNames( $userId, $socialNames );
+        }
     }
 
 
@@ -242,44 +263,38 @@ class UserHelperTest extends TestCase
 
         // facebook users
         $facebookUserIds = array(
-            1975,
-            1972
+            4902,
+            4897
         );
 
-
-        $socialNames = UserHelper::getSocialUserNames(array(
-            'facebook' => $facebookUserIds
-        ));
+        $users = UserHelper::getBasicInfo( $facebookUserIds );
+        $socialNames = UserHelper::getSocialUserNames( $users );
 
         foreach ($facebookUserIds as $facebookUserId) {
-            $this->checkFacebookUserNames($facebookUserId, $socialNames);
+            $this->assertUserSocialNames( $facebookUserId, $socialNames );
         }
 
         // google users
         $googleUserIds = array(
-            790,
-            789
+            4876,
+            4887
         );
 
-        $socialNames = UserHelper::getSocialUserNames(array(
-            'google' => $googleUserIds
-        ));
+        $users = UserHelper::getBasicInfo( $googleUserIds );
+        $socialNames = UserHelper::getSocialUserNames( $users );
 
         foreach ($googleUserIds as $googleUserId) {
-            $this->checkGoogleUserNames($googleUserId, $socialNames);
+            $this->assertUserSocialNames( $googleUserId, $socialNames );
         }
 
         // both facebook and google users
-        $socialNames = UserHelper::getSocialUserNames(array(
-            'facebook' => $facebookUserIds,
-            'google' => $googleUserIds
-        ));
+        $userIds = array_merge( $facebookUserIds, $googleUserIds );
 
-        foreach ($facebookUserIds as $facebookUserId) {
-            $this->checkFacebookUserNames($facebookUserId, $socialNames);
-        }
-        foreach ($googleUserIds as $googleUserId) {
-            $this->checkGoogleUserNames($googleUserId, $socialNames);
+        $users = UserHelper::getBasicInfo( $userIds );
+        $socialNames = UserHelper::getSocialUserNames( $users );
+
+        foreach ($userIds as $userId) {
+            $this->assertUserSocialNames( $userId, $socialNames );
         }
     }
 
@@ -459,7 +474,7 @@ class UserHelperTest extends TestCase
 
         $this->assertNotEmpty( $votes );
         $this->assertArrayHasKey( $userId, $votes );
-        $this->checkUserVotes( $userId, $votes[ $userId ] );
+        $this->assertUserVotes( $userId, $votes[ $userId ] );
     }
 
 
@@ -475,7 +490,7 @@ class UserHelperTest extends TestCase
 
         foreach( $userIds as $userId ) {
             $this->assertArrayHasKey( $userId, $votes );
-            $this->checkUserVotes( $userId, $votes[ $userId ] );
+            $this->assertUserVotes( $userId, $votes[ $userId ] );
         }
     }
 
@@ -491,7 +506,7 @@ class UserHelperTest extends TestCase
         $this->assertNotEmpty( $usersInfo );
         $this->assertArrayHasKey( $userId, $usersInfo );
         $this->assertArrayHasKey( 'votes', $usersInfo[ $userId ] );
-        $this->checkUserVotes( $userId, $usersInfo[ $userId ]['votes'] );
+        $this->assertUserVotes( $userId, $usersInfo[ $userId ]['votes'] );
     }
 
 
@@ -507,7 +522,7 @@ class UserHelperTest extends TestCase
         foreach( $userIds as $userId ) {
             $this->assertArrayHasKey( $userId, $usersInfo );
             $this->assertArrayHasKey( 'votes', $usersInfo[ $userId ] );
-            $this->checkUserVotes( $userId, $usersInfo[ $userId ]['votes'] );
+            $this->assertUserVotes( $userId, $usersInfo[ $userId ]['votes'] );
         }
     }
 
@@ -522,7 +537,7 @@ class UserHelperTest extends TestCase
 
         $this->assertNotEmpty( $phones );
         $this->assertArrayHasKey( $userId, $phones );
-        $this->checkUserPhone( $userId, $phones[ $userId ] );
+        $this->assertUserPhone( $userId, $phones[ $userId ] );
     }
 
 
@@ -538,7 +553,7 @@ class UserHelperTest extends TestCase
 
         foreach( $userIds as $userId ) {
             $this->assertArrayHasKey( $userId, $phones );
-            $this->checkUserPhone( $userId, $phones[ $userId ] );
+            $this->assertUserPhone( $userId, $phones[ $userId ] );
         }
     }
 
@@ -554,7 +569,7 @@ class UserHelperTest extends TestCase
         $this->assertNotEmpty( $usersInfo );
         $this->assertArrayHasKey( $userId, $usersInfo );
         $this->assertArrayHasKey( 'phone_info', $usersInfo[ $userId ] );
-        $this->checkUserPhone( $userId, $usersInfo[ $userId ]['phone_info'] );
+        $this->assertUserPhone( $userId, $usersInfo[ $userId ]['phone_info'] );
     }
 
 
@@ -571,7 +586,7 @@ class UserHelperTest extends TestCase
         foreach( $userIds as $userId ) {
             $this->assertArrayHasKey( $userId, $usersInfo );
             $this->assertArrayHasKey( 'phone_info', $usersInfo[ $userId ] );
-            $this->checkUserPhone( $userId, $usersInfo[ $userId ]['phone_info'] );
+            $this->assertUserPhone( $userId, $usersInfo[ $userId ]['phone_info'] );
         }
     }
 

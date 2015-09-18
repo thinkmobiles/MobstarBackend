@@ -9,6 +9,8 @@ class UserHelper
 
     private static $basicInfo = array();
 
+    private static $socialInfo = array();
+
     private static $starsInfo = array();
 
     private static $starNamesReady = array();
@@ -19,9 +21,15 @@ class UserHelper
 
     private static $phonesInfo = array();
 
-    private static $emptyVote = array(
-        'up' => 0,
-        'down' => 0,
+    private static $emptyVotes = array(
+        'my' => array(
+            'up' => 0,
+            'down' => 0,
+        ),
+        'me' => array(
+            'up' => 0,
+            'down' => 0,
+        ),
     );
 
     private static $emptyStars = array(
@@ -74,12 +82,121 @@ class UserHelper
         if (empty($newUsers))
             return array();
 
+        $newUsers = $newUsers->keyBy( 'user_id' )->toArray();
+
         $newUsers = self::fixUserNames($newUsers);
 
-        $newUsers = $newUsers->toArray();
+        foreach( $newUsers as $userId => $user )
+            self::$basicInfo[ $userId ] = $user;
+    }
 
-        foreach( $newUsers as $user )
-            self::$basicInfo[ $user['user_id' ] ] = $user;
+
+    private static function prepareSocialNames( array $users )
+    {
+        $socialIds = array();
+        $socialUsers = array();
+
+        foreach( $users as $userId => $user ) {
+
+            if (isset( self::$socialInfo[ $userId ] ) ) continue;
+
+            $socialInfo = null;
+
+            if ($user['user_facebook_id']) {
+                $socialInfo = array( 'facebook', $user['user_facebook_id'], $userId );
+            } elseif ($user['user_google_id']) {
+                $socialInfo = array( 'google', $user['user_google_id'], $userId );
+            } elseif ($user['user_twitter_id']) {
+                $socialInfo = array( 'twitter', $user['user_twitter_id'], $userId );
+            }
+
+            if ($socialInfo) {
+                $socialIds[ $socialInfo[0] ][ $socialInfo[2] ] = $socialInfo[1];
+                $socialUsers[ $userId ] = array( $socialInfo[0], $socialInfo[1] );
+            }
+        }
+
+        if ( empty( $socialIds ) ) return;
+
+        $query = $facebookQuery = $googleQuery = $twitterQuery = null;
+
+        if (! empty($socialIds['facebook'])) {
+
+            $facebookQuery = DB::Table('facebook_users')
+                ->select(
+                    DB::Raw("'facebook' as usertype"),
+                    'facebook_user_id as user_id',
+                    'facebook_user_user_name as user_name',
+                    'facebook_user_display_name as display_name',
+                    'facebook_user_full_name as full_name')
+                ->whereIn('facebook_user_id', $socialIds['facebook']
+            );
+        }
+
+        if (! empty($socialIds['google'])) {
+
+            $googleQuery = DB::Table('google_users')
+                ->select(
+                    DB::Raw("'google' as usertype"),
+                    'google_user_id as user_id',
+                    'google_user_user_name as user_name',
+                    'google_user_display_name as display_name',
+                    'google_user_full_name as full_name')
+                ->whereIn('google_user_id', $socialIds['google']
+            );
+        }
+
+        if (! empty($socialIds['twitter'])) {
+
+            $twitterQuery = DB::Table('twitter_users')
+                ->select(
+                    DB::Raw("'twitter' as usertype"),
+                    'twitter_user_id as user_id',
+                    'twitter_user_user_name as user_name',
+                    'twitter_user_display_name as display_name',
+                    'twitter_user_full_name as full_name')
+                ->whereIn('twitter_user_id', $socialIds['twitter']
+            );
+        }
+
+        if ($facebookQuery) {
+            $query = $query ? $query->union($facebookQuery) : $facebookQuery;
+        }
+
+        if ($googleQuery) {
+            $query = $query ? $query->union($googleQuery) : $googleQuery;
+        }
+
+        if ($twitterQuery) {
+            $query = $query ? $query->union($twitterQuery) : $twitterQuery;
+        }
+
+        if (empty($query))
+            return;
+
+        $result = $query->get();
+
+        if (empty($result))
+            return;
+
+        $socialNames = array();
+        foreach ($result as $row) {
+
+            $socialNames[ $row->usertype ][ $row->user_id ] = array(
+                'name' => $row->user_name,
+                'display_name' => $row->display_name,
+                'full_name' => $row->full_name
+            );
+        }
+
+        foreach( $socialUsers as $userId => $socialInfo ) {
+
+            if (isset( $socialNames[ $socialInfo[0] ][ $socialInfo[1] ] ) ) {
+                self::$socialInfo[ $userId ][ $socialInfo[0] ] = $socialNames[ $socialInfo[0] ][ $socialInfo[1] ];
+            }
+        }
+
+        return;
     }
 
 
@@ -197,16 +314,24 @@ class UserHelper
     {
         $newUserIds = array();
 
-        foreach( $userIds as $userId )
-            if (!isset( self::$votesInfo[ $userId ] ) ) $newUserIds[] = $userId;
+        $votes = array();
+
+        foreach( $userIds as $userId ) {
+            if (!isset( self::$votesInfo[ $userId ] ) ) {
+                $newUserIds[] = $userId;
+                $votes[ $userId ] = self::$emptyVotes;
+                $votes[ $userId ]['user_id'] = $userId;
+            }
+        }
 
         if( empty( $newUserIds ) ) return;
 
+        // get my votes
         $query = DB::table( 'votes as v')
-        ->select(
-            'v.vote_user_id as user_id',
-            DB::raw('sum( if( v.vote_up > 0, 1, 0 ) ) as up'),
-            DB::raw('sum( if( v.vote_down > 0, 1, 0 ) ) as down'))
+            ->select(
+                'v.vote_user_id as user_id',
+                DB::raw('sum( if( v.vote_up > 0, 1, 0 ) ) as up'),
+                DB::raw('sum( if( v.vote_down > 0, 1, 0 ) ) as down'))
             ->leftJoin( 'entries as e', 'v.vote_entry_id', '=', 'e.entry_id')
             ->where( 'e.entry_deleted', '=', 0 )
             ->whereNotIn( 'e.entry_category_id', array( 7, 8 ) )
@@ -218,18 +343,35 @@ class UserHelper
 
         foreach( $rows as $row ) {
 
-            self::$votesInfo[ $row->user_id ]['up'] = $row->up;
-            self::$votesInfo[ $row->user_id ]['down'] = $row->down;
-            self::$votesInfo[ $row->user_id ]['user_id'] = $row->user_id;
+            $votes[ $row->user_id ]['my']['up'] = $row->up;
+            $votes[ $row->user_id ]['my']['down'] = $row->down;
+        }
+
+        // get votes for me
+        $query = DB::table( 'entries as e')
+            ->select(
+                'e.entry_user_id as user_id',
+                DB::raw('sum( if( v.vote_up > 0, 1, 0 ) ) as up'),
+                DB::raw('sum( if( v.vote_down > 0, 1, 0 ) ) as down'))
+            ->leftJoin( 'votes as v', 'v.vote_entry_id', '=', 'e.entry_id')
+            ->where( 'e.entry_deleted', '=', 0 )
+            ->whereNotIn( 'e.entry_category_id', array( 7, 8 ) )
+            ->where( 'v.vote_deleted', '=', 0 )
+            ->whereIn( 'e.entry_user_id', $newUserIds )
+            ->groupBy( 'e.entry_user_id' );
+
+        $rows = $query->get();
+
+        foreach( $rows as $row ) {
+
+            $votes[ $row->user_id ]['me']['up'] = $row->up;
+            $votes[ $row->user_id ]['me']['down'] = $row->down;
         }
 
         // mark other users as users with zero votes
-        foreach( $newUserIds as $userId ) {
+        foreach( $votes as $userId => $vote  ) {
 
-            if( isset( self::$votesInfo[ $userId ] ) ) continue;
-
-            self::$votesInfo[ $userId ] = self::$emptyVote;
-            self::$votesInfo[ $userId ]['user_id'] = $userId;
+            self::$votesInfo[ $userId ] = $vote;
         }
     }
 
@@ -304,158 +446,58 @@ class UserHelper
         }
 
         return $users;
-
-        $users = User::whereIn('user_id', $userIds)->get();
-
-        if (empty($users))
-            return array();
-
-        $users = $users->keyBy('user_id');
-
-        $users = self::fixUserNames($users);
-
-        $users = $users->toArray();
-
-        return $users;
     }
 
 
-    protected static function fixUserNames( $users )
+    protected static function fixUserNames( array $users )
     {
-        $socialIds = array();
-        $usersToFix = array();
+        $socialNames = self::getSocialUserNames( $users );
 
-        // get users which needs name fix
-        foreach ($users as $index => $user) {
-
-            if (empty($user->user_name) || empty($user->user_display_name) || empty($user->user_full_name)) {
-
-                $socialInfo = null;
-
-                if ($user->user_facebook_id) {
-                    $socialInfo = array( 'facebook', $user->user_facebook_id );
-                } elseif ($user->user_google_id) {
-                    $socialInfo = array( 'google', $user->user_google_id );
-                } elseif ($user->user_twitter_id) {
-                    $socialInfo = array( 'twitter', $user->user_twitter_id );
-                }
-
-                if ($socialInfo) {
-                    $socialIds[ $socialInfo[0] ][] = $socialInfo[1];
-                    $usersToFix[ $index ] = $socialInfo;
-                }
-            }
-        }
-
-        if (empty($usersToFix))
-            return $users; // all names are set
-
-        $socialNames = self::getSocialUserNames($socialIds);
-
-        foreach ($usersToFix as $index => $socialInfo) {
-
-            $socialType = $socialInfo[0];
-            $socialId = $socialInfo[1];
-
-            $names = isset( $socialNames[ $socialType ][ $socialId ] )
-                ? $socialNames[ $socialType ][ $socialId ]
-                : null;
-
-            if ($names) {
-
-                $user = &$users[$index];
-
-                if (empty($user->user_name))
-                    $user->user_name = $names['user_name'];
-
-                if (empty($user->user_display_name))
-                    $user->user_display_name = $names['user_display_name'];
-
-                if (empty($user->user_full_name))
-                    $user->user_full_name = $names['user_full_name'];
-            }
-        }
-
-        return $users;
-    }
-
-
-    public static function getSocialUserNames( $socialIds )
-    {
-        $socialNames = array(
-            'facebook' => array(),
-            'google' => array(),
-            'twitter' => array()
+        $emptyNames = array(
+            'name' => '',
+            'display_name' => '',
+            'full_name' => '',
         );
 
-        $query = $facebookQuery = $googleQuery = $twitterQuery = null;
+        foreach( $users as $userId => &$user ) {
 
-        if (! empty($socialIds['facebook'])) {
 
-            $facebookQuery = DB::Table('facebook_users')
-                ->select(
-                    DB::Raw("'facebook' as usertype"),
-                    'facebook_user_id as user_id',
-                    'facebook_user_user_name as user_name',
-                    'facebook_user_display_name as display_name',
-                    'facebook_user_full_name as full_name')
-                ->whereIn('facebook_user_id', $socialIds['facebook']
-            );
+            $names = $emptyNames;
+
+            if ( isset($socialNames[ $userId ]['facebook']) ) {
+                $names = $socialNames[ $userId ]['facebook'];
+            } elseif ( isset($socialNames[ $userId ]['google']) ) {
+                $names = $socialNames[ $userId ]['google'];
+            } elseif ( isset($socialNames[ $userId ]['twitter']) ) {
+                $names = $socialNames[ $userId ]['twitter'];
+            }
+
+            $user['name'] = $user['user_name'] ? $user['user_name'] : $names['name'];
+            $user['display_name'] = $user['user_display_name'] ? $user['user_display_name'] : $names['display_name'];
+            $user['full_name'] = $user['user_full_name'] ? $user['user_full_name'] : $names['full_name'];
         }
+        unset( $user );
 
-        if (! empty($socialIds['google'])) {
+        return $users;
+    }
 
-            $googleQuery = DB::Table('google_users')
-                ->select(
-                    DB::Raw("'google' as usertype"),
-                    'google_user_id as user_id',
-                    'google_user_user_name as user_name',
-                    'google_user_display_name as display_name',
-                    'google_user_full_name as full_name')
-                ->whereIn('google_user_id', $socialIds['google']
-            );
-        }
 
-        if (! empty($socialIds['twitter'])) {
+    public static function getSocialUserNames( array $users )
+    {
+        if ( empty( $users ) )
+            return array();
 
-            $twitterQuery = DB::Table('twitter_users')
-                ->select(
-                    DB::Raw("'twitter' as usertype"),
-                    'twitter_user_id as user_id',
-                    'twitter_user_user_name as user_name',
-                    'twitter_user_display_name as display_name',
-                    'twitter_user_full_name as full_name')
-                ->whereIn('twitter_user_id', $socialIds['twitter']
-            );
-        }
+        self::prepareSocialNames( $users );
 
-        if ($facebookQuery) {
-            $query = $query ? $query->union($facebookQuery) : $facebookQuery;
-        }
+        $socialNames = array();
 
-        if ($googleQuery) {
-            $query = $query ? $query->union($googleQuery) : $googleQuery;
-        }
+        foreach( $users as $userId => $user ) {
 
-        if ($twitterQuery) {
-            $query = $query ? $query->union($twitterQuery) : $twitterQuery;
-        }
-
-        if (empty($query))
-            return $socialNames;
-
-        $result = $query->get();
-
-        if (empty($result))
-            return $socialNames;
-
-        foreach ($result as $row) {
-
-            $socialNames[ $row->usertype ][ $row->user_id ] = array(
-                'user_name' => $row->user_name,
-                'user_display_name' => $row->display_name,
-                'user_full_name' => $row->full_name
-            );
+            if ( isset( self::$socialInfo[ $userId ] ) ) {
+                $socialNames[ $userId ] = self::$socialInfo[ $userId ];
+            } else {
+                $socialNames[ $userId ] = false;
+            }
         }
 
         return $socialNames;
@@ -566,7 +608,7 @@ class UserHelper
                 $votes[ $userId ] = self::$votesInfo[ $userId ];
             } else {
                 error_log( 'can not get votes info for user: '. $userId );
-                $votes[ $userId ] = self::$emptyVote;
+                $votes[ $userId ] = self::$emptyVotes;
                 $votes[ $userId ]['user_id'] = $userId;
             }
         }
@@ -616,6 +658,7 @@ class UserHelper
     public static function dump()
     {
         error_log( 'basicInfo: '.print_r( self::$basicInfo, true ) );
+        error_log( 'socialInfo: '.print_r( self::$socialInfo, true ) );
         error_log( 'starsInfo: '.print_r( self::$starsInfo, true ) );
         error_log( 'starNamesReady Info: '.print_r( self::$starNamesReady, true ) );
         error_log( 'starNamesInfo: '.print_r( self::$starNamesInfo, true ) );
