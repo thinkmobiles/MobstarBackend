@@ -5,6 +5,7 @@ use MobStar\Storage\Token\TokenRepository as Token;
 use Swagger\Annotations as SWG;
 use Aws\S3\S3Client;
 use Aws\Common\Credentials\Credentials as Creds;
+use MobStar\ResponseHelper;
 
 /**
  * @package
@@ -257,60 +258,15 @@ class EntryController extends BaseController
 		{
 			if( $user != 0 )
 			{
-				$user = User::find( $user );
-				$current[ 'id' ] = null;
-				$current[ 'user' ] = oneUser( $user, $session );
-				$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $user->user_id )->where( 'user_star_deleted', '=', '0')->count();
-				$iAmStarFlag = Star::where( 'user_star_user_id', '=', $user->user_id )->where( 'user_star_star_id', '=', $session->token_user_id )->where( 'user_star_deleted', '=', '0')->count();
-				if($iAmStarFlag > 0)
-				{
-					$current[ 'user' ][ 'iAmStar' ] = 1;
-				}
-				else
-				{
-					$current[ 'user' ][ 'iAmStar' ] = 0;
-				}
-				$current[ 'category' ] = null;
-				$current[ 'type' ] = null;
-				$current[ 'name' ] = null;
-				$current[ 'description' ] = null;
-				$current[ 'created' ] = null;
-				$current[ 'modified' ] = null;
-
-				$return[ 'entries' ][ ][ 'entry' ] = $current;
-				/* Added By AJ for getting followrs */
-				$starredBy = [ ];
-				foreach( $user->StarredBy as $starred )
-				{
-					if( $starred->user_star_deleted == 0 )
-					{
-						$starNames = [];
-						$starNames = userDetails($starred->User);
-
-						$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
-										  'starName'     => @$starNames['displayName'],
-										  'starredDate'  => $starred->user_star_created_date,
-										  'profileImage' => ( isset( $starred->User->user_profile_image ) )
-											  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_profile_image, '+720 minutes' )
-											  : '',
-										  'profileCover' => ( isset( $starred->User->user_cover_image ) )
-										  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_cover_image, '+720 minutes' ) : '',
-						];
-					}
-				}
-				$return[ 'starredBy' ] = $starredBy;
-				$return['fans'] = count($starredBy);
-				/* End */
-				$status_code = 200;
-
+			    $return = ResponseHelper::entries_onlyUser( $user, $session->token_user_id );
 			}
 			else
 			{
-				$return = [ 'error' => 'No Entries Found' ];
-				$status_code = 404;
+			    $return = ResponseHelper::entries_noEntries();
 			}
 
-			return Response::make( $return, $status_code );
+			return Response::make( $return['data'], $return['code'] );
+			unset( $return );
 		}
 
 		//If the count is greater than the highest number of items displayed show a next link
@@ -363,7 +319,7 @@ class EntryController extends BaseController
 				if( in_array( "userName", $fields ) )
 				{
 
-					$current[ 'user' ] = oneUser( $entry->User, $session );
+					$current[ 'user' ] = ResponseHelper::oneUser( $entry->entry_user_id, $session->token_user_id );
 
 				}
 
@@ -465,7 +421,7 @@ class EntryController extends BaseController
 			{
 
 				$current[ 'id' ] = $entry->entry_id;
-				$current[ 'user' ] = oneUser( $entry->User, $session );
+				$current[ 'user' ] = ResponseHelper::oneUser( $entry->entry_user_id, $session->token_user_id );
 
 //				$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
 //				$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
@@ -553,33 +509,12 @@ class EntryController extends BaseController
 			}
 		}
 
-		/* Added By AJ for getting followers */
 		if( $user != 0 )
 		{
-			$aj = User::find( $user );
-			$starredBy = [ ];
-			foreach( $aj->StarredBy as $starred )
-			{
-				if( $starred->user_star_deleted == 0 )
-				{
-					$starNames = [];
-					$starNames = userDetails($starred->User);
-
-					$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
-									  'starName'     => @$starNames['displayName'],
-									  'starredDate'  => $starred->user_star_created_date,
-									  'profileImage' => ( isset( $starred->User->user_profile_image ) )
-										  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_profile_image, '+720 minutes' )
-										  : '',
-									  'profileCover' => ( isset( $starred->User->user_cover_image ) )
-									  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_cover_image, '+720 minutes' ) : '',
-					];
-				}
-			}
+		    $starredBy = ResponseHelper::getFollowers( $user );
 			$return[ 'starredBy' ] = $starredBy;
 			$return['fans'] = count($starredBy);
 		}
-		/* End */
 		$status_code = 200;
 
 		if( $debug !== false )
@@ -764,29 +699,9 @@ class EntryController extends BaseController
 	            $current[ 'modified' ] = null;
 
 	            $return[ 'entries' ][ ][ 'entry' ] = $current;
-	            /* Added By AJ for getting followrs */
-	            $starredBy = [ ];
-	            foreach( $user->StarredBy as $starred )
-	            {
-	                if( $starred->user_star_deleted == 0 )
-	                {
-	                    $starNames = [];
-	                    $starNames = userDetails($starred->User);
-
-	                    $starredBy[ ] = [ 'starId'       => $starred->User->user_id,
-	                        'starName'     => @$starNames['displayName'],
-	                        'starredDate'  => $starred->user_star_created_date,
-	                        'profileImage' => ( isset( $starred->User->user_profile_image ) )
-	                        ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_profile_image, '+720 minutes' )
-	                        : '',
-	                        'profileCover' => ( isset( $starred->User->user_cover_image ) )
-	                        ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_cover_image, '+720 minutes' ) : '',
-	                    ];
-	                }
-	            }
+	            $starredBy = ResponseHelper::getFollowers( $user );
 	            $return[ 'starredBy' ] = $starredBy;
 	            $return['fans'] = count($starredBy);
-	            /* End */
 	            $status_code = 200;
 
 	        }
@@ -1039,33 +954,12 @@ class EntryController extends BaseController
 	        }
 	    }
 
-	    /* Added By AJ for getting followers */
 	    if( $user != 0 )
 	    {
-	        $aj = User::find( $user );
-	        $starredBy = [ ];
-	        foreach( $aj->StarredBy as $starred )
-	        {
-	            if( $starred->user_star_deleted == 0 )
-	            {
-	                $starNames = [];
-	                $starNames = userDetails($starred->User);
-
-	                $starredBy[ ] = [ 'starId'       => $starred->User->user_id,
-	                    'starName'     => @$starNames['displayName'],
-	                    'starredDate'  => $starred->user_star_created_date,
-	                    'profileImage' => ( isset( $starred->User->user_profile_image ) )
-	                    ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_profile_image, '+720 minutes' )
-	                    : '',
-	                    'profileCover' => ( isset( $starred->User->user_cover_image ) )
-	                    ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_cover_image, '+720 minutes' ) : '',
-	                ];
-	            }
-	        }
+	        $starredBy = ResponseHelper::getFollowers( $user );
 	        $return[ 'starredBy' ] = $starredBy;
 	        $return['fans'] = count($starredBy);
 	    }
-	    /* End */
 	    $status_code = 200;
 
 	    if( $debug !== false )
@@ -3578,59 +3472,15 @@ class EntryController extends BaseController
 		{
 			if( $user != 0 )
 			{
-				$user = User::find( $user );
-				$current[ 'id' ] = null;
-				$current[ 'user' ] = oneUser( $user, $session );
-				$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->token_user_id )->where( 'user_star_star_id', '=', $user->user_id )->where( 'user_star_deleted', '=', '0')->count();
-				$iAmStarFlag = Star::where( 'user_star_user_id', '=', $user->user_id )->where( 'user_star_star_id', '=', $session->token_user_id )->where( 'user_star_deleted', '=', '0')->count();
-				if($iAmStarFlag > 0)
-				{
-					$current[ 'user' ][ 'iAmStar' ] = 1;
-				}
-				else
-				{
-					$current[ 'user' ][ 'iAmStar' ] = 0;
-				}
-				$current[ 'category' ] = null;
-				$current[ 'type' ] = null;
-				$current[ 'name' ] = null;
-				$current[ 'description' ] = null;
-				$current[ 'created' ] = null;
-				$current[ 'modified' ] = null;
-
-				$return[ 'entries' ][ ][ 'entry' ] = $current;
-				/* Added By AJ for getting followrs */
-				$starredBy = [ ];
-				foreach( $user->StarredBy as $starred )
-				{
-					if( $starred->user_star_deleted == 0 )
-					{
-						$starNames = [];
-						$starNames = userDetails($starred->User);
-
-						$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
-										  'starName'     => @$starNames['displayName'],
-										  'starredDate'  => $starred->user_star_created_date,
-										  'profileImage' => ( isset( $starred->User->user_profile_image ) )
-											  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_profile_image, '+720 minutes' )
-											  : '',
-										  'profileCover' => ( isset( $starred->User->user_cover_image ) )
-										  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_cover_image, '+720 minutes' ) : '',
-						];
-					}
-				}
-				$return[ 'starredBy' ] = $starredBy;
-				$return['fans'] = count($starredBy);
-				/* End */
-				$status_code = 200;
+			    $return = ResponseHelper::entries_onlyUser( $user, $session->token_user_id );
 			}
 			else
 			{
-				$return = [ 'error' => 'No Entries Found' ];
-				$status_code = 404;
+			    $return = ResponseHelper::entries_noEntries();
 			}
 
-			return Response::make( $return, $status_code );
+			return Response::make( $return['data'], $return['code'] );
+			unset( $return );
 		}
 
 		//If the count is greater than the highest number of items displayed show a next link
@@ -3698,7 +3548,7 @@ class EntryController extends BaseController
 				if( in_array( "userName", $fields ) )
 				{
 
-					$current[ 'user' ] = oneUser( $entry->User, $session );
+					$current[ 'user' ] = ResponseHelper::oneUser( $entry->entry_user_id, $session->token_user_id );
 
 				}
 
@@ -3801,7 +3651,7 @@ class EntryController extends BaseController
 			{
 
 				$current[ 'id' ] = $entry->entry_id;
-				$current[ 'user' ] = oneUser( $entry->User, $session );
+				$current[ 'user' ] = ResponseHelper::oneUser( $entry->entry_user_id, $session->token_user_id );
 				if( isset( $entry->entry_category_id )  && $entry->entry_category_id == 3 )
 				{
 					$current[ 'subcategory' ] = $entry->entry_subcategory;
@@ -3873,36 +3723,13 @@ class EntryController extends BaseController
 				$return[ 'entries' ][ ][ 'entry' ] = $current;
 			}
 		}
-		/* Added By AJ for getting followrs */
 		if( $user != 0 )
 		{
 			$aj = User::find( $user );
 			$starredBy = [ ];
-			/*foreach( $aj->StarredBy as $starred )
-			{
-				if( $starred->user_star_deleted == 0 )
-				{
-					$starNames = [];
-					$starNames = userDetails($starred->User);
-
-					$starredBy[ ] = [ 'starId'       => $starred->User->user_id,
-									  'starName'     => @$starNames['displayName'],
-									  'starredDate'  => $starred->user_star_created_date,
-									  'profileImage' => ( isset( $starred->User->user_profile_image ) )
-										  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_profile_image, '+720 minutes' )
-										  : '',
-									  'profileCover' => ( isset( $starred->User->user_cover_image ) )
-									  ? $client->getObjectUrl( Config::get('app.bucket'), $starred->User->user_cover_image, '+720 minutes' ) : '',
-					];
-				}
-			}
 			$return[ 'starredBy' ] = $starredBy;
-			$return['fans'] = count($starredBy);
-			*/
-			$return[ 'starredBy' ] = $starredBy;
-			$return['fans'] = count($aj->StarredBy);
+			$return['fans'] = count( $aj->StarredBy ); // @fixme counts and deleted stars
 		}
-		/* End */
 		$status_code = 200;
 
 		if($debug !== false)

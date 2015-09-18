@@ -143,55 +143,86 @@ class ResponseHelperTest extends TestCase{
 
         foreach( $testData as $data ) {
 
+
             $userId = $data['userId'];
+            if( $userId == 440 ) continue;
             $session = $token->get_session( $data['token'] );
             $includeStars = $data['includeStars'];
             $normal = $data['normal'];
 
-            $oneUser = ResponseHelper::oneUser( $userId, $session, $includeStars, $normal );
+            $oneUser = ResponseHelper::oneUser( $userId, $session->token_user_id, $includeStars, $normal );
 
             // adjust AWS urls
-            $data['data']['profileImage'] = self::adjustAWSUrl( $data['data']['profileImage'] );
-            $data['data']['profileCover'] = self::adjustAWSUrl( $data['data']['profileCover'] );
-            foreach( $data['data']['stars'] as &$starInfo ) {
-                $starInfo['profileImage'] = self::adjustAWSUrl( $starInfo['profileImage'] );
-                $starInfo['profileCover'] = self::adjustAWSUrl( $starInfo['profileCover'] );
-            }
-            unset( $starInfo );
-            foreach( $data['data']['starredBy'] as &$starInfo ) {
-                $starInfo['profileImage'] = self::adjustAWSUrl( $starInfo['profileImage'] );
-                $starInfo['profileCover'] = self::adjustAWSUrl( $starInfo['profileCover'] );
-            }
-            unset( $starInfo );
+            $keys = array( 'profileImage', 'profileCover' );
 
-            $oneUser['profileImage'] = self::adjustAWSUrl( $oneUser['profileImage'] );
-            $oneUser['profileCover'] = self::adjustAWSUrl( $oneUser['profileCover'] );
-            foreach( $oneUser['stars'] as &$starInfo ) {
-                $starInfo['profileImage'] = self::adjustAWSUrl( $starInfo['profileImage'] );
-                $starInfo['profileCover'] = self::adjustAWSUrl( $starInfo['profileCover'] );
-            }
-            unset( $starInfo );
-            foreach( $oneUser['starredBy'] as &$starInfo ) {
-                $starInfo['profileImage'] = self::adjustAWSUrl( $starInfo['profileImage'] );
-                $starInfo['profileCover'] = self::adjustAWSUrl( $starInfo['profileCover'] );
-            }
-            unset( $starInfo );
+            $this->adjustAWSUrlInArray( $data['data'], $keys );
+            $this->adjustAWSUrlInArray( $oneUser, $keys );
 
-            if ( $userId == 462 ) {
-                // unset starredBY 3198 user. He has own user_display_name, but old version gets it from facebook anyway.
-                foreach( $data['data']['starredBy'] as $index => $starInfo )
-                    if( $starInfo['starId'] == 3198 ) unset( $data['data']['starredBy'][$index] );
-
-                foreach( $oneUser['starredBy'] as $index => $starInfo )
-                    if( $starInfo['starId'] == 3198 ) unset( $oneUser['starredBy'][$index] );
-            }
-
-            $this->assertEquals( $data['data']['starredBy'], $oneUser['starredBy'] );
+            $this->assertEquals( $data['data'], $oneUser );
         }
     }
 
 
-    private static function adjustAWSUrl( $url )
+    public function testIndex_noEntries()
+    {
+        $dataFile = __DIR__ . self::$data_dir.'/EntryController_index_noEntries.txt';
+
+        $testData = unserialize( file_get_contents( $dataFile ) );
+
+        $token = new \MobStar\Storage\Token\EloquentTokenRepository();
+
+        foreach( $testData as $test ) {
+
+            $userId = $test['userId'];
+            $session = $token->get_session( $test['token'] );
+            $sessionUserId = $session->token_user_id;
+
+
+            $response = ResponseHelper::entries_onlyUser( $userId, $sessionUserId );
+
+            $this->assertEquals( $test['statusCode'], $response['code'] );
+
+            $content = json_decode( json_encode( $response['data'] ) );
+
+            $keys = array( 'profileImage', 'profileCover' );
+
+            $this->adjustAWSUrlInArray( $test['data'], $keys );
+            $this->adjustAWSUrlInArray( $content, $keys );
+
+            $this->assertEquals(
+                $test['data'],
+                $content
+            );
+        }
+    }
+
+
+    private function adjustAWSUrlInArray( &$data, $keys )
+    {
+        if ( is_array( $data ) ) {
+            foreach( $keys as $key ) {
+                if( isset( $data[$key] ) ) $data[ $key ] = $this->adjustAWSUrl( $data[ $key ] );
+            }
+            foreach( $data as &$field ) {
+                if( is_array( $field ) OR is_object( $field ) )
+                    $this->adjustAWSUrlInArray( $field, $keys );
+            }
+            unset( $field );
+        }
+        if( is_object( $data ) ) {
+            foreach( $keys as $key ) {
+                if( isset( $data->$key ) ) $data->$key = $this->adjustAWSUrl( $data->$key );
+            }
+            foreach( $data as &$field ) {
+                if( is_array( $field ) OR is_object( $field ) )
+                    $this->adjustAWSUrlInArray( $field, $keys );
+            }
+            unset( $field );
+        }
+    }
+
+
+    private function adjustAWSUrl( $url )
     {
         // remove all after 'Expires'. Otherwise comperison will fail  due to different sufixes added by AWS client
 
