@@ -145,7 +145,6 @@ class ResponseHelperTest extends TestCase{
 
 
             $userId = $data['userId'];
-            if( $userId == 440 ) continue;
             $session = $token->get_session( $data['token'] );
             $includeStars = $data['includeStars'];
             $normal = $data['normal'];
@@ -163,36 +162,41 @@ class ResponseHelperTest extends TestCase{
     }
 
 
-    public function testIndex_noEntries()
+    public function testOneEntry()
     {
-        $dataFile = __DIR__ . self::$data_dir.'/EntryController_index_noEntries.txt';
+        $dataFile = __DIR__ . self::$data_dir.'/oneEntry.txt';
 
         $testData = unserialize( file_get_contents( $dataFile ) );
 
         $token = new \MobStar\Storage\Token\EloquentTokenRepository();
 
-        foreach( $testData as $test ) {
+        // get users
+        $userIds = array();
+        foreach( $testData as $data ) $userIds[] = $data['userId'];
 
-            $userId = $test['userId'];
-            $session = $token->get_session( $test['token'] );
-            $sessionUserId = $session->token_user_id;
+        UserHelper::clear();
+
+        UserHelper::prepareUsers( $userIds );
 
 
-            $response = ResponseHelper::entries_onlyUser( $userId, $sessionUserId );
+        foreach( $testData as $data ) {
 
-            $this->assertEquals( $test['statusCode'], $response['code'] );
 
-            $content = json_decode( json_encode( $response['data'] ) );
+            $entryId = $data['entryId'];
+            $session = $token->get_session( $data['token'] );
+            $includeUser = $data['includeUser'];
 
-            $keys = array( 'profileImage', 'profileCover' );
+            $entry = \Entry::findOrFail( $entryId );
 
-            $this->adjustAWSUrlInArray( $test['data'], $keys );
-            $this->adjustAWSUrlInArray( $content, $keys );
+            $oneEntry = ResponseHelper::oneEntry( $entry, $session->token_user_id, $includeUser );
 
-            $this->assertEquals(
-                $test['data'],
-                $content
-            );
+            // adjust AWS urls
+            $keys = array( 'profileImage', 'profileCover', 'filePath', 'videoThumb' );
+
+            $this->adjustAWSUrlInArray( $data['data'], $keys );
+            $this->adjustAWSUrlInArray( $oneEntry, $keys );
+
+            $this->assertEquals( $data['data'], $oneEntry );
         }
     }
 

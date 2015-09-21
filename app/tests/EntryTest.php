@@ -422,4 +422,66 @@ class EntryTest extends TestCase {
       $content = json_decode( $response->getContent() );
       error_log( print_r( $content, true ) );
   }
+
+
+  public function testAddView()
+  {
+      $userIdForAddedViews = 1;
+      $userId = 427;
+
+      $entryId = 404;
+
+      $entry = \Entry::findOrFail( $entryId );
+
+      $entryViews = $entry->entry_views;
+      $entryViewsAdded = $entry->entry_views_added;
+
+      // verify current views
+      $this->assertEquals(
+          $entryViews,
+          $entry->entryViews()->where( 'entry_view_user_id', '<>', $userIdForAddedViews )->count()
+      );
+      $this->assertEquals(
+          $entryViewsAdded,
+          $entry->entryViews()->where( 'entry_view_user_id', '=', $userIdForAddedViews )->count()
+      );
+
+      // add added view
+      \Entry::addView( $entryId, $userIdForAddedViews );
+      $entryViewsAdded = $entryViewsAdded + 1;
+
+      // reget entry
+      $entry = \Entry::findOrFail( $entryId );
+
+      $this->assertEquals( $entryViews, $entry->entry_views );
+      $this->assertEquals( $entryViewsAdded, $entry->entry_views_added );
+
+      $this->assertEquals(
+          $entryViews,
+          $entry->entryViews()->where( 'entry_view_user_id', '<>', $userIdForAddedViews )->count()
+      );
+      $this->assertEquals(
+          $entryViewsAdded,
+          $entry->entryViews()->where( 'entry_view_user_id', '=', $userIdForAddedViews )->count()
+      );
+
+      // add view
+      \Entry::addView( $entryId, $userId );
+      $entryViews = $entryViews + 1;
+
+      // reget entry
+      $entry = \Entry::findOrFail( $entryId );
+
+      $this->assertEquals( $entryViews, $entry->entry_views );
+      $this->assertEquals( $entryViewsAdded, $entry->entry_views_added );
+
+      $this->assertEquals(
+          $entryViews,
+          $entry->entryViews()->where( 'entry_view_user_id', '<>', $userIdForAddedViews )->count()
+      );
+      $this->assertEquals(
+          $entryViewsAdded,
+          $entry->entryViews()->where( 'entry_view_user_id', '=', $userIdForAddedViews )->count()
+      );
+  }
 }

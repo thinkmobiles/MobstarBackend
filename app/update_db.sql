@@ -64,3 +64,29 @@ alter table `users` add column
 alter table `users` add column
   `user_category_filter` varchar( 200 ) not null default ''
   comment 'array of category ids to use as filter';
+
+
+alter table `entries` add column
+  `entry_views` int unsigned not null default 0
+  comment 'views count as of entry_views'
+  after `entry_duration`;
+
+alter table `entries` add column
+  `entry_views_added` int unsigned not null default 0
+  comment 'added views count'
+  after `entry_views`;
+
+
+update `entries`
+  set `entry_views_added` = (select count(*)
+    from `entry_views`
+    where `entry_views`.`entry_view_entry_id` = `entries`.`entry_id`
+      and `entry_views`.`entry_view_user_id` = 1)
+;
+
+update `entries`
+  set `entry_views` = (select count(*)
+    from `entry_views`
+    where `entry_views`.`entry_view_entry_id` = `entries`.`entry_id`
+      and `entry_views`.`entry_view_user_id` <> 1)
+;

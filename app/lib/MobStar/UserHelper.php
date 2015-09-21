@@ -25,10 +25,14 @@ class UserHelper
         'my' => array(
             'up' => 0,
             'down' => 0,
+            'up_deleted' => 0,
+            'down_deleted' => 0,
         ),
         'me' => array(
             'up' => 0,
             'down' => 0,
+            'up_deleted' => 0,
+            'down_deleted' => 0,
         ),
     );
 
@@ -76,6 +80,7 @@ class UserHelper
             if (!isset( self::$basicInfo[ $userId ] ) ) $newUserIds[] = $userId;
 
         if( empty( $newUserIds ) ) return;
+        self::verbose( 'BasicInfo', $newUserIds );
 
         $newUsers = User::whereIn('user_id', $newUserIds)->get();
 
@@ -117,6 +122,8 @@ class UserHelper
         }
 
         if ( empty( $socialIds ) ) return;
+
+        self::verbose( 'SocialInfo', array_keys( $socialUsers ) );
 
         $query = $facebookQuery = $googleQuery = $twitterQuery = null;
 
@@ -215,6 +222,8 @@ class UserHelper
             return;
         }
 
+        self::verbose( 'StarsInfo', $newUserIds );
+
         $queryMyStars = DB::table( 'user_stars' )
             ->select(
                 'user_star_user_id as user_id',
@@ -299,6 +308,8 @@ class UserHelper
 
         if( empty( $newUserIds ) ) return;
 
+        self::verbose( 'StarNamesInfo', $newUserIds ) ;
+
         $newStarNames = self::getBasicInfo( $newUserIds );
 
         foreach( $newStarNames as $userId => $userNames )
@@ -326,46 +337,59 @@ class UserHelper
 
         if( empty( $newUserIds ) ) return;
 
+        self::verbose( 'VotesInfo', $newUserIds );
+
         // get my votes
         $query = DB::table( 'votes as v')
             ->select(
                 'v.vote_user_id as user_id',
+                DB::raw( 'if(v.vote_deleted <> 0, 1, 0) as deleted'),
                 DB::raw('sum( if( v.vote_up > 0, 1, 0 ) ) as up'),
                 DB::raw('sum( if( v.vote_down > 0, 1, 0 ) ) as down'))
             ->leftJoin( 'entries as e', 'v.vote_entry_id', '=', 'e.entry_id')
             ->where( 'e.entry_deleted', '=', 0 )
             ->whereNotIn( 'e.entry_category_id', array( 7, 8 ) )
-            ->where( 'v.vote_deleted', '=', 0 )
             ->whereIn( 'v.vote_user_id', $newUserIds )
-            ->groupBy( 'v.vote_user_id' );
+            ->groupBy( 'v.vote_user_id', 'deleted' );
 
         $rows = $query->get();
 
         foreach( $rows as $row ) {
 
-            $votes[ $row->user_id ]['my']['up'] = $row->up;
-            $votes[ $row->user_id ]['my']['down'] = $row->down;
+            if ( $row->deleted ) {
+                $votes[ $row->user_id ]['my']['up_deleted'] = $row->up;
+                $votes[ $row->user_id ]['my']['down_deleted'] = $row->down;
+            } else {
+                $votes[ $row->user_id ]['my']['up'] = $row->up;
+                $votes[ $row->user_id ]['my']['down'] = $row->down;
+            }
         }
 
         // get votes for me
         $query = DB::table( 'entries as e')
             ->select(
                 'e.entry_user_id as user_id',
+                DB::raw('if( v.vote_deleted <> 0, 1, 0) as deleted'),
                 DB::raw('sum( if( v.vote_up > 0, 1, 0 ) ) as up'),
                 DB::raw('sum( if( v.vote_down > 0, 1, 0 ) ) as down'))
             ->leftJoin( 'votes as v', 'v.vote_entry_id', '=', 'e.entry_id')
             ->where( 'e.entry_deleted', '=', 0 )
             ->whereNotIn( 'e.entry_category_id', array( 7, 8 ) )
-            ->where( 'v.vote_deleted', '=', 0 )
+//            ->where( 'v.vote_deleted', '=', 0 )
             ->whereIn( 'e.entry_user_id', $newUserIds )
-            ->groupBy( 'e.entry_user_id' );
+            ->groupBy( 'e.entry_user_id', 'deleted' );
 
         $rows = $query->get();
 
         foreach( $rows as $row ) {
 
-            $votes[ $row->user_id ]['me']['up'] = $row->up;
-            $votes[ $row->user_id ]['me']['down'] = $row->down;
+            if( $row->deleted ) {
+                $votes[ $row->user_id ]['me']['up_deleted'] = $row->up;
+                $votes[ $row->user_id ]['me']['down_deleted'] = $row->down;
+            } else {
+                $votes[ $row->user_id ]['me']['up'] = $row->up;
+                $votes[ $row->user_id ]['me']['down'] = $row->down;
+            }
         }
 
         // mark other users as users with zero votes
@@ -384,6 +408,8 @@ class UserHelper
             if (!isset( self::$phonesInfo[ $userId ] ) ) $newUserIds[] = $userId;
 
         if( empty( $newUserIds ) ) return;
+
+        self::verbose( 'PhonesInfo', $newUserIds );
 
         $query = DB::table( 'user_phones' )
             ->whereIn('user_phone_user_id', $newUserIds );
@@ -664,5 +690,11 @@ class UserHelper
         error_log( 'starNamesInfo: '.print_r( self::$starNamesInfo, true ) );
         error_log( 'votesInfo: '.print_r( self::$votesInfo, true ) );
         error_log( 'phonesInfo: '.print_r( self::$phonesInfo, true ) );
+    }
+
+
+    private static function verbose( $type, $ids )
+    {
+        //error_log( 'select '.$type.' for '.implode( ', ', $ids ) );
     }
 }

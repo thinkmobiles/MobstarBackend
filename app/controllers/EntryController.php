@@ -6,6 +6,7 @@ use Swagger\Annotations as SWG;
 use Aws\S3\S3Client;
 use Aws\Common\Credentials\Credentials as Creds;
 use MobStar\ResponseHelper;
+use MobStar\EntriesResponseHelper;
 
 /**
  * @package
@@ -147,6 +148,9 @@ class EntryController extends BaseController
 		if( $currentUser->getContinentFilter() ) {
 		    return $this->index_v2(); // new version. Use geoFilter
 		}
+		if( $currentUser->getCategoryFilter() ) {
+		    return $this->index_v2(); // new version. Use categoryFilter
+		}
 
 		$fields = array_values( explode( ',', Input::get( "fields" ) ) );
 
@@ -155,7 +159,7 @@ class EntryController extends BaseController
 			unset( $fields );
 		}
 
-		$return = [ ];
+		$errors = array();
 		$valid = false;
 
 		if( !empty( $fields ) )
@@ -165,7 +169,7 @@ class EntryController extends BaseController
 			{
 				if( !in_array( $field, $this->valid_fields ) )
 				{
-					$return[ 'errors' ][ ] = [ $field . " is not a valid field." ];
+					$errors[] = [ $field . " is not a valid field." ];
 				}
 				else
 				{
@@ -208,16 +212,6 @@ class EntryController extends BaseController
 		//Calculate offset
 		$offset = ( $page * $limit ) - $limit;
 
-		//If page is greter than one show a previous link
-		if( $page > 1 )
-		{
-			$previous = true;
-		}
-		else
-		{
-			$previous = false;
-		}
-
 		//Get user
 		$user = ( Input::get( 'user', '0' ) );
 		$user = ( !is_numeric( $user ) ) ? 0 : $user;
@@ -254,283 +248,27 @@ class EntryController extends BaseController
 		//dd(DB::getQueryLog());
 		$count = $this->entry->allComplexExclude( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, true );
 
-		if( $count == 0 )
-		{
-			if( $user != 0 )
-			{
-			    $return = ResponseHelper::entries_onlyUser( $user, $session->token_user_id );
-			}
-			else
-			{
-			    $return = ResponseHelper::entries_noEntries();
-			}
+		$params = array(
+		    'userId' => $user,
+		    'totalCount' => $count,
+		    'url' => 'index.php/entry/?',
+		    'limit' => $limit,
+		    'page' => $page,
+		    'debug' => $debug,
+		    'errors' => $errors,
+		);
+		//check to see if fields were specified and at least one is valid
+		if ( ( !empty( $fields ) ) && $valid )
+		    $params['fields'] = $fields;
 
-			return Response::make( $return['data'], $return['code'] );
-			unset( $return );
-		}
-
-		//If the count is greater than the highest number of items displayed show a next link
-		elseif( $count > ( $limit * $page ) )
-		{
-			$next = true;
-		}
-		else
-		{
-			$next = false;
-		}
-
-		foreach( $entries as $entry )
-		{
-
-			$up_votes = 0;
-			$down_votes = 0;
-			foreach( $entry->vote as $vote )
-			{
-				if( $vote->vote_up == 1 && $vote->vote_deleted == 0 )
-				{
-					$up_votes++;
-				}
-				elseif( $vote->vote_down == 1 && $vote->vote_deleted == 0 )
-				{
-					$down_votes++;
-				}
-
-			}
-
-			$current = array();
-
-			if( $entry->entry_splitVideoId ) $current['splitVideoId'] = $entry->entry_splitVideoId;
-
-			//check to see if fields were specified and at least one is valid
-			if( ( !empty( $fields ) ) && $valid )
-			{
-
-				if( in_array( "id", $fields ) )
-				{
-					$current[ 'id' ] = $entry->entry_id;
-				}
-
-				if( in_array( "user", $fields ) )
-				{
-					$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
-					$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
-				}
-
-				if( in_array( "userName", $fields ) )
-				{
-
-					$current[ 'user' ] = ResponseHelper::oneUser( $entry->entry_user_id, $session->token_user_id );
-
-				}
-
-				if( in_array( "category", $fields ) )
-				{
-					$current[ 'category' ] = $entry->category->category_name;
-				}
-
-				if( in_array( "type", $fields ) )
-				{
-					$current[ 'type' ] = $entry->entry_type;
-				}
-
-				if( in_array( "name", $fields ) )
-				{
-					$current[ 'name' ] = $entry->entry_name;
-				}
-
-				if( in_array( "description", $fields ) )
-				{
-					$current[ 'description' ] = $entry->entry_description;
-				}
-
-				if( in_array( "created", $fields ) )
-				{
-					$current[ 'created' ] = $entry->entry_created_date;
-				}
-
-				if( in_array( "modified", $fields ) )
-				{
-					$current[ 'modified' ] = $entry->entry_modified_date;
-				}
-
-				if( in_array( "tags", $fields ) )
-				{
-					$current[ 'tags' ] = array();
-					foreach( $entry->entryTag as $tag )
-					{
-						$current[ 'tags' ][ ] = Tag::find( $tag->entry_tag_tag_id )->tag_name;
-					}
-				}
-
-				if( in_array( "entryFiles", $fields ) )
-				{
-					$current[ 'entryFiles' ] = array();
-					if(count($entry->file) <= 0)
-					continue;
-					foreach( $entry->file as $file )
-					{
-
-						$url = $client->getObjectUrl( Config::get('app.bucket'), $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
-						$current[ 'entryFiles' ][ ] = [
-							'fileType' => $file->entry_file_type,
-							'filePath' => $url ];
-
-						$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-							$client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
-							: "";
-					}
-					if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
-						continue;
-					if( ( count( $current[ 'entryFiles' ] ) < 1 ) &&  $entry->entry_type === 'video' )
-						continue;
-				}
-
-				if( in_array( "upVotes", $fields ) )
-				{
-					$current[ 'upVotes' ] = $up_votes;
-				}
-
-				if( in_array( "upVotes", $fields ) )
-				{
-					$current[ 'downVotes' ] = $down_votes;
-				}
-
-				if( in_array( "rank", $fields ) )
-				{
-					$current[ 'rank' ] = $entry->entry_rank;
-				}
-
-				if( in_array( "language", $fields ) )
-				{
-					$current[ 'language' ] = $entry->entry_language;
-				}
-
-				if( $entry->entry_deleted )
-				{
-					$current[ 'deleted' ] = true;
-				}
-				else
-				{
-					$current[ 'deleted' ] = false;
-				}
-
-				$return[ 'entries' ][ ][ 'entry' ] = $current;
-			}
-
-			else
-			{
-
-				$current[ 'id' ] = $entry->entry_id;
-				$current[ 'user' ] = ResponseHelper::oneUser( $entry->entry_user_id, $session->token_user_id );
-
-//				$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
-//				$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
-//				$current[ 'user' ][ 'displayName' ] = $entry->User->user_display_name;
-//				$current[ 'user' ][ 'email' ] = $entry->User->user_email;
-//				$current[ 'user' ][ 'profileImage' ] = ( !empty( $entry->user->user_profile_image ) )
-//					? "http://" . $_ENV[ 'URL' ] . "/" . $entry->user->user_profile_image : "";
-//				$current[ 'user' ][ 'profileCover' ] = ( !empty( $entry->User->user_profile_cover ) )
-//					? "http://" . $_ENV[ 'URL' ] . "/" . $entry->User->user_profile_cover : "";
-//				$current[ 'user' ][ 'isMyStar' ] = Star::where( 'user_star_user_id', '=', $session->user_id )->where( 'user_star_star_id', '=', $entry->entry_user_id )->count();
-				if( isset( $entry->entry_category_id )  && $entry->entry_category_id == 3 )
-				{
-					$current[ 'subcategory' ] = $entry->entry_subcategory;
-					$current[ 'age' ] = $entry->entry_age;
-					$current[ 'height' ] = $entry->entry_height;
-				}
-				$current[ 'category' ] = $entry->category->category_name;
-				$current[ 'type' ] = $entry->entry_type;
-				$current[ 'name' ] = $entry->entry_name;
-				$current[ 'description' ] = $entry->entry_description;
-				$current[ 'totalComments' ] = $entry->comments->count();
-				$current[ 'totalviews' ] = $entry->entryViews->count();
-				$current[ 'created' ] = $entry->entry_created_date;
-				$current[ 'modified' ] = $entry->entry_modified_date;
-
-				$current[ 'tags' ] = array();
-				foreach( $entry->entryTag as $entry_tag )
-				{
-					//TODO: Fix tags so that we do not need to find this
-					$current[ 'tags' ][ ] = $entry_tag->tag->tag_name;
-				}
-				if(count($entry->file) <= 0)
-				continue;
-				foreach( $entry->file as $file )
-				{
-
-					$signedUrl = $client->getObjectUrl( Config::get('app.bucket'), $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
-
-					$current[ 'entryFiles' ][ ] = [
-						'fileType' => $file->entry_file_type,
-						'filePath' => $signedUrl ];
-
-					$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-						$client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
-						: "";
-				}
-				if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
-				{
-					continue;
-				}
-				if( ( count( $current[ 'entryFiles' ] ) < 1 ) &&  $entry->entry_type === 'video' )
-				{
-					continue;
-				}
-
-				$current[ 'upVotes' ] = $up_votes;
-				$current[ 'downVotes' ] = $down_votes;
-				$current[ 'rank' ] = $entry->entry_rank;
-				$current[ 'language' ] = $entry->entry_language;
-
-				if( $showFeedback == 1 )
-				{
-					$currentFeedback = [ ];
-
-					foreach( $entry->comments as $comment )
-					{
-						$currentFeedback[ ] = [
-							'comment'        => $comment->comment_content,
-							'commentDate'    => $comment->comment_added_date,
-							'commentDeleted' => (bool)$comment->comment_deleted ];
-					}
-					$current[ 'feedback' ] = $currentFeedback;
-				}
-
-				if( $entry->entry_deleted )
-				{
-					$current[ 'deleted' ] = true;
-				}
-				else
-				{
-					$current[ 'deleted' ] = false;
-				}
-
-				$return[ 'entries' ][ ][ 'entry' ] = $current;
-			}
-		}
-
-		if( $user != 0 )
-		{
-		    $starredBy = ResponseHelper::getFollowers( $user );
-			$return[ 'starredBy' ] = $starredBy;
-			$return['fans'] = count($starredBy);
-		}
-		$status_code = 200;
-
-		if( $debug !== false )
-		{
-			$return[ 'debug' ] = $debug;
-		}
-		//If next is true create next page link
-		if( $next )
-		{
-			$return[ 'next' ] = url( "index.php/entry/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] ) );
-		}
-
-		if( $previous )
-		{
-			$return[ 'previous' ] = url( "index.php/entry/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] ) );
-		}
+		$data = EntriesResponseHelper::getForIndex(
+		    $entries,
+		    $session->token_user_id,
+		    $showFeedback,
+		    $params
+		);
+		$status_code = $data['code'];
+		$return = $data['data'];
 
 		$response = Response::make( $return, $status_code );
 
@@ -699,7 +437,7 @@ class EntryController extends BaseController
 	            $current[ 'modified' ] = null;
 
 	            $return[ 'entries' ][ ][ 'entry' ] = $current;
-	            $starredBy = ResponseHelper::getFollowers( $user );
+	            $starredBy = ResponseHelper::getFollowers( $user->user_id );
 	            $return[ 'starredBy' ] = $starredBy;
 	            $return['fans'] = count($starredBy);
 	            $status_code = 200;
@@ -888,7 +626,7 @@ class EntryController extends BaseController
 	            $current[ 'name' ] = $entry->entry_name;
 	            $current[ 'description' ] = $entry->entry_description;
 	            $current[ 'totalComments' ] = $entry->comments->count();
-	            $current[ 'totalviews' ] = $entry->entryViews->count();
+	            $current[ 'totalviews' ] = $entry->viewsTotal();
 	            $current[ 'created' ] = $entry->entry_created_date;
 	            $current[ 'modified' ] = $entry->entry_modified_date;
 
@@ -1367,7 +1105,7 @@ class EntryController extends BaseController
 				$current[ 'language' ] = $entry->entry_language;
 
 				$current[ 'totalComments' ] = $entry->comments->count();
-				$current[ 'totalviews' ] = $entry->entryViews->count();
+				$current[ 'totalviews' ] = $entry->viewsTotal();
 				if( $entry->entry_deleted )
 				{
 					$current[ 'deleted' ] = true;
@@ -2194,13 +1932,7 @@ class EntryController extends BaseController
 
 		$session = $this->token->get_session( $token );
 
-		$view = [
-			'entry_view_entry_id' => $id,
-			'entry_view_user_id'  => $session->token_user_id,
-			'entry_view_date'     => date( 'Y-m-d H:i:s' ),
-		];
-
-		EntryView::create( $view );
+		\Entry::addView( $id, $session->token_user_id );
 
 		$response[ 'notice' ] = "View recorded.";
 		$status_code = 200;
@@ -2935,7 +2667,11 @@ class EntryController extends BaseController
 		$current[ 'name' ] = $entry->entry_name;
 		$current[ 'description' ] = $entry->entry_description;
 		$totalComments = Comment::where( 'comment_entry_id', '=', $entry->entry_id )->where( 'comment_deleted', '=', '0' )->count();
-		$totalviews = EntryView::where( 'entry_view_entry_id', '=', $entry->entry_id )->count();
+		if ( $entry instanceof \Entry ) {
+		  $totalviews = $entry->viewsTotal();
+		} else {
+		    $totalviews = $entry->entry_views + $entry->entry_views_added; // @todo must be in model
+		}
 		$current[ 'totalComments' ] = $totalComments;
 		$current[ 'totalviews' ] = $totalviews;
 		$current[ 'created' ] = $entry->entry_created_date;
@@ -3185,23 +2921,15 @@ class EntryController extends BaseController
 			$return = $validator->messages();
 			$status_code = 401;
 		}
+		elseif( \Entry::addView( Input::get( 'entryId' ), Input::get( 'userId' ) ))
+		{
+		    $return = [ 'notice' => 'success' ];
+		    $status_code = 200;
+		}
 		else
 		{
-			$viewcount = new EntryView;
-			$viewcount->entry_view_entry_id = Input::get( 'entryId' );
-			$viewcount->entry_view_user_id = Input::get( 'userId' );
-			$viewcount->entry_view_date = date( 'Y-m-d H:i:s' );
-
-			if( $viewcount->save() )
-			{
-				$return = [ 'notice' => 'success' ];
-				$status_code = 200;
-			}
-			else
-			{
-				$return = [ 'error' => 'No Entries Found' ];
-				$status_code = 404;
-			}
+		    $return = [ 'error' => 'No Entries Found' ];
+		    $status_code = 404;
 		}
 
 		$response = Response::make( $return, $status_code );
@@ -3370,6 +3098,7 @@ class EntryController extends BaseController
 		}
 
 		$return = [ ];
+		$errors = array();
 		$valid = false;
 
 		if( !empty( $fields ) )
@@ -3379,7 +3108,8 @@ class EntryController extends BaseController
 			{
 				if( !in_array( $field, $this->valid_fields ) )
 				{
-					$return[ 'errors' ][ ] = [ $field . " is not a valid field." ];
+				    $errors[] = [ $field . " is not a valid field." ];
+					//$return[ 'errors' ][ ] = [ $field . " is not a valid field." ];
 				}
 				else
 				{
@@ -3468,282 +3198,27 @@ class EntryController extends BaseController
 		//dd(DB::getQueryLog());
 		$count = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, true );
 
-		if( $count == 0 )
-		{
-			if( $user != 0 )
-			{
-			    $return = ResponseHelper::entries_onlyUser( $user, $session->token_user_id );
-			}
-			else
-			{
-			    $return = ResponseHelper::entries_noEntries();
-			}
+		$params = array(
+		    'userId' => $user,
+		    'totalCount' => $count,
+		    'url' => 'index.php/entry/?',
+		    'limit' => $limit,
+		    'page' => $page,
+		    'debug' => $debug,
+		    'errors' => $errors,
+		);
+		//check to see if fields were specified and at least one is valid
+		if ( ( !empty( $fields ) ) && $valid )
+		    $params['fields'] = $fields;
 
-			return Response::make( $return['data'], $return['code'] );
-			unset( $return );
-		}
-
-		//If the count is greater than the highest number of items displayed show a next link
-		elseif( $count > ( $limit * $page ) )
-		{
-			$next = true;
-		}
-		else
-		{
-			$next = false;
-		}
-
-		foreach( $entries as $entry )
-		{
-
-			$up_votes = 0;
-			$down_votes = 0;
-			foreach( $entry->vote as $vote )
-			{
-				if( $vote->vote_up == 1 && $vote->vote_deleted == 0 )
-				{
-					$up_votes++;
-				}
-				elseif( $vote->vote_down == 1 && $vote->vote_deleted == 0 )
-				{
-					$down_votes++;
-				}
-
-			}
-
-			$current = array();
-			if( $entry->entry_splitVideoId ) $current['splitVideoId'] = $entry->entry_splitVideoId;
-			if($entry->entry_category_id == 7)
-			{
-				$votes = DB::table('votes')->where('vote_user_id', '=', $session->token_user_id)->where('vote_entry_id', '=', $entry->entry_id)->where('vote_deleted', '=', '0')->orderBy( 'vote_id','desc')->get();
-				$isVotedByYou= 0;
-				foreach( $votes as $v )
-				{
-					if($v->vote_up == 0)
-					{
-						$isVotedByYou = 0;
-					}
-					else
-					{
-						$isVotedByYou = 1;
-					}
-				}
-				$current[ 'isVotedByYou' ] = $isVotedByYou;
-			}
-			//check to see if fields were specified and at least one is valid
-			if( ( !empty( $fields ) ) && $valid )
-			{
-
-				if( in_array( "id", $fields ) )
-				{
-					$current[ 'id' ] = $entry->entry_id;
-				}
-
-				if( in_array( "user", $fields ) )
-				{
-					$current[ 'user' ][ 'userId' ] = $entry->entry_user_id;
-					$current[ 'user' ][ 'userName' ] = $entry->User->user_name;
-				}
-
-				if( in_array( "userName", $fields ) )
-				{
-
-					$current[ 'user' ] = ResponseHelper::oneUser( $entry->entry_user_id, $session->token_user_id );
-
-				}
-
-				if( in_array( "category", $fields ) )
-				{
-					$current[ 'category' ] = $entry->category->category_name;
-				}
-
-				if( in_array( "type", $fields ) )
-				{
-					$current[ 'type' ] = $entry->entry_type;
-				}
-
-				if( in_array( "name", $fields ) )
-				{
-					$current[ 'name' ] = $entry->entry_name;
-				}
-
-				if( in_array( "description", $fields ) )
-				{
-					$current[ 'description' ] = $entry->entry_description;
-				}
-
-				if( in_array( "created", $fields ) )
-				{
-					$current[ 'created' ] = $entry->entry_created_date;
-				}
-
-				if( in_array( "modified", $fields ) )
-				{
-					$current[ 'modified' ] = $entry->entry_modified_date;
-				}
-
-				if( in_array( "tags", $fields ) )
-				{
-					$current[ 'tags' ] = array();
-					foreach( $entry->entryTag as $tag )
-					{
-						$current[ 'tags' ][ ] = Tag::find( $tag->entry_tag_tag_id )->tag_name;
-					}
-				}
-
-				if( in_array( "entryFiles", $fields ) )
-				{
-					$current[ 'entryFiles' ] = array();
-					if(count($entry->file) <= 0)
-					continue;
-					foreach( $entry->file as $file )
-					{
-
-						$url = $client->getObjectUrl( Config::get('app.bucket'), $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
-						$current[ 'entryFiles' ][ ] = [
-							'fileType' => $file->entry_file_type,
-							'filePath' => $url ];
-
-						$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-							$client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
-							: "";
-					}
-					if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
-						continue;
-					if( ( count( $current[ 'entryFiles' ] ) < 1 ) &&  $entry->entry_type === 'video' )
-						continue;
-				}
-
-				if( in_array( "upVotes", $fields ) )
-				{
-					$current[ 'upVotes' ] = $up_votes;
-				}
-
-				if( in_array( "upVotes", $fields ) )
-				{
-					$current[ 'downVotes' ] = $down_votes;
-				}
-
-				if( in_array( "rank", $fields ) )
-				{
-					$current[ 'rank' ] = $entry->entry_rank;
-				}
-
-				if( in_array( "language", $fields ) )
-				{
-					$current[ 'language' ] = $entry->entry_language;
-				}
-
-				if( $entry->entry_deleted )
-				{
-					$current[ 'deleted' ] = true;
-				}
-				else
-				{
-					$current[ 'deleted' ] = false;
-				}
-
-				$return[ 'entries' ][ ][ 'entry' ] = $current;
-
-			}
-
-			else
-			{
-
-				$current[ 'id' ] = $entry->entry_id;
-				$current[ 'user' ] = ResponseHelper::oneUser( $entry->entry_user_id, $session->token_user_id );
-				if( isset( $entry->entry_category_id )  && $entry->entry_category_id == 3 )
-				{
-					$current[ 'subcategory' ] = $entry->entry_subcategory;
-					$current[ 'age' ] = $entry->entry_age;
-					$current[ 'height' ] = $entry->entry_height;
-				}
-				$current[ 'category' ] = $entry->category->category_name;
-				$current[ 'type' ] = $entry->entry_type;
-				$current[ 'name' ] = $entry->entry_name;
-				$current[ 'description' ] = $entry->entry_description;
-				$current[ 'totalComments' ] = $entry->comments->count();
-				$current[ 'totalviews' ] = $entry->entryViews->count();
-				$current[ 'created' ] = $entry->entry_created_date;
-				$current[ 'modified' ] = $entry->entry_modified_date;
-
-				$current[ 'tags' ] = array();
-				foreach( $entry->entryTag as $entry_tag )
-				{
-					//TODO: Fix tags so that we do not need to find this
-					$current[ 'tags' ][ ] = $entry_tag->tag->tag_name;
-				}
-				if(count($entry->file) <= 0)
-					continue;
-				foreach( $entry->file as $file )
-				{
-
-					$signedUrl = $client->getObjectUrl( Config::get('app.bucket'), $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
-
-					$current[ 'entryFiles' ][ ] = [
-						'fileType' => $file->entry_file_type,
-						'filePath' => $signedUrl ];
-
-					$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-						$client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
-						: "";
-				}
-				if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
-					continue;
-				if( ( count( $current[ 'entryFiles' ] ) < 1 ) &&  $entry->entry_type === 'video' )
-					continue;
-				$current[ 'upVotes' ] = $up_votes;
-				$current[ 'downVotes' ] = $down_votes;
-				$current[ 'rank' ] = $entry->entry_rank;
-				$current[ 'language' ] = $entry->entry_language;
-
-				if( $showFeedback == 1 )
-				{
-					$currentFeedback = [ ];
-
-					foreach( $entry->comments as $comment )
-					{
-						$currentFeedback[ ] = [
-							'comment'        => $comment->comment_content,
-							'commentDate'    => $comment->comment_added_date,
-							'commentDeleted' => (bool)$comment->comment_deleted ];
-					}
-					$current[ 'feedback' ] = $currentFeedback;
-				}
-
-				if( $entry->entry_deleted )
-				{
-					$current[ 'deleted' ] = true;
-				}
-				else
-				{
-					$current[ 'deleted' ] = false;
-				}
-
-				$return[ 'entries' ][ ][ 'entry' ] = $current;
-			}
-		}
-		if( $user != 0 )
-		{
-			$aj = User::find( $user );
-			$starredBy = [ ];
-			$return[ 'starredBy' ] = $starredBy;
-			$return['fans'] = count( $aj->StarredBy ); // @fixme counts and deleted stars
-		}
-		$status_code = 200;
-
-		if($debug !== false)
-			$return['debug'] = $debug;
-		//If next is true create next page link
-		if( $next )
-		{
-			$return[ 'next' ] = url( "index.php/entry/?" . http_build_query( [ "limit" => $limit, "page" => $page + 1 ] ) );
-		}
-
-		if( $previous )
-		{
-			$return[ 'previous' ] = url( "index.php/entry/?" . http_build_query( [ "limit" => $limit, "page" => $page - 1 ] ) );
-		}
+		$data = EntriesResponseHelper::getForMix(
+		    $entries,
+		    $session->token_user_id,
+		    $showFeedback,
+		    $params
+		);
+		$status_code = $data['code'];
+		$return = $data['data'];
 
 		$response = Response::make( $return, $status_code );
 
@@ -3751,6 +3226,9 @@ class EntryController extends BaseController
 
 		return $response;
 	}
+
+
+
 	public function search3()
 	{
 
@@ -3922,6 +3400,10 @@ class EntryController extends BaseController
 		if( $currentUser->getContinentFilter() )
 		{
 		    return $this->search4_v2();
+		}
+		if( $currentUser->getCategoryFilter() )
+		{
+		    return $this->search4_v2(); // new version. Use categoryFilter
 		}
 
 		$term = Input::get( "term" );

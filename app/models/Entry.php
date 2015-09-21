@@ -51,6 +51,31 @@ class Entry extends \Eloquent
 		return $this->hasMany( 'EntryView', 'entry_view_entry_id' );
 	}
 
+
+	public static function addView( $entryId, $userId, $date = NULL )
+	{
+	    $view = new EntryView;
+	    $view->entry_view_entry_id = $entryId;
+	    $view->entry_view_user_id = $userId;
+	    $view->entry_view_date = isset( $date ) ? $date : date( 'Y-m-d H:i:s' );
+
+	    if ( ! $view->save() )
+	        return false;
+
+	    $viewTypeColumn = $userId == 1 ? 'entry_views_added' : 'entry_views';
+
+	    \DB::table( 'entries' )->where( 'entry_id', $entryId )->increment( $viewTypeColumn );
+
+	    return true;
+	}
+
+
+	public function viewsTotal()
+	{
+	    return $this->entry_views + $this->entry_views_added;
+	}
+
+
 	public function oneEntry( $entry, $session, $includeUser = false )
 	{
 

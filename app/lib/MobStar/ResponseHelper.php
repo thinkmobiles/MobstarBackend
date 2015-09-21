@@ -2,8 +2,13 @@
 
 namespace MobStar;
 
+use MobStar\Storage\Vote\EloquentVoteRepository as VoteRepository;
+
 class ResponseHelper
 {
+
+    private static $S3client;
+
 
     public static function getUserProfile( $session, $normal = false )
     {
@@ -13,16 +18,14 @@ class ResponseHelper
 
         $user = $users[ $userId ];
 
-        $client = getS3Client();
-
         $return = array();
 
         if ($normal) {
             $profileImage = ( isset( $user['user_profile_image'] ) ) ? 'http://' . $_ENV[ 'URL' ] . '/' . $user['user_profile_image'] : '';
             $profileCover = ( isset( $user['user_cover_image'] ) )   ? 'http://' . $_ENV[ 'URL' ] . '/' . $user['user_cover_image'] : '';
         } else {
-            $profileImage = ( isset( $user['user_profile_image'] ) ) ? $client->getObjectUrl( \Config::get('app.bucket'), $user['user_profile_image'], '+720 minutes' ) : '';
-            $profileCover = ( isset( $user['user_cover_image'] ) )   ? $client->getObjectUrl( \Config::get('app.bucket'), $user['user_cover_image'], '+720 minutes' ) : '';
+            $profileImage = self::getResourceUrl( $user['user_profile_image'] );
+            $profileCover = self::getResourceUrl( $user['user_cover_image'] );
         }
 
         $return[ 'profileImage' ] = $profileImage;
@@ -112,19 +115,13 @@ class ResponseHelper
 
         $user = $users[ $userId ];
 
-        $client = getS3Client();
-
         $return = array();
 
         $return['userId'] = $userId;
 
-        $return['profileImage'] = isset( $user['user_profile_image'] )
-            ? $client->getObjectUrl( \Config::get('app.bucket'), $user['user_profile_image'], '+720 minutes' )
-            : '';
+        $return['profileImage'] = self::getResourceUrl( $user['user_profile_image'] );
 
-        $return['profileCover'] = isset( $user['user_cover_image'] )
-            ? $client->getObjectUrl( \Config::get('app.bucket'), $user['user_cover_image'], '+720 minutes' )
-            : '';
+        $return['profileCover'] = self::getResourceUrl( $user['user_cover_image'] );
 
         $return['displayName'] = $user['display_name'];
 
@@ -145,8 +142,6 @@ class ResponseHelper
 
         $user = $users[ $userId ];
 
-        $client = getS3Client();
-
         $profileImage = '';
         $profileCover = '';
 
@@ -154,8 +149,8 @@ class ResponseHelper
             $profileImage = ( isset( $user['user_profile_image'] ) ) ? 'http://' . $_ENV[ 'URL' ] . '/' . $user['user_profile_image'] : '';
             $profileCover = ( isset( $user['user_cover_image'] ) )   ? 'http://' . $_ENV[ 'URL' ] . '/' . $user['user_cover_image'] : '';
         } else {
-            $profileImage = ( isset( $user['user_profile_image'] ) ) ? $client->getObjectUrl( \Config::get('app.bucket'), $user['user_profile_image'], '+720 minutes' ) : '';
-            $profileCover = ( isset( $user['user_cover_image'] ) )   ? $client->getObjectUrl( \Config::get('app.bucket'), $user['user_cover_image'], '+720 minutes' ) : '';
+            $profileImage = self::getResourceUrl( $user['user_profile_image'] );
+            $profileCover = self::getResourceUrl( $user['user_cover_image'] );
         }
 
 
@@ -201,28 +196,92 @@ class ResponseHelper
     }
 
 
+    public static function oneEntry( $entry, $sessionUserId, $includeUser = false )
+    {
+        $data = array();
+        $data[ 'id' ] = $entry->entry_id;
+        if( $entry->entry_splitVideoId ) $data['splitVideoId'] = $entry->entry_splitVideoId;
+        $data[ 'category' ] = $entry->category->category_name;
+        $data[ 'type' ] = $entry->entry_type;
+
+        if( $includeUser )
+        {
+            $data[ 'user' ] = self::oneUser( $entry->entry_user_id, $sessionUserId );
+        }
+
+        $data[ 'name' ] = $entry->entry_name;
+        $data[ 'description' ] = $entry->entry_description;
+        $data[ 'totalComments' ] = $entry->comments->count();
+        $data[ 'totalviews' ] = $entry->viewsTotal();
+        $data[ 'created' ] = $entry->entry_created_date;
+        $data[ 'modified' ] = $entry->entry_modified_date;
+
+        $data[ 'tags' ] = array();
+        foreach( $entry->entryTag as $tag )
+        {
+            $data[ 'tags' ][ ] = \Tag::find( $tag->entry_tag_tag_id )->tag_name;
+        }
+
+        $data[ 'entryFiles' ] = array();
+        foreach( $entry->file as $file )
+        {
+            $signedUrl = self::getResourceUrl( $file->entry_file_name . "." . $file->entry_file_type );
+            $data[ 'entryFiles' ][ ] = [
+                'fileType' => $file->entry_file_type,
+                'filePath' => $signedUrl ];
+
+            $data[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" )
+                ? self::getResourceUrl( 'thumbs/' . $file->entry_file_name . '-thumb.jpg' )
+                : "";
+        }
+
+        $votesInfo = self::getEntryVotes( $entry->entry_id );
+        $data[ 'upVotes' ] = $votesInfo->votes_up;
+        $data[ 'downVotes' ] = $votesInfo->votes_down;
+        $data[ 'rank' ] = $entry->entry_rank;
+        $data[ 'language' ] = $entry->entry_language;
+
+        if( $entry->entry_deleted )
+        {
+            $data[ 'deleted' ] = true;
+        }
+        else
+        {
+            $data[ 'deleted' ] = false;
+        }
+
+        return $data;
+    }
+
+
     public static function getStars( $userId )
     {
-        $client = getS3Client();
-
         $users = UserHelper::getUsersInfo( array( $userId ), array( 'stars.users') );
 
         $user = $users[ $userId ];
 
         $stars = array();
 
+        // for some reasons star may appear multiple times
+        $processedStarUsers = array(); // holds already processed stars.
+
         foreach( $user['stars_info']['my'] as $star_info ) {
+
+            // do not process already processed stars
+            if( isset( $processedStarUsers[ $star_info['star_user_id'] ] ) ) {
+                continue;
+            } else {
+                $processedStarUsers[ $star_info['star_user_id'] ] = true;
+            }
 
             $star = array();
             $star['starId'] = $star_info['star_user_id'];
-            $star['starName'] = $star_info['user_info']['display_name'];
+
+            $starUserDetails = self::userDetails( $star_info['star_user_id'] );
+            $star['starName'] = $starUserDetails['displayName'];
             $star['starredDate'] = $star_info['star_date'];
-            $star['profileImage'] = isset( $star_info['user_info']['user_profile_image'] )
-                ? $client->getObjectUrl( \Config::get('app.bucket'), $star_info['user_info']['user_profile_image'], '+720 minutes' )
-                : '';
-            $star['profileCover'] = isset( $star_info['user_info']['user_cover_image'] )
-                ? $client->getObjectUrl( \Config::get('app.bucket'), $star_info['user_info']['user_cover_image'], '+720 minutes' )
-                : '';
+            $star['profileImage'] = self::getResourceUrl( $star_info['user_info']['user_profile_image'] );
+            $star['profileCover'] = self::getResourceUrl( $star_info['user_info']['user_cover_image'] );
             $star['rank'] = $star_info['user_info']['user_rank'];
             $star['stat'] = $star_info['user_info']['user_entry_rank'];
 
@@ -236,8 +295,6 @@ class ResponseHelper
 
     public static function getFollowers( $userId )
     {
-        $client = getS3Client();
-
         $users = UserHelper::getUsersInfo( array( $userId ), array( 'stars.users') );
 
         $user = $users[ $userId ];
@@ -248,18 +305,14 @@ class ResponseHelper
 
             $star = array();
 
-            $starDetails = self::userDetails( $star_info['star_user_id'] );
+            $starUserDetails = self::userDetails( $star_info['star_user_id'] );
 
             $star['starId'] = $star_info['star_user_id'];
-            $star['starName'] = $starDetails['displayName'];
+            $star['starName'] = $starUserDetails['displayName'];
             $star['starredDate'] = $star_info['star_date'];
 
-            $star['profileImage'] = isset( $star_info['user_info']['user_profile_image'] )
-                ? $client->getObjectUrl( \Config::get('app.bucket'), $star_info['user_info']['user_profile_image'], '+720 minutes' )
-                : '';
-            $star['profileCover'] = isset( $star_info['user_info']['user_cover_image'] )
-                ? $client->getObjectUrl( \Config::get('app.bucket'), $star_info['user_info']['user_cover_image'], '+720 minutes' )
-                : '';
+            $star['profileImage'] = self::getResourceUrl( $star_info['user_info']['user_profile_image'] );
+            $star['profileCover'] = self::getResourceUrl( $star_info['user_info']['user_cover_image'] );
 
             $starredBy[] = $star;
             unset( $star );
@@ -303,51 +356,29 @@ class ResponseHelper
     }
 
 
-    /**
-     * Returns response, when no entries found and user is provided in request.
-     *
-     * @param int $userId
-     * @param int $sessionUserId
-     * @return array
-     */
-    public static function entries_onlyUser( $userId, $sessionUserId )
+    public static function getEntryVotes( $entryId )
     {
-        $current = array();
-        $current[ 'id' ] = null;
-        $current[ 'user' ] = ResponseHelper::oneUser( $userId, $sessionUserId );
+        $voteRepository = new VoteRepository();
 
-        $starFlags = ResponseHelper::getStarFlags( $userId, $sessionUserId );
-        $current['user']['isMyStar'] = $starFlags['isMyStar'];
-        $current['user']['iAmStar'] = $starFlags['iAmStar'];
-        $current[ 'category' ] = null;
-        $current[ 'type' ] = null;
-        $current[ 'name' ] = null;
-        $current[ 'description' ] = null;
-        $current[ 'created' ] = null;
-        $current[ 'modified' ] = null;
+        $votes = $voteRepository->getTotalVotesForEntries( $entryId );
 
-        $data = array();
-        $data[ 'entries' ][ ][ 'entry' ] = $current;
+        if( empty( $votes ) ) {
+            $votes = new \stdClass();
+            $votes->votes_up = 0;
+            $votes->votes_down = 0;
+        }
 
-        $starredBy = ResponseHelper::getFollowers( $userId );
-        $data[ 'starredBy' ] = $starredBy;
-        $data['fans'] = count($starredBy);
-        $status_code = 200;
-
-        return array( 'code' => $status_code, 'data' => $data );
+        return $votes;
     }
 
 
-    /**
-     * Returns response when no entries found.
-     *
-     * @return array
-     */
-    public static function entries_noEntries()
+    public static function getResourceUrl( $name )
     {
-        $code = 404;
-        $data = array( 'error' => 'No Entries Found' );
+        if ( ! self::$S3client )
+            self::$S3client = getS3Client();
 
-        return array( 'code' => $code, 'data' => $data );
+        return $name
+            ? self::$S3client->getObjectUrl( \Config::get('app.bucket'), $name, '+720 minutes' )
+            : '';
     }
 }

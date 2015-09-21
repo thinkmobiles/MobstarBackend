@@ -86,13 +86,13 @@ class UserHelperTest extends TestCase
 
     private $userVotes = array(
         440 => array(
-            'my' => array( 'up' => 1, 'down' => 1 ),
-            'me' => array( 'up' => 0, 'down' => 0 ),
+            'my' => array( 'up' => 1, 'down' => 1, 'up_deleted' => 0, 'down_deleted' => 2 ),
+            'me' => array( 'up' => 0, 'down' => 0, 'up_deleted' => 0, 'down_deleted' => 0 ),
             'user_id' => 440,
         ),
         462 => array(
-            'my' => array( 'up' => 7, 'down' => 2 ),
-            'me' => array( 'up' => 39, 'down' => 51 ),
+            'my' => array( 'up' => 7, 'down' => 2, 'up_deleted' => 15, 'down_deleted' => 2 ),
+            'me' => array( 'up' => 39, 'down' => 49, 'up_deleted' => 42, 'down_deleted' => 15 ),
             'user_id' => 462,
         ),
     );
@@ -130,10 +130,10 @@ class UserHelperTest extends TestCase
         $this->assertArrayHasKey( 'my', $stars );
         $this->assertArrayHasKey( 'me', $stars );
         $this->assertCount( 2, $stars['my'] );
-        $this->assertCount( 24, $stars['me'] );
+        $this->assertCount( 23, $stars['me'] );
         // if order is Ok, first row must be user own star
         $this->assertEquals( $userId, $stars['my'][0]['star_user_id'] );
-        $this->assertEquals( $userId, $stars['me'][8]['star_user_id'] );
+        $this->assertEquals( $userId, $stars['me'][7]['star_user_id'] );
     }
 
 
@@ -144,9 +144,9 @@ class UserHelperTest extends TestCase
         $this->assertArrayHasKey( 'user_info', $stars['my'][0] );
         $this->assertArrayHasKey( 'user_info', $stars['me'][8] );
         $this->assertNotEmpty( $stars['my'][0]['user_info'] );
-        $this->assertNotEmpty( $stars['me'][8]['user_info'] );
+        $this->assertNotEmpty( $stars['me'][7]['user_info'] );
         $this->assertEquals( $userId, $stars['my'][0]['user_info']['user_id'] );
-        $this->assertEquals( $userId, $stars['me'][8]['user_info']['user_id'] );
+        $this->assertEquals( $userId, $stars['me'][7]['user_info']['user_id'] );
     }
 
 
