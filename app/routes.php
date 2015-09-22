@@ -42,6 +42,7 @@ Route::get( '/', function()
 
 Route::get( 'debug/', function ()
 {
+  return; // no output in production. Comment it while testing
   ob_start();
 
   echo '<pre>';
