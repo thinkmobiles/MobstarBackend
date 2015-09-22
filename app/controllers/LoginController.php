@@ -151,7 +151,7 @@ class LoginController extends BaseController
 				//Return user id and token details:
 				$return = array(
 					'token'           => $session_key,
-					'userId'          => Auth::user()->user_id,
+					'userId'          => strval( Auth::user()->user_id ),
 					'userName'        => Auth::user()->user_name,
 					'userFullName'    => Auth::user()->user_full_name,
 					'userDisplayName' => Auth::user()->user_display_name,
@@ -371,6 +371,7 @@ class LoginController extends BaseController
 			$return = getUserProfile( $user, $session, true );
 			if(!empty($return))
 			{
+			    $return['userId'] = strval( $return['userId'] );
 				$isVerifiedPhone = DB::table('user_phones')->where('user_phone_user_id', '=', $return['userId'])->pluck('user_phone_verified');
 				if(empty($isVerifiedPhone))
 				{
@@ -564,6 +565,7 @@ class LoginController extends BaseController
 			$return = getUserProfile( $user, $session, true );
 			if(!empty($return))
 			{
+			    $return['userId'] = strval( $return['userId'] );
 				$isVerifiedPhone = DB::table('user_phones')->where('user_phone_user_id', '=', $return['userId'])->pluck('user_phone_verified');
 				if(empty($isVerifiedPhone))
 				{
@@ -773,6 +775,7 @@ class LoginController extends BaseController
 			$return = getUserProfile( $user, $session, true );
 			if(!empty($return))
 			{
+			    $return['userId'] = strval( $return['userId'] );
 				$isVerifiedPhone = DB::table('user_phones')->where('user_phone_user_id', '=', $return['userId'])->pluck('user_phone_verified');
 				if(empty($isVerifiedPhone))
 				{
