@@ -3561,7 +3561,7 @@ class EntryController extends BaseController
 	    }
 	    if( ! empty( $categoryFilter ) )
 	    {
-	        $entriesQuery = $entriesQuery->whereIn( 'entries.entry_category', $categoryFilter );
+	        $entriesQuery = $entriesQuery->whereIn( 'entries.entry_category_id', $categoryFilter );
 	    }
 	    $entriesQuery = $entriesQuery->where( function ( $query ) use ( $term )
 	    {
