@@ -196,6 +196,42 @@ class EntryControllerTest extends TestCase{
     }
 
 
+    public function testSearch4()
+    {
+        $dataFile = __DIR__ . self::$data_dir.'/EntryController_search4.txt';
+
+        $testData = unserialize( file_get_contents( $dataFile ) );
+
+        foreach( $testData as $test ) {
+
+            $pars = array(
+                'term' => $test['term'],
+            );
+
+            $response = $this->getResponse(
+                $test['token'],
+                'GET',
+                '/entry/search4',
+                $pars
+            );
+
+            $this->assertEquals( $test['statusCode'], $response->getStatusCode() );
+
+            $content = json_decode( $response->getContent() );
+
+            $keys = array( 'profileImage', 'profileCover', 'filePath', 'videoThumb' );
+
+            $this->adjustAWSUrlInArray( $test['data'], $keys );
+            $this->adjustAWSUrlInArray( $content, $keys );
+
+            $this->assertEquals(
+                $test['data'],
+                $content
+            );
+        }
+    }
+
+
     private function adjustAWSUrlInArray( &$data, $keys )
     {
         if ( is_array( $data ) ) {

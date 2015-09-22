@@ -163,9 +163,42 @@ class ResponseHelper
         $return['profileImage'] = $profileImage;
         $return['profileCover'] = $profileCover;
 
-        $return[ 'userName' ] = $user['name'];
-        $return[ 'displayName' ] = $user['display_name'];
-        $return[ 'fullName' ] = $user['full_name'];
+        if ( ( $user['user_display_name'] == '' ) || ( is_null( $user['user_name'] ) ) || ( is_null( $user['user_email'] ) ) ) {
+
+            if ( $user['user_facebook_id'] || $user['user_google_id'] || $user['user_twitter_id'] ) {
+
+                $return[ 'userName' ] = $user['name'];
+                $return[ 'displayName' ] = $user['display_name'];
+                $return[ 'fullName' ] = $user['full_name'];
+            }
+
+//             if( $user->user_facebook_id != 0 )
+//             {
+//                 $return[ 'userName' ] = $user->FacebookUser->facebook_user_user_name;
+//                 $return[ 'displayName' ] = $user->FacebookUser->facebook_user_display_name;
+//                 $return[ 'fullName' ] = $user->FacebookUser->facebook_user_full_name;
+//             }
+//             elseif( $user->user_twitter_id != 0 )
+//             {
+//                 $return[ 'userName' ] = $user->TwitterUser->twitter_user_user_name;
+//                 $return[ 'displayName' ] = $user->TwitterUser->twitter_user_display_name;
+//                 $return[ 'fullName' ] = $user->TwitterUser->twitter_user_full_name;
+//             }
+//             elseif( $user->user_google_id != 0 )
+//             {
+//                 $return[ 'userName' ] = $user->GoogleUser->google_user_user_name;
+//                 $return[ 'displayName' ] = $user->GoogleUser->google_user_display_name;
+//                 $return[ 'fullName' ] = $user->GoogleUser->google_user_full_name;
+//             }
+        } else {
+            $return[ 'userName' ] = $user['user_name'];
+            $return[ 'displayName' ] = $user['user_display_name'];
+            $return[ 'fullName' ] = $user['user_full_name'];
+        }
+
+//         $return[ 'userName' ] = $user['name'];
+//         $return[ 'displayName' ] = $user['display_name'];
+//         $return[ 'fullName' ] = $user['full_name'];
 
         if ($userId != $sessionUserId) {
 
