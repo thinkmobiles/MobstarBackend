@@ -143,13 +143,9 @@ class EntryController extends BaseController
 
 		$session = $this->token->get_session( $token );
 
-		$currentUser = User::find( $session->token_user_id );
-
-		if( $currentUser->getContinentFilter() ) {
-		    return $this->index_v2(); // new version. Use geoFilter
-		}
-		if( $currentUser->getCategoryFilter() ) {
-		    return $this->index_v2(); // new version. Use categoryFilter
+		if( $session->token_app_version >= 2 )
+		{
+		    return $this->index_v2();
 		}
 
 		$fields = array_values( explode( ',', Input::get( "fields" ) ) );
@@ -3395,15 +3391,9 @@ class EntryController extends BaseController
 
 		$session = $this->token->get_session( $token );
 
-		$currentUser = User::find( $session->token_user_id );
-
-		if( $currentUser->getContinentFilter() )
+		if( $session->token_app_version >= 2 )
 		{
-		    return $this->search4_v2();
-		}
-		if( $currentUser->getCategoryFilter() )
-		{
-		    return $this->search4_v2(); // new version. Use categoryFilter
+		    $this->search_v2();
 		}
 
 		$term = Input::get( "term" );
