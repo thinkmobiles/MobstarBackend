@@ -61,7 +61,10 @@ Route::filter('auth', function()
 Route::filter('logged_in', function()
 {
 
-		$token =  Request::header("X-API-TOKEN");
+	$token =  Request::header("X-API-TOKEN");
+
+	$key =  Request::header("X-API-KEY");
+//	$value = DB::table('tokens')->where('token_value', $token)->first()->api_key;
 
 	if(!$token)
 	{
@@ -87,6 +90,18 @@ Route::filter('logged_in', function()
 // 	}
 
 	else{
+		$value = $token->api_key;
+
+		if($key !== $value){
+
+//			$token =  Request::header("X-API-TOKEN");
+			$app_version = DB::table('api_keys')->where('key_value', $key)->first()->version;
+			$token->api_key = $key;
+			$token->token_app_version = $app_version;
+//			DB::table('tokens')->where('token_value', $token)->update(array('token_app_version' => $app_version));
+
+		}
+
 		$token->token_valid_until = date("Y-m-d H:i:s", strtotime("now + 1 hour"));
 		$token->save();
 	}

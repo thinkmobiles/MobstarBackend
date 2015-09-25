@@ -90,3 +90,28 @@ update `entries`
     where `entry_views`.`entry_view_entry_id` = `entries`.`entry_id`
       and `entry_views`.`entry_view_user_id` <> 1)
 ;
+
+
+-- add app version to api_key
+alter table `api_keys` add column
+  `version` int not null default 0
+  comment 'App version of this API_KEY';
+
+-- set app version to old apps to 1
+update `api_keys`
+  set `version`=1
+;
+
+-- add new api_key for app version 2
+insert into `api_keys`(`key_value`, `version`)
+values( '2_xPvd11Vjj1PfgYZ5C5fIWIosTmR4ADEgVIXsXp95', 2 );
+
+-- holds api_key used for this session
+alter table `tokens` add column
+  `api_key` varchar(45) not null default ''
+  comment 'API_KEY for this session';
+
+-- app version of this session
+alter table `tokens` add column
+  `token_app_version` int not null default 0
+  comment 'app vertion for this session';
