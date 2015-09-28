@@ -1,7 +1,6 @@
 <?php
 namespace MobStar;
 
-use User;
 use DB;
 
 class UserHelper
@@ -82,12 +81,19 @@ class UserHelper
         if( empty( $newUserIds ) ) return;
         self::verbose( 'BasicInfo', $newUserIds );
 
-        $newUsers = User::whereIn('user_id', $newUserIds)->get();
+        $connection = DB::connection();
+        $curFetchMode = $connection->getFetchMode();
+        $connection->setFetchMode( \PDO::FETCH_ASSOC );
+        $rows = $connection->table('users')->whereIn('user_id', $newUserIds)->get();
+        $connection->setFetchMode( $curFetchMode );
 
-        if (empty($newUsers))
+        if (empty($rows))
             return array();
 
-        $newUsers = $newUsers->keyBy( 'user_id' )->toArray();
+        $newUsers = array();
+        foreach( $rows as $row ) {
+            $newUsers[ $row['user_id'] ] = $row;
+        }
 
         $newUsers = self::fixUserNames($newUsers);
 
