@@ -98,7 +98,7 @@ class EloquentEntryRepository implements EntryRepository
 
 	    // @todo we can skip adding profile entries if there is no 'category' == 7 in exclude
 	    // add entries from profile to home feedback
-	    if( empty( $tagId ) ) // home feedback
+	    if( empty( $categoryFilter ) && empty( $tagId ) ) // home feed
 	    {
 	        $max_media_duration_for_home_feed =
 	        isset( $_ENV['MAX_MEDIA_DURATION_FOR_HOME_FEED'] )
