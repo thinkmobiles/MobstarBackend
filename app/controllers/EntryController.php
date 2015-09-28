@@ -3103,7 +3103,7 @@ class EntryController extends BaseController
 
 		if( $session->token_app_version >= 2 )
 		{
-		    $this->search_v2();
+		    $this->search4_v2();
 		}
 
 		$term = Input::get( "term" );
