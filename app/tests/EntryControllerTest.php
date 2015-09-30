@@ -1,5 +1,8 @@
 <?php
 
+use MobStar\UserHelper;
+use MobStar\EntryHelper;
+
 class EntryControllerTest extends TestCase{
 
     private static $data_dir = '/data/old_version';
@@ -204,6 +207,9 @@ class EntryControllerTest extends TestCase{
 
         foreach( $testData as $test ) {
 
+            UserHelper::clear();
+            EntryHelper::clear();
+
             $pars = array(
                 'term' => $test['term'],
             );
@@ -223,6 +229,13 @@ class EntryControllerTest extends TestCase{
 
             $this->adjustAWSUrlInArray( $test['data'], $keys );
             $this->adjustAWSUrlInArray( $content, $keys );
+
+            foreach( $test['data']->entries as $e ) {
+                if( isset( $e->entry->tags ) ) sort( $e->entry->tags );
+            }
+            foreach( $content->entries as $e ) {
+                if( isset( $e->entry->tags ) ) sort( $e->entry->tags );
+            }
 
             $this->assertEquals(
                 $test['data'],

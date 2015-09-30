@@ -6,6 +6,7 @@ use Swagger\Annotations as SWG;
 use Aws\S3\S3Client;
 use Aws\Common\Credentials\Credentials as Creds;
 use MobStar\UserHelper;
+use MobStar\EntryHelper;
 use MobStar\ResponseHelper;
 use MobStar\EntriesResponseHelper;
 
@@ -3134,7 +3135,7 @@ class EntryController extends BaseController
 		$return = [ ];
 		//$excludeCategory = [7,8];
 		$results = DB::table( 'entries' )
-					 ->select( 'entries.*' )
+					 ->select( 'entries.entry_id', 'entries.entry_user_id', 'entries.entry_deleted' )
 					 ->leftJoin( 'users', 'entries.entry_user_id', '=', 'users.user_id' )
 					 ->leftJoin('comments', 'comments.comment_entry_id', '=', 'entries.entry_id')
 					 ->leftJoin('facebook_users', 'users.user_facebook_id', '=', 'facebook_users.facebook_user_id')
@@ -3160,7 +3161,7 @@ class EntryController extends BaseController
 		$status_code = 200;
 
 		$results_user = DB::table( 'users' )
-				 ->select( 'users.*' )
+				 ->select( 'users.user_id' )
 				 ->leftJoin('facebook_users', 'users.user_facebook_id', '=', 'facebook_users.facebook_user_id')
 				 ->leftJoin('google_users', 'users.user_google_id', '=', 'google_users.google_user_id')
 				 ->where( 'users.user_deleted', '=', '0' )
@@ -3175,6 +3176,7 @@ class EntryController extends BaseController
 				 } )
 				 //->get();
 				 ->take( $limit )->skip( $offset )->get();
+
 		if(count($results_user) > 0)
 		{
 		    // get user ids for prepare
@@ -3183,7 +3185,7 @@ class EntryController extends BaseController
 		    {
 		        $userIds[] = $results_user[$i]->user_id;
 		    }
-		    UserHelper::prepareUsers( $userIds, array('stars') );
+		    UserHelper::prepareUsers( $userIds, array( 'votes', 'stars' ) );
 			for( $i = 0; $i < count( $results_user ); $i++ )
 			{
 				$current = array();
@@ -3192,6 +3194,21 @@ class EntryController extends BaseController
 				$return[ 'entries' ][ ][ 'entry' ] = $current;
 			}
 		}
+		// get entry ids and user ids for prepare
+		$userIds = $entryIds = array();
+		for( $i = 0; $i < count( $results ); $i++ )
+		{
+		    if( $results[$i]->entry_deleted == 1 )
+		    {
+		        continue;
+		    }
+		    $entryIds[] = $results[$i]->entry_id;
+		    $userIds[] = $results[$i]->entry_user_id;
+		}
+		UserHelper::prepareUsers( $userIds, array( 'votes', 'stars') );
+		EntryHelper::prepareEntries( $entryIds, array('commentCounts', 'filesInfo', 'tagNames', 'totalVotes', 'votedByUser') );
+
+		$sessionUserId = $session->token_user_id;
 		for( $i = 0; $i < count( $results ); $i++ )
 		{
 			if( $results[ $i ]->entry_deleted === 1 )
@@ -3200,9 +3217,12 @@ class EntryController extends BaseController
 			}
 			else
 			{
-				if(!$this->oneEntryNew( $results[ $i ], $session, true ))
-					continue;
-				$return[ 'entries' ][ ][ 'entry' ] = $this->oneEntryNew( $results[ $i ], $session, true );
+			    $entryId = $results[$i]->entry_id;
+			    $entry = ResponseHelper::oneEntryNewById( $entryId, $sessionUserId, true );
+			    if( ! $entry )
+			        continue;
+
+			    $return[ 'entries' ][ ][ 'entry' ] = $entry;
 			}
 		}
 		return Response::make( $return, $status_code );
@@ -3316,7 +3336,7 @@ class EntryController extends BaseController
 	        {
 	            $userIds[] = $results_user[$i]->user_id;
 	        }
-	        UserHelper::prepareUsers( $userIds, array('stars') );
+	        UserHelper::prepareUsers( $userIds, array('votes', 'stars') );
 
 	        for( $i = 0; $i < count( $results_user ); $i++ )
 	        {
@@ -3326,6 +3346,22 @@ class EntryController extends BaseController
 	            $return[ 'entries' ][ ][ 'entry' ] = $current;
 	        }
 	    }
+	    // get entry ids and user ids for prepare
+	    $userIds = $entryIds = array();
+	    for( $i = 0; $i < count( $results ); $i++ )
+	    {
+	        if( $results[$i]->entry_deleted == 1 )
+	        {
+	            continue;
+	        }
+	        $entryIds[] = $results[$i]->entry_id;
+	        $userIds[] = $results[$i]->entry_user_id;
+	    }
+	    UserHelper::prepareUsers( $userIds, array( 'votes', 'stars') );
+	    EntryHelper::prepareEntries( $entryIds, array('commentCounts', 'filesInfo', 'tagNames', 'totalVotes', 'votedByUser') );
+
+	    $sessionUserId = $session->token_user_id;
+
 	    for( $i = 0; $i < count( $results ); $i++ )
 	    {
 	        if( $results[ $i ]->entry_deleted === 1 )
@@ -3334,9 +3370,12 @@ class EntryController extends BaseController
 	        }
 	        else
 	        {
-	            if(!$this->oneEntryNew( $results[ $i ], $session, true ))
+	            $entryId = $results[$i]->entry_id;
+	            $entry = ResponseHelper::oneEntryNewById( $entryId, $sessionUserId, true );
+	            if( ! $entry )
 	                continue;
-	            $return[ 'entries' ][ ][ 'entry' ] = $this->oneEntryNew( $results[ $i ], $session, true );
+
+	            $return[ 'entries' ][ ][ 'entry' ] = $entry;
 	        }
 	    }
 	    return Response::make( $return, $status_code );
