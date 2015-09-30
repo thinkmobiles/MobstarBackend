@@ -449,13 +449,19 @@ function oneEntry( $entry, $session, $includeUser = false )
 
 function getS3Client()
 {
+    static $S3Client = null;
 
-	$config = array(
-		'key'    => Creds::ENV_KEY,
-		'secret' => Creds::ENV_SECRET
-	);
+    if( empty( $S3Client ) )
+    {
+        $config = array(
+            'key'    => Creds::ENV_KEY,
+            'secret' => Creds::ENV_SECRET
+        );
 
-	return S3Client::factory( $config );
+        $S3Client = S3Client::factory( $config );
+    }
+
+	return $S3Client;
 }
 
 function getSNSClient()
