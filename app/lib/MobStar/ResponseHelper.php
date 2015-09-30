@@ -287,6 +287,158 @@ class ResponseHelper
     }
 
 
+    // same as self::oneEntry but takes entryId not entry object as parameter
+    public static function oneEntryById( $entryId, $sessionUserId, $includeUser = false )
+    {
+        EntryHelper::prepareVotedByUserInfo( array( $entryId ), $sessionUserId );
+
+        $entries = EntryHelper::getEntries(
+            array( $entryId ),
+            array( 'commentCounts', 'filesInfo', 'tagNames', 'totalVotes', 'votedByUser' ),
+            $sessionUserId
+        );
+        $entry = $entries[ $entryId ];
+
+        $data = array();
+        $data[ 'id' ] = $entryId;
+        if( empty( $entry ) )
+            return $data;
+
+        if( $entry->entry_splitVideoId ) $data['splitVideoId'] = $entry->entry_splitVideoId;
+        $data[ 'category' ] = $entry->categoryInfo->category_name;
+        $data[ 'type' ] = $entry->entry_type;
+
+        if( $includeUser )
+        {
+            $data[ 'user' ] = self::oneUser( $entry->entry_user_id, $sessionUserId );
+        }
+
+        $data[ 'name' ] = $entry->entry_name;
+        $data[ 'description' ] = $entry->entry_description;
+        $data[ 'totalComments' ] = $entry->commentCounts;
+        $data[ 'totalviews' ] = $entry->entry_views + $entry->entry_views_added;
+        $data[ 'created' ] = $entry->entry_created_date;
+        $data[ 'modified' ] = $entry->entry_modified_date;
+
+        $data[ 'tags' ] = $entry->tagNames;
+
+        $data[ 'entryFiles' ] = array();
+        foreach( $entry->filesInfo as $file ) {
+            $signedUrl = self::getResourceUrl( $file->entry_file_name . "." . $file->entry_file_type );
+            $data[ 'entryFiles' ][] = array(
+                'fileType' => $file->entry_file_type,
+                'filePath' => $signedUrl
+            );
+
+            $data[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" )
+                ? self::getResourceUrl( 'thumbs/' . $file->entry_file_name . '-thumb.jpg' )
+                : "";
+        }
+
+        $data[ 'upVotes' ] = $entry->totalVotes['up'];
+        $data[ 'downVotes' ] = $entry->totalVotes['down'];
+
+        $data[ 'rank' ] = $entry->entry_rank;
+        $data[ 'language' ] = $entry->entry_language;
+
+        if( $entry->entry_deleted )
+        {
+            $data[ 'deleted' ] = true;
+        }
+        else
+        {
+            $data[ 'deleted' ] = false;
+        }
+
+        return $data;
+    }
+
+
+    // moved from EntryController::oneEntryNew
+    public static function oneEntryNewById( $entryId, $sessionUserId, $includeUser = false )
+    {
+        $entries = EntryHelper::getEntries(
+            array( $entryId ),
+            array( 'commentCounts', 'filesInfo', 'tagNames', 'totalVotes' )
+        );
+        $entry = $entries[ $entryId ];
+
+        $current = array();
+
+        $current[ 'id' ] = $entryId;
+        if( $entry->entry_splitVideoId ) $current['splitVideoId'] = $entry->entry_splitVideoId;
+        if( isset( $entry->entry_category_id )  && $entry->entry_category_id == 3 )
+        {
+            $current[ 'subcategory' ] = $entry->entry_subcategory;
+            $current[ 'age' ] = $entry->entry_age;
+            $current[ 'height' ] = $entry->entry_height;
+        }
+        $current[ 'category' ] = $entry->categoryInfo->category_name;
+        $current[ 'type' ] = $entry->entry_type;
+
+        if( $includeUser )
+        {
+             $current[ 'user' ] = self::oneUser( $entry->entry_user_id, $sessionUserId );
+        }
+
+        $current[ 'name' ] = $entry->entry_name;
+        $current[ 'description' ] = $entry->entry_description;
+
+        $totalComments = $entry->commentCounts;
+        if ( $entry instanceof \Entry ) {
+            $totalviews = $entry->viewsTotal();
+        } else {
+            $totalviews = $entry->entry_views + $entry->entry_views_added; // @todo must be in model
+        }
+        $current[ 'totalComments' ] = $totalComments;
+        $current[ 'totalviews' ] = $totalviews;
+        $current[ 'created' ] = $entry->entry_created_date;
+        $current[ 'modified' ] = $entry->entry_modified_date;
+
+        $current[ 'tags' ] = $entry->tagNames;
+
+        $current[ 'entryFiles' ] = array();
+        $EntryFile = $entry->filesInfo;
+        if(count($EntryFile) <= 0)
+            return false;
+        foreach( $EntryFile as $file )
+        {
+            $url = self::getResourceUrl( $file->entry_file_name . "." . $file->entry_file_type );
+            $current[ 'entryFiles' ][ ] = [
+                'fileType' => $file->entry_file_type,
+                'filePath' => $url ];
+
+            $current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" )
+                ? self::getResourceUrl( 'thumbs/' . $file->entry_file_name . '-thumb.jpg' )
+                : "";
+        }
+        if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
+        {
+            return false;
+        }
+        if( ( count( $current[ 'entryFiles' ] ) < 1 ) &&  $entry->entry_type === 'video' )
+        {
+            return false;
+        }
+
+        $current[ 'upVotes' ] = $entry->totalVotes['up'];
+        $current[ 'downVotes' ] = $entry->totalVotes['down'];
+        $current[ 'rank' ] = $entry->entry_rank;
+        $current[ 'language' ] = $entry->entry_language;
+
+        if( $entry->entry_deleted )
+        {
+            $current[ 'deleted' ] = true;
+        }
+        else
+        {
+            $current[ 'deleted' ] = false;
+        }
+
+        return $current;
+    }
+
+
     public static function getStars( $userId )
     {
         $users = UserHelper::getUsersInfo( array( $userId ), array( 'stars.users') );

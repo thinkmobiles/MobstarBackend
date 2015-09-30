@@ -1,6 +1,7 @@
 <?php
 
 use MobStar\UserHelper;
+use MobStar\EntryHelper;
 use MobStar\ResponseHelper;
 
 class ResponseHelperTest extends TestCase{
@@ -178,7 +179,6 @@ class ResponseHelperTest extends TestCase{
 
         UserHelper::prepareUsers( $userIds );
 
-
         foreach( $testData as $data ) {
 
 
@@ -189,6 +189,49 @@ class ResponseHelperTest extends TestCase{
             $entry = \Entry::findOrFail( $entryId );
 
             $oneEntry = ResponseHelper::oneEntry( $entry, $session->token_user_id, $includeUser );
+
+            // adjust AWS urls
+            $keys = array( 'profileImage', 'profileCover', 'filePath', 'videoThumb' );
+
+            $this->adjustAWSUrlInArray( $data['data'], $keys );
+            $this->adjustAWSUrlInArray( $oneEntry, $keys );
+
+            $this->assertEquals( $data['data'], $oneEntry );
+        }
+    }
+
+
+    public function testOneEntryById()
+    {
+        $dataFile = __DIR__ . self::$data_dir.'/oneEntry.txt';
+
+        $testData = unserialize( file_get_contents( $dataFile ) );
+
+        $token = new \MobStar\Storage\Token\EloquentTokenRepository();
+
+        // get users
+        $userIds = array();
+        foreach( $testData as $data ) $userIds[] = $data['userId'];
+
+        UserHelper::clear();
+
+        UserHelper::prepareUsers( $userIds );
+
+        // get entries
+        $entryIds = array();
+        foreach( $testData as $data ) $entryIds[] = $data['entryId'];
+
+        EntryHelper::clear();
+        EntryHelper::prepareEntries( $entryIds, array('commentCounts', 'filesInfo', 'tagNames', 'totalVotes', 'votedByUser') );
+
+        foreach( $testData as $data ) {
+
+
+            $entryId = $data['entryId'];
+            $session = $token->get_session( $data['token'] );
+            $includeUser = $data['includeUser'];
+
+            $oneEntry = ResponseHelper::oneEntryById( $entryId, $session->token_user_id, $includeUser );
 
             // adjust AWS urls
             $keys = array( 'profileImage', 'profileCover', 'filePath', 'videoThumb' );
