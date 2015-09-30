@@ -463,7 +463,7 @@ class ResponseHelper
             $star['starId'] = $star_info['star_user_id'];
 
             $starUserDetails = self::userDetails( $star_info['star_user_id'] );
-            $star['starName'] = $starUserDetails['displayName'];
+            $star['starName'] = isset( $starUserDetails['displayName'] ) ? $starUserDetails['displayName'] : '';
             $star['starredDate'] = $star_info['star_date'];
             $star['profileImage'] = self::getResourceUrl( $star_info['user_info']['user_profile_image'] );
             $star['profileCover'] = self::getResourceUrl( $star_info['user_info']['user_cover_image'] );
@@ -493,7 +493,7 @@ class ResponseHelper
             $starUserDetails = self::userDetails( $star_info['star_user_id'] );
 
             $star['starId'] = $star_info['star_user_id'];
-            $star['starName'] = $starUserDetails['displayName'];
+            $star['starName'] = isset( $starUserDetails['displayName'] ) ? $starUserDetails['displayName'] : '';
             $star['starredDate'] = $star_info['star_date'];
 
             $star['profileImage'] = self::getResourceUrl( $star_info['user_info']['user_profile_image'] );
