@@ -4,6 +4,8 @@ use Swagger\Annotations as SWG;
 use MobStar\Storage\Token\TokenRepository as Token;
 use Aws\S3\S3Client;
 use Aws\Common\Credentials\Credentials as Creds;
+use MobStar\UserResponseHelper;
+use MobStar\Pager;
 
 /**
  * @package
@@ -565,6 +567,45 @@ class UserController extends BaseController
 
 		return $response;
 		//return $user;
+	}
+
+
+	public function info( $userId, $withInfo = null )
+	{
+	    $token = Request::header( "X-API-TOKEN" );
+
+	    $session = $this->token->get_session( $token );
+
+	    if( $userId == 'me' ) {
+	        $userId = $session->token_user_id;
+	    }
+
+	    if( empty( $withInfo ) ) { // fallback to old handler
+	        return $this->show( $userId );
+	    }
+
+	    $pager = new Pager(
+	        url( Request::path() ),
+	        Input::get( 'limit', 20 ),
+	        Input::get( 'page', 1 )
+	    );
+
+	    switch( $withInfo ) {
+	        case 'profile':
+	            $response = UserResponseHelper::getUserInfo( $userId, $session->token_user_id );
+	            break;
+	        case 'stars':
+	            $response = UserResponseHelper::getUserInfoWithStars( $userId, $session->token_user_id, $pager );
+	            break;
+            case 'starredby':
+                $response = UserResponseHelper::getUserInfoWithStarredBy( $userId, $session->token_user_id, $pager );
+                break;
+	        default:
+	            $response = array( 'code' => 404, 'data' => array( 'error' => 'Unknown request info: '.$withInfo ) );
+	            break;
+	    }
+
+	    return Response::make( $response['data'], $response['code'] );
 	}
 
 	/**

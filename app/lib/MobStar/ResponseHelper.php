@@ -4,6 +4,8 @@ namespace MobStar;
 
 use MobStar\Storage\Vote\EloquentVoteRepository as VoteRepository;
 
+use DB;
+
 class ResponseHelper
 {
 
@@ -129,14 +131,9 @@ class ResponseHelper
     }
 
 
-    public static function oneUser( $userId, $sessionUserId, $includeStars = false, $normal = false )
+    public static function userProfile( $userId, $sessionUserId, $normal = false )
     {
-        $fields = array( 'votes' );
-
-        if ($includeStars)
-            $fields[] = 'stars.users';
-        else
-            $fields[] = 'stars';
+        $fields = array( 'votes', 'stars' );
 
         $users = UserHelper::getUsersInfo( array( $userId ), $fields );
 
@@ -145,14 +142,13 @@ class ResponseHelper
         $profileImage = '';
         $profileCover = '';
 
-        if ($normal) {
-            $profileImage = ( isset( $user['user_profile_image'] ) ) ? 'http://' . $_ENV[ 'URL' ] . '/' . $user['user_profile_image'] : '';
-            $profileCover = ( isset( $user['user_cover_image'] ) )   ? 'http://' . $_ENV[ 'URL' ] . '/' . $user['user_cover_image'] : '';
-        } else {
+         if ($normal) {
+             $profileImage = ( isset( $user['user_profile_image'] ) ) ? 'http://' . $_ENV[ 'URL' ] . '/' . $user['user_profile_image'] : '';
+             $profileCover = ( isset( $user['user_cover_image'] ) )   ? 'http://' . $_ENV[ 'URL' ] . '/' . $user['user_cover_image'] : '';
+         } else {
             $profileImage = self::getResourceUrl( $user['user_profile_image'] );
             $profileCover = self::getResourceUrl( $user['user_cover_image'] );
-        }
-
+         }
 
         $return = array();
         $return['id'] = $user['user_id'];
@@ -172,33 +168,11 @@ class ResponseHelper
                 $return[ 'fullName' ] = $user['full_name'];
             }
 
-//             if( $user->user_facebook_id != 0 )
-//             {
-//                 $return[ 'userName' ] = $user->FacebookUser->facebook_user_user_name;
-//                 $return[ 'displayName' ] = $user->FacebookUser->facebook_user_display_name;
-//                 $return[ 'fullName' ] = $user->FacebookUser->facebook_user_full_name;
-//             }
-//             elseif( $user->user_twitter_id != 0 )
-//             {
-//                 $return[ 'userName' ] = $user->TwitterUser->twitter_user_user_name;
-//                 $return[ 'displayName' ] = $user->TwitterUser->twitter_user_display_name;
-//                 $return[ 'fullName' ] = $user->TwitterUser->twitter_user_full_name;
-//             }
-//             elseif( $user->user_google_id != 0 )
-//             {
-//                 $return[ 'userName' ] = $user->GoogleUser->google_user_user_name;
-//                 $return[ 'displayName' ] = $user->GoogleUser->google_user_display_name;
-//                 $return[ 'fullName' ] = $user->GoogleUser->google_user_full_name;
-//             }
         } else {
             $return[ 'userName' ] = $user['user_name'];
             $return[ 'displayName' ] = $user['user_display_name'];
             $return[ 'fullName' ] = $user['user_full_name'];
         }
-
-//         $return[ 'userName' ] = $user['name'];
-//         $return[ 'displayName' ] = $user['display_name'];
-//         $return[ 'fullName' ] = $user['full_name'];
 
         if ($userId != $sessionUserId) {
 
@@ -208,6 +182,30 @@ class ResponseHelper
             $return['iAmStar'] = $starFlags['iAmStar'];
         }
 
+        $return['rank'] = $user['user_rank'];
+
+        $starredBy = self::getFollowers( $userId );
+        $return['fans'] = count( $starredBy );
+        $return['votes'] = $user['votes']['me']['up'];
+
+        return $return;
+    }
+
+
+    public static function oneUser( $userId, $sessionUserId, $includeStars = false, $normal = false )
+    {
+        $fields = array( 'votes' );
+
+        if ($includeStars)
+            $fields[] = 'stars.users';
+        else
+            $fields[] = 'stars';
+
+        $users = UserHelper::getUsersInfo( array( $userId ), $fields );
+
+        $user = $users[ $userId ];
+
+        $userProfile = self::userProfile( $userId, $sessionUserId, $normal );
         $stars = array();
         $starredBy = array();
 
@@ -218,14 +216,11 @@ class ResponseHelper
             $starredBy = self::getFollowers( $userId );
         }
 
-        $return['stars'] = $stars;
-        $return['starredBy'] = $starredBy;
+        $userProfile['stars'] = $stars;
+        $userProfile['starredBy'] = $starredBy;
+        $userProfile['fans'] = count( $starredBy );
 
-        $return['rank'] = $user['user_rank'];
-        $return['fans'] = count( $starredBy );
-        $return['votes'] = $user['votes']['me']['up'];
-
-        return $return;
+        return $userProfile;
     }
 
 
@@ -459,22 +454,31 @@ class ResponseHelper
                 $processedStarUsers[ $star_info['star_user_id'] ] = true;
             }
 
-            $star = array();
-            $star['starId'] = $star_info['star_user_id'];
-
-            $starUserDetails = self::userDetails( $star_info['star_user_id'] );
-            $star['starName'] = isset( $starUserDetails['displayName'] ) ? $starUserDetails['displayName'] : '';
-            $star['starredDate'] = $star_info['star_date'];
-            $star['profileImage'] = self::getResourceUrl( $star_info['user_info']['user_profile_image'] );
-            $star['profileCover'] = self::getResourceUrl( $star_info['user_info']['user_cover_image'] );
-            $star['rank'] = $star_info['user_info']['user_rank'];
-            $star['stat'] = $star_info['user_info']['user_entry_rank'];
-
-            $stars[] = $star;
-            unset( $star );
+            $stars[] = self::getStar( $star_info );
         }
 
         return $stars;
+    }
+
+
+    public static function getStar( $starInfo )
+    {
+        $star = array();
+        $star['starId'] = $starInfo['star_user_id'];
+
+        $starUserDetails = self::userDetails( $starInfo['star_user_id'] );
+        $star['starName'] = isset( $starUserDetails['displayName'] ) ? $starUserDetails['displayName'] : '';
+        $star['starredDate'] = $starInfo['star_date'];
+
+        $starUserInfo = UserHelper::getBasicInfo( array( $starInfo['star_user_id'] ) );
+        $starUserInfo = array_pop( $starUserInfo );
+
+        $star['profileImage'] = self::getResourceUrl( $starUserInfo['user_profile_image'] );
+        $star['profileCover'] = self::getResourceUrl( $starUserInfo['user_cover_image'] );
+        $star['rank'] = $starUserInfo['user_rank'];
+        $star['stat'] = $starUserInfo['user_entry_rank'];
+
+        return $star;
     }
 
 
@@ -486,24 +490,44 @@ class ResponseHelper
 
         $starredBy = array();
 
+        // for some reasons star may appear multiple times
+        $processedStarUsers = array(); // holds already processed stars.
+
         foreach( $user['stars_info']['me'] as $star_info ) {
 
-            $star = array();
+            // commented out to follow old behaviour ( wrong )
+            // @todo uncomment it work correct working
+            // do not process already processed stars
+//             if( isset( $processedStarUsers[ $star_info['star_user_id'] ] ) ) {
+//                 continue;
+//             } else {
+//                 $processedStarUsers[ $star_info['star_user_id'] ] = true;
+//             }
 
-            $starUserDetails = self::userDetails( $star_info['star_user_id'] );
-
-            $star['starId'] = $star_info['star_user_id'];
-            $star['starName'] = isset( $starUserDetails['displayName'] ) ? $starUserDetails['displayName'] : '';
-            $star['starredDate'] = $star_info['star_date'];
-
-            $star['profileImage'] = self::getResourceUrl( $star_info['user_info']['user_profile_image'] );
-            $star['profileCover'] = self::getResourceUrl( $star_info['user_info']['user_cover_image'] );
-
-            $starredBy[] = $star;
-            unset( $star );
+            $starredBy[] = self::getFollower( $star_info );
         }
 
         return $starredBy;
+    }
+
+
+    public static function getFollower( $starInfo )
+    {
+        $star = array();
+
+        $starUserDetails = self::userDetails( $starInfo['star_user_id'] );
+
+        $star['starId'] = $starInfo['star_user_id'];
+        $star['starName'] = isset( $starUserDetails['displayName'] ) ? $starUserDetails['displayName'] : '';
+        $star['starredDate'] = $starInfo['star_date'];
+
+        $starUserInfo = UserHelper::getBasicInfo( array( $starInfo['star_user_id'] ) );
+        $starUserInfo = array_pop( $starUserInfo );
+
+        $star['profileImage'] = self::getResourceUrl( $starUserInfo['user_profile_image'] );
+        $star['profileCover'] = self::getResourceUrl( $starUserInfo['user_cover_image'] );
+
+        return $star;
     }
 
 

@@ -616,6 +616,56 @@ class UserHelper
     }
 
 
+    public static function getUserStarsInfoByPage( $userId, $starType, $limit = 0, $offset = 0 )
+    {
+        if( $starType == 'my' ) {
+            $query = DB::table( 'user_stars' )
+                ->select(
+                    DB::raw( "'my' as star_type"),
+                    'user_star_created_date as star_date',
+                    'user_star_star_id as star_user_id')
+                ->where('user_star_deleted', '=', 0)
+                ->where( 'user_star_user_id', $userId );
+        } elseif( $starType == 'me' ) {
+            $query = DB::table( 'user_stars' )
+                ->select(
+                    DB::raw( "'me' as star_type"),
+                    'user_star_created_date as star_date',
+                    'user_star_user_id as star_user_id')
+                ->where('user_star_deleted', '=', 0)
+                ->where( 'user_star_star_id', $userId );
+        } else {
+            $errorMsg = 'unknown star type: '.$starType;
+            error_log( $errorMsg );
+            die( $errorMsg );
+        }
+
+        $query->orderBy( 'star_date', 'desc' );
+
+        if( $limit ) {
+            $query->take( $limit );
+        }
+        if( $offset ) {
+            $query->skip( $offset );
+        }
+
+        $rows = $query->get();
+
+        $starsInfo = array();
+
+        foreach( $rows as $row ) {
+            $starsInfo[] = array(
+                'user_id' => $userId,
+                'star_type' => $row->star_type,
+                'star_user_id' => $row->star_user_id,
+                'star_date' => $row->star_date
+            );
+        }
+
+        return $starsInfo;
+    }
+
+
     private static function addVotes( array $users )
     {
         $votes = self::getVotes( array_keys( $users ) );

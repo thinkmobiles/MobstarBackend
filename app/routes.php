@@ -131,6 +131,14 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "UserController@me"
 		] );
 
+		Route::get( 'user/{userId}/{withInfo?}', [
+		    'as' => 'user/info',
+		    'uses' => 'UserController@info'
+		])->where( array(
+		    'userId' => '[0-9]+|me',
+		    'withInfo' => 'profile|stars|starredby'
+		));
+
 		Route::get( "user/{id}", [
 			"as"   => "user/show",
 			"uses" => "UserController@show"
