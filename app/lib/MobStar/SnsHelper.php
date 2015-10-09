@@ -96,8 +96,8 @@ class SnsHelper
         self::$client = getSNSClient();
 
         self::$apps = array(
-            'apple' => 'arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushdemo',
-            '' => 'arn:aws:sns:eu-west-1:830026328040:app/GCM/admin-android-notification',
+            'apple' => \Congif::get( 'app.apple_arn' ), //'arn:aws:sns:eu-west-1:830026328040:app/APNS/adminpushdemo',
+            '' => \Config::get( 'app.android_arn' ), //'arn:aws:sns:eu-west-1:830026328040:app/GCM/admin-android-notification',
         );
     }
 
