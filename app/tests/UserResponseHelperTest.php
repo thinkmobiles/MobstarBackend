@@ -120,6 +120,39 @@ class UserResponseHelperTest extends TestCase
     }
 
 
+    public function testShowUser()
+    {
+        $dataFile = __DIR__ . self::$data_dir.'/UserController_show.txt';
+
+        $testData = unserialize( file_get_contents( $dataFile ) );
+
+        $token = new \MobStar\Storage\Token\EloquentTokenRepository();
+
+        foreach( $testData as $test ) {
+
+
+            $userId = $test['userId'];
+            $session = $token->get_session( $test['token'] );
+            $sessionUserId = $session->token_user_id;
+
+            $response = UserResponseHelper::showUser( $userId, $sessionUserId );
+
+            $this->assertEquals( $test['statusCode'], $response['code'] );
+
+            $content = json_decode( json_encode( $response['data'] ) );
+
+            $keys = array( 'profileImage', 'profileCover' );
+
+            $this->adjustAWSUrlInArray( $test['data'], $keys );
+            $this->adjustAWSUrlInArray( $content, $keys );
+
+            $this->assertEquals(
+                $test['data'],
+                $content
+            );
+        }
+    }
+
 
     private function adjustAWSUrlInArray( &$data, $keys )
     {

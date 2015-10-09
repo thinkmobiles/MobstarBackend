@@ -194,17 +194,6 @@ class ResponseHelper
 
     public static function oneUser( $userId, $sessionUserId, $includeStars = false, $normal = false )
     {
-        $fields = array( 'votes' );
-
-        if ($includeStars)
-            $fields[] = 'stars.users';
-        else
-            $fields[] = 'stars';
-
-        $users = UserHelper::getUsersInfo( array( $userId ), $fields );
-
-        $user = $users[ $userId ];
-
         $userProfile = self::userProfile( $userId, $sessionUserId, $normal );
         $stars = array();
         $starredBy = array();

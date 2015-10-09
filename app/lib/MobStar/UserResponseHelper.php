@@ -155,4 +155,31 @@ class UserResponseHelper extends ResponseHelper
 
         return array( 'code' => $code, 'data' => $data );
     }
+
+
+    public static function showUsers( $userIds, $sessionUserId )
+    {
+        $data = array();
+
+        $found = false;
+        foreach( $userIds as $userId ) {
+
+            $userInfo = self::oneUser( $userId, $sessionUserId, true );
+            $data['users'][]['user'] = $userInfo;
+            $found = true;
+        }
+
+        if( ! $found ) {
+            return array(
+                'code' => 404,
+                'data' => array(
+                    'error' => 'No Users Found'
+                )
+            );
+        }
+
+        $code = 200;
+
+        return array( 'code' => $code, 'data' => $data );
+    }
 }
