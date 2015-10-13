@@ -846,6 +846,19 @@ class EntryController extends BaseController
 		return $response;
 	}
 
+
+	public function info( $entryId )
+	{
+	    $token = Request::header( "X-API-TOKEN" );
+
+	    $session = $this->token->get_session( $token );
+
+	    $response = EntriesResponseHelper::getEntryInfo( $entryId, $session->token_user_id );
+
+	    return Response::make( $response['data'], $response['code'] );
+	}
+
+
 	/**
 	 *
 	 * @SWG\Api(

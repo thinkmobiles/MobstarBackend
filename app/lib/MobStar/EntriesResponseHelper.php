@@ -144,6 +144,22 @@ class EntriesResponseHelper extends ResponseHelper
     }
 
 
+    public static function getEntryInfo( $entryId, $sessionUserId )
+    {
+        $entryInfo = self::oneEntryInfo( $entryId, $sessionUserId );
+
+        $statusCode = 200;
+
+        if( ! $entryInfo ) {
+            $statusCode = 404;
+
+            $entryInfo = array( 'error' => 'Entry Not Found' );
+        }
+
+        return array( 'data' => $entryInfo, 'code' => $statusCode );
+    }
+
+
     private static function getOneEntryWithFields( $entry, $fields, $sessionUserId, $showFeedback )
     {
         $data = array();

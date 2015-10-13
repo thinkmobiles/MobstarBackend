@@ -299,6 +299,11 @@ Route::group( [ "before" => "auth" ], function ()
 			"uses" => "EntryController@dummytest"
 		] );
 
+		Route::get( 'entry/{id}/info', [
+		    'as' => 'entry/info',
+		    'uses' => 'EntryController@info'
+		]);
+
 		Route::get( "entry/{id}", [
 			"as"   => "entry/show",
 			"uses" => "EntryController@show"

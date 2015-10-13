@@ -302,6 +302,71 @@ class ResponseHelper
     }
 
 
+    protected static function oneEntryInfo( $entryId, $sessionUserId )
+    {
+        EntryHelper::prepareVotedByUserInfo( array( $entryId ), $sessionUserId );
+
+        $entries = EntryHelper::getEntries(
+            array( $entryId ),
+            array( 'commentCounts', 'filesInfo', 'tagNames', 'totalVotes', 'votedByUser' ),
+            $sessionUserId
+        );
+        $entry = $entries[ $entryId ];
+
+        $data = array();
+        $data[ 'id' ] = $entryId;
+
+        if( empty( $entry ) ) {
+            return $data;
+        }
+
+        if( $entry->entry_splitVideoId ) $data['splitVideoId'] = $entry->entry_splitVideoId;
+        $data[ 'category' ] = $entry->categoryInfo->category_name;
+        $data[ 'type' ] = $entry->entry_type;
+
+        $data[ 'user' ] = self::oneUser_StarsCountsOnly( $entry->entry_user_id, $sessionUserId );
+
+        $data[ 'name' ] = $entry->entry_name;
+        $data[ 'description' ] = $entry->entry_description;
+        $data[ 'totalComments' ] = $entry->commentCounts;
+        $data[ 'totalviews' ] = $entry->entry_views + $entry->entry_views_added;
+        $data[ 'created' ] = $entry->entry_created_date;
+        $data[ 'modified' ] = $entry->entry_modified_date;
+
+        $data[ 'tags' ] = $entry->tagNames;
+
+        $data[ 'entryFiles' ] = array();
+        foreach( $entry->filesInfo as $file ) {
+            $signedUrl = self::getResourceUrl( $file->entry_file_name . "." . $file->entry_file_type );
+            $data[ 'entryFiles' ][] = array(
+                'fileType' => $file->entry_file_type,
+                'filePath' => $signedUrl
+            );
+
+            $data[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" )
+            ? self::getResourceUrl( 'thumbs/' . $file->entry_file_name . '-thumb.jpg' )
+            : "";
+        }
+
+        $data[ 'upVotes' ] = $entry->totalVotes['up'];
+        $data[ 'downVotes' ] = $entry->totalVotes['down'];
+
+        $data[ 'rank' ] = $entry->entry_rank;
+        $data[ 'language' ] = $entry->entry_language;
+
+        if( $entry->entry_deleted )
+        {
+            $data[ 'deleted' ] = true;
+        }
+        else
+        {
+            $data[ 'deleted' ] = false;
+        }
+
+        return $data;
+    }
+
+
     // same as self::oneEntry but takes entryId not entry object as parameter
     public static function oneEntryById( $entryId, $sessionUserId, $includeUser = false )
     {
