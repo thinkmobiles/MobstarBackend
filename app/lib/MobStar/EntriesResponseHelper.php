@@ -149,14 +149,19 @@ class EntriesResponseHelper extends ResponseHelper
         $entryInfo = self::oneEntryInfo( $entryId, $sessionUserId );
 
         $statusCode = 200;
+        $data = array();
 
-        if( ! $entryInfo ) {
+        if( (! $entryInfo) OR (count($entryInfo) < 5) ) {
+
             $statusCode = 404;
+            $data = array( 'error' => 'Entry Not Found' );
 
-            $entryInfo = array( 'error' => 'Entry Not Found' );
+        } else {
+
+            $data['entries'][]['entry'] = $entryInfo;
         }
 
-        return array( 'data' => $entryInfo, 'code' => $statusCode );
+        return array( 'data' => $data, 'code' => $statusCode );
     }
 
 
