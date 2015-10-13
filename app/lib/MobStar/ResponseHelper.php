@@ -131,24 +131,22 @@ class ResponseHelper
     }
 
 
-    public static function userProfile( $userId, $sessionUserId, $normal = false )
+    protected static function userProfileInfo( $userId, $normal = false )
     {
-        $fields = array( 'votes', 'stars' );
-
-        $users = UserHelper::getUsersInfo( array( $userId ), $fields );
+        $users = UserHelper::getUsersInfo( array( $userId ), array( 'votes' ) );
 
         $user = $users[ $userId ];
 
         $profileImage = '';
         $profileCover = '';
 
-         if ($normal) {
-             $profileImage = ( isset( $user['user_profile_image'] ) ) ? 'http://' . $_ENV[ 'URL' ] . '/' . $user['user_profile_image'] : '';
-             $profileCover = ( isset( $user['user_cover_image'] ) )   ? 'http://' . $_ENV[ 'URL' ] . '/' . $user['user_cover_image'] : '';
-         } else {
+        if ($normal) {
+            $profileImage = ( isset( $user['user_profile_image'] ) ) ? 'http://' . $_ENV[ 'URL' ] . '/' . $user['user_profile_image'] : '';
+            $profileCover = ( isset( $user['user_cover_image'] ) )   ? 'http://' . $_ENV[ 'URL' ] . '/' . $user['user_cover_image'] : '';
+        } else {
             $profileImage = self::getResourceUrl( $user['user_profile_image'] );
             $profileCover = self::getResourceUrl( $user['user_cover_image'] );
-         }
+        }
 
         $return = array();
         $return['id'] = $user['user_id'];
@@ -174,21 +172,36 @@ class ResponseHelper
             $return[ 'fullName' ] = $user['user_full_name'];
         }
 
+        $return['rank'] = $user['user_rank'];
+        $return['votes'] = $user['votes']['me']['up'];
+
+        return $return;
+    }
+
+
+    public static function userProfile( $userId, $sessionUserId, $normal = false )
+    {
+        $fields = array( 'votes', 'stars' );
+
+        $users = UserHelper::getUsersInfo( array( $userId ), $fields );
+
+        $user = $users[ $userId ];
+
+        $profile = self::userProfileInfo( $userId, $normal );
+
+
         if ($userId != $sessionUserId) {
 
             $starFlags = self::getStarFlags( $userId, $sessionUserId );
 
-            $return[ 'isMyStar' ] = $starFlags['isMyStar'];
-            $return['iAmStar'] = $starFlags['iAmStar'];
+            $profile[ 'isMyStar' ] = $starFlags['isMyStar'];
+            $profile['iAmStar'] = $starFlags['iAmStar'];
         }
 
-        $return['rank'] = $user['user_rank'];
+        $starredBy = $user['stars_info']['me'];
+        $profile['fans'] = count( $starredBy );
 
-        $starredBy = self::getFollowers( $userId );
-        $return['fans'] = count( $starredBy );
-        $return['votes'] = $user['votes']['me']['up'];
-
-        return $return;
+        return $profile;
     }
 
 
@@ -208,6 +221,24 @@ class ResponseHelper
         $userProfile['stars'] = $stars;
         $userProfile['starredBy'] = $starredBy;
         $userProfile['fans'] = count( $starredBy );
+
+        return $userProfile;
+    }
+
+
+    public static function oneUser_StarsCountsOnly( $userId, $sessionUserId )
+    {
+        $fields = array( 'votes', 'stars' );
+
+        $users = UserHelper::getUsersInfo( array( $userId ), $fields );
+
+        $user = $users[ $userId ];
+
+        $userProfile = self::userProfile( $userId, $sessionUserId );
+
+        $userProfile['starsCount'] = self::getUniqueStarsCount( $user['stars_info']['my'] );
+        $userProfile['starredByCount'] = count( $user['stars_info']['me'] );
+        $userProfile['fans'] = $userProfile['starredByCount'];
 
         return $userProfile;
     }
@@ -420,6 +451,25 @@ class ResponseHelper
         }
 
         return $current;
+    }
+
+
+    protected static function getUniqueStarsCount( $stars_info )
+    {
+        // for some reasons star may appear multiple times
+        $processedStarUsers = array(); // holds already processed stars.
+
+        foreach( $stars_info as $star_info ) {
+
+            // do not process already processed stars
+            if( isset( $processedStarUsers[ $star_info['star_user_id'] ] ) ) {
+                continue;
+            } else {
+                $processedStarUsers[ $star_info['star_user_id'] ] = true;
+            }
+        }
+
+        return count( $processedStarUsers );
     }
 
 

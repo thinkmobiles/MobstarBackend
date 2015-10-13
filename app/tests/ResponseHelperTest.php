@@ -163,6 +163,52 @@ class ResponseHelperTest extends TestCase{
     }
 
 
+    public function testOneUser_StarsCountsOnly()
+    {
+        $dataFile = __DIR__ . self::$data_dir.'/oneUser.txt';
+
+        $testData = unserialize( file_get_contents( $dataFile ) );
+
+        $token = new \MobStar\Storage\Token\EloquentTokenRepository();
+
+        // get users
+        $userIds = array();
+        foreach( $testData as $data ) $userIds[] = $data['userId'];
+
+        UserHelper::clear();
+
+        UserHelper::prepareUsers( $userIds );
+
+
+        foreach( $testData as $data ) {
+
+
+            $userId = $data['userId'];
+            $session = $token->get_session( $data['token'] );
+            $includeStars = $data['includeStars'];
+
+            if( ! $includeStars ) continue; // no need (incorect results)
+
+            $oneUser = ResponseHelper::oneUser_StarsCountsOnly( $userId, $session->token_user_id );
+
+            //add stars/starredby counts
+            $data['data']['starsCount'] = count( $data['data']['stars'] );
+            $data['data']['starredByCount'] = count( $data['data']['starredBy'] );
+
+            // remove stars/starredby fields
+            unset( $data['data']['stars'] );
+            unset( $data['data']['starredBy'] );
+            // adjust AWS urls
+            $keys = array( 'profileImage', 'profileCover' );
+
+            $this->adjustAWSUrlInArray( $data['data'], $keys );
+            $this->adjustAWSUrlInArray( $oneUser, $keys );
+
+            $this->assertEquals( $data['data'], $oneUser );
+        }
+    }
+
+
     public function testOneEntry()
     {
         $dataFile = __DIR__ . self::$data_dir.'/oneEntry.txt';
