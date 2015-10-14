@@ -115,6 +115,11 @@ class SnsHelper
 
         if( $device->device_registration_device_type == 'apple')
         {
+            $APNS = 'APNS';
+            if( strpos( $endpointArn, 'APNS_SANDBOX' ) !== false ) {
+                $APNS = 'APNS_SANDBOX';
+            }
+
             $data = $messageData;
             $data['sound'] = 'default';
             $data['alert'] = $messageText;
@@ -125,7 +130,7 @@ class SnsHelper
                 'Message' => json_encode( array(
                     'default' => $messageText,
                     //'APNS_SANDBOX' => json_encode(array(
-                    'APNS' => json_encode( array(
+                    $APNS => json_encode( array(
                         'aps' => $data
                     )),
                 ))
