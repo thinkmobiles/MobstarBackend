@@ -1005,7 +1005,9 @@ class UserController extends BaseController
 
 		$user->save();
 
-		$return[ 'user' ] = oneUser( $user, $session, true, true );
+//		$return[ 'user' ] = oneUser( $user, $session, true, true );
+
+		$return['user'] = UserResponseHelper::oneUser_StarsCountsOnly( $user->user_id, $session->token_user_id );
 
 		return Response::make( $return, 200 );
 
@@ -1083,34 +1085,7 @@ class UserController extends BaseController
 
 		$user->save();
 
-		$stars = [ ];
-
-		foreach( $user->Stars as $star )
-		{
-			if( $star->user_star_deleted == 0 )
-			{
-
-				$stars[ ] = [ 'star_id'   => $star->user_star_star_id,
-							  'star_name' => $star->Stars->user_display_name,
-				];
-
-			}
-		}
-
-		$starredBy = [ ];
-
-		foreach( $user->StarredBy as $starred )
-		{
-			if( $starred->user_star_deleted == 0 )
-			{
-				$starredBy[ ] = [ 'star_id'   => $starred->user_star_user_id,
-								  'star_name' => $starred->User->user_display_name,
-				];
-			}
-
-		}
-
-		$return[ 'user' ] = oneUser( $user, $session, true );
+		$return['user'] = UserResponseHelper::oneUser_StarsCountsOnly( $user->user_id, $session->token_user_id );
 
 		return Response::make( $return, 200 );
 	}
