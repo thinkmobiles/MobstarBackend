@@ -2645,6 +2645,12 @@ class EntryController extends BaseController
 		{
 		    $return = [ 'notice' => 'success' ];
 		    $status_code = 200;
+
+		    // return entry in response to allow client to update entry info
+		    $entryId = Input::get('entryId');
+		    $userId = Input::get( 'userId' );
+		    $entryInfo = ResponseHelper::oneEntryInfo( $entryId, $userId );
+		    $return['entries'][]['entry'] = $entryInfo;
 		}
 		else
 		{

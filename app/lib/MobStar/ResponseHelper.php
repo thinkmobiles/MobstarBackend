@@ -302,7 +302,7 @@ class ResponseHelper
     }
 
 
-    protected static function oneEntryInfo( $entryId, $sessionUserId )
+    public static function oneEntryInfo( $entryId, $sessionUserId )
     {
         EntryHelper::prepareVotedByUserInfo( array( $entryId ), $sessionUserId );
 

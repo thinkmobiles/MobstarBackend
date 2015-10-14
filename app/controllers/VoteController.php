@@ -5,6 +5,8 @@ use MobStar\Storage\Token\TokenRepository as Token;
 use Swagger\Annotations as SWG;
 use Aws\S3\S3Client;
 use Aws\Common\Credentials\Credentials as Creds;
+use MobStar\ResponseHelper;
+
 /**
  * @package
  * @category
@@ -610,6 +612,11 @@ class VoteController extends BaseController
 			$response[ 'message' ] = "vote added";
 			$status_code = 201;
 			Eloquent::reguard();
+
+			// return entry in response to allow client to update entry info
+			$entryId = Input::get('entry');
+			$entryInfo = ResponseHelper::oneEntryInfo( $entryId, $session->totken_user_id );
+			$response['entries'][]['entry'] = $entryInfo;
 		}
 
 		return Response::make( $response, $status_code );
