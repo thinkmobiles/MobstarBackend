@@ -516,4 +516,73 @@ class EloquentEntryRepositoryTest extends TestCase {
       $this->assertNotNull( $entries );
   }
 
+
+  public function testAll_MainFeed_includeHideOnFeed()
+  {
+      $params = array(
+          'userId' => 0,
+          'categoryId' => 0,
+          'tagId' => 0,
+          'orderBy' => 'entry_id',
+          'order' => 'asc',
+          'limit' => 10,
+          'offset' => 0,
+          'count' => false,
+          'withAll' => false,
+      );
+
+      //restore all hidden entries
+      \DB::table( 'entries' )
+        ->where( 'entry_hide_on_feed', '>', 0 )
+        ->update( array( 'entry_hide_on_feed' => 0 ) );
+
+      $entryRepository = $this->getEntryRepository();
+
+      $exclude = array();
+
+      $entryIds = $this->getEntryIds(
+          $entryRepository->allWithFilters(
+              array(),
+              array(),
+              null,
+              $exclude,
+              'entry_created_date',
+              'desc',
+              10,
+              0,
+              false
+          )
+      );
+
+      // mark first
+      $entryToHide = $entryIds[0];
+      $entryModifyDate = \DB::table('entries')->where('entry_id', '=', $entryToHide )->pluck('entry_modified_date');
+      \DB::table('entries')->where('entry_id', '=', $entryToHide )->update( array(
+          'entry_hide_on_feed' => 1,
+          'entry_modified_date' => $entryModifyDate,
+      ));
+
+      $entryIds = $this->getEntryIds(
+          $entryRepository->allWithFilters(
+              array(),
+              array(),
+              null,
+              $exclude,
+              'entry_created_date',
+              'desc',
+              10,
+              0,
+              false
+          )
+      );
+
+      $this->assertFalse( in_array( $entryToHide, $entryIds ) );
+
+      // revert entry hide
+      \DB::table('entries')->where('entry_id', '=', $entryToHide )->update( array(
+          'entry_hide_on_feed' => 0,
+          'entry_modified_date' => $entryModifyDate,
+      ));
+  }
+
 }

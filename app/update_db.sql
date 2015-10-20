@@ -115,3 +115,8 @@ alter table `tokens` add column
 alter table `tokens` add column
   `token_app_version` int not null default 0
   comment 'app vertion for this session';
+
+-- hide entry from feed
+alter table `entries` add column
+  `entry_hide_on_feed` tinyint not null default 0
+  comment 'whether the entry must be hidden on main feed';

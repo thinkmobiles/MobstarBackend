@@ -23,9 +23,13 @@ class EloquentEntryRepository implements EntryRepository
 		$query = $query->where( 'entry_deleted', '=', '0' );
 
 
-		if( $user )
+		if( $user ) // all entries from user profile
 		{
 			$query = $query->where( 'entry_user_id', '=', $user );
+		}
+		else // entry for main feed
+		{
+		    $query = $query->where( 'entry_hide_on_feed', '=', 0 );
 		}
 
 		if( $category )
@@ -93,6 +97,8 @@ class EloquentEntryRepository implements EntryRepository
 	        $query->whereIn( 'entry_category_id', $categoryFilter );
 	    }
 
+	    $query = $query->where( 'entry_hide_on_feed', '=', 0 );
+
 	    // process excludes
 	    if( $exclude ) $query = $this->addExcludeRules( $query, $exclude );
 
@@ -121,6 +127,7 @@ class EloquentEntryRepository implements EntryRepository
 	                use( $max_media_duration_for_home_feed, $self, $localExclude, $geoLocationFilter ) {
 	                $query->where( 'entry_category_id', '=', 7 )
 	                ->where( 'entry_deleted', '=', 0 )
+	                ->where( 'entry_hide_on_feed', '=', 0 )
 	                ->whereIn( 'entry_type', array( 'video', 'audio' ) )
 	                ->whereBetween( 'entry_duration', array( 0, $max_media_duration_for_home_feed ) );
 
@@ -178,6 +185,8 @@ class EloquentEntryRepository implements EntryRepository
 	        // remove profile entries from exclude
 	        $include_entries = DB::table('entries')
 	          ->where( 'entry_category_id', '=', 7 )
+	          ->where( 'entry_deleted', '=', 0 )
+	          ->where( 'entry_hide_on_feed', '=', 0 )
 	          ->whereIn( 'entry_type', array( 'video', 'audio' ) )
 	          ->whereBetween( 'entry_duration', array( 0, $max_media_duration_for_home_feed ) )
 	          ->lists( 'entry_id' );
@@ -203,9 +212,13 @@ class EloquentEntryRepository implements EntryRepository
 	  $query = $query->where( 'entry_deleted', '=', '0' );
 
 
-	  if( $user )
+	  if( $user ) // entries for user profile
 	  {
 	    $query = $query->where( 'entry_user_id', '=', $user );
+	  }
+	  else // entries on main feed
+	  {
+	      $query = $query->where( 'entry_hide_on_feed', '=', 0 );
 	  }
 
 	  if( $category )
@@ -276,9 +289,13 @@ class EloquentEntryRepository implements EntryRepository
 	    } );
 	  }
 
-	  if( $userId )
+	  if( $userId ) // entries from user profile
 	  {
 	    $query->where( 'entry_user_id', '=', (int)$userId );
+	  }
+	  else // entries on main feed
+	  {
+	      $query = $query->where( 'entry_hide_on_feed', '=', 0 );
 	  }
 
 	  if( $categoryId )
@@ -314,6 +331,7 @@ class EloquentEntryRepository implements EntryRepository
 	        use( $max_media_duration_for_home_feed, $self, $localExclude ) {
 	        $query->where( 'entry_category_id', '=', 7 )
 	          ->where( 'entry_deleted', '=', 0 )
+	          ->where( 'entry_hide_on_feed', '=', 0 )
 	          ->whereIn( 'entry_type', array( 'video', 'audio' ) )
 	          ->whereBetween( 'entry_duration', array( 0, $max_media_duration_for_home_feed ) );
 
