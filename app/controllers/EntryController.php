@@ -382,11 +382,11 @@ class EntryController extends BaseController
 	        $exclude['category'] = array(7, 8);
 	    }
 	    /* End */
-	    if( ! $user ) // use geoLocation filtering
+	    if( ! $user ) // use geoLocation filtering (it is query for main feed)
 	    {
 	        $geoFilter = $currentUser->getContinentFilter();
 	        $categoryFilter = $currentUser->getCategoryFilter();
-	        if( $category ) // users asks some category (in some way)
+	        if( $category ) // users asks some category (in some way), so ignore user's categoryFilter (replace it)
 	        {
 	            $categoryFilter = array( $category );
 	        }

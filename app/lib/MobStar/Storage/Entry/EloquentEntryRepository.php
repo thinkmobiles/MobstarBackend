@@ -104,7 +104,7 @@ class EloquentEntryRepository implements EntryRepository
 
 	    // @todo we can skip adding profile entries if there is no 'category' == 7 in exclude
 	    // add entries from profile to home feedback
-	    if( empty( $categoryFilter ) && empty( $tagId ) ) // home feed
+	    if( empty( $tagId ) ) // home feed
 	    {
 	        $max_media_duration_for_home_feed =
 	        isset( $_ENV['MAX_MEDIA_DURATION_FOR_HOME_FEED'] )
@@ -124,7 +124,7 @@ class EloquentEntryRepository implements EntryRepository
 	            $self = $this;
 
 	            $query->orWhere( function( $query )
-	                use( $max_media_duration_for_home_feed, $self, $localExclude, $geoLocationFilter ) {
+	                use( $max_media_duration_for_home_feed, $self, $localExclude, $geoLocationFilter, $categoryFilter ) {
 	                $query->where( 'entry_category_id', '=', 7 )
 	                ->where( 'entry_deleted', '=', 0 )
 	                ->where( 'entry_hide_on_feed', '=', 0 )
@@ -136,6 +136,11 @@ class EloquentEntryRepository implements EntryRepository
 	                    if( ! is_array( $geoLocationFilter ) ) $geoLocationFilter = array( $geoLocationFilter );
 	                    if( \Config::get( 'app.force_include_all_world', false ) ) $geoLocationFilter[] = 0;
 	                    $query->whereIn( 'entry_continent', $geoLocationFilter );
+	                }
+
+	                if( $categoryFilter )
+	                {
+	                    $query->whereIn( 'entry_profile_category_id', $categoryFilter );
 	                }
 
 	                $self->addExcludeRules( $query, $localExclude );
