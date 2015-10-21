@@ -928,12 +928,19 @@ class UserController extends BaseController
 
 			$user->save();
 
-			return [
-			    'user' => ResponseHelper::oneUser_StarsCountsOnly(
-			        $user->user_id,
-			        $session->token_user_id
-			    )
-			];
+			if( $session->token_app_version < 3 )
+			{
+			    return [ 'user' => oneUser( $user, $session, true ) ];
+			}
+			else
+			{
+			    return [
+			        'user' => ResponseHelper::oneUser_StarsCountsOnly(
+			            $user->user_id,
+			            $session->token_user_id
+			        )
+			    ];
+			}
 		}
 	}
 
@@ -1010,9 +1017,15 @@ class UserController extends BaseController
 
 		$user->save();
 
-//		$return[ 'user' ] = oneUser( $user, $session, true, true );
-
-		$return['user'] = UserResponseHelper::oneUser_StarsCountsOnly( $user->user_id, $session->token_user_id );
+		$return = array();
+		if( $session->token_app_version < 3 )
+		{
+		    $return[ 'user' ] = oneUser( $user, $session, true, true );
+		}
+		else
+		{
+		    $return['user'] = UserResponseHelper::oneUser_StarsCountsOnly( $user->user_id, $session->token_user_id );
+		}
 
 		return Response::make( $return, 200 );
 
@@ -1090,7 +1103,15 @@ class UserController extends BaseController
 
 		$user->save();
 
-		$return['user'] = UserResponseHelper::oneUser_StarsCountsOnly( $user->user_id, $session->token_user_id );
+		$return = array();
+		if( $session->token_app_version < 3 )
+		{
+		    $return[ 'user' ] = oneUser( $user, $session, true );
+		}
+		else
+		{
+		    $return['user'] = UserResponseHelper::oneUser_StarsCountsOnly( $user->user_id, $session->token_user_id );
+		}
 
 		return Response::make( $return, 200 );
 	}

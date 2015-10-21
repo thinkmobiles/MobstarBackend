@@ -120,3 +120,14 @@ alter table `tokens` add column
 alter table `entries` add column
   `entry_hide_on_feed` tinyint not null default 0
   comment 'whether the entry must be hidden on main feed';
+
+
+-- add category for profile entry
+alter table `entries` add column
+  `entry_profile_category_id` tinyint not null default 0
+  comment 'category for profile entry';
+
+
+-- add new api_key for app version 3
+insert into `api_keys`(`key_value`, `version`)
+values( '3_pyZpee2M2qIjLJ5uqqO0Mp65nL4MXwGqBWFxYUWm', 3 );
