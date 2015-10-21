@@ -928,7 +928,12 @@ class UserController extends BaseController
 
 			$user->save();
 
-			return [ 'user' => oneUser( $user, $session, true ) ];
+			return [
+			    'user' => ResponseHelper::oneUser_StarsCountsOnly(
+			        $user->user_id,
+			        $session->token_user_id
+			    )
+			];
 		}
 	}
 
