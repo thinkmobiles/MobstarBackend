@@ -32,8 +32,8 @@ class EntriesResponseHelper extends ResponseHelper
         $current[ 'user' ] = ResponseHelper::oneUser( $userId, $sessionUserId );
 
         $starFlags = ResponseHelper::getStarFlags( $userId, $sessionUserId );
-        $current['user']['isMyStar'] = $starFlags['isMyStar'];
-        $current['user']['iAmStar'] = $starFlags['iAmStar'];
+        $current['user']['isMyStar'] = (int)$starFlags['isMyStar'];
+        $current['user']['iAmStar'] = (int)$starFlags['iAmStar'];
         $current[ 'category' ] = null;
         $current[ 'type' ] = null;
         $current[ 'name' ] = null;
@@ -53,7 +53,7 @@ class EntriesResponseHelper extends ResponseHelper
     }
 
 
-    private static function getOneEntry( $entry, $sessionUserId, $showFeedback, array $fields = NULL )
+    public static function getOneEntry( $entry, $sessionUserId, $showFeedback, array $fields = NULL )
     {
         if ( $fields )
             return self::getOneEntryWithFields( $entry, $sessionUserId, $showFeedback, $fields );
@@ -411,13 +411,17 @@ class EntriesResponseHelper extends ResponseHelper
     }
 
 
-    private static function prepareForEntries( $entries )
+    private static function prepareForEntries( $entries, $sessionUserId = null )
     {
         $userIds = array();
         foreach( $entries as $entry ) {
             $userIds[ $entry->entry_user_id ] = $entry->entry_user_id;
         }
         UserHelper::prepareUsers( $userIds, array('stars', 'votes') );
+
+        if( $sessionUserId ) {
+            UserHelper::prepareStarFlagsInfo( $userIds, $sessionUserId );
+        }
 
         //@todo get 'Categories', 'Comments' , 'Views', 'Tags', 'Files', 'Votes' for all entries
         return;

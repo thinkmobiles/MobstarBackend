@@ -194,8 +194,8 @@ class ResponseHelper
 
             $starFlags = self::getStarFlags( $userId, $sessionUserId );
 
-            $profile[ 'isMyStar' ] = $starFlags['isMyStar'];
-            $profile['iAmStar'] = $starFlags['iAmStar'];
+            $profile[ 'isMyStar' ] = (int)$starFlags['isMyStar'];
+            $profile['iAmStar'] = (int)$starFlags['iAmStar'];
         }
 
         $starredBy = $user['stars_info']['me'];
@@ -637,35 +637,9 @@ class ResponseHelper
 
     public static function getStarFlags( $userId, $sessionUserId )
     {
-        $starsInfo = UserHelper::getStars( array( $userId ) );
-        $starFlags = array(
-            'isMyStar' => 0,
-            'iAmStar' => 0,
-        );
-        $userStarsInfo = isset( $starsInfo[ $userId ] ) ? $starsInfo[ $userId ] : null;
-        if ( empty( $userStarsInfo ) ) return $starFlags;
+        $starFlags = UserHelper::getStarFlags( array( $userId ), $sessionUserId );
 
-        $isMyStar = false;
-        foreach( $userStarsInfo['me'] as $star_info ) {
-
-            if( $sessionUserId == $star_info['star_user_id'] ) {
-                $isMyStar = true;
-                break;
-            }
-        }
-        $starFlags['isMyStar'] = (int)$isMyStar;
-
-        $iAmStar = false;
-        foreach( $userStarsInfo['my'] as $star_info ) {
-
-            if( $sessionUserId == $star_info['star_user_id'] ) {
-                $iAmStar = true;
-                break;
-            }
-        }
-        $starFlags['iAmStar'] = (int)$iAmStar;
-
-        return $starFlags;
+        return $starFlags[ $userId ];
     }
 
 

@@ -116,6 +116,15 @@ class UserHelperTest extends TestCase
     );
 
 
+    private $starFlags = array(
+        307 => array(
+            357 => array( 'isMyStar' => true, 'iAmStar' => true ),
+            462 => array( 'isMyStar' => true, 'iAmStar' => false ),
+            528 => array( 'isMyStar' => false, 'iAmStar' => false ),
+        ),
+    );
+
+
     private function assertSameNames($etalon, $user)
     {
         $this->assertEquals($etalon['name'], $user['name'] );
@@ -611,4 +620,27 @@ class UserHelperTest extends TestCase
         UserHelper::prepareUsers( array( $user1, $user2 ), array( 'stars.users' ) );
     }
 
+
+    public function testPrepareStarFlagsInfo_manyUsers()
+    {
+        UserHelper::clear();
+
+        $currentUserId = 307;
+        $userIds = array( 357, 462, 528, 640, 641, 642 );
+
+        UserHelper::prepareStarFlagsInfo( $userIds, $currentUserId );
+    }
+
+
+    public function testGetStarFlags_manyUsers()
+    {
+        UserHelper::clear();
+
+        $currentUserId = 307;
+        $userIds = array( 357, 462, 528 );
+
+        $starFlags = UserHelper::getStarFlags( $userIds, $currentUserId );
+
+        $this->assertEquals( $this->starFlags[ $currentUserId ], $starFlags );
+    }
 }

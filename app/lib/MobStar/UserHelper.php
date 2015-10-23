@@ -12,6 +12,8 @@ class UserHelper
 
     private static $starsInfo = array();
 
+    private static $starFlagsInfo = array();
+
     private static $starNamesReady = array();
 
     private static $starNamesInfo = array();
@@ -38,6 +40,11 @@ class UserHelper
     private static $emptyStars = array(
         'my' => array(),
         'me' => array(),
+    );
+
+    private static $emptyStarFlags = array(
+        'isMyStar' => false,
+        'iAmStar' => false,
     );
 
     /**
@@ -210,6 +217,66 @@ class UserHelper
         }
 
         return;
+    }
+
+
+    public static function prepareStarFlagsInfo( array $userIds, $currentUserId )
+    {
+        if( empty( self::$starFlagsInfo[ $currentUserId ] ) ) {
+            $newIds = $userIds;
+        } else {
+            $newIds = array();
+
+            foreach( $userIds as $userId ) {
+                if( ! isset( self::$starFlagsInfo[ $currentUserId ][ $userId ] ) ) {
+                    $newIds[] = $userId;
+                }
+            }
+
+        }
+
+        if( empty( $newIds ) ) return;
+
+        $queryStarFlags = DB::table( 'user_stars' )
+            ->select(
+                'user_star_user_id',
+                'user_star_star_id',
+                'user_star_deleted'
+            )
+            ->where( function( $query ) use( $currentUserId, $newIds ) {
+                $query->where( 'user_star_user_id', '=', $currentUserId )
+                ->whereIn( 'user_star_star_id', $newIds );
+            })
+            ->orWhere( function( $query ) use( $currentUserId, $newIds ) {
+                $query->where( 'user_star_star_id', '=', $currentUserId )
+                    ->whereIn( 'user_star_user_id', $newIds );
+            }
+        );
+
+        $rows = $queryStarFlags->get();
+
+        $starFlags = array();
+
+        foreach( $rows as $row ) {
+            if( $row->user_star_deleted ) continue;
+
+            $userId = null;
+            if( $row->user_star_user_id == $currentUserId ) {
+                $userId = $row->user_star_star_id;
+                if( empty( $starFlags[ $userId ] ) ) $starFlags[ $userId ] = self::$emptyStarFlags;
+                $starFlags[ $userId ]['isMyStar'] = true;
+            } else {
+                $userId = $row->user_star_user_id;
+                if( empty( $starFlags[ $userId ] ) ) $starFlags[ $userId ] = self::$emptyStarFlags;
+                $starFlags[ $userId ]['iAmStar'] = true;
+            }
+        }
+
+        foreach( $newIds as $userId ) {
+            self::$starFlagsInfo[ $currentUserId ][ $userId ] = isset( $starFlags[ $userId ] )
+                ? $starFlags[ $userId ]
+                : self::$emptyStarFlags;
+        }
     }
 
 
@@ -549,6 +616,24 @@ class UserHelper
     }
 
 
+    public static function getStarFlags( array $userIds, $currentUserId )
+    {
+        if( empty( $userIds ) ) return array();
+
+        self::prepareStarFlagsInfo( $userIds, $currentUserId );
+
+        $starFlags = array();
+
+        $currentUserStarFlags = self::$starFlagsInfo[ $currentUserId ];
+
+        foreach( $userIds as $userId ) {
+            $starFlags[ $userId ] = $currentUserStarFlags[ $userId ];
+        }
+
+        return $starFlags;
+    }
+
+
     public static function getStars( array $userIds, $includeUsersInfo = false )
     {
 
@@ -734,6 +819,7 @@ class UserHelper
     {
         self::$basicInfo = self::$votesInfo = self::$phonesInfo = array();
         self::$starsInfo = self::$starNamesReady = self::$starsInfo = array();
+        self::$starFlagsInfo = self::$socialInfo = self::$starNamesInfo = array();
     }
 
 
@@ -741,6 +827,7 @@ class UserHelper
     {
         error_log( 'basicInfo: '.print_r( self::$basicInfo, true ) );
         error_log( 'socialInfo: '.print_r( self::$socialInfo, true ) );
+        error_log( 'starFlagsInfo: '.print_r( self::$starFlagsInfo, true ) );
         error_log( 'starsInfo: '.print_r( self::$starsInfo, true ) );
         error_log( 'starNamesReady Info: '.print_r( self::$starNamesReady, true ) );
         error_log( 'starNamesInfo: '.print_r( self::$starNamesInfo, true ) );
