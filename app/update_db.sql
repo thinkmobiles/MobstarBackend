@@ -131,3 +131,13 @@ alter table `entries` add column
 -- add new api_key for app version 3
 insert into `api_keys`(`key_value`, `version`)
 values( '3_pyZpee2M2qIjLJ5uqqO0Mp65nL4MXwGqBWFxYUWm', 3 );
+
+
+alter table `tokens` add column
+  `token_device_registration_id` int not null default 0
+  comment 'linked device registration: 0 - not set yet, -1 - no device registration';
+
+-- add column to store Amazon SNS Endpoint (to avoid its creation each time we need to send PUSH)
+alter table `tokens` add column
+  `token_is_subscribed` tinyint not null default 0
+  comment 'whether this session is subscribed to SNS updates topic: 0 - not subscribed, -1 - no need to subscribe';

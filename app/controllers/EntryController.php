@@ -9,6 +9,7 @@ use MobStar\UserHelper;
 use MobStar\EntryHelper;
 use MobStar\ResponseHelper;
 use MobStar\EntriesResponseHelper;
+use MobStar\SnsHelper;
 
 /**
  * @package
@@ -1281,6 +1282,23 @@ class EntryController extends BaseController
 				    \Entry::findOrFail( $response['entry_id'] ),
 				    Input::get( 'splitVideoId' )
 				  );
+				}
+
+				// send notification about new unloaded entry
+				$newEntry = \Entry::findOrFail( $response['entry_id'] );
+				if( ($newEntry->entry_category_id != 7) AND ($newEntry->entry_category_id != 8) ) { // no notification on profile entries
+				    $messageData = array(
+				        'Type' => 'newEntry',
+				        'entries' =>  array(
+				            array(
+				                'id' => $newEntry->entry_id,
+				                'timeUpload' => time(),
+				                'category' => $newEntry->entry_category_id,
+				                'continent' => $newEntry->entry_continent,
+				            )
+				        )
+				    );
+				    SnsHelper::sendBroadcast( $messageData );
 				}
 			}
 			else

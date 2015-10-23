@@ -56,6 +56,25 @@ class SnsHelper
     }
 
 
+    public static function sendBroadcast( $messageData )
+    {
+        self::init();
+
+        $data = self::getBroadcastPublishData( $messageData );
+
+        try {
+            $ret = self::$client->publish( $data );
+
+            $ret = $ret->toArray();
+
+            error_log( print_r( $ret, true ) );
+        } catch( \Exception $e )
+        {
+            error_log( $e->getMessage() );
+        }
+    }
+
+
     public static function subscribeSession( $session )
     {
         self::init();
@@ -81,6 +100,29 @@ class SnsHelper
         DB::table( 'tokens' )->
             where( 'token_id', '=', $session->token_id )
             ->update( array( 'token_is_subscribed' => $subscribeStatus) );
+    }
+
+
+    private static function getBroadcastPublishData( $data )
+    {
+        $prepData = array(
+            'TopicArn' => self::$updateTopic,
+            'MessageStructure' => 'json',
+            'Message' => json_encode( array(
+                'default' => json_encode( $data ),
+                'APNS' => json_encode( array(
+                    'aps' => $data,
+                )),
+                'APNS_SANDBOX' => json_encode( array(
+                    'aps' => $data,
+                )),
+                'GCM' => json_encode( array(
+                    'data' => $data,
+                ))
+            ))
+        );
+
+        return $prepData;
     }
 
 
