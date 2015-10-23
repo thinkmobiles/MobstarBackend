@@ -205,6 +205,8 @@ return array(
 
     'android_arn' => isset( $_ENV['ANDROID_ARN'] ) ? $_ENV['ANDROID_ARN'] : '',
 
+    'updateTopic_arn' => isset( $_ENV['UPDATE_TOPIC_ARN'] ) ? $_ENV['UPDATE_TOPIC_ARN'] : '',
+
 	'disable_youtube_upload' => empty( $_ENV['DISABLE_YOUTUBE_UPLOAD'] ) ? false : true,
 
     'keep_uploaded_entry_files' => empty( $_ENV['KEEP_UPLOADED_ENTRY_FILES'] ) ? false : true,
