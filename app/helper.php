@@ -683,5 +683,50 @@ function makeVideoThumbnail( $videoPath, $thumbnailPath, $videoInfo = false  )
 }
 
 
+function linkDeviceToSession( $tokenId )
+{
+    $timeWindow = 2;
+
+    $query = DB::table( 'tokens' )
+        ->select(DB::raw('timestampdiff( SECOND, tokens.token_created_date, device_registrations.device_registration_date_created) as window, tokens.*, device_registrations.*'))
+        ->leftJoin( 'device_registrations', 'tokens.token_user_id', '=', 'device_registrations.device_registration_user_id' )
+        ->where( 'tokens.token_id', '=', (int)$tokenId );
+
+    $devices = $query->get();
+
+    $deviceId = 0;
+    if( count( $devices ) == 0 ) {
+        $deviceId = -1; // no device
+    } else {
+        $foundDevices = array();
+        foreach( $devices as $device ) {
+            if( is_null( $device->window ) ) continue; // device without date created
+            if( abs( $device->window ) <= $timeWindow ) {
+                $foundDevices[] = $device;
+            }
+        }
+
+        if( count( $foundDevices ) == 1 ) {
+            $deviceId = $foundDevices[0]->device_registration_id;
+        } else {
+            $deviceId = 0; // can not get device
+        }
+    }
+
+    DB::table( 'tokens' )
+        ->where( 'token_id', '=', (int)$tokenId )
+        ->update( array( 'token_device_registration_id' => (int) $deviceId ) );
+
+    return $deviceId > 0 ? $deviceId : null;
+}
+
+
+function getmicrotime()
+{
+    list($usec, $sec) = explode(" ", microtime());
+    return ((float)$usec + (float)$sec);
+}
+
+
 // end of prevent multiple inclusion block
 }

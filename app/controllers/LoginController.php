@@ -364,6 +364,11 @@ class LoginController extends BaseController
 				'token_type'         => 'Facebook'
 			);
 
+			// link device to session
+			if( isset( $device ) ) {
+			    $token['token_device_registration_id'] = $device->device_registration_id;
+			}
+
 			$session = Token::create( $token );
 
 			//Return user id and token details not using auth library:
@@ -555,6 +560,11 @@ class LoginController extends BaseController
 				'token_user_id'      => $user->user_id,
 				'token_type'         => 'Twitter'
 			);
+
+			// link device to session
+			if( isset( $device ) ) {
+			    $token['token_device_registration_id'] = $device->device_registration_id;
+			}
 
 			$session = new Token( $token );
 
@@ -767,6 +777,11 @@ class LoginController extends BaseController
 				'token_user_id'      => $user->user_id,
 				'token_type'         => 'Google'
 			);
+
+			// link device to session
+			if( isset( $device ) ) {
+			    $token['token_device_registration_id'] = $device->device_registration_id;
+			}
 
 			$session = new Token( $token );
 

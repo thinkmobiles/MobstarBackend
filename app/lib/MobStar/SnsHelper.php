@@ -12,6 +12,8 @@ class SnsHelper
 
     private static $apps;
 
+    private static $updateTopic;
+
 
     public static function sendNotification( $toUserId, $messageText, $messageData )
     {
@@ -50,6 +52,68 @@ class SnsHelper
             {
                 error_log( 'can not send sns to device '.$device->device_registration_id.': '.$e->getMessage() );
             }
+        }
+    }
+
+
+    public static function subscribeSession( $session )
+    {
+        self::init();
+
+        $subscribeStatus = -1;
+
+        $deviceId = self::getSessionDeviceId( $session );
+
+        if( $deviceId ) {
+
+            $device = DB::table( 'device_registrations' )
+                ->where( 'device_registration_id', '=', $deviceId )
+                ->first();
+
+            if( $device ) {
+                $endpoint = self::getEndpointArnForDevice( $device );
+
+                $arn = self::subscribeToTopic( self::$updateTopic, $endpoint );
+
+                $subscribeStatus = $arn ? 1 : -1;
+            }
+        }
+        DB::table( 'tokens' )->
+            where( 'token_id', '=', $session->token_id )
+            ->update( array( 'token_is_subscribed' => $subscribeStatus) );
+    }
+
+
+    private static function getSessionDeviceId( $session )
+    {
+        $deviceId = $session->token_device_registration_id;
+
+        if( $deviceId > 0 ) return $deviceId;
+
+        if( $deviceId == 0 ) { // try to find device for session
+            $deviceId = linkDeviceToSession( $session->token_id );
+            if( $deviceId > 0 ) return $deviceId;
+        }
+
+        return null;  // no device for session
+    }
+
+
+    private static function subscribeToTopic( $topic, $endpoint )
+    {
+        try{
+            $ret = self::$client->subscribe( array(
+                'Endpoint' => $endpoint,
+                'Protocol' => 'application',
+                'TopicArn' => $topic
+            ));
+
+            $ret = $ret->toArray();
+            return isset( $ret['SubscriptionArn'] ) ? $ret['SubscriptionArn'] : null;
+
+        } catch( \Exception $e )
+        {
+            return null;
         }
     }
 
@@ -99,6 +163,8 @@ class SnsHelper
             'apple' => \Config::get( 'app.apple_arn' ),
             '' => \Config::get( 'app.android_arn' ),
         );
+
+        self::$updateTopic = \Config::get( 'app.updateTopic_arn' );
     }
 
 

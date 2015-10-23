@@ -5,7 +5,7 @@ class Token extends \Eloquent {
 	protected $primaryKey = "token_id";
 
 	// Use fillable as a white list
-    protected $fillable = array('token_id', 'token_value','token_user_id', 'token_created_date', 'token_valid_until', 'token_type');
+    protected $fillable = array('token_id', 'token_value','token_user_id', 'token_created_date', 'token_valid_until', 'token_type', 'token_device_registration_id');
     public $timestamps = false;
 
 

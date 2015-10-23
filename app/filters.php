@@ -90,9 +90,9 @@ Route::filter('logged_in', function()
 // 	}
 
 	else{
-		$value = $token->api_key;
+		$oldApiKey = $token->api_key;
 
-		if($key !== $value){
+		if($key !== $oldApiKey){
 
 //			$token =  Request::header("X-API-TOKEN");
 			$app_version = DB::table('api_keys')->where('key_value', $key)->first()->version;
@@ -104,6 +104,12 @@ Route::filter('logged_in', function()
 
 		$token->token_valid_until = date("Y-m-d H:i:s", strtotime("now + 1 hour"));
 		$token->save();
+
+		if( $token->api_version >= 3 ) {
+		    if( $token->token_is_subscribed == 0 ) {
+		        SnsHelper::subscribeSession( $token );
+		    }
+		}
 	}
 
 
