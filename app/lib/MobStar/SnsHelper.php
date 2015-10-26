@@ -78,24 +78,31 @@ class SnsHelper
     {
         self::init();
 
-        $subscribeStatus = -1;
+        try {
 
-        $deviceId = self::getSessionDeviceId( $session );
+            $subscribeStatus = -1;
 
-        if( $deviceId ) {
+            $deviceId = self::getSessionDeviceId( $session );
 
-            $device = DB::table( 'device_registrations' )
-                ->where( 'device_registration_id', '=', $deviceId )
-                ->first();
+            if( $deviceId ) {
 
-            if( $device ) {
-                $endpoint = self::getEndpointArnForDevice( $device );
+                $device = DB::table( 'device_registrations' )
+                    ->where( 'device_registration_id', '=', $deviceId )
+                    ->first();
 
-                $arn = self::subscribeToTopic( self::$updateTopic, $endpoint );
+                if( $device ) {
+                    $endpoint = self::getEndpointArnForDevice( $device );
 
-                $subscribeStatus = $arn ? 1 : -1;
+                    $arn = self::subscribeToTopic( self::$updateTopic, $endpoint );
+
+                    $subscribeStatus = $arn ? 1 : -1;
+                }
             }
+        } catch( \Exception $e )
+        {
+            error_log( $e->getMessage() );
         }
+
         DB::table( 'tokens' )->
             where( 'token_id', '=', $session->token_id )
             ->update( array( 'token_is_subscribed' => $subscribeStatus) );
