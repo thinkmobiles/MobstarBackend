@@ -1,5 +1,7 @@
 <?php
 
+use MobStar\SnsHelper;
+
 /*
 |--------------------------------------------------------------------------
 | Application & Route Filters
@@ -105,7 +107,7 @@ Route::filter('logged_in', function()
 		$token->token_valid_until = date("Y-m-d H:i:s", strtotime("now + 1 hour"));
 		$token->save();
 
-		if( $token->api_version >= 3 ) {
+		if( $token->token_app_version >= 3 ) {
 		    if( $token->token_is_subscribed == 0 ) {
 		        SnsHelper::subscribeSession( $token );
 		    }

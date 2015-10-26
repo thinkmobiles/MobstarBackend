@@ -66,9 +66,8 @@ class SnsHelper
             $ret = self::$client->publish( $data );
 
             $ret = $ret->toArray();
-
-            error_log( print_r( $ret, true ) );
-        } catch( \Exception $e )
+        }
+        catch( \Exception $e )
         {
             error_log( $e->getMessage() );
         }
