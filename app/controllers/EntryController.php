@@ -1292,7 +1292,8 @@ class EntryController extends BaseController
 				        'entries' =>  array(
 				            array(
 				                'id' => $newEntry->entry_id,
-				                'timeUpload' => time(),
+				                'userId' => $newEntry->entry_user_id,
+				                'timeUpload' => \DateTime::createFromFormat( 'Y-m-d H:i:s', $newEntry->entry_created_date )->getTimestamp() * 1000,
 				                'category' => $newEntry->entry_category_id,
 				                'continent' => $newEntry->entry_continent,
 				            )

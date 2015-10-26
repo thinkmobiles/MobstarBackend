@@ -334,6 +334,8 @@ class EntriesResponseHelper extends ResponseHelper
             $data['errors'] = $params['errors'];
         }
 
+        $data['timestamp'] = time()*1000;
+
         $statusCode = 200;
 
         return array( 'code' => $statusCode, 'data' => $data );
