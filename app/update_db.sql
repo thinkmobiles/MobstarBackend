@@ -141,3 +141,25 @@ alter table `tokens` add column
 alter table `tokens` add column
   `token_is_subscribed` tinyint not null default 0
   comment 'whether this session is subscribed to SNS updates topic: 0 - not subscribed, -1 - no need to subscribe';
+
+
+-- create indexes to speedup user search
+alter table users
+add index (user_twitter_id)
+;
+
+alter table users
+add index (user_display_name(20))
+;
+
+alter table google_users
+add index (google_user_display_name(20))
+;
+
+alter table facebook_users
+add index (facebook_user_display_name(20))
+;
+
+alter table twitter_users
+add index (twitter_user_display_name(20))
+;

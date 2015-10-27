@@ -352,6 +352,17 @@ Route::group( [ "before" => "auth" ], function ()
 			"as"   => "entry/delete",
 			"uses" => "EntryController@delete"
 		] );
+
+
+		// -------------------------------------------------------
+		// Search
+		// --------------------------------------------------------
+
+		Route::get( "search/users/beginsWith/{searchStr}", [
+		    'as' => 'search/users/beginsWith',
+		    'uses' => 'SearchController@usersBeginsWith'
+		] );
+
 		// -------------------------------------------------------
 		// Entry Feedback
 		//---------------------------------------------------------
