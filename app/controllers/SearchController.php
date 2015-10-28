@@ -2,6 +2,8 @@
 
 use MobStar\Storage\Token\TokenRepository as Token;
 use MobStar\Pager;
+use MobStar\UserHelper;
+use MobStar\ResponseHelper;
 
 
 class SearchController extends BaseController
@@ -82,10 +84,27 @@ order by user_name';
 
         $data = array();
 
+        $userIds = array();
+
         foreach( $rows as $row ) {
+            $userIds[] = $row->user_id;
+        }
+        $users = UserHelper::getBasicInfo( $userIds );
+
+        $emptyUser = array(
+            'user_profile_image' => '',
+            'user_cover_image' => ''
+        );
+
+        foreach( $rows as $row ) {
+            $userId = $row->user_id;
+            $user = isset( $users[ $userId ] ) ? $users[ $userId ] : $emptyUser;
+
             $data['users'][] = array(
-                'userId' => $row->user_id,
-                'userName' => $row->user_name
+                'userId' => $userId,
+                'userName' => $row->user_name,
+                'profileImage' => ResponseHelper::getResourceUrl( $user['user_profile_image'] ),
+                'profileCover' => ResponseHelper::getResourceUrl( $user['user_cover_image'] ),
             );
         }
 
