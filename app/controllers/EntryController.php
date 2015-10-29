@@ -1299,7 +1299,7 @@ class EntryController extends BaseController
 				            )
 				        )
 				    );
-				    SnsHelper::sendBroadcast( $messageData );
+				    SnsHelper::sendBroadcast( 'New entry uploaded', $messageData );
 				}
 			}
 			else

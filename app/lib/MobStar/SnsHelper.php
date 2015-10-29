@@ -56,7 +56,7 @@ class SnsHelper
     }
 
 
-    public static function sendBroadcast( $messageData )
+    public static function sendBroadcast( $message, $messageData )
     {
         self::init();
 
@@ -109,21 +109,27 @@ class SnsHelper
     }
 
 
-    private static function getBroadcastPublishData( $data )
+    private static function getBroadcastPublishData( $message, $data )
     {
+        $appleData = $data;
+        $appleData['alert'] = $message;
+
+        $googleData = $data;
+        $googleData['message'] = $message;
+
         $prepData = array(
             'TopicArn' => self::$updateTopic,
             'MessageStructure' => 'json',
             'Message' => json_encode( array(
-                'default' => json_encode( $data ),
+                'default' => $message,
                 'APNS' => json_encode( array(
-                    'aps' => $data,
+                    'aps' => $appleData,
                 )),
                 'APNS_SANDBOX' => json_encode( array(
-                    'aps' => $data,
+                    'aps' => $appleData,
                 )),
                 'GCM' => json_encode( array(
-                    'data' => $data,
+                    'data' => $googleData,
                 ))
             ))
         );
