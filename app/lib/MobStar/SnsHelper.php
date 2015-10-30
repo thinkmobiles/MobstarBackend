@@ -62,7 +62,7 @@ class SnsHelper
 
         self::init();
 
-        $data = self::getBroadcastPublishData( $messageData );
+        $data = self::getBroadcastPublishData( $message, $messageData );
 
         try {
             $ret = self::$client->publish( $data );
