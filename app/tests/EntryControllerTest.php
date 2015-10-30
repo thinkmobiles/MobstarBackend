@@ -38,10 +38,9 @@ class EntryControllerTest extends TestCase{
 
             $content = json_decode( $response->getContent() );
 
-            $keys = array( 'profileImage', 'profileCover' );
+            $content = $this->prepDataForCompare( $content );
 
-            $this->adjustAWSUrlInArray( $test['data'], $keys );
-            $this->adjustAWSUrlInArray( $content, $keys );
+            $test['data'] = $this->prepDataForCompare( $test['data'] );
 
             $this->assertEquals(
                 $test['data'],
@@ -73,10 +72,9 @@ class EntryControllerTest extends TestCase{
 
             $content = json_decode( $response->getContent() );
 
-            $keys = array( 'profileImage', 'profileCover', 'filePath', 'videoThumb' );
+            $content = $this->prepDataForCompare( $content );
 
-            $this->adjustAWSUrlInArray( $test['data'], $keys );
-            $this->adjustAWSUrlInArray( $content, $keys );
+            $test['data'] = $this->prepDataForCompare( $test['data'] );
 
             $this->assertEquals(
                 $test['data'],
@@ -111,10 +109,9 @@ class EntryControllerTest extends TestCase{
 
             $content = json_decode( $response->getContent() );
 
-            $keys = array( 'profileImage', 'profileCover', 'filePath', 'videoThumb' );
+            $content = $this->prepDataForCompare( $content );
 
-            $this->adjustAWSUrlInArray( $test['data'], $keys );
-            $this->adjustAWSUrlInArray( $content, $keys );
+            $test['data'] = $this->prepDataForCompare( $test['data'] );
 
             $this->assertEquals(
                 $test['data'],
@@ -149,10 +146,9 @@ class EntryControllerTest extends TestCase{
 
             $content = json_decode( $response->getContent() );
 
-            $keys = array( 'profileImage', 'profileCover', 'filePath', 'videoThumb' );
+            $content = $this->prepDataForCompare( $content );
 
-            $this->adjustAWSUrlInArray( $test['data'], $keys );
-            $this->adjustAWSUrlInArray( $content, $keys );
+            $test['data'] = $this->prepDataForCompare( $test['data'] );
 
             $this->assertEquals(
                 $test['data'],
@@ -186,10 +182,10 @@ class EntryControllerTest extends TestCase{
 
             $content = json_decode( $response->getContent() );
 
-            $keys = array( 'profileImage', 'profileCover', 'filePath', 'videoThumb' );
+            $content = $this->prepDataForCompare( $content );
 
-            $this->adjustAWSUrlInArray( $test['data'], $keys );
-            $this->adjustAWSUrlInArray( $content, $keys );
+            $test['data'] = $this->prepDataForCompare( $test['data'] );
+
 
             $this->assertEquals(
                 $test['data'],
@@ -225,10 +221,9 @@ class EntryControllerTest extends TestCase{
 
             $content = json_decode( $response->getContent() );
 
-            $keys = array( 'profileImage', 'profileCover', 'filePath', 'videoThumb' );
+            $content = $this->prepDataForCompare( $content );
 
-            $this->adjustAWSUrlInArray( $test['data'], $keys );
-            $this->adjustAWSUrlInArray( $content, $keys );
+            $test['data'] = $this->prepDataForCompare( $test['data'] );
 
             foreach( $test['data']->entries as $e ) {
                 if( isset( $e->entry->tags ) ) sort( $e->entry->tags );
@@ -280,6 +275,46 @@ class EntryControllerTest extends TestCase{
         if( $index === false ) return $url;
 
         return substr( $url, 0, $index );
+    }
+
+
+    private function unsetRecursive( & $data, $keys )
+    {
+        if( is_array( $data ) )
+        {
+            foreach( $keys as $key )
+            {
+                unset( $data[ $key ] );
+            }
+        }
+        elseif( is_object( $data ) )
+        {
+            foreach( $keys as $key )
+            {
+                unset( $data->$key );
+            }
+        }
+
+        foreach( $data as &$value )
+        {
+            if( is_array( $value ) )
+            {
+                $this->unsetRecursive( $value, $keys );
+            }
+        }
+    }
+
+
+    private function prepDataForCompare( $data, $AWSUrlKeys = null, $unsetKeys = null )
+    {
+        if( is_null( $AWSUrlKeys ) ) $AWSUrlKeys = array( 'profileImage', 'profileCover', 'filePath', 'videoThumb' );
+
+        if( is_null( $unsetKeys ) ) $unsetKeys = array( 'modified', 'timestamp' );
+
+        $this->adjustAWSUrlInArray( $data, $AWSUrlKeys );
+        $this->unsetRecursive( $data, $unsetKeys );
+
+        return $data;
     }
 
 }

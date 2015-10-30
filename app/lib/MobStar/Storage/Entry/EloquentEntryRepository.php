@@ -403,6 +403,15 @@ class EloquentEntryRepository implements EntryRepository
 	        $query->where( 'entry_rank', '<>', 0 );
 	        break;
 
+	      case 'entryType':
+	        if( empty( $value ) ) continue;
+	        if( is_array( $value ) ) {
+	          $query->whereNotIn( 'entry_type', $value );
+	        } else {
+	          $query->where( 'entry_type', '<>', $value );
+	        }
+	        break;
+
 	      default:
 	        error_log( 'skipping unknown exclude field: '.$field );
 	    }
@@ -448,6 +457,16 @@ class EloquentEntryRepository implements EntryRepository
 	        // add not popular entries
 	        if( empty( $value ) ) continue;
 	        $query->orWhere( 'entry_rank', '=', 0 );
+	        break;
+
+	      case 'entryType':
+	        if( empty( $value ) ) continue;
+	        if( is_array( $value ) )
+	        {
+	          $query->orWhereIn( 'entry_type', $value );
+	        } else {
+	          $query->orWhere( 'entry_type', '==', $value );
+	        }
 	        break;
 
 	      default:

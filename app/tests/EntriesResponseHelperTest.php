@@ -36,6 +36,10 @@ class EntriesResponseHelperTest extends TestCase
             $this->adjustAWSUrlInArray( $test['data'], $keys );
             $this->adjustAWSUrlInArray( $content, $keys );
 
+            $keysToUnset = array( 'modified' );
+            $this->unsetRecursive( $content, $keysToUnset );
+            $this->unsetRecursive( $test['data'], $keysToUnset );
+
             $this->assertEquals(
                 $test['data'],
                 $content
@@ -69,6 +73,10 @@ class EntriesResponseHelperTest extends TestCase
 
                 $this->adjustAWSUrlInArray( $entryObj, $keys );
                 $this->adjustAWSUrlInArray( $content, $keys );
+
+                $keysToUnset = array( 'modified' );
+                $this->unsetRecursive( $content, $keysToUnset );
+                $this->unsetRecursive( $entryObj, $keysToUnset );
 
                 $this->assertEquals( $entryObj, $content );
             }
@@ -111,6 +119,33 @@ class EntriesResponseHelperTest extends TestCase
         if( $index === false ) return $url;
 
         return substr( $url, 0, $index );
+    }
+
+
+    private function unsetRecursive( & $data, $keys )
+    {
+        if( is_array( $data ) )
+        {
+            foreach( $keys as $key )
+            {
+                unset( $data[ $key ] );
+            }
+        }
+        elseif( is_object( $data ) )
+        {
+            foreach( $keys as $key )
+            {
+                unset( $data->$key );
+            }
+        }
+
+        foreach( $data as &$value )
+        {
+            if( is_array( $value ) )
+            {
+                $this->unsetRecursive( $value, $keys );
+            }
+        }
     }
 
 }

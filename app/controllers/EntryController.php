@@ -382,6 +382,10 @@ class EntryController extends BaseController
 	    {
 	        $exclude['category'] = array(7, 8);
 	    }
+	    if( $session->token_app_version < 3 ) // skip youtube entries
+	    {
+	        $exclude['entryType'] = array( 'video_youtube' );
+	    }
 	    /* End */
 	    if( ! $user ) // use geoLocation filtering (it is query for main feed)
 	    {
@@ -3134,23 +3138,24 @@ class EntryController extends BaseController
 
 		if( Input::get( 'excludeVotes' ) == 'true' )
 		{
-			$votes = Vote::where( 'vote_user_id', '=', $session->token_user_id )->get();
-			foreach( $votes as $vote )
-			{
-				$exclude[ ] = $vote->vote_entry_id;
-			}
+		    // skip entries, voted down by user
+		    $exclude['excludeVotes'] = $session->token_user_id;
 		}
 		if( $order_by == 'popular' )
 		{
-			$entry_rank = DB::table('entries')->where( 'entry_rank', '=', '0')->get();
-			foreach( $entry_rank as $rank )
-			{
-				$exclude[ ] = $rank->entry_id;
-			}
+		    // skip not popular entries
+		    $exclude['notPopular'] = true;
 		}
-		$entries = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false, true );
-		//dd(DB::getQueryLog());
-		$count = $this->entry->all( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, true );
+
+		if( $session->token_app_version < 3 ) // skip youtube entries
+		{
+		    $exclude['entryType'] = 'video_youtube';
+		}
+
+		$entries = $this->entry->allComplexExclude( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false, true );
+
+		// for some strange reasons, count all user entries, independent of 'exclude' and 'tag'
+		$count = $this->entry->allComplexExclude( $user, $category, 0, array(), $order, $dir, $limit, $offset, true );
 
 		$params = array(
 		    'userId' => $user,
