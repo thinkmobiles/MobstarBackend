@@ -969,6 +969,10 @@ class EntryController extends BaseController
 			$response[ 'errors' ] = $validator->messages();
 			$status_code = 400;
 		}
+		elseif( Input::get( 'type', '' ) == 'video_youtube' )
+		{
+		    return $this->storeYoutubeEntry();
+		}
 		else
 		{
 			$file = Input::file( 'file1' );
@@ -1322,6 +1326,211 @@ class EntryController extends BaseController
 
 		return Response::make( $response, $status_code );
 	}
+
+
+	private function storeYoutubeEntry()
+	{
+        do
+        {
+            $token = Request::header( "X-API-TOKEN" );
+            $session = $this->token->get_session( $token );
+
+            $response = array();
+            $statusCode = 200;
+
+            $entry_by_default_enable = DB::table( 'settings' )->where( 'vUniqueName', '=', 'ENTRY_DEFAULT' )->pluck( 'vSettingValue' );
+            $categoryId = DB::table( 'categories' )->where( 'category_id', '=', Input::get( 'category' ) )->pluck( 'category_id' );
+            if(empty($categoryId))
+            {
+                // @todo currently, if no catagory provided, it sets category to 1, saves entry and returns error and created entry_id
+                $response[ 'error' ] = "No category selected";
+                $statusCode = 400;
+            }
+
+            // create EntryFile with video
+            $youtubeUrl = Input::get( 'video_url', '' );
+            if( empty( $youtubeUrl ) )
+            {
+                $response[ 'error' ] = "No video_url provided";
+                $statusCode = 400;
+                break;
+            }
+            $urlParts = parse_url( $youtubeUrl );
+            if( ! $urlParts )
+            {
+                $response[ 'error' ] = "Invalid video_url provided";
+                $statusCode = 400;
+                break;
+            }
+            if( $urlParts['host'] != 'www.youtube.com' )
+            {
+                $response[ 'error' ] = "Not YouTube video_url provided";
+                $statusCode = 400;
+                break;
+            }
+
+            $urlParams = array();
+            parse_str( $urlParts['query'], $urlParams );
+
+            if( empty( $urlParams['v'] ) )
+            {
+                $response[ 'error' ] = "Wrong YouTube video_url provided";
+                $statusCode = 400;
+                break;
+            }
+
+            $youtubeFilename = $urlParams[ 'v' ];
+            $entryDuration = $this->getYoutubeDuration( $youtubeFilename );
+
+            $videoEntryFile = array(
+                'entry_file_name'         => $youtubeFilename,
+                'entry_file_entry_id'     => 0, // we will set it later
+                'entry_file_location'     => $youtubeUrl,
+                'entry_file_type'         => 'video_youtube',
+                'entry_file_size' => 0,
+            );
+
+            // create EntryFile with thumbnail
+            $thumbnailUrl = Input::get( 'thumbnail_url', '' );
+            if( ! $thumbnailUrl )
+            {
+                $response[ 'error' ] = "No thumbnail_url provided";
+                $statusCode = 400;
+                break;
+            }
+            $urlParts = parse_url( $thumbnailUrl );
+            if( empty( $urlParts ) || empty( $urlParts['path'] ) )
+            {
+                $response[ 'error' ] = "Invalid thumbnail_url provided";
+                $statusCode = 400;
+                break;
+            }
+            $pathParts = pathinfo( $urlParts['path'] );
+            $thumbExtention = empty( $pathParts['extension'] ) ? 'jpg' : $pathParts['extension'];
+
+            $thumbEntryFile = array(
+                'entry_file_name'         => 'thumbnail',
+                'entry_file_entry_id'     => 0, // we will set it later
+                'entry_file_location'     => $thumbnailUrl,
+                'entry_file_type'         => $thumbExtention,
+                'entry_file_size' => 0,
+            );
+
+            if( $categoryId == 7 || $categoryId == 8 )
+            {
+                $entry_deleted = 0;
+            }
+            else
+            {
+                $entry_deleted = $entry_by_default_enable === 'TRUE' ? 0 : 1;
+            }
+
+            $input = [
+                'entry_user_id'      => $session->token_user_id,
+                'entry_category_id'  => $categoryId ? $categoryId : 1,
+                'entry_type'         => Input::get( 'type' ),
+                'entry_name'         => str_replace('"', '', Input::get( 'name' )),
+                'entry_language'     => str_replace('"', '', Input::get( 'language' )),
+                'entry_description'  => str_replace('"', '', Input::get( 'description' )),
+                'entry_created_date' => date( 'Y-m-d H:i:s' ),
+                'entry_deleted'      => $entry_deleted,
+                'entry_subcategory'  => '',
+                'entry_age'           => '',
+                'entry_height'       => '',
+            ];
+
+            if( $categoryId == 3 ) // adjust modeling entry
+            {
+                $input['entry_subcategory'] = Input::get( 'subCategory' );
+                $input['entry_age'] = Input::get( 'age' );
+                $input['entry_height'] = Input::get( 'height' );
+            }
+
+            if( empty( $input['entry_subcategory'] ) ) unset( $input['entry_subcategory'] );
+            if( empty( $input['entry_age'] ) ) unset( $input['entry_age'] );
+            if( Input::get( 'splitVideoId', false ) ) $input['entry_splitVideoId'] = (int)Input::get( 'splitVideoId' );
+            $input['entry_duration'] = $entryDuration ? $entryDuration : -1;
+
+            // set entry continent based on user continent
+            $user = \User::findOrFail( $session->token_user_id );
+            $input['entry_continent'] = $user->user_continent;
+            unset( $user );
+
+            // create new entry
+            Eloquent::unguard();
+            $newEntry = $this->entry->create( $input );
+            $response[ 'entry_id' ] = $newEntry->entry_id;
+            $status_code = 201;
+            Eloquent::reguard();
+
+            // add tags
+            $tags = Input::get( 'tags' );
+            if( isset( $tags ) )
+            {
+                $tags = array_values( explode( ',', $tags ) );
+
+                foreach( $tags as $tag )
+                {
+                    $this->entry->addTag( str_replace('"', '', $tag), $newEntry->entry_id, $session->token_user_id );
+                }
+            }
+
+            // add EntryFiles
+            Eloquent::unguard();
+
+            $videoEntryFile['entry_file_entry_id'] = $newEntry->entry_id;
+            $videoEntryFile['entry_file_created_date'] = date( 'Y-m-d H:i:s' );
+            $videoEntryFile['entry_file_updated_date'] = date( 'Y-m-d H:i:s' );
+
+            EntryFile::create( $videoEntryFile );
+
+            $thumbEntryFile['entry_file_entry_id'] = $newEntry->entry_id;
+            $thumbEntryFile['entry_file_created_date'] = date( 'Y-m-d H:i:s' );
+            $thumbEntryFile['entry_file_updated_date'] = date( 'Y-m-d H:i:s' );
+
+            EntryFile::create( $thumbEntryFile );
+
+            Eloquent::reguard();
+
+            // if entry is split screen, send notification
+            if( Input::get( 'splitVideoId', false ) )
+            {
+                $this->processSplitVideoNotifications(
+                    $session->token_user_id,
+                    $newEntry,
+                    Input::get( 'splitVideoId' )
+                );
+            }
+
+            // send notification about new unloaded entry
+            if( ($newEntry->entry_category_id != 7) AND ($newEntry->entry_category_id != 8) ) { // no notification on profile entries
+                $messageData = array(
+                    'Type' => 'newEntry',
+                    'entries' =>  array(
+                        array(
+                            'id' => $newEntry->entry_id,
+                            'userId' => $newEntry->entry_user_id,
+                            'timeUpload' => \DateTime::createFromFormat( 'Y-m-d H:i:s', $newEntry->entry_created_date )->getTimestamp() * 1000,
+                            'category' => $newEntry->entry_category_id,
+                            'continent' => $newEntry->entry_continent,
+                        )
+                    )
+                );
+                SnsHelper::sendBroadcast( 'New entry uploaded', $messageData );
+            }
+
+        } while( false );
+
+        return Response::make( $response, $statusCode );
+    }
+
+
+	private function getYoutubeDuration( $videoId )
+	{
+	    // @todo implement me
+	    return -1;
+	}
+
 
 	/**
 	 *
