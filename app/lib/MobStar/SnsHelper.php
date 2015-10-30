@@ -17,9 +17,9 @@ class SnsHelper
 
     public static function sendNotification( $toUserId, $messageText, $messageData )
     {
-        self::init();
-
         if( Config::get('app.disable_sns') ) return;
+
+        self::init();
 
         // get user devices
         $devices = DB::table( 'users as u' )
@@ -58,6 +58,8 @@ class SnsHelper
 
     public static function sendBroadcast( $message, $messageData )
     {
+        if( Config::get('app.disable_sns') ) return;
+
         self::init();
 
         $data = self::getBroadcastPublishData( $messageData );
@@ -76,6 +78,8 @@ class SnsHelper
 
     public static function subscribeSession( $session )
     {
+        if( Config::get('app.disable_sns') ) return;
+
         self::init();
 
         try {
