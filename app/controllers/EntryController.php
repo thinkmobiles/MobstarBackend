@@ -691,23 +691,15 @@ class EntryController extends BaseController
 				if( in_array( "entryFiles", $fields ) )
 				{
 					$current[ 'entryFiles' ] = array();
-					if(count($entry->file) <= 0)
-					continue;
+					if( ! ResponseHelper::isEntryFilesValid( $entry, $entry->file ) )
+					{
+					    continue;
+					}
 					foreach( $entry->file as $file )
 					{
-						$url = $client->getObjectUrl( Config::get('app.bucket'), $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
-						$current[ 'entryFiles' ][ ] = [
-							'fileType' => $file->entry_file_type,
-							'filePath' => $url ];
-
-						$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-							$client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
-							: "";
+					    $current['entryFiles'][] = ResponseHelper::entryFile( $file );
 					}
-					if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
-						continue;
-					if( ( count( $current[ 'entryFiles' ] ) < 1 ) &&  $entry->entry_type === 'video' )
-						continue;
+					$current['videoThumb'] = ResponseHelper::entryThumb( $entry, $entry->file );
 				}
 
 				if( in_array( "upVotes", $fields ) )
@@ -780,23 +772,15 @@ class EntryController extends BaseController
 				//break;
 
 				$current[ 'entryFiles' ] = array();
-				if(count($entry->file) <= 0)
-					continue;
+				if( ! ResponseHelper::isEntryFilesValid( $entry, $entry->file ) )
+				{
+				    continue;
+				}
 				foreach( $entry->file as $file )
 				{
-					$url = $client->getObjectUrl( Config::get('app.bucket'), $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
-					$current[ 'entryFiles' ][ ] = [
-						'fileType' => $file->entry_file_type,
-						'filePath' => $url ];
-
-					$current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-						$client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
-						: "";
+				    $current['entryFiles'][] = ResponseHelper::entryFile( $file );
 				}
-				if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
-					continue;
-				if( ( count( $current[ 'entryFiles' ] ) < 1 ) &&  $entry->entry_type === 'video' )
-					continue;
+				$current['videoThumb'] = ResponseHelper::entryThumb( $entry, $entry->file );
 				if( $showFeedback == 1 )
 				{
 					$currentFeedback = [ ];

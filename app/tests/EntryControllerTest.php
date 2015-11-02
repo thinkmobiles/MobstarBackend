@@ -240,6 +240,45 @@ class EntryControllerTest extends TestCase{
     }
 
 
+    public function testShow()
+    {
+        $dataFile = __DIR__ . self::$data_dir.'/EntryController_show.txt';
+
+        $testData = unserialize( file_get_contents( $dataFile ) );
+
+        foreach( $testData as $test ) {
+
+            UserHelper::clear();
+            EntryHelper::clear();
+
+            $pars = array();
+
+            $response = $this->getResponse(
+                $test['token'],
+                'GET',
+                '/entry/'.$test['entryId'],
+                $pars
+            );
+
+            $this->assertEquals( $test['statusCode'], $response->getStatusCode() );
+
+            $content = json_decode( $response->getContent() );
+
+            $content = $this->prepDataForCompare( $content );
+
+            $test['data'] = $this->prepDataForCompare( $test['data'] );
+
+            if( isset( $test['data']->tags ) ) sort( $test['data']->tags );
+            if( isset( $content->tags ) ) sort( $content->tags );
+
+            $this->assertEquals(
+                $test['data'],
+                $content
+            );
+        }
+    }
+
+
     private function adjustAWSUrlInArray( &$data, $keys )
     {
         if ( is_array( $data ) ) {
