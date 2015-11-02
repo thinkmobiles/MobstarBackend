@@ -273,15 +273,10 @@ class ResponseHelper
         $data[ 'entryFiles' ] = array();
         foreach( $entry->file as $file )
         {
-            $signedUrl = self::getResourceUrl( $file->entry_file_name . "." . $file->entry_file_type );
-            $data[ 'entryFiles' ][ ] = [
-                'fileType' => $file->entry_file_type,
-                'filePath' => $signedUrl ];
-
-            $data[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" )
-                ? self::getResourceUrl( 'thumbs/' . $file->entry_file_name . '-thumb.jpg' )
-                : "";
+            $data['entryFiles'][] = self::entryFile( $file );
         }
+
+        $data['videoThumb'] = self::entryThumb( $entry, $entry->file );
 
         $votesInfo = self::getEntryVotes( $entry->entry_id );
         $data[ 'upVotes' ] = $votesInfo->votes_up;
@@ -337,16 +332,10 @@ class ResponseHelper
 
         $data[ 'entryFiles' ] = array();
         foreach( $entry->filesInfo as $file ) {
-            $signedUrl = self::getResourceUrl( $file->entry_file_name . "." . $file->entry_file_type );
-            $data[ 'entryFiles' ][] = array(
-                'fileType' => $file->entry_file_type,
-                'filePath' => $signedUrl
-            );
-
-            $data[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" )
-            ? self::getResourceUrl( 'thumbs/' . $file->entry_file_name . '-thumb.jpg' )
-            : "";
+            $data['entryFiles'][] = self::entryFile( $file );
         }
+
+        $data['videoThumb'] = self::entryThumb( $entry, $entry->filesInfo );
 
         $data[ 'upVotes' ] = $entry->totalVotes['up'];
         $data[ 'downVotes' ] = $entry->totalVotes['down'];
@@ -404,16 +393,10 @@ class ResponseHelper
 
         $data[ 'entryFiles' ] = array();
         foreach( $entry->filesInfo as $file ) {
-            $signedUrl = self::getResourceUrl( $file->entry_file_name . "." . $file->entry_file_type );
-            $data[ 'entryFiles' ][] = array(
-                'fileType' => $file->entry_file_type,
-                'filePath' => $signedUrl
-            );
-
-            $data[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" )
-                ? self::getResourceUrl( 'thumbs/' . $file->entry_file_name . '-thumb.jpg' )
-                : "";
+            $data[ 'entryFiles' ][] = self::entryFile( $file );
         }
+
+        $data[ 'videoThumb' ] = self::entryThumb( $entry, $entry->filesInfo );
 
         $data[ 'upVotes' ] = $entry->totalVotes['up'];
         $data[ 'downVotes' ] = $entry->totalVotes['down'];
@@ -483,20 +466,11 @@ class ResponseHelper
             return false;
         foreach( $EntryFile as $file )
         {
-            $url = self::getResourceUrl( $file->entry_file_name . "." . $file->entry_file_type );
-            $current[ 'entryFiles' ][ ] = [
-                'fileType' => $file->entry_file_type,
-                'filePath' => $url ];
+            $current['entryFiles'][] = self::entryFile( $file );
+        }
+        $current['videoThumb'] = self::entryThumb( $entry, $EntryFile );
 
-            $current[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" )
-                ? self::getResourceUrl( 'thumbs/' . $file->entry_file_name . '-thumb.jpg' )
-                : "";
-        }
-        if( ( count( $current[ 'entryFiles' ] ) < 2 ) &&  $entry->entry_type === 'audio' )
-        {
-            return false;
-        }
-        if( ( count( $current[ 'entryFiles' ] ) < 1 ) &&  $entry->entry_type === 'video' )
+        if( ! self::isEntryFilesValid( $entry, $EntryFile ) )
         {
             return false;
         }
@@ -516,6 +490,100 @@ class ResponseHelper
         }
 
         return $current;
+    }
+
+
+    public static function isEntryFilesValid( $entry, $files )
+    {
+        $isValid = false;
+
+        switch( $entry->entry_type )
+        {
+            case 'image':
+                if( count( $files ) == 1 ) $isValid = true;
+                break;
+            case 'audio':
+                if( count( $files ) == 2 ) $isValid = true;
+                break;
+            case 'video':
+                if( count( $files ) == 1 ) $isValid = true;
+                break;
+            default:
+               $isValid = false;
+        }
+        return $isValid;
+    }
+
+
+    public static function entryFile( $file )
+    {
+        return array(
+            'fileType' => $file->entry_file_type,
+            'filePath' => self::filePath( $file )
+        );
+    }
+
+
+    private static function filePath( $file )
+    {
+        $path = '';
+        switch( $file->entry_file_location_type )
+        {
+            case 'url':
+                $path = $file->entry_file_location;
+                break;
+            case 'S3':
+            case 's3':
+            case '':
+            default:
+                $path = self::getResourceUrl( $file->entry_file_name . '.' . $file->entry_file_type );
+                break;
+        }
+        return $path;
+    }
+
+
+    public static function entryThumb( $entry, $files )
+    {
+        $thumb = '';
+        switch( $entry->entry_type )
+        {
+            case 'video':
+                $thumb = self::entryVideoThumb( $files );
+                break;
+            case 'video_youtube':
+                $thumb = self::entryYoutubeThumb( $files );
+                break;
+        }
+        return $thumb;
+    }
+
+
+    private static function entryVideoThumb( $files )
+    {
+        $thumb = '';
+        foreach( $files as $file )
+        {
+            if( $file->entry_file_type == 'mp4' )
+            {
+                $thumb = self::getResourceUrl( 'thumbs/' . $file->entry_file_name . '-thumb.jpg' );
+            }
+        }
+        return $thumb;
+    }
+
+
+    private static function entryYoutubeThumb( $files )
+    {
+        $thumb = '';
+        foreach( $files as $file )
+        {
+            if( $file->entry_file_type != 'video_youtube' )
+            {
+                $thumb = self::filePath( $file );
+            }
+        }
+        return $thumb;
     }
 
 

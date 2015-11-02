@@ -87,28 +87,16 @@ class EntriesResponseHelper extends ResponseHelper
             $data[ 'tags' ][ ] = $entry_tag->tag->tag_name;
         }
 
-        if ( count( $entry->file ) <= 0 ) {
-            return false;
-        } elseif ( ( count( $entry->file ) < 2 ) &&  $entry->entry_type === 'audio' ) {
-            return false;
-        } elseif ( ( count( $entry->file ) < 1 ) &&  $entry->entry_type === 'video' ) {
+        if( ! self::isEntryFilesValid( $entry, $entry->file ) )
+        {
             return false;
         }
 
         if ( count($entry->file) > 0) {
             foreach( $entry->file as $file ) {
-
-                $signedUrl = self::getResourceUrl( $file->entry_file_name . "." . $file->entry_file_type );
-
-                $data[ 'entryFiles' ][ ] = array(
-                    'fileType' => $file->entry_file_type,
-                    'filePath' => $signedUrl,
-                );
-
-                $data[ 'videoThumb' ] = ( $file->entry_file_type == "mp4" )
-                    ? self::getResourceUrl( 'thumbs/' . $file->entry_file_name . '-thumb.jpg' )
-                    : '';
+                $data['entryFiles'][] = self::entryFile( $file );
             }
+            $data['videoThumb'] = self::entryThumb( $entry, $entry->file );
         }
 
         $entryVotes = self::getEntryVotes( $entry->entry_id );
@@ -223,27 +211,16 @@ class EntriesResponseHelper extends ResponseHelper
         if( in_array( "entryFiles", $fields ) )
         {
             $data[ 'entryFiles' ] = array();
-            if ( count($entry->file) <= 0 ) {
-                return false;
-            } elseif ( count($entry->file) < 2 && $entry->entry_type === 'audio' ) {
-                return false;
-            } elseif ( ( count( $data[ 'entryFiles' ] ) < 1 ) &&  $entry->entry_type === 'video') {
+            if( self::isEntryFilesValid( $entry, $entry->file ) )
+            {
                 return false;
             }
 
             foreach( $entry->file as $file )
             {
-
-                $url = self::getResourceUrl( $file->entry_file_name . "." . $file->entry_file_type );
-                $data[ 'entryFiles' ][] = array(
-                    'fileType' => $file->entry_file_type,
-                    'filePath' => $url,
-                );
-
-                $data[ 'videoThumb' ] = $file->entry_file_type == "mp4"
-                    ? self::getResourceUrl( 'thumbs/' . $file->entry_file_name . '-thumb.jpg' )
-                    : '';
+                $data['entryFiles'][] = self::entryFile( $file );
             }
+            $data['videoThumb'] = self::entryThumb( $entry, $entry->file );
 
             $entryVotes = self::getEntryVotes( $entry->entry_id );
             $data[ 'upVotes' ] = $entryVotes->votes_up;
