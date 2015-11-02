@@ -1389,6 +1389,7 @@ class EntryController extends BaseController
             $videoEntryFile = array(
                 'entry_file_name'         => $youtubeFilename,
                 'entry_file_entry_id'     => 0, // we will set it later
+                'entry_file_location_type'=> 'url',
                 'entry_file_location'     => $youtubeUrl,
                 'entry_file_type'         => 'video_youtube',
                 'entry_file_size' => 0,
@@ -1416,6 +1417,7 @@ class EntryController extends BaseController
                 'entry_file_name'         => 'thumbnail',
                 'entry_file_entry_id'     => 0, // we will set it later
                 'entry_file_location'     => $thumbnailUrl,
+                'entry_file_location_type'=> 'url',
                 'entry_file_type'         => $thumbExtention,
                 'entry_file_size' => 0,
             );

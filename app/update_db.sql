@@ -163,3 +163,11 @@ add index (facebook_user_display_name(20))
 alter table twitter_users
 add index (twitter_user_display_name(20))
 ;
+
+
+-- add support to different file location types
+alter table entry_files add column
+  `entry_file_location_type` varchar( 30 ) not null default ''
+  comment 'location type, like: S3, url, local'
+  after entry_file_entry_id
+;
