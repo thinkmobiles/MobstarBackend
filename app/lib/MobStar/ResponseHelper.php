@@ -508,6 +508,20 @@ class ResponseHelper
             case 'video':
                 if( count( $files ) == 1 ) $isValid = true;
                 break;
+            case 'video_youtube':
+                if( count( $files ) == 2  )
+                {
+                    $fileTypes = array();
+                    foreach( $files as $file )
+                    {
+                        $fileTypes[] = $file->entry_file_type;
+                    }
+                    if( in_array( 'video_youtube', $fileTypes ) )
+                    {
+                        $isValid = true;
+                    }
+                }
+                break;
             default:
                $isValid = false;
         }
