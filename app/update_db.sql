@@ -171,3 +171,8 @@ alter table entry_files add column
   comment 'location type, like: S3, url, local'
   after entry_file_entry_id
 ;
+
+
+-- add new api_key for app version 4
+insert into `api_keys`(`key_value`, `version`)
+values( '4_XwmvVGSyUPhjxr81MK7GSU24xklvdSRj3cfVzC7u', 4 );
