@@ -189,7 +189,7 @@ class CommentController extends BaseController
 			$current[ 'commentDate' ] = $comment->comment_added_date;
 			$current[ 'commentDeleted' ] = (bool)$comment->comment_deleted;
 
-			$current['entry'] = oneEntry($comment->Entry, $session, true);
+			$current['entry'] = \MobStar\ResponseHelper::oneEntryById($comment->Entry->entry_id, $session->token_user_id, true); //oneEntry($comment->Entry, $session, true);
 
 			$return[ 'comments' ][ ][ 'comment' ] = $current;
 		}
@@ -555,15 +555,9 @@ class CommentController extends BaseController
 			$current['entry'][ 'entryFiles' ] = array();
 			foreach( $comment->Entry->file as $file )
 			{
-				$signedUrl = $client->getObjectUrl( Config::get('app.bucket'), $file->entry_file_name . "." . $file->entry_file_type, '+720 minutes' );
-				$current['entry'][ 'entryFiles' ][ ] = [
-					'fileType' => $file->entry_file_type,
-					'filePath' => $signedUrl ];
-
-				$current['entry'][ 'videoThumb' ] = ( $file->entry_file_type == "mp4" ) ?
-					$client->getObjectUrl( Config::get('app.bucket'), 'thumbs/' . $file->entry_file_name . '-thumb.jpg', '+720 minutes' )
-					: "";
+			    $current['entry']['entryFiles'][] = \MobStar\ResponseHelper::entryFile( $file );
 			}
+			$current['entry']['videoThumb'] = \MobStar\ResponseHelper::entryThumb( $comment->Entry, $comment->Entry->file );
 
 			$return[ 'comments' ][ ][ 'comment' ] = $current;
 		}

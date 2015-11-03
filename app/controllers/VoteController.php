@@ -243,7 +243,7 @@ class VoteController extends BaseController
 
 				if( in_array( "entry", $fields ) )
 				{
-					$current[ 'entry' ] = oneEntry( $vote->entry, $session, true );
+					$current[ 'entry' ] = \MobStar\ResponseHelper::oneEntryById( $vote->entry->entry_id, $session->token_user_id, true );
 				}
 
 				if( in_array( "type", $fields ) )
@@ -275,7 +275,7 @@ class VoteController extends BaseController
 
 				$current[ 'id' ] = $vote->vote_id;
 				$current[ 'user' ] = oneUser( $vote->user, $session );
-				$current[ 'entry' ] = oneEntry( $vote->entry, $session, true );
+				$current[ 'entry' ] = \MobStar\ResponseHelper::oneEntryById($vote->entry->entry_id, $session->token_user_id, true );
 
 				if( $vote[ 'vote_up' ] == 1 && $vote[ 'vote_down' ] == 0 )
 				{
@@ -780,7 +780,7 @@ class VoteController extends BaseController
 				$current[ 'id' ] = $vote->vote_id;
 
 				$current[ 'user' ] = oneUser( $vote->user, $session, false );
-				$current[ 'entry' ] = oneEntry( $vote->entry, $session, true );
+				$current[ 'entry' ] = \MobStar\ResponseHelper::oneEntryById( $vote->entry->entry_id, $session->token_user_id, true );
 				$current[ 'entry' ]['created'] = $vote['vote_created_date'];
 				if( $vote[ 'vote_up' ] == 1 && $vote[ 'vote_down' ] == 0 )
 				{
