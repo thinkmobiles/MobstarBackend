@@ -223,6 +223,14 @@ class VoteController extends BaseController
 
 		foreach( $votes as $vote )
 		{
+		    if( $session->token_app_version < 4 )
+		    {
+		        // @todo this is quick fix to avoid youtube entries for old apps. Need to be rewritten
+		        if( $vote->entry->entry_type == 'video_youtube' )
+		        {
+		            continue;
+		        }
+		    }
 
 			$current = array();
 
@@ -705,7 +713,15 @@ class VoteController extends BaseController
 		$excludeCategory = [7,8];
 		//$entries = Entry::where( 'entry_user_id', '=', $user )->lists( 'entry_id' );
 		//$entries = Entry::where( 'entry_user_id', '=', $user )->whereNotIn( 'entry_category_id', $excludeCategory )->lists( 'entry_id' );
-		$entries = Entry::where( 'entry_user_id', '=', $user )->where( 'entry_deleted', '=', '0' )->whereNotIn( 'entry_category_id', $excludeCategory )->lists( 'entry_id' );
+		$entries = Entry::where( 'entry_user_id', '=', $user )->where( 'entry_deleted', '=', '0' )->whereNotIn( 'entry_category_id', $excludeCategory );
+
+		if( $session->token_app_version < 4 )
+		{
+		    // @todo this is quick fix to avoid youtube entries for old apps. Need to be rewritten
+		    $entries = $entries->where( 'entry_type', '<>', 'video_youtube' );
+		}
+
+		$entries = $entries->lists( 'entry_id' );
 
 
 		if(count($entries) == 0)

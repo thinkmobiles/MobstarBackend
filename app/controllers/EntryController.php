@@ -242,6 +242,10 @@ class EntryController extends BaseController
 		{
 		  $exclude['category'] = array(7, 8);
 		}
+		if( $session->token_app_version < 4 )
+		{
+		    $exclude['entryType'] = 'video_youtube';
+		}
 		/* End */
 		$entries = $this->entry->allComplexExclude( $user, $category, $tag, $exclude, $order, $dir, $limit, $offset, false, true );
 		//dd(DB::getQueryLog());
@@ -382,7 +386,7 @@ class EntryController extends BaseController
 	    {
 	        $exclude['category'] = array(7, 8);
 	    }
-	    if( $session->token_app_version < 3 ) // skip youtube entries
+	    if( $session->token_app_version < 4 ) // skip youtube entries
 	    {
 	        $exclude['entryType'] = array( 'video_youtube' );
 	    }
@@ -3133,7 +3137,7 @@ class EntryController extends BaseController
 		    $exclude['notPopular'] = true;
 		}
 
-		if( $session->token_app_version < 3 ) // skip youtube entries
+		if( $session->token_app_version < 4 ) // skip youtube entries
 		{
 		    $exclude['entryType'] = 'video_youtube';
 		}
@@ -3380,6 +3384,7 @@ class EntryController extends BaseController
 					 ->leftJoin('google_users', 'users.user_google_id', '=', 'google_users.google_user_id')
 					// ->whereNotIn( 'entries.entry_category_id', $excludeCategory )
 					 ->where( 'entries.entry_deleted', '=', '0' )
+					 ->where( 'entries.entry_type', '<>', 'video_youtube' )
 					 ->where( 'users.user_deleted', '=', '0' )
 					 ->where( function ( $query ) use ( $term )
 					 {
@@ -3520,6 +3525,10 @@ class EntryController extends BaseController
 	    // ->whereNotIn( 'entries.entry_category_id', $excludeCategory )
 	    ->where( 'entries.entry_deleted', '=', '0' )
 	    ->where( 'users.user_deleted', '=', '0' );
+	    if( $session->token_app_version < 4 )
+	    {
+	        $entriesQuery = $entriesQuery->where( 'entries.entry_type', '<>', 'video_youtube' );
+	    }
 	    if( ! empty( $geoFilter ) )
 	    {
 	        $entriesQuery = $entriesQuery->whereIn( 'entries.entry_continent', $geoFilter );

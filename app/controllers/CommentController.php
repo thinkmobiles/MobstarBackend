@@ -176,6 +176,15 @@ class CommentController extends BaseController
 
 		foreach( $comments as $comment )
 		{
+		    if( $session->token_app_version < 4 )
+		    {
+		        // @todo this is quick fix to avoid youtube entries for old apps. Need to be rewritten
+		        if( $comment->Entry->entry_type == 'video_youtube' )
+		        {
+		            continue;
+		        }
+		    }
+
 			$current = array();
 
 			$current[ 'commentId' ] = $comment->comment_id;
@@ -545,6 +554,15 @@ class CommentController extends BaseController
 		$client = getS3Client();
 		foreach( $comments as $comment )
 		{
+		    if( $session->token_app_version < 4 )
+		    {
+		        // @todo this is quick fix to avoid youtube entries for old apps. Need to be rewritten
+		        if( $comment->Entry->entry_type == 'video_youtube' )
+		        {
+		            continue;
+		        }
+		    }
+
 			$current = array();
 			$current['entry'][ 'id' ] = $comment->Entry->entry_id;
 			$current['entry'][ 'name' ] = $comment->Entry->entry_name;
