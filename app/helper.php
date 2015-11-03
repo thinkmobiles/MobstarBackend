@@ -728,5 +728,18 @@ function getmicrotime()
 }
 
 
+function markDeprecated( $funcName )
+{
+    if( is_null( $funcName ) )
+    {
+        $funcName = 'unknown';
+    }
+    $msg = date( 'Y.m.d H:i:s').' Deprecated: ';
+    $msg .= Request::method().' '.Request::url().' (in '.$funcName.')';
+    $msg .= "\n".print_r( Request::instance(), true );
+    error_log( $msg, 3, Config::get( 'app.home' ).'./deprecated.log' );
+}
+
+
 // end of prevent multiple inclusion block
 }

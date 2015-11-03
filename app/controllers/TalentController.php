@@ -60,6 +60,8 @@ class TalentController extends BaseController
 
 	public function index()
 	{
+	    markDeprecated( __METHOD__ );
+
 		$return = [ ];
 
 		$token = Request::header( "X-API-TOKEN" );
@@ -213,6 +215,8 @@ class TalentController extends BaseController
 
 	public function delete($user)
 	{
+	    markDeprecated( __METHOD__ );
+
 		$return = [ ];
 
 		$token = Request::header( "X-API-TOKEN" );

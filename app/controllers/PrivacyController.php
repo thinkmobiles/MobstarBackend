@@ -98,6 +98,8 @@ class PrivacyController extends BaseController
 
 	public function store()
 	{
+	    markDeprecated( __METHOD__ );
+
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );

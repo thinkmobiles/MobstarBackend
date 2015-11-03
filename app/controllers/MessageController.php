@@ -16,6 +16,7 @@ class MessageController extends BaseController {
 
 	public function index()
 	{
+	    markDeprecated( __METHOD__ );
 
 		$fields = array_values(explode(',',Input::get("fields")));
 
@@ -222,6 +223,7 @@ class MessageController extends BaseController {
 
 	public  function store()
 	{
+	    markDeprecated( __METHOD__ );
 
 		$token =  Request::header("X-API-TOKEN");
 
@@ -264,6 +266,8 @@ class MessageController extends BaseController {
 
 	public function destroy()
 	{
+	    markDeprecated( __METHOD__ );
+
 		$input = Input::get();
 
 		if(!isset($input['id']) && !isset($input['thread'])){

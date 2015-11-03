@@ -1604,6 +1604,7 @@ class EntryController extends BaseController
 
 	public function update( $id )
 	{
+	    markDeprecated( __METHOD__ );
 
 		$client = getS3Client();
 
@@ -1729,6 +1730,7 @@ class EntryController extends BaseController
 
 	public function tagEntry( $id )
 	{
+	    markDeprecated( __METHOD__ );
 
 		$tag = Input::get( 'tag' );
 
@@ -1869,6 +1871,7 @@ class EntryController extends BaseController
 
 	public function view( $id )
 	{
+	    markDeprecated( __METHOD__ );
 
 		$token = Request::header( "X-API-TOKEN" );
 
@@ -1926,6 +1929,8 @@ class EntryController extends BaseController
 
 	public function storeFeedback( $id )
 	{
+	    markDeprecated( __METHOD__ );
+
 		//Validate Input
 		$rules = array(
 			'feedback' => 'required',
@@ -2028,6 +2033,8 @@ class EntryController extends BaseController
 	 */
 	public function getFeedback()
 	{
+	    markDeprecated( __METHOD__ );
+
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );
@@ -2196,6 +2203,7 @@ class EntryController extends BaseController
 
 	public function search()
 	{
+	    markDeprecated( __METHOD__ );
 
 		$token = Request::header( "X-API-TOKEN" );
 
@@ -2227,6 +2235,7 @@ class EntryController extends BaseController
 
 	public function search2()
 	{
+	    markDeprecated( __METHOD__ );
 
 		$token = Request::header( "X-API-TOKEN" );
 
@@ -2492,6 +2501,7 @@ class EntryController extends BaseController
 
 	public function undelete( $id )
 	{
+	    markDeprecated( __METHOD__ );
 
 		$this->entry->undelete( $id );
 
@@ -2500,6 +2510,8 @@ class EntryController extends BaseController
 
 	public function mysearch()
 	{
+	    markDeprecated( __METHOD__ );
+
 		$token = Request::header( "X-API-TOKEN" );
 		$session = $this->token->get_session( $token );
 		$term = Input::get( "term" );
@@ -2680,6 +2692,7 @@ class EntryController extends BaseController
 
 	public function dummytest()
 	{
+	    markDeprecated( __METHOD__ );
 
 		/*$exclude = [ ];
 		$entry_rank = DB::table('entries')->where( 'entry_rank', '=', '0')->get();
@@ -3180,6 +3193,7 @@ class EntryController extends BaseController
 
 	public function search3()
 	{
+	    markDeprecated( __METHOD__ );
 
 		$token = Request::header( "X-API-TOKEN" );
 
@@ -3264,6 +3278,8 @@ class EntryController extends BaseController
 	}
 	public function videoupload()
 	{
+	    markDeprecated( __METHOD__ );
+
 		$file = Input::file( 'video' );
 
 		if( !empty( $file ) )
@@ -3632,6 +3648,8 @@ class EntryController extends BaseController
 	/* Added by Anil for testing youtube upload and watermark symbol add in video */
 	public function store2()
 	{
+	    markDeprecated( __METHOD__ );
+
 		$token = Request::header( "X-API-TOKEN" );
 		$response = array();
 		$session = $this->token->get_session( $token );

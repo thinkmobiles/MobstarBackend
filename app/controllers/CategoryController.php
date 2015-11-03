@@ -306,6 +306,7 @@ class CategoryController extends BaseController {
 
 	public function show($id_commas)
 	{
+	    markDeprecated( __METHOD__ );
 
 		$id = array_values(explode(',',$id_commas));
 

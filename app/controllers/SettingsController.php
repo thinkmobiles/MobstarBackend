@@ -194,6 +194,8 @@ class SettingsController extends BaseController
 
 	public function addAccount()
 	{
+	    markDeprecated( __METHOD__ );
+
 		$type = Input::get( 'type' );
 
 		$token = Request::header( "X-API-TOKEN" );

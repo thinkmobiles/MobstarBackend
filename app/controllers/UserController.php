@@ -454,6 +454,8 @@ class UserController extends BaseController
 
 	public function search()
 	{
+	    markDeprecated( __METHOD__ );
+
 		$term = Input::get( "term" );
 		//check to see if an email was entered
 		$validator = Validator::make(
@@ -1118,6 +1120,8 @@ class UserController extends BaseController
 
 	public function destroy( $user )
 	{
+	    markDeprecated( __METHOD__ );
+
 		$user->delete();
 
 		return Response::json( true );
@@ -1125,6 +1129,8 @@ class UserController extends BaseController
 
 	public function test()
 	{
+	    markDeprecated( __METHOD__ );
+
 //		$config = array(
 //			'key' => Creds::ENV_KEY,
 //			'secret' => Creds::ENV_SECRET

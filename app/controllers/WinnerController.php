@@ -69,6 +69,8 @@ class WinnerController extends BaseController
 
 	public function index()
 	{
+	    markDeprecated( __METHOD__ );
+
 		$token = Request::header( "X-API-TOKEN" );
 
 		$session = $this->token->get_session( $token );

@@ -65,6 +65,7 @@ class TagController extends BaseController
 
 	public function index()
 	{
+	    markDeprecated( __METHOD__ );
 
 		//Get limit to calculate pagination
 		$limit = ( Input::get( 'limit', '50' ) );

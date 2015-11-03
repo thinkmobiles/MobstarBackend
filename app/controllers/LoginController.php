@@ -460,6 +460,8 @@ class LoginController extends BaseController
 
 	public function twitter()
 	{
+	    markDeprecated( __METHOD__ );
+
 		// validate the info, create rules for the inputs
 		$rules = array(
 			'userId'      => 'required',
@@ -905,6 +907,9 @@ class LoginController extends BaseController
 
 	public function verifyphonenumber()
 	{
+
+	    markDeprecated( __METHOD__ );
+
 		// validate the info, create rules for the inputs
 		$rules = array(
 			'userId'    => 'required',
@@ -1024,6 +1029,8 @@ class LoginController extends BaseController
 	}
 	public function twiml()
 	{
+	    markDeprecated( __METHOD__ );
+
 		// tell the caller that they should listen to their howl
 			// and play the recording back, using the URL that Twilio posted
 			header("content-type: text/xml");
@@ -1037,6 +1044,8 @@ class LoginController extends BaseController
 	}
 	public function verifycode()
 	{
+	    markDeprecated( __METHOD__ );
+
 		// validate the info, create rules for the inputs
 		$rules = array(
 			'userId'    => 'required',
