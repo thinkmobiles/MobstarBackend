@@ -125,10 +125,15 @@ class EloquentEntryRepository implements EntryRepository
 
 	            $query->orWhere( function( $query )
 	                use( $max_media_duration_for_home_feed, $self, $localExclude, $geoLocationFilter, $categoryFilter ) {
+	                $allowedEntryTypes = array( 'video', 'audio' );
+	                if( ! $self->isEntryTypeExcluded( 'video_youtube', $localExclude ) )
+	                {
+	                    $allowedEntryTypes[] = 'video_youtube';
+	                }
 	                $query->where( 'entry_category_id', '=', 7 )
 	                ->where( 'entry_deleted', '=', 0 )
 	                ->where( 'entry_hide_on_feed', '=', 0 )
-	                ->whereIn( 'entry_type', array( 'video', 'audio' ) )
+	                ->whereIn( 'entry_type', $allowedEntryTypes )
 	                ->whereBetween( 'entry_duration', array( 0, $max_media_duration_for_home_feed ) );
 
 	                if( $geoLocationFilter )
@@ -168,6 +173,17 @@ class EloquentEntryRepository implements EntryRepository
 	    $entries = $query->get();
 
 	    return $entries;
+	}
+
+
+	private function isEntryTypeExcluded( $entryType, $excludes )
+	{
+	    if( empty( $excludes['entryType'] ) ) return false;
+	    $excludedTypes = is_array( $excludes['entryType'] )
+	       ? $excludes['entryType']
+	       : array( $excludes['entryType'] );
+
+	    return in_array( $entryType, $excludedTypes );
 	}
 
 
@@ -334,10 +350,15 @@ class EloquentEntryRepository implements EntryRepository
 
 	      $query->orWhere( function( $query )
 	        use( $max_media_duration_for_home_feed, $self, $localExclude ) {
+	        $allowedEntryTypes = array( 'video', 'audio' );
+	        if( ! $self->isEntryTypeExcluded( 'video_youtube', $localExclude ) )
+	        {
+	            $allowedEntryTypes[] = 'video_youtube';
+	        }
 	        $query->where( 'entry_category_id', '=', 7 )
 	          ->where( 'entry_deleted', '=', 0 )
 	          ->where( 'entry_hide_on_feed', '=', 0 )
-	          ->whereIn( 'entry_type', array( 'video', 'audio' ) )
+	          ->whereIn( 'entry_type', $allowedEntryTypes )
 	          ->whereBetween( 'entry_duration', array( 0, $max_media_duration_for_home_feed ) );
 
 	        $self->addExcludeRules( $query, $localExclude );

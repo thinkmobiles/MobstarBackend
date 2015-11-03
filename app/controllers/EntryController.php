@@ -1443,7 +1443,7 @@ class EntryController extends BaseController
             if( empty( $input['entry_subcategory'] ) ) unset( $input['entry_subcategory'] );
             if( empty( $input['entry_age'] ) ) unset( $input['entry_age'] );
             if( Input::get( 'splitVideoId', false ) ) $input['entry_splitVideoId'] = (int)Input::get( 'splitVideoId' );
-            $input['entry_duration'] = $entryDuration ? $entryDuration : -1;
+            $input['entry_duration'] = isset( $entryDuration ) ? $entryDuration : -1;
 
             // set entry continent based on user continent
             $user = \User::findOrFail( $session->token_user_id );
@@ -1522,7 +1522,7 @@ class EntryController extends BaseController
 	private function getYoutubeDuration( $videoId )
 	{
 	    // @todo implement me
-	    return -1;
+	    return 0; // walkaround to show youtube entry from profile on main feed
 	}
 
 
