@@ -16,7 +16,7 @@ class ProfileContentController extends BaseController
 	}
 	public function store()
 	{
-	    markDeprecated( __METHOD__ );
+	    markDead( __METHOD__ );
 
 		$token = Request::header( "X-API-TOKEN" );
 
@@ -229,7 +229,7 @@ class ProfileContentController extends BaseController
 	}
 	public function pushmessage()
 	{
-	    markDeprecated( __METHOD__ );
+	    markDead( __METHOD__ );
 
 	  if( Config::get('app.disable_sns') ) return;
 

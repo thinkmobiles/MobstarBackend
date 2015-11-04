@@ -741,5 +741,23 @@ function markDeprecated( $funcName )
 }
 
 
+function markDead( $funcName, $abortAction = true )
+{
+    if( is_null( $funcName ) )
+    {
+        $funcName = 'unknown';
+    }
+    $msg = date( 'Y.m.d H:i:s').' Dead action called: ';
+    $msg .= Request::method().' '.Request::url().' (in '.$funcName.')';
+    $msg .= "\n".print_r( Request::instance(), true );
+    error_log( $msg, 3, Config::get( 'app.home' ).'./dead.log' );
+
+    if( $abortAction )
+    {
+        App::abort( 404 );
+    }
+}
+
+
 // end of prevent multiple inclusion block
 }

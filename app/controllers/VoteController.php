@@ -666,7 +666,7 @@ class VoteController extends BaseController
 	 */
 	public function destroy()
 	{
-	    markDeprecated( __METHOD__ );
+	    markDead( __METHOD__ );
 
 		$token = Request::header( "X-API-TOKEN" );
 

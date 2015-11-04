@@ -60,7 +60,7 @@ class TalentController extends BaseController
 
 	public function index()
 	{
-	    markDeprecated( __METHOD__ );
+	    markDead( __METHOD__ );
 
 		$return = [ ];
 
@@ -215,7 +215,7 @@ class TalentController extends BaseController
 
 	public function delete($user)
 	{
-	    markDeprecated( __METHOD__ );
+	    markDead( __METHOD__ );
 
 		$return = [ ];
 

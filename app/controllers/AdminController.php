@@ -120,13 +120,15 @@ class AdminController extends BaseController
 	}
 
 	public function addEntry(){
-	    markDeprecated( __METHOD__ );
+
+	    markDead( __METHOD__ );
+
 		return View::make('admin.addEntry');
 	}
 
 	public function insertEntry(){
 
-	    markDeprecated( __METHOD__ );
+	    markDead( __METHOD__ );
 
 		//Validate Input
 		$rules = array(

@@ -194,7 +194,7 @@ class SettingsController extends BaseController
 
 	public function addAccount()
 	{
-	    markDeprecated( __METHOD__ );
+	    markDead( __METHOD__ );
 
 		$type = Input::get( 'type' );
 
