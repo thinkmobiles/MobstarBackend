@@ -116,16 +116,13 @@ class SnsHelper
     private static function getBroadcastPublishData( $message, $data )
     {
         $appleData = $data;
-        $appleData['alert'] = $message;
 
         $googleData = $data;
-        $googleData['message'] = $message;
 
         $prepData = array(
             'TopicArn' => self::$updateTopic,
             'MessageStructure' => 'json',
             'Message' => json_encode( array(
-                'default' => $message,
                 'APNS' => json_encode( array(
                     'aps' => $appleData,
                 )),
