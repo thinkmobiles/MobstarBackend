@@ -207,6 +207,8 @@ return array(
 
     'updateTopic_arn' => isset( $_ENV['UPDATE_TOPIC_ARN'] ) ? $_ENV['UPDATE_TOPIC_ARN'] : '',
 
+    'google_apikey' => isset( $_ENV['GOOGLE_API_KEY'] ) ? $_ENV['GOOGLE_API_KEY'] : '',
+
 	'disable_youtube_upload' => empty( $_ENV['DISABLE_YOUTUBE_UPLOAD'] ) ? false : true,
 
     'keep_uploaded_entry_files' => empty( $_ENV['KEEP_UPLOADED_ENTRY_FILES'] ) ? false : true,

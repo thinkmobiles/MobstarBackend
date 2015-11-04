@@ -10,6 +10,7 @@ use MobStar\EntryHelper;
 use MobStar\ResponseHelper;
 use MobStar\EntriesResponseHelper;
 use MobStar\SnsHelper;
+use MobStar\YoutubeHelper;
 
 /**
  * @package
@@ -1347,35 +1348,24 @@ class EntryController extends BaseController
                 $statusCode = 400;
                 break;
             }
-            $urlParts = parse_url( $youtubeUrl );
-            if( ! $urlParts )
+            $youtubeInfo = YoutubeHelper::getInfoFromUrl( $youtubeUrl );
+
+            if( $youtubeInfo['error'] )
             {
-                $response[ 'error' ] = "Invalid video_url provided";
-                $statusCode = 400;
-                break;
-            }
-            if( $urlParts['host'] != 'www.youtube.com' )
-            {
-                $response[ 'error' ] = "Not YouTube video_url provided";
+                $response[ 'error' ] = $youtubeInfo['error'];
                 $statusCode = 400;
                 break;
             }
 
-            $urlParams = array();
-            parse_str( $urlParts['query'], $urlParams );
-
-            if( empty( $urlParams['v'] ) )
+            if( $youtubeInfo['access'] != 'public' )
             {
-                $response[ 'error' ] = "Wrong YouTube video_url provided";
+                $response['error'] = 'Youtube video is not public';
                 $statusCode = 400;
                 break;
             }
-
-            $youtubeFilename = $urlParams[ 'v' ];
-            $entryDuration = $this->getYoutubeDuration( $youtubeFilename );
 
             $videoEntryFile = array(
-                'entry_file_name'         => $youtubeFilename,
+                'entry_file_name'         => $youtubeInfo['id'],
                 'entry_file_entry_id'     => 0, // we will set it later
                 'entry_file_location_type'=> 'url',
                 'entry_file_location'     => $youtubeUrl,
@@ -1429,7 +1419,7 @@ class EntryController extends BaseController
                 'entry_created_date' => date( 'Y-m-d H:i:s' ),
                 'entry_deleted'      => $entry_deleted,
                 'entry_subcategory'  => '',
-                'entry_age'           => '',
+                'entry_age'          => '',
                 'entry_height'       => '',
             ];
 
@@ -1443,7 +1433,7 @@ class EntryController extends BaseController
             if( empty( $input['entry_subcategory'] ) ) unset( $input['entry_subcategory'] );
             if( empty( $input['entry_age'] ) ) unset( $input['entry_age'] );
             if( Input::get( 'splitVideoId', false ) ) $input['entry_splitVideoId'] = (int)Input::get( 'splitVideoId' );
-            $input['entry_duration'] = isset( $entryDuration ) ? $entryDuration : -1;
+            $input['entry_duration'] = isset( $youtubeInfo['duration'] ) ? $youtubeInfo['duration'] : -1;
 
             // set entry continent based on user continent
             $user = \User::findOrFail( $session->token_user_id );
@@ -1517,13 +1507,6 @@ class EntryController extends BaseController
 
         return Response::make( $response, $statusCode );
     }
-
-
-	private function getYoutubeDuration( $videoId )
-	{
-	    // @todo implement me
-	    return 0; // walkaround to show youtube entry from profile on main feed
-	}
 
 
 	/**
