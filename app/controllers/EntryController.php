@@ -1284,7 +1284,7 @@ class EntryController extends BaseController
 				$newEntry = \Entry::findOrFail( $response['entry_id'] );
 				if( ($newEntry->entry_category_id != 7) AND ($newEntry->entry_category_id != 8) ) { // no notification on profile entries
 				    $messageData = array(
-				        'Type' => 'newEntry',
+				        'pushType' => 'newEntry',
 				        'entries' =>  array(
 				            array(
 				                'id' => $newEntry->entry_id,
