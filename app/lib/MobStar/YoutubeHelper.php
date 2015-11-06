@@ -21,7 +21,10 @@ class YoutubeHelper
         $APIKey = \Config::get( 'app.google_apikey' );
         if( empty( $APIKey ) )
         {
-            die( 'No Google API key in config' );
+            // @todo may be better to throw an exception ?
+            $msg = 'No Google API key in config';
+            error_log( $msg );
+            die( $msg );
         }
 
         $client = new Google_Client();
