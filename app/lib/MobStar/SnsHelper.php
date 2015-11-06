@@ -123,6 +123,7 @@ class SnsHelper
             'TopicArn' => self::$updateTopic,
             'MessageStructure' => 'json',
             'Message' => json_encode( array(
+                'default' => $message,
                 'APNS' => json_encode( array(
                     'aps' => $appleData,
                 )),
