@@ -31,14 +31,8 @@ class EntriesResponseHelperTest extends TestCase
 
             $content = json_decode( json_encode( $response['data'] ) );
 
-            $keys = array( 'profileImage', 'profileCover' );
-
-            $this->adjustAWSUrlInArray( $test['data'], $keys );
-            $this->adjustAWSUrlInArray( $content, $keys );
-
-            $keysToUnset = array( 'modified' );
-            $this->unsetRecursive( $content, $keysToUnset );
-            $this->unsetRecursive( $test['data'], $keysToUnset );
+            $this->prepDataForCompare( $content );
+            $this->prepDataForCompare( $test['data'] );
 
             $this->assertEquals(
                 $test['data'],
@@ -69,14 +63,9 @@ class EntriesResponseHelperTest extends TestCase
                 $response = EntriesResponseHelper::getOneEntry( $entry, $sessionUserId, $showFeedback );
                 $content = json_decode( json_encode( $response ) );
 
-                $keys = array( 'profileImage', 'profileCover', 'filePath', 'videoThumb' );
-
-                $this->adjustAWSUrlInArray( $entryObj, $keys );
-                $this->adjustAWSUrlInArray( $content, $keys );
-
-                $keysToUnset = array( 'modified' );
-                $this->unsetRecursive( $content, $keysToUnset );
-                $this->unsetRecursive( $entryObj, $keysToUnset );
+                $keysToUnset = array( 'modified', 'isVotedByYou' );
+                $this->prepDataForCompare( $content, null, $keysToUnset );
+                $this->prepDataForCompare( $entryObj, null, $keysToUnset );
 
                 $this->assertEquals( $entryObj, $content );
             }
@@ -148,4 +137,15 @@ class EntriesResponseHelperTest extends TestCase
         }
     }
 
+    private function prepDataForCompare( $data, $AWSUrlKeys = null, $unsetKeys = null )
+    {
+        if( is_null( $AWSUrlKeys ) ) $AWSUrlKeys = array( 'profileImage', 'profileCover', 'filePath', 'videoThumb' );
+
+        if( is_null( $unsetKeys ) ) $unsetKeys = array( 'modified', 'timestamp' );
+
+        $this->adjustAWSUrlInArray( $data, $AWSUrlKeys );
+        $this->unsetRecursive( $data, $unsetKeys );
+
+        return $data;
+    }
 }

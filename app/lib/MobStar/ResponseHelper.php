@@ -246,54 +246,7 @@ class ResponseHelper
 
     public static function oneEntry( $entry, $sessionUserId, $includeUser = false )
     {
-        $data = array();
-        $data[ 'id' ] = $entry->entry_id;
-        if( $entry->entry_splitVideoId ) $data['splitVideoId'] = $entry->entry_splitVideoId;
-        $data[ 'category' ] = $entry->category->category_name;
-        $data[ 'type' ] = $entry->entry_type;
-
-        if( $includeUser )
-        {
-            $data[ 'user' ] = self::oneUser( $entry->entry_user_id, $sessionUserId );
-        }
-
-        $data[ 'name' ] = $entry->entry_name;
-        $data[ 'description' ] = $entry->entry_description;
-        $data[ 'totalComments' ] = $entry->comments->count();
-        $data[ 'totalviews' ] = $entry->viewsTotal();
-        $data[ 'created' ] = $entry->entry_created_date;
-        $data[ 'modified' ] = $entry->entry_modified_date;
-
-        $data[ 'tags' ] = array();
-        foreach( $entry->entryTag as $tag )
-        {
-            $data[ 'tags' ][ ] = \Tag::find( $tag->entry_tag_tag_id )->tag_name;
-        }
-
-        $data[ 'entryFiles' ] = array();
-        foreach( $entry->file as $file )
-        {
-            $data['entryFiles'][] = self::entryFile( $file );
-        }
-
-        $data['videoThumb'] = self::entryThumb( $entry, $entry->file );
-
-        $votesInfo = self::getEntryVotes( $entry->entry_id );
-        $data[ 'upVotes' ] = $votesInfo->votes_up;
-        $data[ 'downVotes' ] = $votesInfo->votes_down;
-        $data[ 'rank' ] = $entry->entry_rank;
-        $data[ 'language' ] = $entry->entry_language;
-
-        if( $entry->entry_deleted )
-        {
-            $data[ 'deleted' ] = true;
-        }
-        else
-        {
-            $data[ 'deleted' ] = false;
-        }
-
-        return $data;
+        return self::oneEntryById( $entry->entry_id, $sessionUserId, $includeUser );
     }
 
 
@@ -308,51 +261,26 @@ class ResponseHelper
         );
         $entry = $entries[ $entryId ];
 
-        $data = array();
-        $data[ 'id' ] = $entryId;
+        $noEntry = array(
+            'id' => $entryId
+        );
 
-        if( empty( $entry ) ) {
-            return $data;
+        if( empty( $entry ) )
+        {
+            return $noEntry;
         }
 
-        if( $entry->entry_splitVideoId ) $data['splitVideoId'] = $entry->entry_splitVideoId;
-        $data[ 'category' ] = $entry->categoryInfo->category_name;
-        $data[ 'type' ] = $entry->entry_type;
+        $data = self::makeEntryBasicInfo( $entry, $sessionUserId );
+
+        if( empty( $data ) )
+        {
+            return $noEntry;
+        }
 
         $data[ 'user' ] = self::oneUser_StarsCountsOnly( $entry->entry_user_id, $sessionUserId );
 
-        $data[ 'name' ] = $entry->entry_name;
-        $data[ 'description' ] = $entry->entry_description;
-        $data[ 'totalComments' ] = $entry->commentCounts;
-        $data[ 'totalviews' ] = $entry->entry_views + $entry->entry_views_added;
-        $data[ 'created' ] = $entry->entry_created_date;
-        $data[ 'modified' ] = $entry->entry_modified_date;
-
-        $data[ 'tags' ] = $entry->tagNames;
-
-        $data[ 'entryFiles' ] = array();
-        foreach( $entry->filesInfo as $file ) {
-            $data['entryFiles'][] = self::entryFile( $file );
-        }
-
-        $data['videoThumb'] = self::entryThumb( $entry, $entry->filesInfo );
-
-        $data[ 'upVotes' ] = $entry->totalVotes['up'];
-        $data[ 'downVotes' ] = $entry->totalVotes['down'];
-
-        $data[ 'rank' ] = $entry->entry_rank;
-        $data[ 'language' ] = $entry->entry_language;
-
-        if( $entry->entry_deleted )
-        {
-            $data[ 'deleted' ] = true;
-        }
-        else
-        {
-            $data[ 'deleted' ] = false;
-        }
-
         return $data;
+
     }
 
 
@@ -368,49 +296,25 @@ class ResponseHelper
         );
         $entry = $entries[ $entryId ];
 
-        $data = array();
-        $data[ 'id' ] = $entryId;
-        if( empty( $entry ) )
-            return $data;
+        $noEntry = array(
+            'id' => $entryId
+        );
 
-        if( $entry->entry_splitVideoId ) $data['splitVideoId'] = $entry->entry_splitVideoId;
-        $data[ 'category' ] = $entry->categoryInfo->category_name;
-        $data[ 'type' ] = $entry->entry_type;
+        if( empty( $entry ) )
+        {
+            return $noEntry;
+        }
+
+        $data = self::makeEntryBasicInfo( $entry, $sessionUserId );
+
+        if( empty( $data ) )
+        {
+            return $noEntry;
+        }
 
         if( $includeUser )
         {
             $data[ 'user' ] = self::oneUser( $entry->entry_user_id, $sessionUserId );
-        }
-
-        $data[ 'name' ] = $entry->entry_name;
-        $data[ 'description' ] = $entry->entry_description;
-        $data[ 'totalComments' ] = $entry->commentCounts;
-        $data[ 'totalviews' ] = $entry->entry_views + $entry->entry_views_added;
-        $data[ 'created' ] = $entry->entry_created_date;
-        $data[ 'modified' ] = $entry->entry_modified_date;
-
-        $data[ 'tags' ] = $entry->tagNames;
-
-        $data[ 'entryFiles' ] = array();
-        foreach( $entry->filesInfo as $file ) {
-            $data[ 'entryFiles' ][] = self::entryFile( $file );
-        }
-
-        $data[ 'videoThumb' ] = self::entryThumb( $entry, $entry->filesInfo );
-
-        $data[ 'upVotes' ] = $entry->totalVotes['up'];
-        $data[ 'downVotes' ] = $entry->totalVotes['down'];
-
-        $data[ 'rank' ] = $entry->entry_rank;
-        $data[ 'language' ] = $entry->entry_language;
-
-        if( $entry->entry_deleted )
-        {
-            $data[ 'deleted' ] = true;
-        }
-        else
-        {
-            $data[ 'deleted' ] = false;
         }
 
         return $data;
@@ -489,7 +393,68 @@ class ResponseHelper
             $current[ 'deleted' ] = false;
         }
 
+        $voteInfo = EntryHelper::getVotedByUserInfo( array( $entry->entry_id ), $sessionUserId );
+        $voteInfo = array_pop( $voteInfo );
+
+        $current['isVotedByYou'] = empty( $voteInfo['up'] ) ? 0 : 1;
+
         return $current;
+    }
+
+
+    private static function makeEntryBasicInfo( $entry, $sessionUserId )
+    {
+        if( ! self::isEntryFilesValid( $entry, $entry->filesInfo ) )
+        {
+            return null;
+        }
+
+        $data = array();
+        $data['id'] = $entry->entry_id;
+        if( $entry->entry_splitVideoId ) {
+            $data['splitVideoId'] = $entry->entry_splitVideoId;
+        }
+        $data['category'] = $entry->categoryInfo->category_name;
+
+        if( isset( $entry->entry_category_id )  && $entry->entry_category_id == 3 )
+        {
+            $data['subcategory'] = $entry->entry_subcategory;
+            $data['age'] = $entry->entry_age;
+            $data['height'] = $entry->entry_height;
+        }
+
+        $data['type'] = $entry->entry_type;
+
+        $data['name'] = $entry->entry_name;
+        $data['description'] = $entry->entry_description;
+        $data['totalComments'] = $entry->commentCounts;
+        $data['totalviews'] = $entry->entry_views + $entry->entry_views_added;
+        $data['created'] = $entry->entry_created_date;
+        $data['modified'] = $entry->entry_modified_date;
+
+        $data['tags'] = $entry->tagNames;
+
+        $data['entryFiles'] = array();
+        foreach( $entry->filesInfo as $file ) {
+            $data['entryFiles'][] = self::entryFile( $file );
+        }
+
+        $data['videoThumb'] = self::entryThumb( $entry, $entry->filesInfo );
+
+        $data['upVotes'] = $entry->totalVotes['up'];
+        $data['downVotes'] = $entry->totalVotes['down'];
+
+        $data['rank'] = $entry->entry_rank;
+        $data['language'] = $entry->entry_language;
+
+        $data['deleted'] = $entry->entry_deleted ? true : false;
+
+        $voteInfo = EntryHelper::getVotedByUserInfo( array( $entry->entry_id ), $sessionUserId );
+        $voteInfo = array_pop( $voteInfo );
+
+        $data['isVotedByYou'] = empty( $voteInfo['up'] ) ? 0 : 1;
+
+        return $data;
     }
 
 

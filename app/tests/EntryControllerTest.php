@@ -317,7 +317,7 @@ class EntryControllerTest extends TestCase{
     }
 
 
-    private function unsetRecursive( & $data, $keys )
+private function unsetRecursive( & $data, $keys )
     {
         if( is_array( $data ) )
         {
@@ -336,7 +336,7 @@ class EntryControllerTest extends TestCase{
 
         foreach( $data as &$value )
         {
-            if( is_array( $value ) )
+            if( is_array( $value ) or is_object( $value ) )
             {
                 $this->unsetRecursive( $value, $keys );
             }
@@ -348,7 +348,7 @@ class EntryControllerTest extends TestCase{
     {
         if( is_null( $AWSUrlKeys ) ) $AWSUrlKeys = array( 'profileImage', 'profileCover', 'filePath', 'videoThumb' );
 
-        if( is_null( $unsetKeys ) ) $unsetKeys = array( 'modified', 'timestamp' );
+        if( is_null( $unsetKeys ) ) $unsetKeys = array( 'modified', 'timestamp', 'isVotedByYou' );
 
         $this->adjustAWSUrlInArray( $data, $AWSUrlKeys );
         $this->unsetRecursive( $data, $unsetKeys );

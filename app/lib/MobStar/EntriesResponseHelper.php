@@ -58,74 +58,23 @@ class EntriesResponseHelper extends ResponseHelper
         if ( $fields )
             return self::getOneEntryWithFields( $entry, $sessionUserId, $showFeedback, $fields );
 
-        $data = array();
-
-        if( $entry->entry_splitVideoId ) $data['splitVideoId'] = $entry->entry_splitVideoId;
-
-        $data[ 'id' ] = $entry->entry_id;
-        $data[ 'user' ] = ResponseHelper::oneUser( $entry->entry_user_id, $sessionUserId );
-
-        if( isset( $entry->entry_category_id )  && $entry->entry_category_id == 3 )
-        {
-            $data[ 'subcategory' ] = $entry->entry_subcategory;
-            $data[ 'age' ] = $entry->entry_age;
-            $data[ 'height' ] = $entry->entry_height;
-        }
-        $data[ 'category' ] = $entry->category->category_name;
-        $data[ 'type' ] = $entry->entry_type;
-        $data[ 'name' ] = $entry->entry_name;
-        $data[ 'description' ] = $entry->entry_description;
-        $data[ 'totalComments' ] = $entry->comments->count(); // @todo fix it
-        $data[ 'totalviews' ] = $entry->viewsTotal();
-        $data[ 'created' ] = $entry->entry_created_date;
-        $data[ 'modified' ] = $entry->entry_modified_date;
-
-        $data[ 'tags' ] = array();
-        foreach( $entry->entryTag as $entry_tag )
-        {
-            //TODO: Fix tags so that we do not need to find this
-            $data[ 'tags' ][ ] = $entry_tag->tag->tag_name;
-        }
-
-        if( ! self::isEntryFilesValid( $entry, $entry->file ) )
+        $data = self::oneEntryById( $entry->entry_id, $sessionUserId, true );
+        if( empty( $data ) )
         {
             return false;
         }
 
-        if ( count($entry->file) > 0) {
-            foreach( $entry->file as $file ) {
-                $data['entryFiles'][] = self::entryFile( $file );
-            }
-            $data['videoThumb'] = self::entryThumb( $entry, $entry->file );
-        }
-
-        $entryVotes = self::getEntryVotes( $entry->entry_id );
-        $data[ 'upVotes' ] = $entryVotes->votes_up;
-        $data[ 'downVotes' ] = $entryVotes->votes_down;
-        $data[ 'rank' ] = $entry->entry_rank;
-        $data[ 'language' ] = $entry->entry_language;
-
         if( $showFeedback == 1 )
         {
-            $feedback = array();
-
+            $data['feedback'] = array();
             foreach( $entry->comments as $comment )
             {
-                $feedback[ ] = [
+                $data['feedback'][] = array(
                     'comment'        => $comment->comment_content,
                     'commentDate'    => $comment->comment_added_date,
-                    'commentDeleted' => (bool)$comment->comment_deleted ];
+                    'commentDeleted' => (bool)$comment->comment_deleted
+                );
             }
-            $data[ 'feedback' ] = $feedback;
-        }
-
-        if( $entry->entry_deleted )
-        {
-            $data[ 'deleted' ] = true;
-        }
-        else
-        {
-            $data[ 'deleted' ] = false;
         }
 
         return $data;
@@ -258,7 +207,7 @@ class EntriesResponseHelper extends ResponseHelper
 
             $entryData = self::getOneEntry( $entry, $sessionUserId, $showFeedback, $fields );
 
-            if( empty( $entryData ) ) continue;
+            if( empty( $entryData ) OR (count( $entryData ) < 5) ) continue;
 
             $data[] = $entryData;
         }
