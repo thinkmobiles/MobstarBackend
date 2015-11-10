@@ -1,9 +1,12 @@
 <?php
 
+require_once __DIR__.'/ResponseTestCase.php';
+
 use MobStar\UserHelper;
 use MobStar\EntryHelper;
 
-class EntryControllerTest extends TestCase{
+
+class EntryControllerTest extends ResponseTestCase{
 
     private static $data_dir = '/data/old_version';
 
@@ -22,6 +25,9 @@ class EntryControllerTest extends TestCase{
 
         $testData = unserialize( file_get_contents( $dataFile ) );
 
+        $preparator = new DataPreparator();
+        $preparator->addUnsetKeys( array( 'isVotedByYou', 'timestamp' ) );
+
         foreach( $testData as $test ) {
 
             $response = $this->getResponse(
@@ -38,9 +44,8 @@ class EntryControllerTest extends TestCase{
 
             $content = json_decode( $response->getContent() );
 
-            $content = $this->prepDataForCompare( $content );
-
-            $test['data'] = $this->prepDataForCompare( $test['data'] );
+            $content = $preparator->getPreparedData( $content );
+            $test['data'] = $preparator->getPreparedData( $test['data'] );
 
             $this->assertEquals(
                 $test['data'],
@@ -56,6 +61,9 @@ class EntryControllerTest extends TestCase{
 
         $testData = unserialize( file_get_contents( $dataFile ) );
 
+        $preparator = new DataPreparator();
+        $preparator->addUnsetKeys( array( 'isVotedByYou', 'timestamp' ) );
+
         foreach( $testData as $test ) {
 
             $response = $this->getResponse(
@@ -72,14 +80,10 @@ class EntryControllerTest extends TestCase{
 
             $content = json_decode( $response->getContent() );
 
-            $content = $this->prepDataForCompare( $content );
+            $content = $preparator->getPreparedData( $content );
+            $test['data'] = $preparator->getPreparedData( $test['data'] );
 
-            $test['data'] = $this->prepDataForCompare( $test['data'] );
-
-            $this->assertEquals(
-                $test['data'],
-                $content
-            );
+            $this->assertEntryListEquals( $test['data'], $content );
         }
     }
 
@@ -89,6 +93,9 @@ class EntryControllerTest extends TestCase{
         $dataFile = __DIR__ . self::$data_dir.'/EntryController_index_category6.txt';
 
         $testData = unserialize( file_get_contents( $dataFile ) );
+
+        $preparator = new DataPreparator();
+        $preparator->addUnsetKeys( array( 'isVotedByYou', 'timestamp' ) );
 
         foreach( $testData as $test ) {
 
@@ -109,11 +116,10 @@ class EntryControllerTest extends TestCase{
 
             $content = json_decode( $response->getContent() );
 
-            $content = $this->prepDataForCompare( $content );
+            $content = $preparator->getPreparedData( $content );
+            $test['data'] = $preparator->getPreparedData( $test['data'] );
 
-            $test['data'] = $this->prepDataForCompare( $test['data'] );
-
-            $this->assertEquals(
+            $this->assertEntryListEquals(
                 $test['data'],
                 $content
             );
@@ -127,6 +133,9 @@ class EntryControllerTest extends TestCase{
 
         $testData = unserialize( file_get_contents( $dataFile ) );
 
+        $preparator = new DataPreparator();
+        $preparator->addUnsetKeys( array( 'isVotedByYou', 'timestamp' ) );
+
         foreach( $testData as $test ) {
 
             $pars = array(
@@ -146,11 +155,10 @@ class EntryControllerTest extends TestCase{
 
             $content = json_decode( $response->getContent() );
 
-            $content = $this->prepDataForCompare( $content );
+            $content = $preparator->getPreparedData( $content );
+            $test['data'] = $preparator->getPreparedData( $test['data'] );
 
-            $test['data'] = $this->prepDataForCompare( $test['data'] );
-
-            $this->assertEquals(
+            $this->assertEntryListEquals(
                 $test['data'],
                 $content
             );
@@ -163,6 +171,9 @@ class EntryControllerTest extends TestCase{
         $dataFile = __DIR__ . self::$data_dir.'/EntryController_mix_user.txt';
 
         $testData = unserialize( file_get_contents( $dataFile ) );
+
+        $preparator = new DataPreparator();
+        $preparator->addUnsetKeys( array( 'isVotedByYou', 'timestamp' ) );
 
         foreach( $testData as $test ) {
 
@@ -182,12 +193,10 @@ class EntryControllerTest extends TestCase{
 
             $content = json_decode( $response->getContent() );
 
-            $content = $this->prepDataForCompare( $content );
+            $content = $preparator->getPreparedData( $content );
+            $test['data'] = $preparator->getPreparedData( $test['data'] );
 
-            $test['data'] = $this->prepDataForCompare( $test['data'] );
-
-
-            $this->assertEquals(
+            $this->assertEntryListEquals(
                 $test['data'],
                 $content
             );
@@ -200,6 +209,9 @@ class EntryControllerTest extends TestCase{
         $dataFile = __DIR__ . self::$data_dir.'/EntryController_search4.txt';
 
         $testData = unserialize( file_get_contents( $dataFile ) );
+
+        $preparator = new DataPreparator();
+        $preparator->addUnsetKeys( array( 'isVotedByYou', 'timestamp' ) );
 
         foreach( $testData as $test ) {
 
@@ -221,9 +233,8 @@ class EntryControllerTest extends TestCase{
 
             $content = json_decode( $response->getContent() );
 
-            $content = $this->prepDataForCompare( $content );
-
-            $test['data'] = $this->prepDataForCompare( $test['data'] );
+            $content = $preparator->getPreparedData( $content );
+            $test['data'] = $preparator->getPreparedData( $test['data'] );
 
             foreach( $test['data']->entries as $e ) {
                 if( isset( $e->entry->tags ) ) sort( $e->entry->tags );
@@ -231,6 +242,7 @@ class EntryControllerTest extends TestCase{
             foreach( $content->entries as $e ) {
                 if( isset( $e->entry->tags ) ) sort( $e->entry->tags );
             }
+
 
             $this->assertEquals(
                 $test['data'],
@@ -245,6 +257,9 @@ class EntryControllerTest extends TestCase{
         $dataFile = __DIR__ . self::$data_dir.'/EntryController_show.txt';
 
         $testData = unserialize( file_get_contents( $dataFile ) );
+
+        $preparator = new DataPreparator();
+        $preparator->addUnsetKeys( array( 'isVotedByYou', 'timestamp' ) );
 
         foreach( $testData as $test ) {
 
@@ -264,9 +279,8 @@ class EntryControllerTest extends TestCase{
 
             $content = json_decode( $response->getContent() );
 
-            $content = $this->prepDataForCompare( $content );
-
-            $test['data'] = $this->prepDataForCompare( $test['data'] );
+            $content = $preparator->getPreparedData( $content );
+            $test['data'] = $preparator->getPreparedData( $test['data'] );
 
             if( isset( $test['data']->tags ) ) sort( $test['data']->tags );
             if( isset( $content->tags ) ) sort( $content->tags );
@@ -277,83 +291,4 @@ class EntryControllerTest extends TestCase{
             );
         }
     }
-
-
-    private function adjustAWSUrlInArray( &$data, $keys )
-    {
-        if ( is_array( $data ) ) {
-            foreach( $keys as $key ) {
-                if( isset( $data[$key] ) ) $data[ $key ] = $this->adjustAWSUrl( $data[ $key ] );
-            }
-            foreach( $data as &$field ) {
-                if( is_array( $field ) OR is_object( $field ) )
-                    $this->adjustAWSUrlInArray( $field, $keys );
-            }
-            unset( $field );
-        }
-        if( is_object( $data ) ) {
-            foreach( $keys as $key ) {
-                if( isset( $data->$key ) ) $data->$key = $this->adjustAWSUrl( $data->$key );
-            }
-            foreach( $data as &$field ) {
-                if( is_array( $field ) OR is_object( $field ) )
-                    $this->adjustAWSUrlInArray( $field, $keys );
-            }
-            unset( $field );
-        }
-    }
-
-
-    private function adjustAWSUrl( $url )
-    {
-        // remove all after 'Expires'. Otherwise comperison will fail  due to different sufixes added by AWS client
-
-        if( empty( $url ) ) return $url;
-
-        $index = strpos( $url, 'Expires' );
-        if( $index === false ) return $url;
-
-        return substr( $url, 0, $index );
-    }
-
-
-private function unsetRecursive( & $data, $keys )
-    {
-        if( is_array( $data ) )
-        {
-            foreach( $keys as $key )
-            {
-                unset( $data[ $key ] );
-            }
-        }
-        elseif( is_object( $data ) )
-        {
-            foreach( $keys as $key )
-            {
-                unset( $data->$key );
-            }
-        }
-
-        foreach( $data as &$value )
-        {
-            if( is_array( $value ) or is_object( $value ) )
-            {
-                $this->unsetRecursive( $value, $keys );
-            }
-        }
-    }
-
-
-    private function prepDataForCompare( $data, $AWSUrlKeys = null, $unsetKeys = null )
-    {
-        if( is_null( $AWSUrlKeys ) ) $AWSUrlKeys = array( 'profileImage', 'profileCover', 'filePath', 'videoThumb' );
-
-        if( is_null( $unsetKeys ) ) $unsetKeys = array( 'modified', 'timestamp', 'isVotedByYou' );
-
-        $this->adjustAWSUrlInArray( $data, $AWSUrlKeys );
-        $this->unsetRecursive( $data, $unsetKeys );
-
-        return $data;
-    }
-
 }

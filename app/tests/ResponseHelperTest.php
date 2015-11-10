@@ -26,18 +26,16 @@ class ResponseHelperTest extends TestCase{
 
         UserHelper::prepareUsers( $userIds );
 
+        $preparator = new DataPreparator();
+
         foreach( $testData as $data ) {
             $session = $token->get_session( $data['token'] );
             $normal = $data['normal'];
 
             $userProfile = ResponseHelper::getUserProfile( $session, $normal );
 
-            // adjust AWS urls
-            $data['data']['profileImage'] = self::adjustAWSUrl( $data['data']['profileImage'] );
-            $data['data']['profileCover'] = self::adjustAWSUrl( $data['data']['profileCover'] );
-
-            $userProfile['profileImage'] = self::adjustAWSUrl( $userProfile['profileImage'] );
-            $userProfile['profileCover'] = self::adjustAWSUrl( $userProfile['profileCover'] );
+            $data['data'] = $preparator->getPreparedData( $data['data'] );
+            $userProfile = $preparator->getPreparedData( $userProfile );
 
             $this->assertEquals( $data['data'], $userProfile );
         }
@@ -104,6 +102,7 @@ class ResponseHelperTest extends TestCase{
 
         UserHelper::prepareUsers( $userIds );
 
+        $preparator = new DataPreparator();
 
         foreach( $testData as $data ) {
 
@@ -113,12 +112,8 @@ class ResponseHelperTest extends TestCase{
 
             $particUser = ResponseHelper::particUser( $userId, $session, $includeStars );
 
-            // adjust AWS urls
-            $data['data']['profileImage'] = self::adjustAWSUrl( $data['data']['profileImage'] );
-            $data['data']['profileCover'] = self::adjustAWSUrl( $data['data']['profileCover'] );
-
-            $particUser['profileImage'] = self::adjustAWSUrl( $particUser['profileImage'] );
-            $particUser['profileCover'] = self::adjustAWSUrl( $particUser['profileCover'] );
+            $data['data'] = $preparator->getPreparedData( $data['data'] );
+            $particUser = $preparator->getPreparedData( $particUser );
 
             $this->assertEquals( $data['data'], $particUser );
         }
@@ -141,6 +136,7 @@ class ResponseHelperTest extends TestCase{
 
         UserHelper::prepareUsers( $userIds );
 
+        $preparator = new DataPreparator();
 
         foreach( $testData as $data ) {
 
@@ -152,11 +148,8 @@ class ResponseHelperTest extends TestCase{
 
             $oneUser = ResponseHelper::oneUser( $userId, $session->token_user_id, $includeStars, $normal );
 
-            // adjust AWS urls
-            $keys = array( 'profileImage', 'profileCover' );
-
-            $this->adjustAWSUrlInArray( $data['data'], $keys );
-            $this->adjustAWSUrlInArray( $oneUser, $keys );
+            $data['data'] = $preparator->getPreparedData( $data['data'] );
+            $oneUser = $preparator->getPreparedData( $oneUser );
 
             $this->assertEquals( $data['data'], $oneUser );
         }
@@ -179,6 +172,7 @@ class ResponseHelperTest extends TestCase{
 
         UserHelper::prepareUsers( $userIds );
 
+        $preparator = new DataPreparator();
 
         foreach( $testData as $data ) {
 
@@ -198,11 +192,9 @@ class ResponseHelperTest extends TestCase{
             // remove stars/starredby fields
             unset( $data['data']['stars'] );
             unset( $data['data']['starredBy'] );
-            // adjust AWS urls
-            $keys = array( 'profileImage', 'profileCover' );
 
-            $this->adjustAWSUrlInArray( $data['data'], $keys );
-            $this->adjustAWSUrlInArray( $oneUser, $keys );
+            $data['data'] = $preparator->getPreparedData( $data['data'] );
+            $oneUser = $preparator->getPreparedData( $oneUser );
 
             $this->assertEquals( $data['data'], $oneUser );
         }
@@ -225,6 +217,9 @@ class ResponseHelperTest extends TestCase{
 
         UserHelper::prepareUsers( $userIds );
 
+        $preparator = new DataPreparator();
+        $preparator->addUnsetKeys( array( 'isVotedByYou', 'subcategory', 'age', 'height' ) );
+
         foreach( $testData as $data ) {
 
 
@@ -236,11 +231,8 @@ class ResponseHelperTest extends TestCase{
 
             $oneEntry = ResponseHelper::oneEntry( $entry, $session->token_user_id, $includeUser );
 
-            // adjust AWS urls
-            $keys = array( 'profileImage', 'profileCover', 'filePath', 'videoThumb' );
-
-            $this->adjustAWSUrlInArray( $data['data'], $keys );
-            $this->adjustAWSUrlInArray( $oneEntry, $keys );
+            $data['data'] = $preparator->getPreparedData( $data['data'] );
+            $oneEntry = $preparator->getPreparedData( $oneEntry );
 
             $this->assertEquals( $data['data'], $oneEntry );
         }
@@ -270,8 +262,10 @@ class ResponseHelperTest extends TestCase{
         EntryHelper::clear();
         EntryHelper::prepareEntries( $entryIds, array('commentCounts', 'filesInfo', 'tagNames', 'totalVotes', 'votedByUser') );
 
-        foreach( $testData as $data ) {
+        $preparator = new DataPreparator();
+        $preparator->addUnsetKeys( array( 'isVotedByYou', 'subcategory', 'age', 'height' ) );
 
+        foreach( $testData as $data ) {
 
             $entryId = $data['entryId'];
             $session = $token->get_session( $data['token'] );
@@ -279,51 +273,10 @@ class ResponseHelperTest extends TestCase{
 
             $oneEntry = ResponseHelper::oneEntryById( $entryId, $session->token_user_id, $includeUser );
 
-            // adjust AWS urls
-            $keys = array( 'profileImage', 'profileCover', 'filePath', 'videoThumb' );
-
-            $this->adjustAWSUrlInArray( $data['data'], $keys );
-            $this->adjustAWSUrlInArray( $oneEntry, $keys );
+            $data['data'] = $preparator->getPreparedData( $data['data'] );
+            $oneEntry = $preparator->getPreparedData( $oneEntry );
 
             $this->assertEquals( $data['data'], $oneEntry );
         }
-    }
-
-
-    private function adjustAWSUrlInArray( &$data, $keys )
-    {
-        if ( is_array( $data ) ) {
-            foreach( $keys as $key ) {
-                if( isset( $data[$key] ) ) $data[ $key ] = $this->adjustAWSUrl( $data[ $key ] );
-            }
-            foreach( $data as &$field ) {
-                if( is_array( $field ) OR is_object( $field ) )
-                    $this->adjustAWSUrlInArray( $field, $keys );
-            }
-            unset( $field );
-        }
-        if( is_object( $data ) ) {
-            foreach( $keys as $key ) {
-                if( isset( $data->$key ) ) $data->$key = $this->adjustAWSUrl( $data->$key );
-            }
-            foreach( $data as &$field ) {
-                if( is_array( $field ) OR is_object( $field ) )
-                    $this->adjustAWSUrlInArray( $field, $keys );
-            }
-            unset( $field );
-        }
-    }
-
-
-    private function adjustAWSUrl( $url )
-    {
-        // remove all after 'Expires'. Otherwise comperison will fail  due to different sufixes added by AWS client
-
-        if( empty( $url ) ) return $url;
-
-        $index = strpos( $url, 'Expires' );
-        if( $index === false ) return $url;
-
-        return substr( $url, 0, $index );
     }
 }

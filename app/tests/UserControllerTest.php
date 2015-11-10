@@ -20,6 +20,11 @@ class UserControllerTest extends TestCase
 
         $testData = unserialize( file_get_contents( $dataFile ) );
 
+        $preparator = new DataPreparator(
+            array(),
+            array( 'profileImage', 'profileCover' )
+        );
+
         foreach( $testData as $test ) {
 
             $userId = $test['userId'];
@@ -30,10 +35,8 @@ class UserControllerTest extends TestCase
 
             $content = json_decode( $response->getContent() );
 
-            $keys = array( 'profileImage', 'profileCover' );
-
-            $this->adjustAWSUrlInArray( $test['data'], $keys );
-            $this->adjustAWSUrlInArray( $content, $keys );
+            $test['data'] = $preparator->getPreparedData( $test['data'] );
+            $content = $preparator->getPreparedData( $content );
 
             $this->assertEquals(
                 $test['data'],
@@ -41,43 +44,4 @@ class UserControllerTest extends TestCase
             );
         }
     }
-
-
-    private function adjustAWSUrlInArray( &$data, $keys )
-    {
-        if ( is_array( $data ) ) {
-            foreach( $keys as $key ) {
-                if( isset( $data[$key] ) ) $data[ $key ] = $this->adjustAWSUrl( $data[ $key ] );
-            }
-            foreach( $data as &$field ) {
-                if( is_array( $field ) OR is_object( $field ) )
-                    $this->adjustAWSUrlInArray( $field, $keys );
-            }
-            unset( $field );
-        }
-        if( is_object( $data ) ) {
-            foreach( $keys as $key ) {
-                if( isset( $data->$key ) ) $data->$key = $this->adjustAWSUrl( $data->$key );
-            }
-            foreach( $data as &$field ) {
-                if( is_array( $field ) OR is_object( $field ) )
-                    $this->adjustAWSUrlInArray( $field, $keys );
-            }
-            unset( $field );
-        }
-    }
-
-
-    private function adjustAWSUrl( $url )
-    {
-        // remove all after 'Expires'. Otherwise comperison will fail  due to different sufixes added by AWS client
-
-        if( empty( $url ) ) return $url;
-
-        $index = strpos( $url, 'Expires' );
-        if( $index === false ) return $url;
-
-        return substr( $url, 0, $index );
-    }
-
 }

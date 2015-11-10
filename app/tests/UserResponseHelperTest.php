@@ -16,6 +16,11 @@ class UserResponseHelperTest extends TestCase
 
         $token = new \MobStar\Storage\Token\EloquentTokenRepository();
 
+        $preparator = new DataPreparator(
+            array('stars', 'starredBy'), // unset keys
+            array('profileImage', 'profileCover') // AWS keys
+        );
+
         foreach( $testData as $test ) {
 
             $userId = $test['userId'];
@@ -28,16 +33,8 @@ class UserResponseHelperTest extends TestCase
 
             $content = json_decode( json_encode( $response['data'] ) );
 
-            unset( $test['data']->users[0]->user->stars );
-            unset( $content->users[0]->user->stars );
-
-            unset( $test['data']->users[0]->user->starredBy );
-            unset( $content->users[0]->user->starredBy );
-
-            $keys = array( 'profileImage', 'profileCover' );
-
-            $this->adjustAWSUrlInArray( $test['data'], $keys );
-            $this->adjustAWSUrlInArray( $content, $keys );
+            $test['data'] = $preparator->getPreparedData( $test['data'] );
+            $content = $preparator->getPreparedData( $content );
 
             $this->assertEquals(
                 $test['data'],
@@ -55,6 +52,15 @@ class UserResponseHelperTest extends TestCase
 
         $token = new \MobStar\Storage\Token\EloquentTokenRepository();
 
+        $testDataPreparator = new DataPreparator(
+            array('starredBy'),
+            array('profileImage', 'profileCover')
+        );
+        $contentPreparator = new DataPreparator(
+            array(),
+            array('profileImage', 'profileCover')
+        );
+
         foreach( $testData as $test ) {
 
             $userId = $test['userId'];
@@ -67,13 +73,8 @@ class UserResponseHelperTest extends TestCase
 
             $content = json_decode( json_encode( $response['data'] ) );
 
-            unset( $test['data']->users[0]->user->starredBy );
-            unset( $content->users[0]->user->starredBy );
-
-            $keys = array( 'profileImage', 'profileCover' );
-
-            $this->adjustAWSUrlInArray( $test['data'], $keys );
-            $this->adjustAWSUrlInArray( $content, $keys );
+            $content = $contentPreparator->getPreparedData( $content );
+            $test['data'] = $testDataPreparator->getPreparedData( $test['data'] );
 
             $this->assertEquals(
                 $test['data'],
@@ -91,6 +92,14 @@ class UserResponseHelperTest extends TestCase
 
         $token = new \MobStar\Storage\Token\EloquentTokenRepository();
 
+        $testDataPreparator = new DataPreparator(
+            array('stars'),
+            array('profileImage', 'profileCover')
+        );
+        $contentPreparator = new DataPreparator(
+            array(),
+            array('profileImage', 'profileCover')
+        );
         foreach( $testData as $test ) {
 
 
@@ -104,13 +113,8 @@ class UserResponseHelperTest extends TestCase
 
             $content = json_decode( json_encode( $response['data'] ) );
 
-            unset( $test['data']->users[0]->user->stars );
-            unset( $content->users[0]->user->stars );
-
-            $keys = array( 'profileImage', 'profileCover' );
-
-            $this->adjustAWSUrlInArray( $test['data'], $keys );
-            $this->adjustAWSUrlInArray( $content, $keys );
+            $test['data'] = $testDataPreparator->getPreparedData( $test['data'] );
+            $content = $contentPreparator->getPreparedData( $content );
 
             $this->assertEquals(
                 $test['data'],
@@ -128,6 +132,8 @@ class UserResponseHelperTest extends TestCase
 
         $token = new \MobStar\Storage\Token\EloquentTokenRepository();
 
+        $preparator = new DataPreparator();
+
         foreach( $testData as $test ) {
 
 
@@ -135,59 +141,19 @@ class UserResponseHelperTest extends TestCase
             $session = $token->get_session( $test['token'] );
             $sessionUserId = $session->token_user_id;
 
-            $response = UserResponseHelper::showUser( $userId, $sessionUserId );
+            $response = UserResponseHelper::showUsers( array( $userId ), $sessionUserId );
 
             $this->assertEquals( $test['statusCode'], $response['code'] );
 
             $content = json_decode( json_encode( $response['data'] ) );
 
-            $keys = array( 'profileImage', 'profileCover' );
-
-            $this->adjustAWSUrlInArray( $test['data'], $keys );
-            $this->adjustAWSUrlInArray( $content, $keys );
+            $test['data'] = $preparator->getPreparedData( $test['data'] );
+            $content = $preparator->getPreparedData( $content );
 
             $this->assertEquals(
                 $test['data'],
                 $content
             );
         }
-    }
-
-
-    private function adjustAWSUrlInArray( &$data, $keys )
-    {
-        if ( is_array( $data ) ) {
-            foreach( $keys as $key ) {
-                if( isset( $data[$key] ) ) $data[ $key ] = $this->adjustAWSUrl( $data[ $key ] );
-            }
-            foreach( $data as &$field ) {
-                if( is_array( $field ) OR is_object( $field ) )
-                    $this->adjustAWSUrlInArray( $field, $keys );
-            }
-            unset( $field );
-        }
-        if( is_object( $data ) ) {
-            foreach( $keys as $key ) {
-                if( isset( $data->$key ) ) $data->$key = $this->adjustAWSUrl( $data->$key );
-            }
-            foreach( $data as &$field ) {
-                if( is_array( $field ) OR is_object( $field ) )
-                    $this->adjustAWSUrlInArray( $field, $keys );
-            }
-            unset( $field );
-        }
-    }
-
-
-    private function adjustAWSUrl( $url )
-    {
-        // remove all after 'Expires'. Otherwise comperison will fail  due to different sufixes added by AWS client
-
-        if( empty( $url ) ) return $url;
-
-        $index = strpos( $url, 'Expires' );
-        if( $index === false ) return $url;
-
-        return substr( $url, 0, $index );
     }
 }

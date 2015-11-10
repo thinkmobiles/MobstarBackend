@@ -1,5 +1,8 @@
 <?php
 
+require_once __DIR__.'/DataPreparator.php';
+
+
 class TestCase extends Illuminate\Foundation\Testing\TestCase {
 
 	/**
