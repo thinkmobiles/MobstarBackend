@@ -278,9 +278,62 @@ class SnsHelper
     }
 
 
+    /**
+     *
+     * @param DeviceRegistration $device
+     * @return string|null
+     * @throws Exception|\AWS\Common\Exception\AwsExceptionInterface>
+     */
     private static function getEndpointArnForDevice( $device )
     {
-        if( $device->device_registration_device_type == "apple" )
+        if( ! $device->device_registration_is_valid )
+        {
+            return null;
+        }
+
+        if( ! empty( $device->device_registration_arn ) ) {
+            return $device->device_registration_arn;
+        }
+
+        // try to register device
+        try {
+            $arn = self::registerEndpointArnForDevice(
+                $device->device_registration_device_token,
+                $device->device_registration_device_type
+            );
+
+            $device->device_registration_arn = $arn;
+            $device->device_registration_is_valid = 1;
+            $device->device_registration_send_try_count = 0;
+
+            $device->save();
+
+            return $arn;
+        }
+        catch( \Exception $e )
+        {
+            if( ! $e instanceof \AWS\Common\Exception\AwsExceptionInterface ) throw $e; // don't know how to handle none AWS
+
+            if( $e->getExceptionCode() != 'InvalidParameter' ) throw $e;
+
+            $device->device_registration_is_valid = 0;
+
+            $device->save();
+        }
+
+        return null;
+    }
+
+
+    /**
+     *
+     * @param unknown $deviceToken
+     * @param unknown $deviceType
+     * @throws \Exception in case of error
+     */
+    private static function registerEndpointArnForDevice( $deviceToken, $deviceType )
+    {
+        if( $deviceType == "apple" )
         {
             $appArn = self::$apps['apple'];
         }
@@ -291,12 +344,11 @@ class SnsHelper
 
         $ret = self::$client->createPlatformEndpoint( array(
             'PlatformApplicationArn' => $appArn,
-            'Token' => $device->device_registration_device_token,
+            'Token' => $deviceToken,
         ));
 
         $ret->toArray();
 
         return $ret['EndpointArn'];
-
     }
 }

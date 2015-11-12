@@ -176,3 +176,17 @@ alter table entry_files add column
 -- add new api_key for app version 4
 insert into `api_keys`(`key_value`, `version`)
 values( '4_XwmvVGSyUPhjxr81MK7GSU24xklvdSRj3cfVzC7u', 4 );
+
+
+alter table device_registrations add column
+  `device_registration_send_try_count` int not null default 0
+  comment 'count of unsuccessful tries to send push notification'
+  after device_registration_arn
+;
+
+
+alter table device_registrations add column
+  `device_registration_is_valid` int not null default 1
+  comment 'whether device registration is valid'
+  after device_registration_send_try_count
+;
