@@ -306,7 +306,14 @@ class SnsHelper
             $device->device_registration_is_valid = 1;
             $device->device_registration_send_try_count = 0;
 
-            $device->save();
+            DB::table( 'device_registrations' )
+                ->where( 'device_registration_id', '=', $device->device_registration_id )
+                ->update( array(
+                    'device_registration_arn' => $arn,
+                    'device_registration_is_valid' => 1,
+                    'device_registration_send_try_count' => 0
+                )
+            );
 
             return $arn;
         }
@@ -316,9 +323,12 @@ class SnsHelper
 
             if( $e->getExceptionCode() != 'InvalidParameter' ) throw $e;
 
-            $device->device_registration_is_valid = 0;
-
-            $device->save();
+            DB::table( 'device_registrations' )
+                ->where( 'device_registration_id', '=', $device->device_registration_id )
+                ->update( array(
+                    'device_registration_is_valid' => 0,
+                )
+            );
         }
 
         return null;
