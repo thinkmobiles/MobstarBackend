@@ -166,6 +166,8 @@ class LoginController extends BaseController
 
 				$status_code = 200;
 
+				self::fixUserContinent( User::findOrFail( Auth::user()->user_id ), Input::get('device'), Request::header( 'X-API-KEY') );
+
 			}
 			else
 			{
@@ -390,6 +392,8 @@ class LoginController extends BaseController
 			}
 			$status_code = 200;
 
+			self::fixUserContinent( $user, Input::get('device'), Request::header( 'X-API-KEY') );
+
 		}
 
 		$response = Response::make( $return, $status_code );
@@ -600,6 +604,8 @@ class LoginController extends BaseController
 
 			$status_code = 200;
 
+			self::fixUserContinent( $user, Input::get('device'), Request::header( 'X-API-KEY') );
+
 		}
 
 		$response = Response::make( $return, $status_code );
@@ -805,6 +811,8 @@ class LoginController extends BaseController
 				$return['userPhone'] = $isVerifiedPhone;
 			}
 			$status_code = 200;
+
+			self::fixUserContinent( $user, Input::get('device'), Request::header( 'X-API-KEY') );
 
 		}
 
@@ -1102,5 +1110,24 @@ class LoginController extends BaseController
 		}
 		$response = Response::make( $return, $status_code );
 		return $response;
+	}
+
+
+	private static function fixUserContinent( User $user, $deviceType, $appKey )
+	{
+	    error_log( 'fixing user '.$user->user_id );
+	    // set user continent to Europe for new users loggined from iPhone
+	    // in order to fix app crash when newly created user has no continent
+	    if( (! $user->user_continent )
+	        AND ( substr( $appKey, 0, 2 ) == '4_' ) )
+	    {
+	        if( $deviceType == 'google' )
+	        {
+	            return;
+	        }
+            $user->user_continent = '3';
+            error_log( 'fixing user continent for user id: '.$user->user_id, 3, 'userFixes.log' );
+            $user->save();
+	    }
 	}
 }

@@ -56,6 +56,22 @@ class SettingsController extends BaseController
 		$session = $this->token->get_session( $token );
 
 		$user = User::find( $session->token_user_id );
+
+		// set user continent to Europe for new users loggined from iPhone
+		// in order to fix app crash when newly created user has no continent
+		do{
+		    if( $user->user_continent ) break;
+		    if( $session->token_app_version != 4 ) break;
+		    if( $session->token_device_registration_id )
+		    {
+		        $devReg = DeviceRegistration::find( $session->token_device_registration_id );
+		        if( $devReg
+		            AND ( $devReg->device_registration_device_type == 'google') ) break;
+		    }
+		    $user->user_continent = '3';
+		    $user->save();
+		} while( false );
+
 		$return[ 'user' ][ 'id' ] = $session->token_user_id;
 		$return[ 'user' ][ 'userContinent' ] = $user->user_continent;
 
